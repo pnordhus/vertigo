@@ -1,0 +1,8 @@
+include_directories(${CMAKE_SOURCE_DIR})
+
+set(QT_USE_QTOPENGL true)
+include(${QT_USE_FILE})
+
+add_subdirectory(gfx)
+add_subdirectory(sfx)
+add_subdirectory(util)
