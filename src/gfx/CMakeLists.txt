@@ -1,4 +1,6 @@
 set(SOURCES
+    font.cpp
+    font.h
     image.cpp
     image.h
     texture.cpp
