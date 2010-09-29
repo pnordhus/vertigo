@@ -1,0 +1,54 @@
+/***************************************************************************
+ *  Copyright (C) 2010  Philipp Nordhus                                    *
+ *                                                                         *
+ *  This program is free software: you can redistribute it and/or modify   *
+ *  it under the terms of the GNU General Public License as published by   *
+ *  the Free Software Foundation, either version 3 of the License, or      *
+ *  (at your option) any later version.                                    *
+ *                                                                         *
+ *  This program is distributed in the hope that it will be useful,        *
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of         *
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the          *
+ *  GNU General Public License for more details.                           *
+ *                                                                         *
+ *  You should have received a copy of the GNU General Public License      *
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
+ ***************************************************************************/
+
+#include "renderer.h"
+#include <GL/gl.h>
+
+
+namespace game {
+
+
+void Renderer::setRect(const QRect &rect)
+{
+    m_rect = rect;
+}
+
+
+void Renderer::setupOrthographicMatrix(float w, float h)
+{
+    const float ratioW = width() / w;
+    const float ratioH = height() / h;
+
+    float left = 0.0f;
+    float top = 0.0f;
+    float scale;
+    if (ratioW < ratioH) {
+        scale = ratioW;
+        top = ((height() / scale) - h) / 2;
+    } else {
+        scale = ratioH;
+        left = ((width() / scale) - w) / 2;
+    }
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(-left, w + left, h + top, -top, -1, 1);
+    glMatrixMode(GL_MODELVIEW);
+}
+
+
+} // namespace game
