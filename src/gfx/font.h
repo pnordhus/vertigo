@@ -20,16 +20,16 @@
 
 
 #include "texture.h"
+#include <QExplicitlySharedDataPointer>
 
 
 namespace gfx {
 
 
-class Font
+class FontPrivate : public QSharedData
 {
 public:
-    Font();
-    Font(const QString &filename, const QVector<QRgb> &colorTable);
+    FontPrivate();
 
 public:
     void load(const QString &filename, const QVector<QRgb> &colorTable);
@@ -48,6 +48,61 @@ private:
     QVector<Symbol> m_symbols;
     int m_height;
 };
+
+
+class Font
+{
+public:
+    Font();
+    Font(const QString &filename, const QVector<QRgb> &colorTable);
+
+public:
+    void load(const QString &filename, const QVector<QRgb> &colorTable);
+    void draw(const QString &text, float x, float y);
+    void draw(const QString &text, const QPointF &pos);
+    int height() const;
+
+private:
+    QExplicitlySharedDataPointer<FontPrivate> d;
+};
+
+
+inline Font::Font() :
+    d(new FontPrivate)
+{
+
+}
+
+
+inline Font::Font(const QString &filename, const QVector<QRgb> &colorTable) :
+    d(new FontPrivate)
+{
+    load(filename, colorTable);
+}
+
+
+inline void Font::load(const QString &filename, const QVector<QRgb> &colorTable)
+{
+    d->load(filename, colorTable);
+}
+
+
+inline void Font::draw(const QString &text, float x, float y)
+{
+    d->draw(text, x, y);
+}
+
+
+inline void Font::draw(const QString &text, const QPointF &pos)
+{
+    d->draw(text, pos.x(), pos.y());
+}
+
+
+inline int Font::height() const
+{
+    return d->height();
+}
 
 
 } // namespace gfx

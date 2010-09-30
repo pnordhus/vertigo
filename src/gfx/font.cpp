@@ -25,21 +25,15 @@
 namespace gfx {
 
 
-Font::Font() :
+
+FontPrivate::FontPrivate() :
     m_height(0)
 {
 
 }
 
 
-Font::Font(const QString &filename, const QVector<QRgb> &colorTable) :
-    m_height(0)
-{
-    load(filename, colorTable);
-}
-
-
-void Font::load(const QString &filename, const QVector<QRgb> &colorTable)
+void FontPrivate::load(const QString &filename, const QVector<QRgb> &colorTable)
 {
     QFile file(filename);
     if (!file.open(QFile::ReadOnly))
@@ -85,7 +79,7 @@ void Font::load(const QString &filename, const QVector<QRgb> &colorTable)
 }
 
 
-void Font::draw(const QString &text, float x, float y)
+void FontPrivate::draw(const QString &text, float x, float y)
 {
     m_texture.bind();
 
