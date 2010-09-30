@@ -37,6 +37,7 @@ public:
 
 public:
     Texture();
+    Texture(const QImage &image);
 
 public:
     int width() const;
@@ -46,6 +47,8 @@ public:
     void createEmpty(int w, int h, Texture::Format format);
     void update(int x, int y, QImage image);
     void draw();
+    void draw(float x, float y);
+    void draw(const QPointF &pos);
     void draw(const QRectF &rect);
 
 private:
@@ -90,6 +93,13 @@ inline Texture::Texture() :
 }
 
 
+inline Texture::Texture(const QImage &image) :
+    d(new TexturePrivate)
+{
+    d->fromImage(image);
+}
+
+
 inline int Texture::width() const
 {
     return d->width();
@@ -128,7 +138,19 @@ inline void Texture::update(int x, int y, QImage image)
 
 inline void Texture::draw()
 {
-    d->draw(QRectF(0, 0, width(), height()), QRectF(0, 0, width(), height()));
+    draw(QRectF(0, 0, width(), height()));
+}
+
+
+inline void Texture::draw(float x, float y)
+{
+    draw(QRectF(x, y, width(), height()));
+}
+
+
+inline void Texture::draw(const QPointF &pos)
+{
+    draw(pos.x(), pos.y());
 }
 
 
