@@ -15,50 +15,43 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GAME_MAINMENU_H
-#define GAME_MAINMENU_H
+#ifndef GAME_MOVIE_H
+#define GAME_MOVIE_H
 
 
 #include "renderer.h"
 #include "gfx/texture.h"
-#include "ui/label.h"
+#include "gfx/video.h"
 
 
 namespace game {
 
 
-class MainMenu : public Renderer
+class Movie : public Renderer
 {
     Q_OBJECT
 
-private:
-    enum State { Invalid, Presents, Title };
-
 public:
-    MainMenu();
-
-public:
-    void draw();
+    Movie();
 
 signals:
-    void startGame();
+    void finished();
+
+public:
+    void play(const QString &filename);
 
 private:
-    void changeState(State state);
-    void keyPressEvent(QKeyEvent *event);
+    void draw();
+    void keyPressEvent(QKeyEvent *);
     void mousePressEvent(QMouseEvent *);
-    void mouseReleaseEvent(QMouseEvent *);
-    void mouseMoveEvent(QMouseEvent *);
 
 private:
-    State m_state;
-    ui::Label m_presents;
-    ui::Label m_title;
-    ui::Widget* m_rootWidget;
+    gfx::Video m_video;
+    gfx::Texture m_texture;
 };
 
 
 } // namespace game
 
 
-#endif // GAME_MAINMENU_H
+#endif // GAME_MOVIE_H

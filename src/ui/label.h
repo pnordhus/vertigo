@@ -41,6 +41,9 @@ public:
     void setText(const QString &text);
     void setTexture(const gfx::Texture &texture);
 
+public:
+    gfx::Texture texture() const { return m_texture; }
+
 protected:
     void draw();
 

@@ -26,6 +26,7 @@ namespace game {
 
 
 class MainMenu;
+class Movie;
 class Window;
 
 
@@ -42,10 +43,13 @@ public:
 
 private slots:
     void update();
+    void startGame();
+    void movieFinished();
 
 private:
     Window *m_window;
     MainMenu *m_mainMenu;
+    Movie *m_movie;
 };
 
 

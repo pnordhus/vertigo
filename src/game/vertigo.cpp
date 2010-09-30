@@ -16,6 +16,7 @@
  ***************************************************************************/
 
 #include "mainmenu.h"
+#include "movie.h"
 #include "vertigo.h"
 #include "window.h"
 #include <QDir>
@@ -37,7 +38,12 @@ Vertigo::Vertigo()
     QDir::addSearchPath("vfx", "data:vfx");
 
     m_window = new Window;
+
     m_mainMenu = new MainMenu;
+    connect(m_mainMenu, SIGNAL(startGame()), SLOT(startGame()));
+
+    m_movie = new Movie;
+    connect(m_movie, SIGNAL(finished()), SLOT(movieFinished()));
 
     m_window->setRenderer(m_mainMenu);
 
@@ -49,6 +55,7 @@ Vertigo::Vertigo()
 
 Vertigo::~Vertigo()
 {
+    delete m_movie;
     delete m_mainMenu;
     delete m_window;
 }
@@ -63,6 +70,19 @@ void Vertigo::start()
 void Vertigo::update()
 {
     m_window->update();
+}
+
+
+void Vertigo::startGame()
+{
+    m_window->setRenderer(m_movie);
+    m_movie->play("gfx:mvi/film/d02.mvi");
+}
+
+
+void Vertigo::movieFinished()
+{
+    m_window->setRenderer(m_mainMenu);
 }
 
 

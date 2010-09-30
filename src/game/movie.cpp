@@ -15,50 +15,52 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GAME_MAINMENU_H
-#define GAME_MAINMENU_H
-
-
-#include "renderer.h"
-#include "gfx/texture.h"
-#include "ui/label.h"
+#include "movie.h"
+#include <QApplication>
+#include <QKeyEvent>
 
 
 namespace game {
 
 
-class MainMenu : public Renderer
+Movie::Movie()
 {
-    Q_OBJECT
 
-private:
-    enum State { Invalid, Presents, Title };
+}
 
-public:
-    MainMenu();
 
-public:
-    void draw();
+void Movie::play(const QString &filename)
+{
+    m_texture.createEmpty(640, 240, gfx::Texture::RGBA);
+    m_video.open(filename);
+}
 
-signals:
-    void startGame();
 
-private:
-    void changeState(State state);
-    void keyPressEvent(QKeyEvent *event);
-    void mousePressEvent(QMouseEvent *);
-    void mouseReleaseEvent(QMouseEvent *);
-    void mouseMoveEvent(QMouseEvent *);
+void Movie::draw()
+{
+    if (m_video.atEnd())
+        emit finished();
 
-private:
-    State m_state;
-    ui::Label m_presents;
-    ui::Label m_title;
-    ui::Widget* m_rootWidget;
-};
+    QImage image = m_video.getFrame();
+    if (!image.isNull())
+        m_texture.update(0, 0, image);
+
+    setupOrthographicMatrix(640, 240);
+    m_texture.draw();
+}
+
+
+void Movie::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Escape)
+        emit finished();
+}
+
+
+void Movie::mousePressEvent(QMouseEvent *event)
+{
+
+}
 
 
 } // namespace game
-
-
-#endif // GAME_MAINMENU_H

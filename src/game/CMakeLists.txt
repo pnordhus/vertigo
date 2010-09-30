@@ -2,6 +2,8 @@ set(SOURCES
     main.cpp
     mainmenu.cpp
     mainmenu.h
+    movie.cpp
+    movie.h
     renderer.cpp
     renderer.h
     vertigo.cpp
@@ -12,6 +14,7 @@ set(SOURCES
 
 set(MOC_SOURCES
     mainmenu.h
+    movie.h
     vertigo.h
 )
 

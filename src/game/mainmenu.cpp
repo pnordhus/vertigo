@@ -70,7 +70,7 @@ MainMenu::MainMenu() :
     button->setPosition(0, 280);
     button->setSize(640, -1);
     button->setText("Neues Spiel");
-    connect(button, SIGNAL(clicked()), SLOT(startGame()));
+    connect(button, SIGNAL(clicked()), SIGNAL(startGame()));
     m_title.addChild(button);
 
     button = new ui::Button;
@@ -157,12 +157,6 @@ void MainMenu::mouseReleaseEvent(QMouseEvent *event)
 void MainMenu::mouseMoveEvent(QMouseEvent *event)
 {
     m_rootWidget->doMouseMoveEvent(screenToImage(event->posF()));
-}
-
-
-void MainMenu::startGame()
-{
-    qDebug("Start Game");
 }
 
 

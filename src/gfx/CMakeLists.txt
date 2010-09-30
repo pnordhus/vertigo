@@ -5,6 +5,8 @@ set(SOURCES
     image.h
     texture.cpp
     texture.h
+    video.cpp
+    video.h
 )
 
 add_library(gfx ${SOURCES})
