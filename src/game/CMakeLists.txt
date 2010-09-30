@@ -11,6 +11,7 @@ set(SOURCES
 )
 
 set(MOC_SOURCES
+    mainmenu.h
     vertigo.h
 )
 

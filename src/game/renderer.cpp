@@ -47,7 +47,20 @@ void Renderer::setupOrthographicMatrix(float w, float h)
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(-left, w + left, h + top, -top, -1, 1);
+
+    glGetDoublev(GL_PROJECTION_MATRIX, m_projection.data());
+    m_projection.optimize();
+
     glMatrixMode(GL_MODELVIEW);
+}
+
+
+QPointF Renderer::screenToImage(const QPointF &pos)
+{
+    QPointF p;
+    p.setX(pos.x() / width() * 2.0f - 1.0f);
+    p.setY(1.0f - pos.y() / height() * 2.0f);
+    return projection().inverted() * p;
 }
 
 

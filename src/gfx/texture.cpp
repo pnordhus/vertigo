@@ -142,7 +142,7 @@ void TexturePrivate::bind()
 }
 
 
-void TexturePrivate::draw(const QRectF &destRect, const QRectF &srcRect)
+QRectF TexturePrivate::draw(const QRectF &destRect, const QRectF &srcRect)
 {
     QRectF srcRectTex;
     srcRectTex.setLeft(srcRect.left() / m_textureWidth);
@@ -165,6 +165,8 @@ void TexturePrivate::draw(const QRectF &destRect, const QRectF &srcRect)
         glTexCoord2f(srcRectTex.right(), srcRectTex.top());
         glVertex2f(destRect.right(), destRect.top());
     glEnd();
+
+    return destRect;
 }
 
 

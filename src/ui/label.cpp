@@ -66,7 +66,7 @@ void Label::setTexture(const gfx::Texture &texture)
 void Label::draw()
 {
     if (m_text.isEmpty())
-        m_texture.draw(m_position);
+        m_rect = m_texture.draw(m_position);
     else
         m_rect = m_font.draw(m_text, m_position, m_size);
 }

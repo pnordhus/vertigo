@@ -41,14 +41,13 @@ public:
     void setText(const QString &text);
     void setTexture(const gfx::Texture &texture);
 
-private:
+protected:
     void draw();
 
-private:
+protected:
     gfx::Font m_font;
     QPointF m_position;
     QSizeF m_size;
-    QRectF m_rect;
     QString m_text;
     gfx::Texture m_texture;
 };

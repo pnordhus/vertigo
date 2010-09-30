@@ -17,6 +17,7 @@
 
 #include "mainmenu.h"
 #include "gfx/image.h"
+#include "ui/button.h"
 #include "util/colortable.h"
 #include <QApplication>
 #include <QKeyEvent>
@@ -63,26 +64,29 @@ MainMenu::MainMenu() :
     label->setPosition(140, 448);
     m_title.addChild(label);
 
-    label = new ui::Label;
-    label->setFont(fontLarge);
-    label->setPosition(0, 280);
-    label->setSize(640, -1);
-    label->setText("Neues Spiel");
-    m_title.addChild(label);
+    ui::Button *button;
+    button = new ui::Button;
+    button->setFont(fontLarge);
+    button->setPosition(0, 280);
+    button->setSize(640, -1);
+    button->setText("Neues Spiel");
+    connect(button, SIGNAL(clicked()), SLOT(startGame()));
+    m_title.addChild(button);
 
-    label = new ui::Label;
-    label->setFont(fontLarge);
-    label->setPosition(0, 300);
-    label->setSize(640, -1);
-    label->setText("Spielstand laden");
-    m_title.addChild(label);
+    button = new ui::Button;
+    button->setFont(fontLarge);
+    button->setPosition(0, 300);
+    button->setSize(640, -1);
+    button->setText("Spielstand laden");
+    m_title.addChild(button);
 
-    label = new ui::Label;
-    label->setFont(fontLarge);
-    label->setPosition(0, 410);
-    label->setSize(640, -1);
-    label->setText("Spiel beenden");
-    m_title.addChild(label);
+    button = new ui::Button;
+    button->setFont(fontLarge);
+    button->setPosition(0, 410);
+    button->setSize(640, -1);
+    button->setText("Spiel beenden");
+    connect(button, SIGNAL(clicked()), qApp, SLOT(quit()));
+    m_title.addChild(button);
 
     changeState(Presents);
 }
@@ -91,7 +95,7 @@ MainMenu::MainMenu() :
 void MainMenu::draw()
 {
     setupOrthographicMatrix(640, 480);
-    m_rootWidget->drawAll();
+    m_rootWidget->doDraw();
 }
 
 
@@ -99,13 +103,11 @@ void MainMenu::changeState(State state)
 {
     switch (state) {
     case Presents:
-        qApp->setOverrideCursor(Qt::BlankCursor);
         m_rootWidget = &m_presents;
         m_state = state;
         break;
 
     case Title:
-        qApp->restoreOverrideCursor();
         m_rootWidget = &m_title;
         m_state = state;
         break;
@@ -134,6 +136,7 @@ void MainMenu::keyPressEvent(QKeyEvent *event)
 
 void MainMenu::mousePressEvent(QMouseEvent *event)
 {
+    m_rootWidget->doMousePressEvent(screenToImage(event->posF()), event->button());
     switch (m_state) {
     case Presents:
         changeState(Title);
@@ -142,6 +145,24 @@ void MainMenu::mousePressEvent(QMouseEvent *event)
     default:
         ; // nothing to do
     }
+}
+
+
+void MainMenu::mouseReleaseEvent(QMouseEvent *event)
+{
+    m_rootWidget->doMouseReleaseEvent(screenToImage(event->posF()), event->button());
+}
+
+
+void MainMenu::mouseMoveEvent(QMouseEvent *event)
+{
+    m_rootWidget->doMouseMoveEvent(screenToImage(event->posF()));
+}
+
+
+void MainMenu::startGame()
+{
+    qDebug("Start Game");
 }
 
 

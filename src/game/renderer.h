@@ -19,6 +19,7 @@
 #define GAME_RENDERER_H
 
 
+#include <QMatrix4x4>
 #include <QRect>
 
 
@@ -29,7 +30,7 @@ class QMouseEvent;
 namespace game {
 
 
-class Renderer
+class Renderer : public QObject
 {
 public:
     virtual void draw() = 0;
@@ -39,6 +40,8 @@ public:
     QRect rect() const { return m_rect; }
     int width() const { return m_rect.width(); }
     int height() const { return m_rect.height(); }
+    QMatrix4x4 projection() const { return m_projection; }
+    QPointF screenToImage(const QPointF &pos);
 
 public:
     virtual void keyPressEvent(QKeyEvent *) = 0;
@@ -52,6 +55,7 @@ protected:
 
 private:
     QRect m_rect;
+    QMatrix4x4 m_projection;
 };
 
 

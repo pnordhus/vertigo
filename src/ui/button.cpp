@@ -15,87 +15,43 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "widget.h"
-#include <QDebug>
+#include "button.h"
 
 
 namespace ui {
 
 
-Widget::Widget() :
-    m_visible(true)
+Button::Button() :
+    m_pressed(false)
 {
 
 }
 
 
-Widget::~Widget()
+void Button::draw()
 {
-    qDeleteAll(m_children);
+    QPointF offset;
+    if (m_pressed)
+        offset += QPointF(1, 1);
+
+    if (m_text.isEmpty())
+        m_rect = m_texture.draw(m_position + offset);
+    else
+        m_rect = m_font.draw(m_text, m_position + offset, m_size);
 }
 
 
-void Widget::setVisible(bool visible)
+void Button::mousePressEvent(const QPointF &pos, Qt::MouseButton button)
 {
-    m_visible = visible;
+    m_pressed = true;
 }
 
 
-void Widget::hide()
+void Button::mouseReleaseEvent(const QPointF &pos, Qt::MouseButton button)
 {
-    m_visible = false;
-}
-
-
-void Widget::show()
-{
-    m_visible = true;
-}
-
-
-void Widget::addChild(Widget *widget)
-{
-    m_children.append(widget);
-}
-
-
-void Widget::doDraw()
-{
-    if (m_visible) {
-        draw();
-        foreach (Widget *widget, m_children)
-            widget->doDraw();
-    }
-}
-
-
-void Widget::doMousePressEvent(const QPointF &pos, Qt::MouseButton button)
-{
-    if (m_visible && m_rect.contains(pos)) {
-        mousePressEvent(pos, button);
-        foreach (Widget *widget, m_children)
-            widget->doMousePressEvent(pos, button);
-    }
-}
-
-
-void Widget::doMouseReleaseEvent(const QPointF &pos, Qt::MouseButton button)
-{
-    if (m_visible) {
-        mouseReleaseEvent(pos, button);
-        foreach (Widget *widget, m_children)
-            widget->doMouseReleaseEvent(pos, button);
-    }
-}
-
-
-void Widget::doMouseMoveEvent(const QPointF &pos)
-{
-    if (m_visible) {
-        mouseMoveEvent(pos);
-        foreach (Widget *widget, m_children)
-            widget->doMouseMoveEvent(pos);
-    }
+    if (m_pressed && m_rect.contains(pos))
+        emit clicked();
+    m_pressed = false;
 }
 
 

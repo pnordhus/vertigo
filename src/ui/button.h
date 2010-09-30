@@ -15,50 +15,37 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GAME_MAINMENU_H
-#define GAME_MAINMENU_H
+#ifndef UI_BUTTON_H
+#define UI_BUTTON_H
 
 
-#include "renderer.h"
-#include "gfx/texture.h"
-#include "ui/label.h"
+#include "label.h"
 
 
-namespace game {
+namespace ui {
 
 
-class MainMenu : public Renderer
+class Button : public Label
 {
     Q_OBJECT
 
-private:
-    enum State { Invalid, Presents, Title };
-
 public:
-    MainMenu();
+    Button();
 
-public:
+signals:
+    void clicked();
+
+protected:
     void draw();
+    void mousePressEvent(const QPointF &pos, Qt::MouseButton button);
+    void mouseReleaseEvent(const QPointF &pos, Qt::MouseButton button);
 
 private:
-    void changeState(State state);
-    void keyPressEvent(QKeyEvent *event);
-    void mousePressEvent(QMouseEvent *);
-    void mouseReleaseEvent(QMouseEvent *);
-    void mouseMoveEvent(QMouseEvent *);
-
-private slots:
-    void startGame();
-
-private:
-    State m_state;
-    ui::Label m_presents;
-    ui::Label m_title;
-    ui::Widget* m_rootWidget;
+    bool m_pressed;
 };
 
 
-} // namespace game
+} // namespace ui
 
 
-#endif // GAME_MAINMENU_H
+#endif // UI_BUTTON_H

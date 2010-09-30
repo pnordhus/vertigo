@@ -20,12 +20,14 @@
 
 
 #include <QList>
+#include <QObject>
+#include <QRectF>
 
 
 namespace ui {
 
 
-class Widget
+class Widget : public QObject
 {
 public:
     Widget();
@@ -37,14 +39,24 @@ public:
     void show();
     bool isVisible() const { return m_visible; }
     void addChild(Widget*);
-    void drawAll();
+
+    void doDraw();
+    void doMousePressEvent(const QPointF &pos, Qt::MouseButton button);
+    void doMouseReleaseEvent(const QPointF &pos, Qt::MouseButton button);
+    void doMouseMoveEvent(const QPointF &pos);
 
 private:
     virtual void draw() = 0;
+    virtual void mousePressEvent(const QPointF &pos, Qt::MouseButton button) {}
+    virtual void mouseReleaseEvent(const QPointF &pos, Qt::MouseButton button) {}
+    virtual void mouseMoveEvent(const QPointF &pos) {}
 
 private:
     bool m_visible;
     QList<Widget*> m_children;
+
+protected:
+    QRectF m_rect;
 };
 
 

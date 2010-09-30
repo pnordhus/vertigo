@@ -46,10 +46,10 @@ public:
     void fromImage(const QImage &image);
     void createEmpty(int w, int h, Texture::Format format);
     void update(int x, int y, QImage image);
-    void draw();
-    void draw(float x, float y);
-    void draw(const QPointF &pos);
-    void draw(const QRectF &rect);
+    QRectF draw();
+    QRectF draw(float x, float y);
+    QRectF draw(const QPointF &pos);
+    QRectF draw(const QRectF &rect);
 
 private:
     QExplicitlySharedDataPointer<TexturePrivate> d;
@@ -71,7 +71,7 @@ public:
     void fromImage(const QImage &image);
     void createEmpty(int w, int h, Texture::Format format);
     void update(int x, int y, QImage image);
-    void draw(const QRectF &rect, const QRectF &srcRect);
+    QRectF draw(const QRectF &rect, const QRectF &srcRect);
 
 private:
     void clear();
@@ -136,27 +136,27 @@ inline void Texture::update(int x, int y, QImage image)
 }
 
 
-inline void Texture::draw()
+inline QRectF Texture::draw()
 {
-    draw(QRectF(0, 0, width(), height()));
+    return draw(QRectF(0, 0, width(), height()));
 }
 
 
-inline void Texture::draw(float x, float y)
+inline QRectF Texture::draw(float x, float y)
 {
-    draw(QRectF(x, y, width(), height()));
+    return draw(QRectF(x, y, width(), height()));
 }
 
 
-inline void Texture::draw(const QPointF &pos)
+inline QRectF Texture::draw(const QPointF &pos)
 {
-    draw(pos.x(), pos.y());
+    return draw(pos.x(), pos.y());
 }
 
 
-inline void Texture::draw(const QRectF &destRect)
+inline QRectF Texture::draw(const QRectF &destRect)
 {
-    d->draw(destRect, QRectF(0, 0, width(), height()));
+    return d->draw(destRect, QRectF(0, 0, width(), height()));
 }
 
 
