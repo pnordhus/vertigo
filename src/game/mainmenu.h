@@ -21,6 +21,7 @@
 
 #include "renderer.h"
 #include "gfx/texture.h"
+#include "ui/label.h"
 
 
 namespace game {
@@ -44,8 +45,9 @@ private:
 
 private:
     State m_state;
-    gfx::Texture m_presents;
-    gfx::Texture m_title;
+    ui::Label m_presents;
+    ui::Label m_title;
+    ui::Widget* m_rootWidget;
 };
 
 

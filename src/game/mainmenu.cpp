@@ -17,6 +17,7 @@
 
 #include "mainmenu.h"
 #include "gfx/image.h"
+#include "util/colortable.h"
 #include <QApplication>
 #include <QKeyEvent>
 #include <GL/gl.h>
@@ -28,8 +29,39 @@ namespace game {
 MainMenu::MainMenu() :
     m_state(Invalid)
 {
-    m_presents.fromImage(gfx::Image::loadPCX("gfx:pic/title/present.pcx"));
-    m_title.fromImage(gfx::Image::loadPCX("gfx:pic/title/title.pcx"));
+    util::ColorTable colorTable("gfx:pal/gui/border.pal");
+
+    gfx::Texture texBar(gfx::Image::load("gfx:img/title/horline.img", colorTable));
+    gfx::Font fontSmall("gfx:fnt/dpsmall.fnt", colorTable);
+    gfx::Font fontMedium("gfx:fnt/dpmedium.fnt", colorTable);
+    gfx::Font fontLarge("gfx:fnt/dplarge.fnt", colorTable);
+
+    m_presents.setTexture(gfx::Image::loadPCX("gfx:pic/title/present.pcx"));
+    m_title.setTexture(gfx::Image::loadPCX("gfx:pic/title/title.pcx"));
+
+    ui::Label *label;
+
+    label = new ui::Label;
+    label->setFont(fontSmall);
+    label->setPosition(2, 2);
+    label->setText("Vertigo 0.1");
+    m_title.addChild(label);
+
+    label = new ui::Label;
+    label->setFont(fontMedium);
+    label->setPosition(145, 256 - fontMedium.height() - 2);
+    label->setText("Hauptmenu");
+    m_title.addChild(label);
+
+    label = new ui::Label;
+    label->setTexture(texBar);
+    label->setPosition(140, 256);
+    m_title.addChild(label);
+
+    label = new ui::Label;
+    label->setTexture(texBar);
+    label->setPosition(140, 448);
+    m_title.addChild(label);
 
     changeState(Presents);
 }
@@ -38,19 +70,7 @@ MainMenu::MainMenu() :
 void MainMenu::draw()
 {
     setupOrthographicMatrix(640, 480);
-
-    switch (m_state) {
-    case Invalid:
-        break;
-
-    case Presents:
-        m_presents.draw();
-        break;
-
-    case Title:
-        m_title.draw();
-        break;
-    }
+    m_rootWidget->drawAll();
 }
 
 
@@ -59,11 +79,13 @@ void MainMenu::changeState(State state)
     switch (state) {
     case Presents:
         qApp->setOverrideCursor(Qt::BlankCursor);
+        m_rootWidget = &m_presents;
         m_state = state;
         break;
 
     case Title:
         qApp->restoreOverrideCursor();
+        m_rootWidget = &m_title;
         m_state = state;
         break;
 
@@ -77,6 +99,15 @@ void MainMenu::keyPressEvent(QKeyEvent *event)
 {
     if (event->key() == Qt::Key_Escape)
         qApp->quit();
+
+    switch (m_state) {
+    case Presents:
+        changeState(Title);
+        break;
+
+    default:
+        ; // nothing to do
+    }
 }
 
 
