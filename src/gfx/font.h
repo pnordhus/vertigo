@@ -33,7 +33,7 @@ public:
 
 public:
     void load(const QString &filename, const QVector<QRgb> &colorTable);
-    void draw(const QString &text, float x, float y);
+    QRectF draw(const QString &text, float x, float y, float w, float h);
     int height() const { return m_height; }
 
 private:
@@ -58,8 +58,9 @@ public:
 
 public:
     void load(const QString &filename, const QVector<QRgb> &colorTable);
-    void draw(const QString &text, float x, float y);
-    void draw(const QString &text, const QPointF &pos);
+    QRectF draw(const QString &text, float x, float y);
+    QRectF draw(const QString &text, const QPointF &pos);
+    QRectF draw(const QString &text, const QPointF &pos, const QSizeF &size);
     int height() const;
 
 private:
@@ -87,15 +88,21 @@ inline void Font::load(const QString &filename, const QVector<QRgb> &colorTable)
 }
 
 
-inline void Font::draw(const QString &text, float x, float y)
+inline QRectF Font::draw(const QString &text, float x, float y)
 {
-    d->draw(text, x, y);
+    return d->draw(text, x, y, -1.0f, -1.0f);
 }
 
 
-inline void Font::draw(const QString &text, const QPointF &pos)
+inline QRectF Font::draw(const QString &text, const QPointF &pos)
 {
-    d->draw(text, pos.x(), pos.y());
+    return draw(text, pos.x(), pos.y());
+}
+
+
+inline QRectF Font::draw(const QString &text, const QPointF &pos, const QSizeF &size)
+{
+    return d->draw(text, pos.x(), pos.y(), size.width(), size.height());
 }
 
 

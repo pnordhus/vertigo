@@ -63,6 +63,27 @@ MainMenu::MainMenu() :
     label->setPosition(140, 448);
     m_title.addChild(label);
 
+    label = new ui::Label;
+    label->setFont(fontLarge);
+    label->setPosition(0, 280);
+    label->setSize(640, -1);
+    label->setText("Neues Spiel");
+    m_title.addChild(label);
+
+    label = new ui::Label;
+    label->setFont(fontLarge);
+    label->setPosition(0, 300);
+    label->setSize(640, -1);
+    label->setText("Spielstand laden");
+    m_title.addChild(label);
+
+    label = new ui::Label;
+    label->setFont(fontLarge);
+    label->setPosition(0, 410);
+    label->setSize(640, -1);
+    label->setText("Spiel beenden");
+    m_title.addChild(label);
+
     changeState(Presents);
 }
 

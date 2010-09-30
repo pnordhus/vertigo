@@ -79,13 +79,27 @@ void FontPrivate::load(const QString &filename, const QVector<QRgb> &colorTable)
 }
 
 
-void FontPrivate::draw(const QString &text, float x, float y)
+QRectF FontPrivate::draw(const QString &text, float x, float y, float w, float h)
 {
     m_texture.bind();
 
     glPushMatrix();
+
+    if (w > 0) {
+        float totalW = 0.0f;
+        for (int i = 0; i < text.size(); i++) {
+            const quint8 c = text[i].toLatin1() - 32;
+            const Symbol &symbol = m_symbols[c];
+            totalW += symbol.width;
+        }
+
+        if (w > totalW)
+            x += (w - totalW) / 2;
+    }
+
     glTranslatef(x, y, 0);
 
+    float width = 0.0f;
     for (int i = 0; i < text.size(); i++) {
         const quint8 c = text[i].toLatin1() - 32;
 
@@ -104,9 +118,17 @@ void FontPrivate::draw(const QString &text, float x, float y)
         glEnd();
 
         glTranslatef(symbol.width, 0, 0);
+        width += symbol.width;
     }
 
     glPopMatrix();
+
+    QRectF rect;
+    rect.setLeft(x);
+    rect.setTop(y);
+    rect.setHeight(m_height);
+    rect.setWidth(width);
+    return rect;
 }
 
 

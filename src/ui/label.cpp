@@ -45,6 +45,12 @@ void Label::setPosition(float x, float y)
 }
 
 
+void Label::setSize(float w, float h)
+{
+    m_size = QSizeF(w, h);
+}
+
+
 void Label::setText(const QString &text)
 {
     m_text = text;
@@ -62,7 +68,7 @@ void Label::draw()
     if (m_text.isEmpty())
         m_texture.draw(m_position);
     else
-        m_font.draw(m_text, m_position);
+        m_rect = m_font.draw(m_text, m_position, m_size);
 }
 
 

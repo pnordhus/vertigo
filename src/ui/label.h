@@ -37,6 +37,7 @@ public:
 public:
     void setFont(const gfx::Font &font);
     void setPosition(float x, float y);
+    void setSize(float w, float h);
     void setText(const QString &text);
     void setTexture(const gfx::Texture &texture);
 
@@ -46,6 +47,8 @@ private:
 private:
     gfx::Font m_font;
     QPointF m_position;
+    QSizeF m_size;
+    QRectF m_rect;
     QString m_text;
     gfx::Texture m_texture;
 };
