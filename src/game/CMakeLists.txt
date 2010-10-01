@@ -16,9 +16,10 @@ set(MOC_SOURCES
     mainmenu.h
     movie.h
     vertigo.h
+    window.h
 )
 
 qt4_wrap_cpp(MOC_SOURCES ${MOC_SOURCES})
 
 add_executable(vertigo ${SOURCES} ${MOC_SOURCES})
-target_link_libraries(vertigo ui ${QT_LIBRARIES} ${OPENGL_LIBRARY})
+target_link_libraries(vertigo txt ui ${QT_LIBRARIES} ${OPENGL_LIBRARY})

@@ -44,6 +44,8 @@ void Renderer::setupOrthographicMatrix(float w, float h)
         left = ((width() / scale) - w) / 2;
     }
 
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(-left, w + left, h + top, -top, -1, 1);

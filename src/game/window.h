@@ -30,11 +30,16 @@ class Renderer;
 
 class Window : public QGLWidget
 {
+    Q_OBJECT
+
 public:
     Window();
 
 public:
     void setRenderer(Renderer *renderer);
+
+private slots:
+    void toggleFullScreen();
 
 private:
     void initializeGL();

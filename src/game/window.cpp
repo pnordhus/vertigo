@@ -19,6 +19,7 @@
 #include "window.h"
 #include "gfx/image.h"
 #include "util/colortable.h"
+#include <QAction>
 
 
 namespace game {
@@ -27,6 +28,11 @@ namespace game {
 Window::Window() :
     m_renderer(NULL)
 {
+    QAction *actionFullScreen = new QAction(this);
+    actionFullScreen->setShortcut(QKeySequence("CTRL+F"));
+    connect(actionFullScreen, SIGNAL(triggered()), SLOT(toggleFullScreen()));
+    addAction(actionFullScreen);
+
     util::ColorTable colorTable("gfx:pal/gui/cursor.pal");
     setCursor(gfx::Image::loadCursor("gfx:img/desktop/gui/cur_norm.img", colorTable));
     setWindowTitle("Vertigo");
@@ -37,6 +43,12 @@ Window::Window() :
 void Window::setRenderer(Renderer *renderer)
 {
     m_renderer = renderer;
+}
+
+
+void Window::toggleFullScreen()
+{
+    setWindowState(windowState() ^ Qt::WindowFullScreen);
 }
 
 
@@ -55,8 +67,6 @@ void Window::resizeGL(int w, int h)
 
 void Window::paintGL()
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     if (m_renderer) {
         m_renderer->setRect(rect());
         m_renderer->draw();
