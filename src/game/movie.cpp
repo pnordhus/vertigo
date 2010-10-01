@@ -31,21 +31,31 @@ Movie::Movie()
 
 void Movie::play(const QString &filename)
 {
-    m_texture.createEmpty(640, 240, gfx::Texture::RGBA);
     m_video.open(filename);
+
+    m_texture.createEmpty(m_video.width(), m_video.height() + 4, gfx::Texture::RGBA);
+
+    QImage line(m_texture.width(), 1, QImage::Format_Indexed8);
+    line.setColorTable(QVector<QRgb>() << qRgb(44, 44, 51));
+    line.fill(0);
+
+    m_texture.update(0, 0, line);
+    m_texture.update(0, m_texture.height() - 1, line);
 }
 
 
 void Movie::draw()
 {
-    if (m_video.atEnd())
+    if (m_video.atEnd()) {
         emit finished();
+        return;
+    }
 
     QImage image = m_video.getFrame();
     if (!image.isNull())
-        m_texture.update(0, 0, image);
+        m_texture.update(0, 2, image);
 
-    setupOrthographicMatrix(640, 240);
+    setupOrthographicMatrix(m_texture.width(), m_texture.height());
     m_texture.draw();
 }
 
