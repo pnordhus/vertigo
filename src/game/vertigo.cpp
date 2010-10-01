@@ -19,6 +19,7 @@
 #include "movie.h"
 #include "vertigo.h"
 #include "window.h"
+#include "txt/stringtable.h"
 #include <QDir>
 #include <QSettings>
 #include <QTimer>
@@ -36,6 +37,8 @@ Vertigo::Vertigo()
     QDir::addSearchPath("sfx", "data:sfx");
     QDir::addSearchPath("txt", "data:txt");
     QDir::addSearchPath("vfx", "data:vfx");
+
+    txt::StringTable::load();
 
     m_window = new Window;
 

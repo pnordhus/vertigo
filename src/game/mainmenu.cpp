@@ -17,6 +17,7 @@
 
 #include "mainmenu.h"
 #include "gfx/image.h"
+#include "txt/stringtable.h"
 #include "ui/button.h"
 #include "util/colortable.h"
 #include <QApplication>
@@ -51,7 +52,7 @@ MainMenu::MainMenu() :
     label = new ui::Label;
     label->setFont(fontMedium);
     label->setPosition(145, 256 - fontMedium.height() - 2);
-    label->setText("Hauptmenu");
+    label->setText(txt::StringTable::get(txt::MainMenu));
     m_title.addChild(label);
 
     label = new ui::Label;
@@ -67,24 +68,24 @@ MainMenu::MainMenu() :
     ui::Button *button;
     button = new ui::Button;
     button->setFont(fontLarge);
-    button->setPosition(0, 280);
+    button->setPosition(0, 288);
     button->setSize(640, -1);
-    button->setText("Neues Spiel");
+    button->setText(txt::StringTable::get(txt::MainMenu_NewGame));
     connect(button, SIGNAL(clicked()), SIGNAL(startGame()));
     m_title.addChild(button);
 
     button = new ui::Button;
     button->setFont(fontLarge);
-    button->setPosition(0, 300);
+    button->setPosition(0, 308);
     button->setSize(640, -1);
-    button->setText("Spielstand laden");
+    button->setText(txt::StringTable::get(txt::MainMenu_Load));
     m_title.addChild(button);
 
     button = new ui::Button;
     button->setFont(fontLarge);
-    button->setPosition(0, 410);
+    button->setPosition(0, 408);
     button->setSize(640, -1);
-    button->setText("Spiel beenden");
+    button->setText(txt::StringTable::get(txt::MainMenu_QuitGame));
     connect(button, SIGNAL(clicked()), qApp, SLOT(quit()));
     m_title.addChild(button);
 
@@ -120,17 +121,7 @@ void MainMenu::changeState(State state)
 
 void MainMenu::keyPressEvent(QKeyEvent *event)
 {
-    if (event->key() == Qt::Key_Escape)
-        qApp->quit();
 
-    switch (m_state) {
-    case Presents:
-        changeState(Title);
-        break;
-
-    default:
-        ; // nothing to do
-    }
 }
 
 
