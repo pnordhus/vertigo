@@ -52,6 +52,7 @@ private:
     void mouseMoveEvent(QMouseEvent *);
 
 private:
+    QCursor m_cursor;
     Renderer *m_renderer;
 };
 

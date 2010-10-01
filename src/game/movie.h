@@ -39,6 +39,7 @@ signals:
 
 public:
     void play(const QString &filename);
+    bool showCursor() const;
 
 private:
     void draw();

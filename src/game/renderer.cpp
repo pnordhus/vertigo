@@ -28,6 +28,12 @@ void Renderer::setRect(const QRect &rect)
 }
 
 
+bool Renderer::showCursor() const
+{
+    return true;
+}
+
+
 void Renderer::setupOrthographicMatrix(float w, float h)
 {
     const float ratioW = width() / w;

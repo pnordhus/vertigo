@@ -44,6 +44,12 @@ void Movie::play(const QString &filename)
 }
 
 
+bool Movie::showCursor() const
+{
+    return false;
+}
+
+
 void Movie::draw()
 {
     if (m_video.atEnd()) {

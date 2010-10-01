@@ -34,7 +34,7 @@ Window::Window() :
     addAction(actionFullScreen);
 
     util::ColorTable colorTable("gfx:pal/gui/cursor.pal");
-    setCursor(gfx::Image::loadCursor("gfx:img/desktop/gui/cur_norm.img", colorTable));
+    m_cursor = gfx::Image::loadCursor("gfx:img/desktop/gui/cur_norm.img", colorTable);
     setWindowTitle("Vertigo");
     makeCurrent();
 }
@@ -68,6 +68,11 @@ void Window::resizeGL(int w, int h)
 void Window::paintGL()
 {
     if (m_renderer) {
+        if (m_renderer->showCursor())
+            setCursor(m_cursor);
+        else
+            setCursor(Qt::BlankCursor);
+
         m_renderer->setRect(rect());
         m_renderer->draw();
     }

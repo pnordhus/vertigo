@@ -36,6 +36,7 @@ public:
     virtual void draw() = 0;
 
 public:
+    virtual bool showCursor() const;
     void setRect(const QRect &rect);
     QRect rect() const { return m_rect; }
     int width() const { return m_rect.width(); }
