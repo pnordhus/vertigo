@@ -43,7 +43,8 @@ void Video::open(const QString &filename)
     m_frame.clear();
 
     m_file.setFileName(filename);
-    m_file.open(QFile::ReadOnly);
+    if (!m_file.open(QFile::ReadOnly))
+        return;
 
     QDataStream stream(&m_file);
     stream.setByteOrder(QDataStream::LittleEndian);
@@ -62,6 +63,10 @@ void Video::open(const QString &filename)
     stream >> framerate;
     stream >> hasAudio >> channels >> sampleRate;
     stream.skipRawData(4);
+
+
+    if (stream.atEnd())
+        return;
 
     const quint32 dataOffset = ((13 * sizeof(quint32) + totalFrames * 4 * sizeof(quint32) - 1) / 2048 + 1) * 2048;
 
@@ -141,7 +146,7 @@ QByteArray Video::getAudio()
 
 bool Video::atEnd() const
 {
-    return m_videoPos >= m_entries.size();
+    return m_videoPos >= quint32(m_entries.size());
 }
 
 
@@ -217,7 +222,7 @@ QImage Video::createImage()
             }
 
             if (y % 2 == 0)
-                *line++ = m_frame[pos - 1];
+                line[-1] = m_frame[pos - 1];
         } else {
             qMemCopy(line, m_frame, m_width);
         }

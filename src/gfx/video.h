@@ -39,6 +39,8 @@ public:
     QImage getFrame();
     QByteArray getAudio();
     bool atEnd() const;
+    quint32 width() const { return m_width; }
+    quint32 height() const { return m_height; }
 
 private:
     void loadColorTable(const QByteArray &data);
