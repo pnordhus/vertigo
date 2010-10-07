@@ -39,6 +39,9 @@ void Video::open(const QString &filename)
 {
     m_file.close();
     m_videoPos = 0;
+    m_nextVideoPos = 0;
+    m_audioPos = 0;
+    m_lastAudioPos = 0;
     m_entries.clear();
     m_frame.clear();
 
@@ -128,7 +131,13 @@ QImage Video::getFrame()
             loadVideoDiff(m_file.read(entry.length));
             gotFrame = true;
             break;
+
+        default:
+            break;
         }
+
+        if (m_videoPos < m_nextVideoPos)
+            gotFrame = false;
     }
 
     if (gotFrame)
@@ -140,7 +149,76 @@ QImage Video::getFrame()
 
 QByteArray Video::getAudio()
 {
+    const quint32 lastAudioPos = m_lastAudioPos;
+    m_lastAudioPos = m_audioPos;
 
+    bool gotAudioLeft = false;
+    bool gotAudioRight = false;
+
+    QByteArray data;
+    data.resize(22050 * 2);
+
+    while (m_audioPos < quint32(m_entries.size()) && (!gotAudioLeft || !gotAudioRight)) {
+        const Entry &entry = m_entries[m_audioPos++];
+
+        m_file.seek(entry.offset);
+
+        switch (entry.type) {
+        case Entry::AudioLeft:
+            mergeChannel(data, m_file.read(entry.length), 0);
+            gotAudioLeft = true;
+            break;
+
+        case Entry::AudioRight:
+            mergeChannel(data, m_file.read(entry.length), 1);
+            gotAudioRight = true;
+            break;
+
+        default:
+            break;
+        }
+    }
+
+    if (lastAudioPos < m_videoPos) {
+        bool colorTableChanged = false;
+        for (int i = m_videoPos; i >= int(lastAudioPos); i--) {
+            if (m_entries[i].type == Entry::ColorTable) {
+                colorTableChanged = true;
+                break;
+            }
+        }
+
+        m_videoPos = lastAudioPos;
+        if (colorTableChanged) {
+            while (m_entries[m_videoPos].type != Entry::ColorTable)
+                m_videoPos--;
+        } else {
+            while (m_entries[m_videoPos].type != Entry::VideoFull)
+                m_videoPos--;
+        }
+    }
+
+    if (lastAudioPos > m_videoPos)
+        m_nextVideoPos = lastAudioPos;
+
+    if (gotAudioLeft && gotAudioRight)
+        return data;
+
+    return QByteArray();
+}
+
+
+void Video::mergeChannel(QByteArray &data, const QByteArray &channel, int channelIndex)
+{
+    const quint8 *input = reinterpret_cast<const quint8*>(channel.data());
+    quint8 *output = reinterpret_cast<quint8*>(data.data());
+    output += channelIndex;
+
+    for (int i = 0; i < channel.size(); i++) {
+        *output = *input + 0x80;
+        output += 2;
+        input += 1;
+    }
 }
 
 

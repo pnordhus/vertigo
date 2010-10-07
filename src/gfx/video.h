@@ -43,6 +43,7 @@ public:
     quint32 height() const { return m_height; }
 
 private:
+    void mergeChannel(QByteArray &data, const QByteArray &channel, int channelIndex);
     void loadColorTable(const QByteArray &data);
     void loadVideoFull(const QByteArray &data);
     void loadVideoDiff(const QByteArray &data);
@@ -68,6 +69,9 @@ private:
     quint32 m_width;
     quint32 m_height;
     quint32 m_videoPos;
+    quint32 m_nextVideoPos;
+    quint32 m_audioPos;
+    quint32 m_lastAudioPos;
 
     QTime m_time;
 };
