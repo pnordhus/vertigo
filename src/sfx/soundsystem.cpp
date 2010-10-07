@@ -15,21 +15,42 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "vertigo.h"
-#include "sfx/soundsystem.h"
-#include <QApplication>
+#include "soundsystem.h"
+#include <AL/alc.h>
 
 
-int main(int argc, char *argv[])
+namespace sfx {
+
+
+SoundSystem *SoundSystem::m_singleton = NULL;
+
+
+struct SoundSystemPrivate
 {
-    QApplication app(argc, argv);
+    ALCdevice* device;
+    ALCcontext* context;
+};
 
-    app.setOrganizationName("Vertigo");
-    app.setApplicationName("Vertigo");
 
-    sfx::SoundSystem soundSystem;
-    game::Vertigo vertigo;
-    vertigo.start();
+SoundSystem::SoundSystem()
+{
+    Q_ASSERT(m_singleton == NULL);
+    m_singleton = this;
 
-    return app.exec();
+    d = new SoundSystemPrivate;
+    d->device = alcOpenDevice(NULL);
+    d->context = alcCreateContext(d->device, NULL);
+    alcMakeContextCurrent(d->context);
 }
+
+
+SoundSystem::~SoundSystem()
+{
+    alcDestroyContext(d->context);
+    alcCloseDevice(d->device);
+    delete d;
+    m_singleton = NULL;
+}
+
+
+} // namespace sfx

@@ -15,21 +15,75 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "vertigo.h"
-#include "sfx/soundsystem.h"
-#include <QApplication>
+#include "stream.h"
+#include <AL/al.h>
 
 
-int main(int argc, char *argv[])
+namespace sfx {
+
+
+Stream::Stream()
 {
-    QApplication app(argc, argv);
-
-    app.setOrganizationName("Vertigo");
-    app.setApplicationName("Vertigo");
-
-    sfx::SoundSystem soundSystem;
-    game::Vertigo vertigo;
-    vertigo.start();
-
-    return app.exec();
+    alGenSources(1, &m_source);
 }
+
+
+Stream::~Stream()
+{
+    alSourceStop(m_source);
+    clearBuffers();
+    alDeleteSources(1, &m_source);
+}
+
+
+void Stream::add(const QByteArray &data)
+{
+    clearBuffers();
+
+    ALuint buffer;
+    alGenBuffers(1, &buffer);
+    alBufferData(buffer, AL_FORMAT_STEREO8, data, data.size(), 22050);
+    alSourceQueueBuffers(m_source, 1, &buffer);
+}
+
+
+void Stream::play()
+{
+    alSourcePlay(m_source);
+}
+
+
+bool Stream::isPlaying() const
+{
+    ALint state;
+    alGetSourcei(m_source, AL_SOURCE_STATE, &state);
+    return (state == AL_PLAYING);
+}
+
+
+quint32 Stream::queued() const
+{
+    ALint v;
+    alGetSourcei(m_source, AL_BUFFERS_QUEUED, &v);
+    return v;
+}
+
+
+quint32 Stream::processed() const
+{
+    ALint v;
+    alGetSourcei(m_source, AL_BUFFERS_PROCESSED, &v);
+    return v;
+}
+
+
+void Stream::clearBuffers()
+{
+    const quint32 buffersProcessed = processed();
+    ALuint bufs[buffersProcessed];
+    alSourceUnqueueBuffers(m_source, buffersProcessed, bufs);
+    alDeleteBuffers(buffersProcessed, bufs);
+}
+
+
+} // namespace sfx

@@ -15,21 +15,35 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "vertigo.h"
-#include "sfx/soundsystem.h"
-#include <QApplication>
+#ifndef SFX_SOUNDSYSTEM_H
+#define SFX_SOUNDSYSTEM_H
 
 
-int main(int argc, char *argv[])
+#include <QtGlobal>
+
+
+namespace sfx {
+
+
+class SoundSystemPrivate;
+
+
+class SoundSystem
 {
-    QApplication app(argc, argv);
+public:
+    SoundSystem();
+    ~SoundSystem();
 
-    app.setOrganizationName("Vertigo");
-    app.setApplicationName("Vertigo");
+private:
+    Q_DISABLE_COPY(SoundSystem);
 
-    sfx::SoundSystem soundSystem;
-    game::Vertigo vertigo;
-    vertigo.start();
+private:
+    static SoundSystem *m_singleton;
+    SoundSystemPrivate *d;
+};
 
-    return app.exec();
-}
+
+} // namespace sfx
+
+
+#endif // SFX_SOUNDSYSTEM_H

@@ -15,21 +15,39 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "vertigo.h"
-#include "sfx/soundsystem.h"
-#include <QApplication>
+#ifndef SFX_STREAM_H
+#define SFX_STREAM_H
 
 
-int main(int argc, char *argv[])
+#include <QByteArray>
+
+
+namespace sfx {
+
+
+class Stream
 {
-    QApplication app(argc, argv);
+public:
+    Stream();
+    ~Stream();
 
-    app.setOrganizationName("Vertigo");
-    app.setApplicationName("Vertigo");
+public:
+    void add(const QByteArray &data);
+    void play();
+    bool isPlaying() const;
+    quint32 queued() const;
+    quint32 processed() const;
 
-    sfx::SoundSystem soundSystem;
-    game::Vertigo vertigo;
-    vertigo.start();
+private:
+    Q_DISABLE_COPY(Stream);
+    void clearBuffers();
 
-    return app.exec();
-}
+private:
+    quint32 m_source;
+};
+
+
+} // namespace sfx
+
+
+#endif // SFX_STREAM_H
