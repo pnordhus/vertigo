@@ -20,6 +20,7 @@
 
 
 #include "renderer.h"
+#include "sfx/stream.h"
 #include "gfx/texture.h"
 #include "gfx/video.h"
 
@@ -49,6 +50,7 @@ private:
 private:
     gfx::Video m_video;
     gfx::Texture m_texture;
+    sfx::Stream m_stream;
 };
 
 
