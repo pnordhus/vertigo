@@ -28,7 +28,8 @@
 namespace game {
 
 
-Vertigo::Vertigo()
+Vertigo::Vertigo() :
+    m_movie(NULL)
 {
     QSettings s;
 
@@ -44,9 +45,6 @@ Vertigo::Vertigo()
 
     m_mainMenu = new MainMenu;
     connect(m_mainMenu, SIGNAL(startGame()), SLOT(startGame()));
-
-    m_movie = new Movie;
-    connect(m_movie, SIGNAL(finished()), SLOT(movieFinished()));
 
     m_window->setRenderer(m_mainMenu);
 
@@ -78,6 +76,10 @@ void Vertigo::update()
 
 void Vertigo::startGame()
 {
+    Q_ASSERT(m_movie == NULL);
+    m_movie = new Movie;
+    connect(m_movie, SIGNAL(finished()), SLOT(movieFinished()));
+
     m_window->setRenderer(m_movie);
     m_movie->play("gfx:mvi/film/d02.mvi");
 }
@@ -86,6 +88,8 @@ void Vertigo::startGame()
 void Vertigo::movieFinished()
 {
     m_window->setRenderer(m_mainMenu);
+    delete m_movie;
+    m_movie = NULL;
 }
 
 
