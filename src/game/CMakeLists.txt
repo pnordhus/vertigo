@@ -1,4 +1,6 @@
 set(SOURCES
+    desktop.cpp
+    desktop.h
     main.cpp
     mainmenu.cpp
     mainmenu.h

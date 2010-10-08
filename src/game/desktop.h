@@ -15,47 +15,50 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GAME_VERTIGO_H
-#define GAME_VERTIGO_H
+#ifndef GAME_DESKTOP_H
+#define GAME_DESKTOP_H
 
 
-#include <QObject>
+#include "renderer.h"
+#include "gfx/texture.h"
+#include "gfx/video.h"
 
 
 namespace game {
 
 
-class Desktop;
-class MainMenu;
-class Movie;
-class Window;
-
-
-class Vertigo : public QObject
+class Desktop : public Renderer
 {
-    Q_OBJECT
+public:
+    Desktop(const QString &name);
+    ~Desktop();
 
 public:
-    Vertigo();
-    ~Vertigo();
-
-public:
-    void start();
-
-private slots:
-    void update();
-    void startGame();
-    void movieFinished();
+    void draw();
 
 private:
-    Window *m_window;
-    MainMenu *m_mainMenu;
-    Movie *m_movie;
-    Desktop *m_desktop;
+    void keyPressEvent(QKeyEvent *);
+    void mousePressEvent(QMouseEvent *);
+    void mouseReleaseEvent(QMouseEvent *);
+    void mouseMoveEvent(QMouseEvent *);
+
+private:
+    struct Video
+    {
+        gfx::Video video;
+        int x;
+        int y;
+        int rndMax;
+        int time;
+    };
+
+    gfx::Texture m_background;
+    QList<Video*> m_videos;
+    QTime m_time;
 };
 
 
 } // namespace game
 
 
-#endif // GAME_VERTIGO_H
+#endif // GAME_DESKTOP_H

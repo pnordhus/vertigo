@@ -15,6 +15,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
+#include "desktop.h"
 #include "mainmenu.h"
 #include "movie.h"
 #include "vertigo.h"
@@ -29,11 +30,13 @@ namespace game {
 
 
 Vertigo::Vertigo() :
-    m_movie(NULL)
+    m_movie(NULL),
+    m_desktop(NULL)
 {
     QSettings s;
 
     QDir::addSearchPath("data", s.value("datadir").toString());
+    QDir::addSearchPath("dat", "data:dat");
     QDir::addSearchPath("gfx", "data:gfx");
     QDir::addSearchPath("sfx", "data:sfx");
     QDir::addSearchPath("txt", "data:txt");
@@ -82,12 +85,15 @@ void Vertigo::startGame()
 
     m_window->setRenderer(m_movie);
     m_movie->play("gfx:mvi/film/d02.mvi");
+
+    Q_ASSERT(m_desktop == NULL);
+    m_desktop = new Desktop("st0201");
 }
 
 
 void Vertigo::movieFinished()
 {
-    m_window->setRenderer(m_mainMenu);
+    m_window->setRenderer(m_desktop);
     delete m_movie;
     m_movie = NULL;
 }
