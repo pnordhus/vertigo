@@ -42,7 +42,13 @@ Window::Window() :
 
 void Window::setRenderer(Renderer *renderer)
 {
+    if (m_renderer)
+        m_renderer->deactivate();
+
     m_renderer = renderer;
+
+    if (m_renderer)
+        m_renderer->activate();
 }
 
 

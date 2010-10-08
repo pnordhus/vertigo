@@ -22,6 +22,7 @@
 #include "renderer.h"
 #include "gfx/texture.h"
 #include "gfx/video.h"
+#include "sfx/sound.h"
 #include "ui/label.h"
 
 
@@ -38,6 +39,8 @@ public:
     void draw();
 
 private:
+    void activate();
+    void deactivate();
     void keyPressEvent(QKeyEvent *);
     void mousePressEvent(QMouseEvent *);
     void mouseReleaseEvent(QMouseEvent *);
@@ -54,6 +57,8 @@ private:
     };
 
     gfx::Texture m_background;
+    sfx::Sound m_backgroundSound;
+    sfx::Sound m_nameSound;
     QList<Video*> m_videos;
     QTime m_time;
     ui::Label* m_rootWidget;

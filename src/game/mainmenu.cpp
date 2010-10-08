@@ -41,6 +41,8 @@ MainMenu::MainMenu() :
     m_presents.setTexture(gfx::Image::loadPCX("gfx:pic/title/present.pcx"));
     m_title.setTexture(gfx::Image::loadPCX("gfx:pic/title/title.pcx"));
 
+    m_backgroundSound.load("sfx:snd/bground/b02.pcl", "sfx:snd/bground/b02.pcr");
+
     ui::Label *label;
 
     label = new ui::Label;
@@ -90,6 +92,18 @@ MainMenu::MainMenu() :
     m_title.addChild(button);
 
     changeState(Presents);
+}
+
+
+void MainMenu::activate()
+{
+    m_backgroundSound.playLoop();
+}
+
+
+void MainMenu::deactivate()
+{
+    m_backgroundSound.stop();
 }
 
 

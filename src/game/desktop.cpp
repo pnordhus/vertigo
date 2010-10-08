@@ -38,7 +38,11 @@ Desktop::Desktop(const QString &name)
     file.beginGroup("Station");
 
     const QString background = file.value("BackGround").toString();
+    const QString backgroundSound = file.value("Sound").toString();
+    const QString nameSound = "st" + file.value("SFV").toString().right(4);
     m_background.fromImage(gfx::Image::loadPCX("gfx:pic/bground/" + background + ".pcx"));
+    m_backgroundSound.load("sfx:snd/bground/" + backgroundSound + ".pcl", "sfx:snd/bground/" + backgroundSound + ".pcr");
+    m_nameSound.load("sfx:snd/names/" + nameSound + ".pcm");
 
     m_rootWidget = new ui::Label;
     m_rootWidget->setTexture(m_background);
@@ -90,6 +94,19 @@ Desktop::Desktop(const QString &name)
 Desktop::~Desktop()
 {
     qDeleteAll(m_videos);
+}
+
+
+void Desktop::activate()
+{
+    m_backgroundSound.playLoop();
+    m_nameSound.play();
+}
+
+
+void Desktop::deactivate()
+{
+    m_backgroundSound.stop();
 }
 
 

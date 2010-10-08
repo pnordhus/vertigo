@@ -59,6 +59,7 @@ Vertigo::Vertigo() :
 
 Vertigo::~Vertigo()
 {
+    delete m_desktop;
     delete m_movie;
     delete m_mainMenu;
     delete m_window;
@@ -79,6 +80,9 @@ void Vertigo::update()
 
 void Vertigo::startGame()
 {
+    m_mainMenu->deleteLater();
+    m_mainMenu = NULL;
+
     Q_ASSERT(m_movie == NULL);
     m_movie = new Movie;
     connect(m_movie, SIGNAL(finished()), SLOT(movieFinished()));

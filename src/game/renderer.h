@@ -34,6 +34,8 @@ class Renderer : public QObject
 {
 public:
     virtual void draw() = 0;
+    virtual void activate() = 0;
+    virtual void deactivate() = 0;
 
 public:
     virtual bool showCursor() const;

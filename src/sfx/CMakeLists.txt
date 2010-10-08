@@ -1,6 +1,8 @@
 include_directories(${OPENAL_INCLUDE_DIR})
 
 set(SOURCES
+    sound.cpp
+    sound.h
     soundsystem.cpp
     soundsystem.h
     stream.cpp

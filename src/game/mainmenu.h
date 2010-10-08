@@ -21,6 +21,7 @@
 
 #include "renderer.h"
 #include "gfx/texture.h"
+#include "sfx/sound.h"
 #include "ui/label.h"
 
 
@@ -44,6 +45,8 @@ signals:
     void startGame();
 
 private:
+    void activate();
+    void deactivate();
     void changeState(State state);
     void keyPressEvent(QKeyEvent *event);
     void mousePressEvent(QMouseEvent *);
@@ -55,6 +58,7 @@ private:
     ui::Label m_presents;
     ui::Label m_title;
     ui::Widget* m_rootWidget;
+    sfx::Sound m_backgroundSound;
 };
 
 

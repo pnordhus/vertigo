@@ -30,6 +30,17 @@ Movie::Movie() :
 }
 
 
+void Movie::activate()
+{
+
+}
+
+
+void Movie::deactivate()
+{
+
+}
+
 void Movie::play(const QString &filename)
 {
     m_video.open(filename);

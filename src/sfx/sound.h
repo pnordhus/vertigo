@@ -15,49 +15,40 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GAME_MOVIE_H
-#define GAME_MOVIE_H
+#ifndef SFX_SOUND_H
+#define SFX_SOUND_H
 
 
-#include "renderer.h"
-#include "sfx/stream.h"
-#include "gfx/texture.h"
-#include "gfx/video.h"
+#include <QtGlobal>
 
 
-namespace game {
+namespace sfx {
 
 
-class Movie : public Renderer
+class Sound
 {
-    Q_OBJECT
+public:
+    Sound();
+    ~Sound();
 
 public:
-    Movie();
-
-signals:
-    void finished();
-
-public:
-    void play(const QString &filename);
-    bool showCursor() const;
+    void stop();
+    void play();
+    void playLoop();
+    void load(const QString &file);
+    void load(const QString &leftFile, const QString &rightFile);
 
 private:
-    void activate();
-    void deactivate();
-    void draw();
-    void keyPressEvent(QKeyEvent *);
-    void mousePressEvent(QMouseEvent *);
+    Q_DISABLE_COPY(Sound);
+    QByteArray loadFile(const QString &filename);
 
 private:
-    gfx::Video m_video;
-    gfx::Texture m_texture;
-    sfx::Stream m_stream;
-    bool m_pause;
+    quint32 m_source;
+    quint32 m_buffer;
 };
 
 
-} // namespace game
+} // namespace sfx
 
 
-#endif // GAME_MOVIE_H
+#endif // SFX_SOUND_H
