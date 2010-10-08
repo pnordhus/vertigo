@@ -17,6 +17,7 @@
 
 #include "desktop.h"
 #include "gfx/image.h"
+#include "gfx/font.h"
 #include "txt/desfile.h"
 #include <QStringList>
 
@@ -26,10 +27,37 @@ namespace game {
 
 Desktop::Desktop(const QString &name)
 {
+    util::ColorTable colorTable("gfx:pal/gui/border.pal");
+
+    gfx::Font fontSmall("gfx:fnt/dpsmall.fnt", colorTable);
+    gfx::Font fontMedium("gfx:fnt/dpmedium.fnt", colorTable);
+    gfx::Font fontLarge("gfx:fnt/dplarge.fnt", colorTable);
+
     txt::DesFile file("dat:world/" + name + ".des");
 
-    const QString background = file.value("Station/BackGround").toString();
+    file.beginGroup("Station");
+
+    const QString background = file.value("BackGround").toString();
     m_background.fromImage(gfx::Image::loadPCX("gfx:pic/bground/" + background + ".pcx"));
+
+    m_rootWidget = new ui::Label;
+    m_rootWidget->setTexture(m_background);
+
+    ui::Label *label;
+
+    label = new ui::Label;
+    label->setFont(fontLarge);
+    label->setPosition(8, 8);
+    label->setText(file.value("Name").toString());
+    m_rootWidget->addChild(label);
+
+    label = new ui::Label;
+    label->setFont(fontSmall);
+    label->setPosition(8, 10 + fontLarge.height());
+    label->setText(file.value("Description").toStringList().join(", "));
+    m_rootWidget->addChild(label);
+
+    file.endGroup();
 
     foreach (const QString &section, file.childGroups().filter("MiniMovie")) {
         file.beginGroup(section);
@@ -85,7 +113,7 @@ void Desktop::draw()
             m_background.update(video->x, video->y, frame);
     }
 
-    m_background.draw();
+    m_rootWidget->doDraw();
 }
 
 

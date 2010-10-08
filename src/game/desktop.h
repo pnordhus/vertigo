@@ -22,6 +22,7 @@
 #include "renderer.h"
 #include "gfx/texture.h"
 #include "gfx/video.h"
+#include "ui/label.h"
 
 
 namespace game {
@@ -55,6 +56,7 @@ private:
     gfx::Texture m_background;
     QList<Video*> m_videos;
     QTime m_time;
+    ui::Label* m_rootWidget;
 };
 
 
