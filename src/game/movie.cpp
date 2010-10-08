@@ -33,6 +33,7 @@ Movie::Movie() :
 void Movie::play(const QString &filename)
 {
     m_video.open(filename);
+    m_video.play();
 
     m_texture.createEmpty(m_video.width(), m_video.height() + 4, gfx::Texture::RGBA);
 

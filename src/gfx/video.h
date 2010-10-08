@@ -36,6 +36,9 @@ public:
 
 public:
     void open(const QString &filename);
+    void play();
+    void playLoop();
+    bool isPlaying() const { return m_playing; }
     QImage getFrame();
     QByteArray getAudio();
     bool atEnd() const;
@@ -43,6 +46,7 @@ public:
     quint32 height() const { return m_height; }
 
 private:
+    void reset();
     void mergeChannel(QByteArray &data, const QByteArray &channel, int channelIndex);
     void loadColorTable(const QByteArray &data);
     void loadVideoFull(const QByteArray &data);
@@ -75,6 +79,8 @@ private:
     quint32 m_lastAudioPos;
 
     QTime m_time;
+    bool m_playing;
+    bool m_looping;
 };
 
 

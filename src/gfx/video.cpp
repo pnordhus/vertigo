@@ -37,6 +37,8 @@ Video::Video(const QString &filename)
 
 void Video::open(const QString &filename)
 {
+    m_playing = false;
+    m_looping = false;
     m_file.close();
     m_videoPos = 0;
     m_nextVideoPos = 0;
@@ -100,12 +102,45 @@ void Video::open(const QString &filename)
 }
 
 
+void Video::play()
+{
+    m_playing = true;
+    m_looping = false;
+    reset();
+}
+
+
+void Video::playLoop()
+{
+    m_playing = true;
+    m_looping = true;
+    reset();
+}
+
+
+void Video::reset()
+{
+    m_videoPos = 0;
+    m_nextVideoPos = 0;
+    m_frame.clear();
+}
+
+
 QImage Video::getFrame()
 {
+    if (!m_playing)
+        return QImage();
+
     bool gotFrame = false;
 
-    if (atEnd())
-        return createEmpty();
+    if (atEnd()) {
+        if (m_looping) {
+            reset();
+        } else {
+            m_playing = false;
+            return QImage();
+        }
+    }
 
     if (m_time.elapsed() < 100)
         return QImage();
@@ -120,7 +155,8 @@ QImage Video::getFrame()
         switch (entry.type) {
         case Entry::ColorTable:
             loadColorTable(m_file.read(entry.length));
-            gotFrame = true;
+            if (m_videoPos > 1)
+                gotFrame = true;
             break;
 
         case Entry::VideoFull:
@@ -141,9 +177,6 @@ QImage Video::getFrame()
             gotFrame = false;
     }
 
-    if (atEnd())
-        return createEmpty();
-
     if (gotFrame)
         return createImage();
 
@@ -153,6 +186,9 @@ QImage Video::getFrame()
 
 QByteArray Video::getAudio()
 {
+    if (!m_playing)
+        return QByteArray();
+
     const quint32 lastAudioPos = m_lastAudioPos;
     m_lastAudioPos = m_audioPos;
 
@@ -285,6 +321,9 @@ void Video::loadVideoDiff(const QByteArray &data)
 
 QImage Video::createImage()
 {
+    if (m_frame.size() == 0)
+        return createEmpty();
+
     QImage image(m_width, m_height, QImage::Format_Indexed8);
     image.fill(0);
     image.setColorTable(m_colorTable);
@@ -308,7 +347,8 @@ QImage Video::createImage()
             if (y % 2 == 0)
                 line[-1] = m_frame[pos - 1];
         } else {
-            qMemCopy(line, m_frame, m_width);
+            qMemCopy(line, &m_frame.data()[pos], m_width);
+            pos += m_width;
         }
     }
 
