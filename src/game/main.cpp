@@ -18,11 +18,13 @@
 #include "vertigo.h"
 #include "sfx/soundsystem.h"
 #include <QApplication>
+#include <QTime>
 
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+    qsrand(QTime::currentTime().second() * 1000 + QTime::currentTime().msec());
 
     app.setOrganizationName("Vertigo");
     app.setApplicationName("Vertigo");

@@ -78,11 +78,11 @@ Desktop::Desktop(const QString &name)
         if (type == "loop")
             video->video.playLoop();
         else if (type == "rnd1")
-            video->rndMax = 7000;
+            video->rndMax = 15000;
         else if (type == "rnd2")
-            video->rndMax = 14000;
+            video->rndMax = 30000;
 
-        video->time = 500 + float(qrand()) / RAND_MAX * video->rndMax;
+        video->time = float(qrand()) / RAND_MAX * video->rndMax;
 
         m_videos.append(video);
 
@@ -99,6 +99,7 @@ Desktop::~Desktop()
 
 void Desktop::activate()
 {
+    m_time.start();
     m_backgroundSound.playLoop();
     m_nameSound.play();
 }
@@ -121,7 +122,7 @@ void Desktop::draw()
             video->time -= time;
             if (video->time < 0) {
                 video->video.play();
-                video->time = 500 + float(qrand()) / RAND_MAX * video->rndMax;
+                video->time = float(qrand()) / RAND_MAX * video->rndMax;
             }
         }
 
