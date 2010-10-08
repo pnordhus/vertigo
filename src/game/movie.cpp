@@ -23,7 +23,8 @@
 namespace game {
 
 
-Movie::Movie()
+Movie::Movie() :
+    m_pause(false)
 {
 
 }
@@ -55,18 +56,20 @@ void Movie::draw()
     if (m_video.atEnd() && !m_stream.isPlaying()) {
         emit finished();
     } else {
-        if (m_stream.queued() < 2 || m_stream.processed() > 0) {
-            const QByteArray audio = m_video.getAudio();
-            if (!audio.isEmpty())
-                m_stream.add(audio);
+        if (!m_pause) {
+            if (m_stream.queued() < 2 || m_stream.processed() > 0) {
+                const QByteArray audio = m_video.getAudio();
+                if (!audio.isEmpty())
+                    m_stream.add(audio);
 
-            if (!m_stream.isPlaying())
-                m_stream.play();
+                if (!m_stream.isPlaying())
+                    m_stream.play();
+            }
+
+            QImage image = m_video.getFrame();
+            if (!image.isNull())
+                m_texture.update(0, 2, image);
         }
-
-        QImage image = m_video.getFrame();
-        if (!image.isNull())
-            m_texture.update(0, 2, image);
 
         setupOrthographicMatrix(m_texture.width(), m_texture.height());
         m_texture.draw();
@@ -78,6 +81,14 @@ void Movie::keyPressEvent(QKeyEvent *event)
 {
     if (event->key() == Qt::Key_Escape)
         emit finished();
+
+    if (event->key() == Qt::Key_Space) {
+        m_pause = !m_pause;
+        if (m_pause)
+            m_stream.pause();
+        else
+            m_stream.play();
+    }
 }
 
 

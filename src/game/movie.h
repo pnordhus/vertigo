@@ -51,6 +51,7 @@ private:
     gfx::Video m_video;
     gfx::Texture m_texture;
     sfx::Stream m_stream;
+    bool m_pause;
 };
 
 

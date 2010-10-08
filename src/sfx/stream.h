@@ -34,6 +34,7 @@ public:
 public:
     void add(const QByteArray &data);
     void play();
+    void pause();
     bool isPlaying() const;
     quint32 queued() const;
     quint32 processed() const;

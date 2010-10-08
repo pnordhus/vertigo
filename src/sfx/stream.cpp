@@ -53,6 +53,12 @@ void Stream::play()
 }
 
 
+void Stream::pause()
+{
+    alSourcePause(m_source);
+}
+
+
 bool Stream::isPlaying() const
 {
     ALint state;
