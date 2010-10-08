@@ -16,6 +16,7 @@
  ***************************************************************************/
 
 #include "image.h"
+#include "util/colortable.h"
 #include "util/rle.h"
 #include <QBitmap>
 #include <QCursor>
@@ -109,12 +110,8 @@ QImage Image::loadPCX(const QString &filename)
         stream >> c;
     } while (c != 12);
 
-    QVector<QRgb> colorTable(256);
-    for (int i = 0; i < 256; i++) {
-        quint8 r, g, b;
-        stream >> r >> g >> b;
-        colorTable[i] = qRgb(r, g, b);
-    }
+    util::ColorTable colorTable;
+    colorTable.load(file.read(256 * 3));
     colorTable[0] = qRgba(0,0,0,0);
 
     image.setColorTable(colorTable);

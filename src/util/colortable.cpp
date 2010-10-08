@@ -50,8 +50,12 @@ void ColorTable::load(const QByteArray &data)
     Q_ASSERT(data.size() == 256 * 3);
 
     clear();
+
+    // the game uses RGB 565 for rendering, even if some color tables are RGB 888
+    // zero the corresponding bits, to get matching color values with different tables
+    // fixes artifacts on overlay videos
     for (int i = 0; i < data.size(); i += 3)
-        append(qRgb(data[i + 0], data[i + 1], data[i + 2]));
+        append(qRgb(data[i + 0] & 0xf8, data[i + 1] & 0xfc, data[i + 2] & 0xf8));
 }
 
 
