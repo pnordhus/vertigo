@@ -48,6 +48,7 @@ private:
     void loadVideoFull(const QByteArray &data);
     void loadVideoDiff(const QByteArray &data);
     QImage createImage();
+    QImage createEmpty();
 
 private:
     Q_DISABLE_COPY(Video);

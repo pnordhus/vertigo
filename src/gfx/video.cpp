@@ -105,7 +105,7 @@ QImage Video::getFrame()
     bool gotFrame = false;
 
     if (atEnd())
-        return QImage();
+        return createEmpty();
 
     if (m_time.elapsed() < 100)
         return QImage();
@@ -120,6 +120,7 @@ QImage Video::getFrame()
         switch (entry.type) {
         case Entry::ColorTable:
             loadColorTable(m_file.read(entry.length));
+            gotFrame = true;
             break;
 
         case Entry::VideoFull:
@@ -139,6 +140,9 @@ QImage Video::getFrame()
         if (m_videoPos < m_nextVideoPos)
             gotFrame = false;
     }
+
+    if (atEnd())
+        return createEmpty();
 
     if (gotFrame)
         return createImage();
@@ -233,6 +237,8 @@ void Video::loadColorTable(const QByteArray &data)
     m_colorTable.load(data.left(256 * 3));
     if (data.size() > 256 * 3)
         m_indexMap = data.right(data.size() - 256 * 3);
+
+    m_frame.fill(0);
 }
 
 
@@ -306,6 +312,15 @@ QImage Video::createImage()
         }
     }
 
+    return image;
+}
+
+
+QImage Video::createEmpty()
+{
+    QImage image(m_width, m_height, QImage::Format_Indexed8);
+    image.fill(0);
+    image.setColorTable(QVector<QRgb>() << qRgb(0, 0, 0));
     return image;
 }
 
