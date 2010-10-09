@@ -15,65 +15,24 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GAME_DESKTOP_H
-#define GAME_DESKTOP_H
+#ifndef GAME_NOTEBOOK_H
+#define GAME_NOTEBOOK_H
 
 
-#include "menu.h"
-#include "notebook.h"
-#include "gfx/texture.h"
-#include "gfx/video.h"
-#include "sfx/sound.h"
-#include "ui/button.h"
+#include "ui/label.h"
 
 
 namespace game {
 
 
-class Desktop : public Menu
+class Notebook : public ui::Label
 {
-    Q_OBJECT
-
 public:
-    Desktop(const QString &name);
-    ~Desktop();
-
-public:
-    void draw();
-
-private slots:
-    void showNotebook();
-    void hideNotebook();
-
-private:
-    void activate();
-    void deactivate();
-    void keyPressEvent(QKeyEvent *event);
-
-private:
-    struct Video
-    {
-        gfx::Video video;
-        int x;
-        int y;
-        int rndMax;
-        int time;
-    };
-
-    gfx::Texture m_background;
-    sfx::Sound m_backgroundSound;
-    sfx::Sound m_nameSound;
-    sfx::Sound m_notebookSound;
-    ui::Label m_lblBackground;
-    ui::Button *m_btnNotebook;
-    Notebook m_notebook;
-    ui::Button *m_btnQuit;
-    QList<Video*> m_videos;
-    QTime m_time;
+    Notebook();
 };
 
 
 } // namespace game
 
 
-#endif // GAME_DESKTOP_H
+#endif // GAME_NOTEBOOK_H

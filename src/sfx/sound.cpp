@@ -63,6 +63,8 @@ void Sound::load(const QString &file)
 {
     const QByteArray data = loadFile(file);
 
+    alSourceStop(m_source);
+    alSourcei(m_source, AL_BUFFER, 0);
     if (m_buffer != 0)
         alDeleteBuffers(1, &m_buffer);
     alGenBuffers(1, &m_buffer);
@@ -83,6 +85,8 @@ void Sound::load(const QString &leftFile, const QString &rightFile)
         data[i * 2 + 1] = right[i];
     }
 
+    alSourceStop(m_source);
+    alSourcei(m_source, AL_BUFFER, 0);
     if (m_buffer != 0)
         alDeleteBuffers(1, &m_buffer);
     alGenBuffers(1, &m_buffer);

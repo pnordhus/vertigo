@@ -15,65 +15,47 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GAME_DESKTOP_H
-#define GAME_DESKTOP_H
-
-
-#include "menu.h"
 #include "notebook.h"
-#include "gfx/texture.h"
-#include "gfx/video.h"
-#include "sfx/sound.h"
+#include "gfx/image.h"
+#include "txt/stringtable.h"
 #include "ui/button.h"
+#include "util/colortable.h"
 
 
 namespace game {
 
 
-class Desktop : public Menu
+Notebook::Notebook()
 {
-    Q_OBJECT
+    const util::ColorTable colorTable("gfx:pal/notebook/notebook.pal");
+    gfx::Font fontNotebook("gfx:fnt/nfont1a.fnt", colorTable);
+    gfx::Texture noteback(gfx::Image::load("gfx:img/desktop/notebook/noteback.img", colorTable));
 
-public:
-    Desktop(const QString &name);
-    ~Desktop();
+    QImage image(640, 480, QImage::Format_Indexed8);
+    image.fill(0);
+    image.setColorTable(QVector<QRgb>() << qRgba(0, 0, 0, 128));
+    setTexture(image);
 
-public:
-    void draw();
+    ui::Label *label;
+    ui::Button *button;
 
-private slots:
-    void showNotebook();
-    void hideNotebook();
+    label = new ui::Label;
+    label->setPosition(48, 48);
+    label->setTexture(gfx::Image::loadPCX("gfx:pic/notebook/notebook.pcx"));
+    addChild(label);
 
-private:
-    void activate();
-    void deactivate();
-    void keyPressEvent(QKeyEvent *event);
+    label = new ui::Label;
+    label->setPosition(210, 121);
+    label->setTexture(noteback);
+    addChild(label);
 
-private:
-    struct Video
-    {
-        gfx::Video video;
-        int x;
-        int y;
-        int rndMax;
-        int time;
-    };
-
-    gfx::Texture m_background;
-    sfx::Sound m_backgroundSound;
-    sfx::Sound m_nameSound;
-    sfx::Sound m_notebookSound;
-    ui::Label m_lblBackground;
-    ui::Button *m_btnNotebook;
-    Notebook m_notebook;
-    ui::Button *m_btnQuit;
-    QList<Video*> m_videos;
-    QTime m_time;
-};
+    button = new ui::Button;
+    button->setFont(fontNotebook);
+    button->setText(txt::StringTable::get(txt::Notebook_QuitGame));
+    button->setPosition(210, 331);
+    button->setSize(304, -1);
+    addChild(button);
+}
 
 
 } // namespace game
-
-
-#endif // GAME_DESKTOP_H

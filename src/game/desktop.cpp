@@ -19,6 +19,7 @@
 #include "gfx/image.h"
 #include "gfx/font.h"
 #include "txt/desfile.h"
+#include <QKeyEvent>
 #include <QStringList>
 
 
@@ -27,7 +28,7 @@ namespace game {
 
 Desktop::Desktop(const QString &name)
 {
-    util::ColorTable colorTable("gfx:pal/gui/border.pal");
+    const util::ColorTable colorTable("gfx:pal/gui/border.pal");
 
     gfx::Font fontSmall("gfx:fnt/dpsmall.fnt", colorTable);
     gfx::Font fontMedium("gfx:fnt/dpmedium.fnt", colorTable);
@@ -66,6 +67,8 @@ Desktop::Desktop(const QString &name)
     m_btnNotebook->setPosition(572, 424);
     connect(m_btnNotebook, SIGNAL(clicked()), SLOT(showNotebook()));
     m_lblBackground.addChild(m_btnNotebook);
+
+    m_notebook.hide();
 
     file.endGroup();
 
@@ -135,13 +138,38 @@ void Desktop::draw()
             m_background.update(video->x, video->y, frame);
     }
 
-    Menu::draw();
+    setupOrthographicMatrix(640, 480);
+    m_lblBackground.doDraw();
+    m_notebook.doDraw();
 }
 
 
 void Desktop::showNotebook()
 {
     m_btnNotebook->hide();
+    m_notebook.show();
+    setRootWidget(&m_notebook);
+
+    m_notebookSound.load("sfx:snd/desktop/noteb1.pcm");
+    m_notebookSound.play();
+}
+
+
+void Desktop::hideNotebook()
+{
+    m_btnNotebook->show();
+    m_notebook.hide();
+    setRootWidget(&m_lblBackground);
+
+    m_notebookSound.load("sfx:snd/desktop/noteb3.pcm");
+    m_notebookSound.play();
+}
+
+
+void Desktop::keyPressEvent(QKeyEvent *event)
+{
+    if (m_notebook.isVisible() && event->key() == Qt::Key_Escape)
+        hideNotebook();
 }
 
 

@@ -8,6 +8,8 @@ set(SOURCES
     menu.h
     movie.cpp
     movie.h
+    notebook.cpp
+    notebook.h
     renderer.cpp
     renderer.h
     vertigo.cpp
