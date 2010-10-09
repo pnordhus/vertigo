@@ -15,54 +15,37 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GAME_RENDERER_H
-#define GAME_RENDERER_H
+#ifndef GAME_MENU_H
+#define GAME_MENU_H
 
 
-#include <QMatrix4x4>
-#include <QRect>
-
-
-class QKeyEvent;
-class QMouseEvent;
+#include "renderer.h"
+#include "ui/widget.h"
 
 
 namespace game {
 
 
-class Renderer : public QObject
+class Menu : public Renderer
 {
 public:
-    virtual void draw() = 0;
-    virtual void activate() = 0;
-    virtual void deactivate() = 0;
+    Menu();
 
 public:
-    virtual bool showCursor() const;
-    void setRect(const QRect &rect);
-    QRect rect() const { return m_rect; }
-    int width() const { return m_rect.width(); }
-    int height() const { return m_rect.height(); }
-    QMatrix4x4 projection() const { return m_projection; }
-    QPointF screenToImage(const QPointF &pos);
-
-public:
-    virtual void keyPressEvent(QKeyEvent *) {}
-    virtual void keyReleaseEvent(QKeyEvent *) {}
-    virtual void mousePressEvent(QMouseEvent *) = 0;
-    virtual void mouseReleaseEvent(QMouseEvent *) {}
-    virtual void mouseMoveEvent(QMouseEvent *) {}
+    void draw();
 
 protected:
-    void setupOrthographicMatrix(float w, float h);
+    void setRootWidget(ui::Widget *widget);
+    void mousePressEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
 
 private:
-    QRect m_rect;
-    QMatrix4x4 m_projection;
+    ui::Widget *m_rootWidget;
 };
 
 
 } // namespace game
 
 
-#endif // GAME_RENDERER_H
+#endif // GAME_MENU_H

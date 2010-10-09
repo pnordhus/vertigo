@@ -107,23 +107,16 @@ void MainMenu::deactivate()
 }
 
 
-void MainMenu::draw()
-{
-    setupOrthographicMatrix(640, 480);
-    m_rootWidget->doDraw();
-}
-
-
 void MainMenu::changeState(State state)
 {
     switch (state) {
     case Presents:
-        m_rootWidget = &m_presents;
+        setRootWidget(&m_presents);
         m_state = state;
         break;
 
     case Title:
-        m_rootWidget = &m_title;
+        setRootWidget(&m_title);
         m_state = state;
         break;
 
@@ -133,15 +126,10 @@ void MainMenu::changeState(State state)
 }
 
 
-void MainMenu::keyPressEvent(QKeyEvent *event)
-{
-
-}
-
-
 void MainMenu::mousePressEvent(QMouseEvent *event)
 {
-    m_rootWidget->doMousePressEvent(screenToImage(event->posF()), event->button());
+    Menu::mousePressEvent(event);
+
     switch (m_state) {
     case Presents:
         changeState(Title);
@@ -150,18 +138,6 @@ void MainMenu::mousePressEvent(QMouseEvent *event)
     default:
         ; // nothing to do
     }
-}
-
-
-void MainMenu::mouseReleaseEvent(QMouseEvent *event)
-{
-    m_rootWidget->doMouseReleaseEvent(screenToImage(event->posF()), event->button());
-}
-
-
-void MainMenu::mouseMoveEvent(QMouseEvent *event)
-{
-    m_rootWidget->doMouseMoveEvent(screenToImage(event->posF()));
 }
 
 

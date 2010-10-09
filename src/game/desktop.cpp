@@ -44,8 +44,8 @@ Desktop::Desktop(const QString &name)
     m_backgroundSound.load("sfx:snd/bground/" + backgroundSound + ".pcl", "sfx:snd/bground/" + backgroundSound + ".pcr");
     m_nameSound.load("sfx:snd/names/" + nameSound + ".pcm");
 
-    m_rootWidget = new ui::Label;
-    m_rootWidget->setTexture(m_background);
+    m_lblBackground.setTexture(m_background);
+    setRootWidget(&m_lblBackground);
 
     ui::Label *label;
 
@@ -53,13 +53,19 @@ Desktop::Desktop(const QString &name)
     label->setFont(fontLarge);
     label->setPosition(8, 8);
     label->setText(file.value("Name").toString());
-    m_rootWidget->addChild(label);
+    m_lblBackground.addChild(label);
 
     label = new ui::Label;
     label->setFont(fontSmall);
     label->setPosition(8, 10 + fontLarge.height());
     label->setText(file.value("Description").toStringList().join(", "));
-    m_rootWidget->addChild(label);
+    m_lblBackground.addChild(label);
+
+    m_btnNotebook = new ui::Button;
+    m_btnNotebook->setTexture(gfx::Image::loadPCX("gfx:pic/notebook/nbklein.pcx"));
+    m_btnNotebook->setPosition(572, 424);
+    connect(m_btnNotebook, SIGNAL(clicked()), SLOT(showNotebook()));
+    m_lblBackground.addChild(m_btnNotebook);
 
     file.endGroup();
 
@@ -113,8 +119,6 @@ void Desktop::deactivate()
 
 void Desktop::draw()
 {
-    setupOrthographicMatrix(640, 480);
-
     const quint32 time = m_time.restart();
 
     foreach (Video *video, m_videos) {
@@ -131,31 +135,13 @@ void Desktop::draw()
             m_background.update(video->x, video->y, frame);
     }
 
-    m_rootWidget->doDraw();
+    Menu::draw();
 }
 
 
-void Desktop::keyPressEvent(QKeyEvent *)
+void Desktop::showNotebook()
 {
-
-}
-
-
-void Desktop::mousePressEvent(QMouseEvent *)
-{
-
-}
-
-
-void Desktop::mouseReleaseEvent(QMouseEvent *)
-{
-
-}
-
-
-void Desktop::mouseMoveEvent(QMouseEvent *)
-{
-
+    m_btnNotebook->hide();
 }
 
 

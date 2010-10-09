@@ -19,18 +19,20 @@
 #define GAME_DESKTOP_H
 
 
-#include "renderer.h"
+#include "menu.h"
 #include "gfx/texture.h"
 #include "gfx/video.h"
 #include "sfx/sound.h"
-#include "ui/label.h"
+#include "ui/button.h"
 
 
 namespace game {
 
 
-class Desktop : public Renderer
+class Desktop : public Menu
 {
+    Q_OBJECT
+
 public:
     Desktop(const QString &name);
     ~Desktop();
@@ -38,13 +40,12 @@ public:
 public:
     void draw();
 
+private slots:
+    void showNotebook();
+
 private:
     void activate();
     void deactivate();
-    void keyPressEvent(QKeyEvent *);
-    void mousePressEvent(QMouseEvent *);
-    void mouseReleaseEvent(QMouseEvent *);
-    void mouseMoveEvent(QMouseEvent *);
 
 private:
     struct Video
@@ -59,9 +60,10 @@ private:
     gfx::Texture m_background;
     sfx::Sound m_backgroundSound;
     sfx::Sound m_nameSound;
+    ui::Label m_lblBackground;
+    ui::Button *m_btnNotebook;
     QList<Video*> m_videos;
     QTime m_time;
-    ui::Label* m_rootWidget;
 };
 
 

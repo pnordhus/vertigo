@@ -15,54 +15,54 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GAME_RENDERER_H
-#define GAME_RENDERER_H
-
-
-#include <QMatrix4x4>
-#include <QRect>
-
-
-class QKeyEvent;
-class QMouseEvent;
+#include "menu.h"
+#include <QMouseEvent>
 
 
 namespace game {
 
 
-class Renderer : public QObject
+Menu::Menu() :
+    m_rootWidget(NULL)
 {
-public:
-    virtual void draw() = 0;
-    virtual void activate() = 0;
-    virtual void deactivate() = 0;
 
-public:
-    virtual bool showCursor() const;
-    void setRect(const QRect &rect);
-    QRect rect() const { return m_rect; }
-    int width() const { return m_rect.width(); }
-    int height() const { return m_rect.height(); }
-    QMatrix4x4 projection() const { return m_projection; }
-    QPointF screenToImage(const QPointF &pos);
+}
 
-public:
-    virtual void keyPressEvent(QKeyEvent *) {}
-    virtual void keyReleaseEvent(QKeyEvent *) {}
-    virtual void mousePressEvent(QMouseEvent *) = 0;
-    virtual void mouseReleaseEvent(QMouseEvent *) {}
-    virtual void mouseMoveEvent(QMouseEvent *) {}
 
-protected:
-    void setupOrthographicMatrix(float w, float h);
+void Menu::draw()
+{
+    setupOrthographicMatrix(640, 480);
 
-private:
-    QRect m_rect;
-    QMatrix4x4 m_projection;
-};
+    if (m_rootWidget)
+        m_rootWidget->doDraw();
+}
+
+
+void Menu::setRootWidget(ui::Widget *widget)
+{
+    m_rootWidget = widget;
+}
+
+
+void Menu::mousePressEvent(QMouseEvent *event)
+{
+    if (m_rootWidget)
+        m_rootWidget->doMousePressEvent(screenToImage(event->posF()), event->button());
+}
+
+
+void Menu::mouseReleaseEvent(QMouseEvent *event)
+{
+    if (m_rootWidget)
+        m_rootWidget->doMouseReleaseEvent(screenToImage(event->posF()), event->button());
+}
+
+
+void Menu::mouseMoveEvent(QMouseEvent *event)
+{
+    if (m_rootWidget)
+        m_rootWidget->doMouseMoveEvent(screenToImage(event->posF()));
+}
 
 
 } // namespace game
-
-
-#endif // GAME_RENDERER_H
