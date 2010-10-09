@@ -30,16 +30,16 @@ Button::Button() :
 
 void Button::draw()
 {
-    QPointF offset;
-    if (m_pressed)
-        offset += QPointF(1, 1);
+    if (m_text.isEmpty()) {
+        m_rect = m_texture.draw(m_position);
+    } else {
+        QPointF offset;
+        if (m_pressed)
+            offset += QPointF(1, 1);
 
-    if (m_text.isEmpty())
-        m_rect = m_texture.draw(m_position + offset);
-    else
         m_rect = m_font.draw(m_text, m_position + offset, m_size);
-
-    m_rect.setTopLeft(m_rect.topLeft() - offset);
+        m_rect.setTopLeft(m_rect.topLeft() - offset);
+    }
 }
 
 
