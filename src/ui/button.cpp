@@ -45,15 +45,18 @@ void Button::draw()
 
 void Button::mousePressEvent(const QPointF &pos, Qt::MouseButton button)
 {
-    m_pressed = true;
+    if (button == Qt::LeftButton)
+        m_pressed = true;
 }
 
 
 void Button::mouseReleaseEvent(const QPointF &pos, Qt::MouseButton button)
 {
-    if (m_pressed && m_rect.contains(pos))
-        emit clicked();
-    m_pressed = false;
+    if (button == Qt::LeftButton) {
+        if (m_pressed && m_rect.contains(pos))
+            emit clicked();
+        m_pressed = false;
+    }
 }
 
 
