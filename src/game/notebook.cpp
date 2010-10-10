@@ -17,8 +17,6 @@
 
 #include "notebook.h"
 #include "gfx/image.h"
-#include "txt/stringtable.h"
-#include "ui/button.h"
 #include "util/colortable.h"
 
 
@@ -28,7 +26,8 @@ namespace game {
 Notebook::Notebook()
 {
     const util::ColorTable colorTable("gfx:pal/notebook/notebook.pal");
-    gfx::Font fontNotebook("gfx:fnt/nfont1a.fnt", colorTable);
+    m_fontGreen.load("gfx:fnt/nfont1a.fnt", colorTable);
+    m_fontYellow.load("gfx:fnt/nfont1b.fnt", colorTable);
     gfx::Texture noteback(gfx::Image::load("gfx:img/desktop/notebook/noteback.img", colorTable));
 
     QImage image(640, 480, QImage::Format_Indexed8);
@@ -49,12 +48,59 @@ Notebook::Notebook()
     label->setTexture(noteback);
     addChild(label);
 
-    button = new ui::Button;
-    button->setFont(fontNotebook);
-    button->setText(txt::StringTable::get(txt::Notebook_QuitGame));
-    button->setPosition(210, 331);
-    button->setSize(304, -1);
+    label = createLabel(txt::Notebook_Title, 30);
+    addChild(label);
+
+    label = createLabel(txt::Notebook_TitleLine, 40);
+    addChild(label);
+
+    button = createButton(txt::Notebook_Missions, 90);
     addChild(button);
+
+    button = createButton(txt::Notebook_LoadSave, 110);
+    addChild(button);
+
+    button = createButton(txt::Notebook_Options, 130);
+    addChild(button);
+
+    button = createButton(txt::Notebook_Map, 150);
+    addChild(button);
+
+    button = createButton(txt::Notebook_Back, 170);
+    connect(button, SIGNAL(clicked()), SIGNAL(close()));
+    addChild(button);
+
+    button = createButton(txt::Notebook_QuitGame, 210);
+    addChild(button);
+}
+
+
+ui::Label* Notebook::createLabel(txt::String text, float posY)
+{
+    ui::Label *label = new ui::Label;
+    label->setFont(m_fontYellow);
+    label->setText(txt::StringTable::get(text));
+    label->setPosition(210, 121 + posY);
+    label->setSize(304, -1);
+    return label;
+}
+
+
+ui::Button* Notebook::createButton(txt::String text, float posY)
+{
+    ui::Button *button = new ui::Button;
+    button->setFont(m_fontGreen);
+    button->setText(txt::StringTable::get(text));
+    button->setPosition(210, 121 + posY);
+    button->setSize(304, -1);
+    return button;
+}
+
+
+void Notebook::mousePressEvent(const QPointF &pos, Qt::MouseButton button)
+{
+    if (button == Qt::RightButton)
+        emit close();
 }
 
 

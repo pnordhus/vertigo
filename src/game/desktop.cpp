@@ -69,6 +69,7 @@ Desktop::Desktop(const QString &name)
     m_lblBackground.addChild(m_btnNotebook);
 
     m_notebook.hide();
+    connect(&m_notebook, SIGNAL(close()), SLOT(hideNotebook()));
 
     file.endGroup();
 
@@ -163,13 +164,6 @@ void Desktop::hideNotebook()
 
     m_notebookSound.load("sfx:snd/desktop/noteb3.pcm");
     m_notebookSound.play();
-}
-
-
-void Desktop::keyPressEvent(QKeyEvent *event)
-{
-    if (m_notebook.isVisible() && event->key() == Qt::Key_Escape)
-        hideNotebook();
 }
 
 

@@ -48,7 +48,6 @@ private slots:
 private:
     void activate();
     void deactivate();
-    void keyPressEvent(QKeyEvent *event);
 
 private:
     struct Video

@@ -19,7 +19,9 @@
 #define GAME_NOTEBOOK_H
 
 
-#include "ui/label.h"
+#include "gfx/font.h"
+#include "ui/button.h"
+#include "txt/stringtable.h"
 
 
 namespace game {
@@ -27,8 +29,24 @@ namespace game {
 
 class Notebook : public ui::Label
 {
+    Q_OBJECT
+
 public:
     Notebook();
+
+signals:
+    void close();
+
+private:
+    ui::Label* createLabel(txt::String text, float posY);
+    ui::Button* createButton(txt::String text, float posY);
+
+private:
+    void mousePressEvent(const QPointF &pos, Qt::MouseButton button);
+
+private:
+    gfx::Font m_fontGreen;
+    gfx::Font m_fontYellow;
 };
 
 

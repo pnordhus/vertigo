@@ -22,6 +22,7 @@ set(MOC_SOURCES
     desktop.h
     mainmenu.h
     movie.h
+    notebook.h
     vertigo.h
     window.h
 )
