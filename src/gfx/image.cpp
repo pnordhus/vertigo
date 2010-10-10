@@ -44,6 +44,32 @@ QImage Image::load(const QString &filename, const QVector<QRgb> &colorTable)
 }
 
 
+QImage Image::load(const QString &filename, int w, int h)
+{
+    QFile file(filename);
+    file.open(QFile::ReadOnly);
+
+    QDataStream stream(&file);
+    stream.setByteOrder(QDataStream::LittleEndian);
+
+    QImage image(w, h, QImage::Format_RGB888);
+
+    for (int y = 0; y < h; y++) {
+        for (int x = 0; x < w; x++) {
+            quint16 value;
+            stream >> value;
+
+            const quint8 r = (value >> 8) & 0xf8;
+            const quint8 g = (value >> 3) & 0xfc;
+            const quint8 b = (value << 3) & 0xf8;
+            image.setPixel(x, y, qRgb(r, g, b));
+        }
+    }
+
+    return image;
+}
+
+
 QImage Image::loadPCX(const QString &filename)
 {
     QFile file(filename);
