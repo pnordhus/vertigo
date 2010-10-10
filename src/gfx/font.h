@@ -32,7 +32,7 @@ public:
     FontPrivate();
 
 public:
-    void load(const QString &filename, const QVector<QRgb> &colorTable);
+    void load(const QString &filename, const QVector<QRgb> &colorTable, bool scale);
     QRectF draw(const QString &text, float x, float y, float w, float h, bool alignHCenter = false, bool alignVCenter = false);
     int height() const { return m_height; }
 
@@ -54,10 +54,10 @@ class Font
 {
 public:
     Font();
-    Font(const QString &filename, const QVector<QRgb> &colorTable);
+    Font(const QString &filename, const QVector<QRgb> &colorTable, bool scale = false);
 
 public:
-    void load(const QString &filename, const QVector<QRgb> &colorTable);
+    void load(const QString &filename, const QVector<QRgb> &colorTable, bool scale = false);
     QRectF draw(const QString &text, float x, float y);
     QRectF draw(const QString &text, const QPointF &pos);
     QRectF draw(const QString &text, const QPointF &pos, const QSizeF &size, bool alignHCenter, bool alignVCenter);
@@ -76,16 +76,16 @@ inline Font::Font() :
 }
 
 
-inline Font::Font(const QString &filename, const QVector<QRgb> &colorTable) :
+inline Font::Font(const QString &filename, const QVector<QRgb> &colorTable, bool scale) :
     d(new FontPrivate)
 {
-    load(filename, colorTable);
+    load(filename, colorTable, scale);
 }
 
 
-inline void Font::load(const QString &filename, const QVector<QRgb> &colorTable)
+inline void Font::load(const QString &filename, const QVector<QRgb> &colorTable, bool scale)
 {
-    d->load(filename, colorTable);
+    d->load(filename, colorTable, scale);
 }
 
 

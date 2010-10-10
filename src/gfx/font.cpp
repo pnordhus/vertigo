@@ -33,11 +33,14 @@ FontPrivate::FontPrivate() :
 }
 
 
-void FontPrivate::load(const QString &filename, const QVector<QRgb> &colorTable)
+void FontPrivate::load(const QString &filename, const QVector<QRgb> &colorTable, bool scale)
 {
     QFile file(filename);
     if (!file.open(QFile::ReadOnly))
         return;
+
+    int scaleFactor = scale ? 2 : 1;
+    const float res = 256 * scaleFactor;
 
     QDataStream stream(&file);
     stream.setByteOrder(QDataStream::LittleEndian);
@@ -46,15 +49,16 @@ void FontPrivate::load(const QString &filename, const QVector<QRgb> &colorTable)
     stream >> numEntries;
     stream.skipRawData(8);
 
-    m_texture.createEmpty(256, 256, Texture::RGBA);
+    m_texture.createEmpty(res, res, Texture::RGBA);
 
     int maxHeight = 0;
     int x = 1;
     int y = 1;
     for (unsigned int i = 0; i < numEntries; i++) {
         QImage image = Image::load(&file, Image::PaletteRLE, colorTable);
+        image = image.scaled(image.width() * scaleFactor, image.height() * scaleFactor);
 
-        if (x + image.width() + 1 >= 256) {
+        if (x + image.width() + 1 >= res) {
             x = 1;
             y += maxHeight + 1;
         }
@@ -62,12 +66,12 @@ void FontPrivate::load(const QString &filename, const QVector<QRgb> &colorTable)
         m_texture.update(x, y, image);
 
         Symbol symbol;
-        symbol.rect.setLeft(x / 256.0f);
-        symbol.rect.setRight((x + image.width()) / 256.0f);
-        symbol.rect.setTop(y / 256.0f);
-        symbol.rect.setBottom((y + image.height()) / 256.0f);
-        symbol.width = image.width();
-        symbol.height = image.height();
+        symbol.rect.setLeft(x / res);
+        symbol.rect.setRight((x + image.width()) / res);
+        symbol.rect.setTop(y / res);
+        symbol.rect.setBottom((y + image.height()) / res);
+        symbol.width = image.width() / scaleFactor;
+        symbol.height = image.height() / scaleFactor;
         m_symbols.append(symbol);
 
         maxHeight = qMax(maxHeight, image.height());
@@ -75,7 +79,7 @@ void FontPrivate::load(const QString &filename, const QVector<QRgb> &colorTable)
         x += image.width() + 1;
     }
 
-    m_height = maxHeight;
+    m_height = maxHeight / scaleFactor;
 }
 
 
