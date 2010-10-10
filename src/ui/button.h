@@ -37,7 +37,7 @@ signals:
 
 protected:
     void draw();
-    void mousePressEvent(const QPointF &pos, Qt::MouseButton button);
+    bool mousePressEvent(const QPointF &pos, Qt::MouseButton button);
     void mouseReleaseEvent(const QPointF &pos, Qt::MouseButton button);
 
 private:

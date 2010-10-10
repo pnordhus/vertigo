@@ -26,8 +26,8 @@ namespace game {
 Notebook::Notebook()
 {
     const util::ColorTable colorTable("gfx:pal/notebook/notebook.pal");
-    m_fontGreen.load("gfx:fnt/nfont1a.fnt", colorTable);
-    m_fontYellow.load("gfx:fnt/nfont1b.fnt", colorTable);
+    m_fontGreen.load("gfx:fnt/nfont1a.fnt", colorTable, true);
+    m_fontYellow.load("gfx:fnt/nfont1b.fnt", colorTable, true);
     gfx::Texture noteback(gfx::Image::load("gfx:img/desktop/notebook/noteback.img", colorTable));
 
     QImage image(640, 480, QImage::Format_Indexed8);
@@ -35,33 +35,42 @@ Notebook::Notebook()
     image.setColorTable(QVector<QRgb>() << qRgba(0, 0, 0, 128));
     setTexture(image);
 
-    ui::Label *label;
-    ui::Button *button;
+    ui::Label *labelBackground = new ui::Label(this);
+    labelBackground->setPosition(48, 48);
+    labelBackground->setTexture(gfx::Image::loadPCX("gfx:pic/notebook/notebook.pcx"));
 
-    label = new ui::Label(this);
-    label->setPosition(48, 48);
-    label->setTexture(gfx::Image::loadPCX("gfx:pic/notebook/notebook.pcx"));
+    {
+        m_lblMain = new ui::Label(labelBackground);
+        m_lblMain->setPosition(162, 73);
+        m_lblMain->setTexture(noteback);
 
-    m_lblMain = new ui::Label(this);
-    m_lblMain->setPosition(210, 121);
-    m_lblMain->setTexture(noteback);
+        ui::Widget *widget;
 
-    label = createLabel(m_lblMain, txt::Notebook_Title, 30);
+        widget = createLabel(m_lblMain, txt::Notebook_Title, 30);
 
-    label = createLabel(m_lblMain, txt::Notebook_TitleLine, 40);
+        widget = createLabel(m_lblMain, txt::Notebook_TitleLine, 40);
 
-    button = createButton(m_lblMain, txt::Notebook_Missions, 90);
+        widget = createButton(m_lblMain, txt::Notebook_Missions, 90);
 
-    button = createButton(m_lblMain, txt::Notebook_LoadSave, 110);
+        widget = createButton(m_lblMain, txt::Notebook_LoadSave, 110);
 
-    button = createButton(m_lblMain, txt::Notebook_Options, 130);
+        widget = createButton(m_lblMain, txt::Notebook_Options, 130);
 
-    button = createButton(m_lblMain, txt::Notebook_Map, 150);
+        widget = createButton(m_lblMain, txt::Notebook_Map, 150);
+        connect(widget, SIGNAL(clicked()), SLOT(showMap()));
 
-    button = createButton(m_lblMain, txt::Notebook_Back, 170);
-    connect(button, SIGNAL(clicked()), SIGNAL(close()));
+        widget = createButton(m_lblMain, txt::Notebook_Back, 170);
+        connect(widget, SIGNAL(clicked()), SIGNAL(close()));
 
-    button = createButton(m_lblMain, txt::Notebook_QuitGame, 210);
+        widget = createButton(m_lblMain, txt::Notebook_QuitGame, 210);
+    }
+
+    {
+        m_lblMap = new ui::Label(labelBackground);
+        m_lblMap->setPosition(164, 75);
+        m_lblMap->setTexture(gfx::Image::load("gfx:pic/notebook/ar02.r16", 304, 284));
+        m_lblMap->hide();
+    }
 }
 
 
@@ -89,10 +98,29 @@ ui::Button* Notebook::createButton(ui::Widget *parent, txt::String text, float p
 }
 
 
-void Notebook::mousePressEvent(const QPointF &pos, Qt::MouseButton button)
+void Notebook::showMap()
 {
-    if (button == Qt::RightButton)
-        emit close();
+    m_lblMain->hide();
+    m_lblMap->show();
+}
+
+
+bool Notebook::mousePressEvent(const QPointF &pos, Qt::MouseButton button)
+{
+    if (m_lblMap->isVisible()) {
+        m_lblMap->hide();
+        m_lblMain->show();
+        return true;
+    }
+
+    if (button == Qt::RightButton) {
+        if (m_lblMain->isVisible()) {
+            emit close();
+            return true;
+        }
+    }
+
+    return false;
 }
 
 

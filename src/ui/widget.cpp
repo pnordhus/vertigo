@@ -105,13 +105,19 @@ void Widget::doDraw()
 }
 
 
-void Widget::doMousePressEvent(const QPointF &pos, Qt::MouseButton button)
+bool Widget::doMousePressEvent(const QPointF &pos, Qt::MouseButton button)
 {
     if (m_visible && pos.x() >= m_rect.x() && pos.y() >= m_rect.y()) {
-        mousePressEvent(pos, button);
-        foreach (Widget *widget, m_children)
-            widget->doMousePressEvent(pos, button);
+        if (mousePressEvent(pos, button))
+            return true;
+
+        foreach (Widget *widget, m_children) {
+            if (widget->doMousePressEvent(pos, button))
+                return true;
+        }
     }
+
+    return false;
 }
 
 

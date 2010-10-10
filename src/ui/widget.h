@@ -46,14 +46,14 @@ public:
     QRectF mapToGlobal(QRectF rect) const;
 
     void doDraw();
-    void doMousePressEvent(const QPointF &pos, Qt::MouseButton button);
+    bool doMousePressEvent(const QPointF &pos, Qt::MouseButton button);
     void doMouseReleaseEvent(const QPointF &pos, Qt::MouseButton button);
     void doMouseMoveEvent(const QPointF &pos);
 
 private:
     void addChild(Widget*);
     virtual void draw() = 0;
-    virtual void mousePressEvent(const QPointF &pos, Qt::MouseButton button) {}
+    virtual bool mousePressEvent(const QPointF &pos, Qt::MouseButton button) { return false; }
     virtual void mouseReleaseEvent(const QPointF &pos, Qt::MouseButton button) {}
     virtual void mouseMoveEvent(const QPointF &pos) {}
 

@@ -44,10 +44,14 @@ void Button::draw()
 }
 
 
-void Button::mousePressEvent(const QPointF &pos, Qt::MouseButton button)
+bool Button::mousePressEvent(const QPointF &pos, Qt::MouseButton button)
 {
-    if (button == Qt::LeftButton && mapToGlobal(m_drawRect).contains(pos))
+    if (button == Qt::LeftButton && mapToGlobal(m_drawRect).contains(pos)) {
         m_pressed = true;
+        return true;
+    }
+
+    return false;
 }
 
 

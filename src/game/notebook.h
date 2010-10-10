@@ -37,17 +37,21 @@ public:
 signals:
     void close();
 
+private slots:
+    void showMap();
+
 private:
     ui::Label* createLabel(ui::Widget *parent, txt::String text, float posY);
     ui::Button* createButton(ui::Widget *parent, txt::String text, float posY);
 
 private:
-    void mousePressEvent(const QPointF &pos, Qt::MouseButton button);
+    bool mousePressEvent(const QPointF &pos, Qt::MouseButton button);
 
 private:
     gfx::Font m_fontGreen;
     gfx::Font m_fontYellow;
     ui::Label *m_lblMain;
+    ui::Label *m_lblMap;
 };
 
 
