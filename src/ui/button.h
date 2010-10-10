@@ -30,7 +30,7 @@ class Button : public Label
     Q_OBJECT
 
 public:
-    Button();
+    Button(Widget *parent = NULL);
 
 signals:
     void clicked();
@@ -42,6 +42,7 @@ protected:
 
 private:
     bool m_pressed;
+    QRectF m_drawRect;
 };
 
 

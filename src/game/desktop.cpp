@@ -50,23 +50,20 @@ Desktop::Desktop(const QString &name)
 
     ui::Label *label;
 
-    label = new ui::Label;
+    label = new ui::Label(&m_lblBackground);
     label->setFont(fontLarge);
     label->setPosition(8, 8);
     label->setText(file.value("Name").toString());
-    m_lblBackground.addChild(label);
 
-    label = new ui::Label;
+    label = new ui::Label(&m_lblBackground);
     label->setFont(fontSmall);
     label->setPosition(8, 10 + fontLarge.height());
     label->setText(file.value("Description").toStringList().join(", "));
-    m_lblBackground.addChild(label);
 
-    m_btnNotebook = new ui::Button;
+    m_btnNotebook = new ui::Button(&m_lblBackground);
     m_btnNotebook->setTexture(gfx::Image::loadPCX("gfx:pic/notebook/nbklein.pcx"));
     m_btnNotebook->setPosition(572, 424);
     connect(m_btnNotebook, SIGNAL(clicked()), SLOT(showNotebook()));
-    m_lblBackground.addChild(m_btnNotebook);
 
     m_notebook.hide();
     connect(&m_notebook, SIGNAL(close()), SLOT(hideNotebook()));

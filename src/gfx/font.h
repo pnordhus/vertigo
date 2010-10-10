@@ -33,7 +33,7 @@ public:
 
 public:
     void load(const QString &filename, const QVector<QRgb> &colorTable);
-    QRectF draw(const QString &text, float x, float y, float w, float h);
+    QRectF draw(const QString &text, float x, float y, float w, float h, bool alignHCenter = false, bool alignVCenter = false);
     int height() const { return m_height; }
 
 private:
@@ -60,7 +60,8 @@ public:
     void load(const QString &filename, const QVector<QRgb> &colorTable);
     QRectF draw(const QString &text, float x, float y);
     QRectF draw(const QString &text, const QPointF &pos);
-    QRectF draw(const QString &text, const QPointF &pos, const QSizeF &size);
+    QRectF draw(const QString &text, const QPointF &pos, const QSizeF &size, bool alignHCenter, bool alignVCenter);
+    QRectF draw(const QString &text, const QSizeF &size, bool alignHCenter, bool alignVCenter);
     int height() const;
 
 private:
@@ -100,9 +101,15 @@ inline QRectF Font::draw(const QString &text, const QPointF &pos)
 }
 
 
-inline QRectF Font::draw(const QString &text, const QPointF &pos, const QSizeF &size)
+inline QRectF Font::draw(const QString &text, const QPointF &pos, const QSizeF &size, bool alignHCenter, bool alignVCenter)
 {
-    return d->draw(text, pos.x(), pos.y(), size.width(), size.height());
+    return d->draw(text, pos.x(), pos.y(), size.width(), size.height(), alignHCenter, alignVCenter);
+}
+
+
+inline QRectF Font::draw(const QString &text, const QSizeF &size, bool alignHCenter, bool alignVCenter)
+{
+    return d->draw(text, 0, 0, size.width(), size.height(), alignHCenter, alignVCenter);
 }
 
 

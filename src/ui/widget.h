@@ -30,7 +30,7 @@ namespace ui {
 class Widget : public QObject
 {
 public:
-    Widget();
+    Widget(Widget *parent = NULL);
     ~Widget();
 
 public:
@@ -38,7 +38,12 @@ public:
     void hide();
     void show();
     bool isVisible() const { return m_visible; }
-    void addChild(Widget*);
+    void setPosition(float x, float y);
+    void setSize(float w, float h);
+    void setWidth(float w);
+    const QRectF& rect() const { return m_rect; }
+    QSizeF size() const { return m_rect.size(); }
+    QRectF mapToGlobal(QRectF rect) const;
 
     void doDraw();
     void doMousePressEvent(const QPointF &pos, Qt::MouseButton button);
@@ -46,16 +51,16 @@ public:
     void doMouseMoveEvent(const QPointF &pos);
 
 private:
+    void addChild(Widget*);
     virtual void draw() = 0;
     virtual void mousePressEvent(const QPointF &pos, Qt::MouseButton button) {}
     virtual void mouseReleaseEvent(const QPointF &pos, Qt::MouseButton button) {}
     virtual void mouseMoveEvent(const QPointF &pos) {}
 
 private:
+    Widget *m_parent;
     bool m_visible;
     QList<Widget*> m_children;
-
-protected:
     QRectF m_rect;
 };
 

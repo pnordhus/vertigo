@@ -38,8 +38,8 @@ signals:
     void close();
 
 private:
-    ui::Label* createLabel(txt::String text, float posY);
-    ui::Button* createButton(txt::String text, float posY);
+    ui::Label* createLabel(ui::Widget *parent, txt::String text, float posY);
+    ui::Button* createButton(ui::Widget *parent, txt::String text, float posY);
 
 private:
     void mousePressEvent(const QPointF &pos, Qt::MouseButton button);
@@ -47,6 +47,7 @@ private:
 private:
     gfx::Font m_fontGreen;
     gfx::Font m_fontYellow;
+    ui::Label *m_lblMain;
 };
 
 

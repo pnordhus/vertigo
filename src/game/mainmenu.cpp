@@ -45,51 +45,47 @@ MainMenu::MainMenu() :
 
     ui::Label *label;
 
-    label = new ui::Label;
+    label = new ui::Label(&m_title);
     label->setFont(fontSmall);
     label->setPosition(2, 2);
     label->setText("Vertigo 0.1");
-    m_title.addChild(label);
 
-    label = new ui::Label;
+    label = new ui::Label(&m_title);
     label->setFont(fontMedium);
     label->setPosition(145, 256 - fontMedium.height() - 2);
     label->setText(txt::StringTable::get(txt::MainMenu));
-    m_title.addChild(label);
 
-    label = new ui::Label;
+    label = new ui::Label(&m_title);
     label->setTexture(texBar);
     label->setPosition(140, 256);
-    m_title.addChild(label);
 
-    label = new ui::Label;
+    label = new ui::Label(&m_title);
     label->setTexture(texBar);
     label->setPosition(140, 448);
-    m_title.addChild(label);
 
     ui::Button *button;
-    button = new ui::Button;
+    button = new ui::Button(&m_title);
     button->setFont(fontLarge);
     button->setPosition(0, 288);
-    button->setSize(640, -1);
+    button->setWidth(640);
+    button->setAlignment(ui::Label::AlignHCenter);
     button->setText(txt::StringTable::get(txt::MainMenu_NewGame));
     connect(button, SIGNAL(clicked()), SIGNAL(startGame()));
-    m_title.addChild(button);
 
-    button = new ui::Button;
+    button = new ui::Button(&m_title);
     button->setFont(fontLarge);
     button->setPosition(0, 308);
-    button->setSize(640, -1);
+    button->setWidth(640);
+    button->setAlignment(ui::Label::AlignHCenter);
     button->setText(txt::StringTable::get(txt::MainMenu_Load));
-    m_title.addChild(button);
 
-    button = new ui::Button;
+    button = new ui::Button(&m_title);
     button->setFont(fontLarge);
     button->setPosition(0, 408);
-    button->setSize(640, -1);
+    button->setWidth(640);
+    button->setAlignment(ui::Label::AlignHCenter);
     button->setText(txt::StringTable::get(txt::MainMenu_QuitGame));
     connect(button, SIGNAL(clicked()), qApp, SLOT(quit()));
-    m_title.addChild(button);
 
     changeState(Presents);
 }

@@ -31,13 +31,21 @@ namespace ui {
 class Label : public Widget
 {
 public:
-    Label();
-    Label(const gfx::Font &font);
+    enum AlignmentFlags
+    {
+        AlignNone = 0,
+        AlignHCenter = 1,
+        AlignVCenter = 2,
+    };
+    Q_DECLARE_FLAGS(Alignment, AlignmentFlags);
 
 public:
+    Label(Widget *parent = NULL);
+    Label(const gfx::Font &font, Widget *parent = NULL);
+
+public:
+    void setAlignment(Alignment alignment);
     void setFont(const gfx::Font &font);
-    void setPosition(float x, float y);
-    void setSize(float w, float h);
     void setText(const QString &text);
     void setTexture(const gfx::Texture &texture);
 
@@ -49,11 +57,13 @@ protected:
 
 protected:
     gfx::Font m_font;
-    QPointF m_position;
-    QSizeF m_size;
     QString m_text;
     gfx::Texture m_texture;
+    Alignment m_alignment;
 };
+
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(Label::Alignment);
 
 
 } // namespace ui

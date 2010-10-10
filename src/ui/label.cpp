@@ -21,33 +21,31 @@
 namespace ui {
 
 
-Label::Label()
+Label::Label(Widget *parent) :
+    Widget(parent),
+    m_alignment(AlignNone)
 {
 
 }
 
 
-Label::Label(const gfx::Font &font)
+Label::Label(const gfx::Font &font, Widget *parent) :
+    Widget(parent),
+    m_alignment(AlignNone)
 {
     setFont(font);
+}
+
+
+void Label::setAlignment(Alignment alignment)
+{
+    m_alignment = alignment;
 }
 
 
 void Label::setFont(const gfx::Font &font)
 {
     m_font = font;
-}
-
-
-void Label::setPosition(float x, float y)
-{
-    m_position = QPointF(x, y);
-}
-
-
-void Label::setSize(float w, float h)
-{
-    m_size = QSizeF(w, h);
 }
 
 
@@ -66,9 +64,9 @@ void Label::setTexture(const gfx::Texture &texture)
 void Label::draw()
 {
     if (m_text.isEmpty())
-        m_rect = m_texture.draw(m_position);
+        m_texture.draw();
     else
-        m_rect = m_font.draw(m_text, m_position, m_size);
+        m_font.draw(m_text, size(), m_alignment & AlignHCenter, m_alignment & AlignVCenter);
 }
 
 

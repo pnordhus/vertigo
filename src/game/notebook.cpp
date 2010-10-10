@@ -38,61 +38,53 @@ Notebook::Notebook()
     ui::Label *label;
     ui::Button *button;
 
-    label = new ui::Label;
+    label = new ui::Label(this);
     label->setPosition(48, 48);
     label->setTexture(gfx::Image::loadPCX("gfx:pic/notebook/notebook.pcx"));
-    addChild(label);
 
-    label = new ui::Label;
-    label->setPosition(210, 121);
-    label->setTexture(noteback);
-    addChild(label);
+    m_lblMain = new ui::Label(this);
+    m_lblMain->setPosition(210, 121);
+    m_lblMain->setTexture(noteback);
 
-    label = createLabel(txt::Notebook_Title, 30);
-    addChild(label);
+    label = createLabel(m_lblMain, txt::Notebook_Title, 30);
 
-    label = createLabel(txt::Notebook_TitleLine, 40);
-    addChild(label);
+    label = createLabel(m_lblMain, txt::Notebook_TitleLine, 40);
 
-    button = createButton(txt::Notebook_Missions, 90);
-    addChild(button);
+    button = createButton(m_lblMain, txt::Notebook_Missions, 90);
 
-    button = createButton(txt::Notebook_LoadSave, 110);
-    addChild(button);
+    button = createButton(m_lblMain, txt::Notebook_LoadSave, 110);
 
-    button = createButton(txt::Notebook_Options, 130);
-    addChild(button);
+    button = createButton(m_lblMain, txt::Notebook_Options, 130);
 
-    button = createButton(txt::Notebook_Map, 150);
-    addChild(button);
+    button = createButton(m_lblMain, txt::Notebook_Map, 150);
 
-    button = createButton(txt::Notebook_Back, 170);
+    button = createButton(m_lblMain, txt::Notebook_Back, 170);
     connect(button, SIGNAL(clicked()), SIGNAL(close()));
-    addChild(button);
 
-    button = createButton(txt::Notebook_QuitGame, 210);
-    addChild(button);
+    button = createButton(m_lblMain, txt::Notebook_QuitGame, 210);
 }
 
 
-ui::Label* Notebook::createLabel(txt::String text, float posY)
+ui::Label* Notebook::createLabel(ui::Widget *parent, txt::String text, float posY)
 {
-    ui::Label *label = new ui::Label;
+    ui::Label *label = new ui::Label(parent);
     label->setFont(m_fontYellow);
     label->setText(txt::StringTable::get(text));
-    label->setPosition(210, 121 + posY);
-    label->setSize(304, -1);
+    label->setPosition(0, posY);
+    label->setWidth(304);
+    label->setAlignment(ui::Label::AlignHCenter);
     return label;
 }
 
 
-ui::Button* Notebook::createButton(txt::String text, float posY)
+ui::Button* Notebook::createButton(ui::Widget *parent, txt::String text, float posY)
 {
-    ui::Button *button = new ui::Button;
+    ui::Button *button = new ui::Button(parent);
     button->setFont(m_fontGreen);
     button->setText(txt::StringTable::get(text));
-    button->setPosition(210, 121 + posY);
-    button->setSize(304, -1);
+    button->setPosition(0, posY);
+    button->setWidth(304);
+    button->setAlignment(ui::Label::AlignHCenter);
     return button;
 }
 

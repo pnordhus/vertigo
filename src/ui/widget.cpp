@@ -16,16 +16,19 @@
  ***************************************************************************/
 
 #include "widget.h"
-#include <QDebug>
+#include <GL/gl.h>
 
 
 namespace ui {
 
 
-Widget::Widget() :
+Widget::Widget(Widget *parent) :
+    m_parent(parent),
     m_visible(true)
 {
-
+    setSize(640, 480);
+    if (parent)
+        parent->addChild(this);
 }
 
 
@@ -53,25 +56,58 @@ void Widget::show()
 }
 
 
+void Widget::setPosition(float x, float y)
+{
+    m_rect.moveTopLeft(QPointF(x, y));
+}
+
+
+void Widget::setSize(float w, float h)
+{
+    m_rect.setSize(QSizeF(w, h));
+}
+
+
+void Widget::setWidth(float w)
+{
+    m_rect.setWidth(w);
+}
+
+
 void Widget::addChild(Widget *widget)
 {
     m_children.append(widget);
 }
 
 
+QRectF Widget::mapToGlobal(QRectF rect) const
+{
+    rect.moveTopLeft(rect.topLeft() + m_rect.topLeft());
+    if (!m_parent)
+        return rect;
+
+    return m_parent->mapToGlobal(rect);
+}
+
+
 void Widget::doDraw()
 {
     if (m_visible) {
+        glPushMatrix();
+        glTranslatef(m_rect.x(), m_rect.y(), 0.0f);
+
         draw();
         foreach (Widget *widget, m_children)
             widget->doDraw();
+
+        glPopMatrix();
     }
 }
 
 
 void Widget::doMousePressEvent(const QPointF &pos, Qt::MouseButton button)
 {
-    if (m_visible && m_rect.contains(pos)) {
+    if (m_visible && pos.x() >= m_rect.x() && pos.y() >= m_rect.y()) {
         mousePressEvent(pos, button);
         foreach (Widget *widget, m_children)
             widget->doMousePressEvent(pos, button);

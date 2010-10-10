@@ -21,7 +21,8 @@
 namespace ui {
 
 
-Button::Button() :
+Button::Button(Widget *parent) :
+    Label(parent),
     m_pressed(false)
 {
 
@@ -31,21 +32,21 @@ Button::Button() :
 void Button::draw()
 {
     if (m_text.isEmpty()) {
-        m_rect = m_texture.draw(m_position);
+        m_drawRect = m_texture.draw();
     } else {
         QPointF offset;
         if (m_pressed)
             offset += QPointF(1, 1);
 
-        m_rect = m_font.draw(m_text, m_position + offset, m_size);
-        m_rect.setTopLeft(m_rect.topLeft() - offset);
+        m_drawRect = m_font.draw(m_text, offset, size(), m_alignment & AlignHCenter, m_alignment & AlignVCenter);
+        m_drawRect.setTopLeft(m_drawRect.topLeft() - offset);
     }
 }
 
 
 void Button::mousePressEvent(const QPointF &pos, Qt::MouseButton button)
 {
-    if (button == Qt::LeftButton)
+    if (button == Qt::LeftButton && mapToGlobal(m_drawRect).contains(pos))
         m_pressed = true;
 }
 
@@ -53,7 +54,7 @@ void Button::mousePressEvent(const QPointF &pos, Qt::MouseButton button)
 void Button::mouseReleaseEvent(const QPointF &pos, Qt::MouseButton button)
 {
     if (button == Qt::LeftButton) {
-        if (m_pressed && m_rect.contains(pos))
+        if (m_pressed && mapToGlobal(m_drawRect).contains(pos))
             emit clicked();
         m_pressed = false;
     }

@@ -79,13 +79,13 @@ void FontPrivate::load(const QString &filename, const QVector<QRgb> &colorTable)
 }
 
 
-QRectF FontPrivate::draw(const QString &text, float x, float y, float w, float h)
+QRectF FontPrivate::draw(const QString &text, float x, float y, float w, float h, bool alignHCenter, bool alignVCenter)
 {
     m_texture.bind();
 
     glPushMatrix();
 
-    if (w > 0) {
+    if (alignHCenter) {
         float totalW = 0.0f;
         for (int i = 0; i < text.size(); i++) {
             const quint8 c = text[i].toLatin1() - 32;
