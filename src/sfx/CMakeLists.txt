@@ -10,4 +10,4 @@ set(SOURCES
 )
 
 add_library(sfx ${SOURCES})
-target_link_libraries(sfx util ${OPENAL_LIBRARY})
+target_link_libraries(sfx ${OPENAL_LIBRARY})

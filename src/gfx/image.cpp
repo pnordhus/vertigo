@@ -15,9 +15,9 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
+#include "colortable.h"
 #include "image.h"
-#include "util/colortable.h"
-#include "util/rle.h"
+#include "rle.h"
 #include <QBitmap>
 #include <QCursor>
 #include <QFile>
@@ -136,7 +136,7 @@ QImage Image::loadPCX(const QString &filename)
         stream >> c;
     } while (c != 12);
 
-    util::ColorTable colorTable;
+    gfx::ColorTable colorTable;
     colorTable.load(file.read(256 * 3));
     colorTable[0] = qRgba(0,0,0,0);
 
@@ -187,7 +187,7 @@ QImage Image::load(QIODevice *device, Type type, const QVector<QRgb> &colorTable
     switch (type) {
     case PaletteRLE:
         stream >> length;
-        image = util::RLE::decodeImage(device->read(length), width, height, colorTable);
+        image = RLE::decodeImage(device->read(length), width, height, colorTable);
         break;
 
     case Palette:
@@ -197,7 +197,7 @@ QImage Image::load(QIODevice *device, Type type, const QVector<QRgb> &colorTable
 
     case RGB565:
         stream >> length;
-        image = util::RLE::decodeImage(device->read(length), width, height);
+        image = RLE::decodeImage(device->read(length), width, height);
         break;
     }
 

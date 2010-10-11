@@ -19,10 +19,10 @@
 #define GFX_VIDEO_H
 
 
+#include "colortable.h"
 #include <QFile>
 #include <QImage>
 #include <QTime>
-#include "util/colortable.h"
 
 
 namespace gfx {
@@ -66,7 +66,7 @@ private:
     };
 
     QList<Entry> m_entries;
-    util::ColorTable m_colorTable;
+    ColorTable m_colorTable;
     QByteArray m_indexMap;
     QByteArray m_frame;
     QFile m_file;

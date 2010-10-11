@@ -16,10 +16,10 @@
  ***************************************************************************/
 
 #include "mainmenu.h"
+#include "gfx/colortable.h"
 #include "gfx/image.h"
 #include "txt/stringtable.h"
 #include "ui/button.h"
-#include "util/colortable.h"
 #include <QApplication>
 #include <QKeyEvent>
 #include <GL/gl.h>
@@ -31,7 +31,7 @@ namespace game {
 MainMenu::MainMenu() :
     m_state(Invalid)
 {
-    util::ColorTable colorTable("gfx:pal/gui/border.pal");
+    const gfx::ColorTable colorTable("gfx:pal/gui/border.pal");
 
     gfx::Texture texBar(gfx::Image::load("gfx:img/title/horline.img", colorTable));
     gfx::Font fontSmall("gfx:fnt/dpsmall.fnt", colorTable);

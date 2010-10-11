@@ -15,14 +15,14 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef UTIL_RLE_H
-#define UTIL_RLE_H
+#ifndef GFX_RLE_H
+#define GFX_RLE_H
 
 
 #include <QImage>
 
 
-namespace util {
+namespace gfx {
 
 
 class RLE
@@ -52,7 +52,7 @@ private:
 };
 
 
-} // namespace util
+} // namespace gfx
 
 
-#endif // UTIL_RLE_H
+#endif // GFX_RLE_H

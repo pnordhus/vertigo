@@ -18,7 +18,7 @@
 #include "rle.h"
 
 
-namespace util {
+namespace gfx {
 
 
 qint32 RLE::readValue(QDataStream &stream)
@@ -167,4 +167,4 @@ QImage RLE::decodeImage(const QByteArray &data, int width, int height)
 }
 
 
-} // namespace util
+} // namespace gfx

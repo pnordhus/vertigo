@@ -17,7 +17,7 @@
 
 #include "font.h"
 #include "image.h"
-#include "util/rle.h"
+#include "rle.h"
 #include <QFile>
 #include <GL/gl.h>
 

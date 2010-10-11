@@ -28,7 +28,7 @@ namespace game {
 
 Desktop::Desktop(const QString &name)
 {
-    const util::ColorTable colorTable("gfx:pal/gui/border.pal");
+    const gfx::ColorTable colorTable("gfx:pal/gui/border.pal");
 
     gfx::Font fontSmall("gfx:fnt/dpsmall.fnt", colorTable);
     gfx::Font fontMedium("gfx:fnt/dpmedium.fnt", colorTable);

@@ -17,8 +17,8 @@
 
 #include "renderer.h"
 #include "window.h"
+#include "gfx/colortable.h"
 #include "gfx/image.h"
-#include "util/colortable.h"
 #include <QAction>
 
 
@@ -33,7 +33,7 @@ Window::Window() :
     connect(actionFullScreen, SIGNAL(triggered()), SLOT(toggleFullScreen()));
     addAction(actionFullScreen);
 
-    util::ColorTable colorTable("gfx:pal/gui/cursor.pal");
+    const gfx::ColorTable colorTable("gfx:pal/gui/cursor.pal");
     m_cursor = gfx::Image::loadCursor("gfx:img/desktop/gui/cur_norm.img", colorTable);
     setWindowTitle("Vertigo");
     makeCurrent();

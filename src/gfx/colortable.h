@@ -15,48 +15,30 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "colortable.h"
-#include <QFile>
+#ifndef GFX_COLORTABLE_H
+#define GFX_COLORTABLE_H
 
 
-namespace util {
+#include <QRgb>
+#include <QVector>
 
 
-ColorTable::ColorTable()
+namespace gfx {
+
+
+class ColorTable : public QVector<QRgb>
 {
+public:
+    ColorTable();
+    ColorTable(const QString &filename);
 
-}
-
-
-ColorTable::ColorTable(const QString &filename)
-{
-    loadFromFile(filename);
-}
-
-
-bool ColorTable::loadFromFile(const QString &filename)
-{
-    QFile file(filename);
-    if (!file.open(QFile::ReadOnly))
-        return false;
-    file.seek(4);
-    load(file.readAll());
-    return true;
-}
+public:
+    bool loadFromFile(const QString &filename);
+    void load(const QByteArray &data);
+};
 
 
-void ColorTable::load(const QByteArray &data)
-{
-    Q_ASSERT(data.size() == 256 * 3);
-
-    clear();
-
-    // the game uses RGB 565 for rendering, even if some color tables are RGB 888
-    // zero the corresponding bits, to get matching color values with different tables
-    // fixes artifacts on overlay videos
-    for (int i = 0; i < data.size(); i += 3)
-        append(qRgb(data[i + 0] & 0xf8, data[i + 1] & 0xfc, data[i + 2] & 0xf8));
-}
+} // namespace gfx
 
 
-} // namespace util
+#endif // GFX_COLORTABLE_H

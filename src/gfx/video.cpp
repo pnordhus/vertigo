@@ -15,8 +15,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
+#include "rle.h"
 #include "video.h"
-#include "util/rle.h"
 #include <QDataStream>
 
 
@@ -280,7 +280,7 @@ void Video::loadColorTable(const QByteArray &data)
 
 void Video::loadVideoFull(const QByteArray &data)
 {
-    util::RLE rle;
+    RLE rle;
     m_frame = rle.decode(data);
 }
 
@@ -299,7 +299,7 @@ void Video::loadVideoDiff(const QByteArray &data)
     QByteArray indices = QByteArray::fromRawData(data.data() + 4 * sizeof(quint32), sizeIndices);
     QByteArray bitmap = QByteArray::fromRawData(data.data() + 4 * sizeof(quint32) + sizeIndices, sizeBitmap);
 
-    util::RLE rle;
+    RLE rle;
     if (sizeIndices != sizeIndicesUnpacked)
         indices = rle.decode(indices);
     if (sizeBitmap != sizeBitmapUnpacked)

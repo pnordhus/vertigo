@@ -16,8 +16,8 @@
  ***************************************************************************/
 
 #include "notebook.h"
+#include "gfx/colortable.h"
 #include "gfx/image.h"
-#include "util/colortable.h"
 
 
 namespace game {
@@ -25,7 +25,7 @@ namespace game {
 
 Notebook::Notebook()
 {
-    const util::ColorTable colorTable("gfx:pal/notebook/notebook.pal");
+    const gfx::ColorTable colorTable("gfx:pal/notebook/notebook.pal");
     m_fontGreen.load("gfx:fnt/nfont1a.fnt", colorTable, true);
     m_fontYellow.load("gfx:fnt/nfont1b.fnt", colorTable, true);
     gfx::Texture noteback(gfx::Image::load("gfx:img/desktop/notebook/noteback.img", colorTable));
