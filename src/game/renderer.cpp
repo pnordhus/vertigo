@@ -16,7 +16,7 @@
  ***************************************************************************/
 
 #include "renderer.h"
-#include <GL/gl.h>
+#include <QGLContext>
 
 
 namespace game {

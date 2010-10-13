@@ -21,8 +21,8 @@
 #include "txt/stringtable.h"
 #include "ui/button.h"
 #include <QApplication>
+#include <QGLContext>
 #include <QKeyEvent>
-#include <GL/gl.h>
 
 
 namespace game {

@@ -19,7 +19,7 @@
 #include "image.h"
 #include "rle.h"
 #include <QFile>
-#include <GL/gl.h>
+#include <QGLContext>
 
 
 namespace gfx {
