@@ -64,6 +64,7 @@ private:
     sfx::Sound m_nameSound;
     sfx::Sound m_notebookSound;
     ui::Label m_lblBackground;
+    ui::Widget *m_widgetRooms;
     ui::Button *m_btnNotebook;
     Notebook m_notebook;
     ui::Button *m_btnQuit;

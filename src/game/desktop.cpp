@@ -70,7 +70,7 @@ Desktop::Desktop(const QString &name)
 
     file.endGroup();
 
-    foreach (const QString &section, file.childGroups().filter("MiniMovie")) {
+    foreach (const QString &section, file.childGroups().filter(QRegExp("^MiniMovie"))) {
         file.beginGroup(section);
 
         const QString name = file.value("Name").toString();
@@ -92,6 +92,50 @@ Desktop::Desktop(const QString &name)
         video->time = float(qrand()) / RAND_MAX * video->rndMax;
 
         m_videos.append(video);
+
+        file.endGroup();
+    }
+
+
+    m_widgetRooms = new ui::Label(&m_lblBackground);
+    foreach (const QString &section, file.childGroups().filter(QRegExp("^Room"))) {
+        file.beginGroup(section);
+
+        const QString name = file.value("Name").toString();
+        const QString arrow = file.value("Arrow").toString();
+        const int width = fontMedium.width(name);
+
+        const bool left = arrow.endsWith("Left");
+        const bool top = arrow.startsWith("Top");
+
+        char arrowX = 'l';
+        char arrowY = 't';
+        QPoint offset(11, 3);
+        QPoint offsetArrow;
+
+        if (left) {
+            offsetArrow.setX(-10);
+            offset.setX(-1 - width);
+            arrowX = 'r';
+        }
+
+        if (top) {
+            offsetArrow.setY(-10);
+            offset.setY(-3);
+            arrowY = 'b';
+        }
+
+        offset += offsetArrow;
+
+        ui::Label *lblArrow = new ui::Label(m_widgetRooms);
+        lblArrow->setTexture(gfx::Image::load(QString("gfx:img/desktop/gui/arr%1%2lar.img").arg(arrowY).arg(arrowX), colorTable));
+        lblArrow->setPosition(offsetArrow.x() + file.value("X").toInt(), offsetArrow.y() + file.value("Y").toInt());
+
+        ui::Button *button = new ui::Button(m_widgetRooms);
+        button->setOffset(0);
+        button->setFont(fontMedium);
+        button->setText(name);
+        button->setPosition(offset.x() + file.value("X").toInt(), offset.y() + file.value("Y").toInt());
 
         file.endGroup();
     }
