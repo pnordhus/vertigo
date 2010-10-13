@@ -16,6 +16,7 @@
  ***************************************************************************/
 
 #include "stream.h"
+#include <QVector>
 #include <al.h>
 
 
@@ -86,9 +87,11 @@ quint32 Stream::processed() const
 void Stream::clearBuffers()
 {
     const quint32 buffersProcessed = processed();
-    ALuint bufs[buffersProcessed];
-    alSourceUnqueueBuffers(m_source, buffersProcessed, bufs);
-    alDeleteBuffers(buffersProcessed, bufs);
+    if (buffersProcessed > 0) {
+        QVector<ALuint> bufs(buffersProcessed);
+        alSourceUnqueueBuffers(m_source, buffersProcessed, &bufs[0]);
+        alDeleteBuffers(buffersProcessed, &bufs[0]);
+    }
 }
 
 

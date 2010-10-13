@@ -26,6 +26,17 @@
 #include <QtEndian>
 
 
+#ifdef _MSC_VER
+#	pragma pack( push, packing )
+#	pragma pack( 1 )
+#	define PACK_STRUCT
+#elif defined( __GNUC__ )
+#	define PACK_STRUCT	__attribute__((packed))
+#else
+#	error byte-alignment not handled for this compiler
+#endif
+
+
 namespace gfx {
 
 
@@ -91,7 +102,7 @@ QImage Image::loadPCX(const QString &filename)
         qint16 hScreenSize;
         qint16 vScreenSize;
         quint8 filler[54];
-    } __attribute__ ((packed));
+    } PACK_STRUCT;
 
     Header header;
     file.read((char *) &header, sizeof(header));
