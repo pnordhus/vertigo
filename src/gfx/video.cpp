@@ -69,6 +69,7 @@ void Video::open(const QString &filename)
     stream >> hasAudio >> channels >> sampleRate;
     stream.skipRawData(4);
 
+    m_hasAudio = hasAudio;
 
     if (stream.atEnd())
         return;
@@ -155,7 +156,7 @@ QImage Video::getFrame()
         switch (entry.type) {
         case Entry::ColorTable:
             loadColorTable(m_file.read(entry.length));
-            if (m_videoPos > 1)
+            if (m_hasAudio)
                 gotFrame = true;
             break;
 
@@ -219,30 +220,31 @@ QByteArray Video::getAudio()
         }
     }
 
-    if (lastAudioPos < m_videoPos) {
-        bool colorTableChanged = false;
-        for (int i = m_videoPos; i >= int(lastAudioPos); i--) {
-            if (m_entries[i].type == Entry::ColorTable) {
-                colorTableChanged = true;
-                break;
+    if (gotAudioLeft && gotAudioRight) {
+        if (lastAudioPos < m_videoPos) {
+            bool colorTableChanged = false;
+            for (int i = m_videoPos; i >= int(lastAudioPos); i--) {
+                if (m_entries[i].type == Entry::ColorTable) {
+                    colorTableChanged = true;
+                    break;
+                }
+            }
+
+            m_videoPos = lastAudioPos;
+            if (colorTableChanged) {
+                while (m_entries[m_videoPos].type != Entry::ColorTable)
+                    m_videoPos--;
+            } else {
+                while (m_entries[m_videoPos].type != Entry::VideoFull)
+                    m_videoPos--;
             }
         }
 
-        m_videoPos = lastAudioPos;
-        if (colorTableChanged) {
-            while (m_entries[m_videoPos].type != Entry::ColorTable)
-                m_videoPos--;
-        } else {
-            while (m_entries[m_videoPos].type != Entry::VideoFull)
-                m_videoPos--;
-        }
-    }
+        if (lastAudioPos > m_videoPos)
+            m_nextVideoPos = lastAudioPos;
 
-    if (lastAudioPos > m_videoPos)
-        m_nextVideoPos = lastAudioPos;
-
-    if (gotAudioLeft && gotAudioRight)
         return data;
+    }
 
     return QByteArray();
 }

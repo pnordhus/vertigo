@@ -71,11 +71,11 @@ void Movie::draw()
         if (!m_pause) {
             if (m_stream.queued() < 2 || m_stream.processed() > 0) {
                 const QByteArray audio = m_video.getAudio();
-                if (!audio.isEmpty())
+                if (!audio.isEmpty()) {
                     m_stream.add(audio);
-
-                if (!m_stream.isPlaying())
-                    m_stream.play();
+                    if (!m_stream.isPlaying())
+                        m_stream.play();
+                }
             }
 
             QImage image = m_video.getFrame();

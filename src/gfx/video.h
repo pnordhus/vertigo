@@ -77,6 +77,7 @@ private:
     quint32 m_nextVideoPos;
     quint32 m_audioPos;
     quint32 m_lastAudioPos;
+    bool m_hasAudio;
 
     QTime m_time;
     bool m_playing;
