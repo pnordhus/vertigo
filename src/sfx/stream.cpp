@@ -16,7 +16,7 @@
  ***************************************************************************/
 
 #include "stream.h"
-#include <AL/al.h>
+#include <al.h>
 
 
 namespace sfx {

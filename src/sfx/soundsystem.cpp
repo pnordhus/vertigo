@@ -16,7 +16,7 @@
  ***************************************************************************/
 
 #include "soundsystem.h"
-#include <AL/alc.h>
+#include <alc.h>
 
 
 namespace sfx {

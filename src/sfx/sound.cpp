@@ -16,7 +16,7 @@
  ***************************************************************************/
 
 #include "sound.h"
-#include <AL/al.h>
+#include <al.h>
 #include <QFile>
 
 
