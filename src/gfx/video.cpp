@@ -162,7 +162,7 @@ QImage Video::getFrame()
 
         case Entry::VideoFull:
             loadVideoFull(m_file.read(entry.length));
-            gotFrame = true;
+            gotFrame = !m_frame.isNull();
             break;
 
         case Entry::VideoDiff:

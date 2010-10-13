@@ -35,7 +35,7 @@ public:
 private:
     qint32 readValue(QDataStream &stream);
     void increaseBits();
-    void addEntry(qint32 value, QByteArray &unpacked);
+    bool addEntry(qint32 value, QByteArray &unpacked);
 
 private:
     struct Entry

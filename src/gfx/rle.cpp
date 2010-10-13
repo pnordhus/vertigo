@@ -49,9 +49,11 @@ void RLE::increaseBits()
 }
 
 
-void RLE::addEntry(qint32 value, QByteArray &unpacked)
+bool RLE::addEntry(qint32 value, QByteArray &unpacked)
 {
-    Q_ASSERT(value >= 3);
+    if (value < 3)
+        return false;
+
     value -= 3;
 
     Entry newEntry;
@@ -62,7 +64,8 @@ void RLE::addEntry(qint32 value, QByteArray &unpacked)
         newEntry.length = 2;
     } else {
         value -= 256;
-        Q_ASSERT(value < m_entries.size());
+        if (value >= m_entries.size())
+            return false;
 
         const Entry &entry = m_entries[value];
         for (unsigned int i = 0; i < entry.length; i++)
@@ -72,6 +75,7 @@ void RLE::addEntry(qint32 value, QByteArray &unpacked)
     }
 
     m_entries.append(newEntry);
+    return true;
 }
 
 
@@ -96,7 +100,10 @@ QByteArray RLE::decode(const QByteArray &input)
 
     while (unpacked.size() < sizeUnpacked) {
         const qint32 value = readValue(stream);
-        addEntry(value, unpacked);
+        if (!addEntry(value, unpacked)) {
+            qDebug("Invalid video data!");
+            return QByteArray();
+        }
         increaseBits();
     }
 
