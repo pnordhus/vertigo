@@ -25,7 +25,7 @@
 namespace sfx {
 
 
-class SoundSystemPrivate;
+struct SoundSystemPrivate;
 
 
 class SoundSystem
