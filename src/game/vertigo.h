@@ -40,7 +40,7 @@ public:
     ~Vertigo();
 
 public:
-    void start();
+    bool start();
 
 private slots:
     void update();

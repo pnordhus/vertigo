@@ -31,7 +31,8 @@ int main(int argc, char *argv[])
 
     sfx::SoundSystem soundSystem;
     game::Vertigo vertigo;
-    vertigo.start();
+    if (!vertigo.start())
+        return 1;
 
     return app.exec();
 }

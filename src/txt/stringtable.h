@@ -224,7 +224,7 @@ enum String
 class StringTable
 {
 public:
-    static void load();
+    static bool load();
     static QString get(String string);
 
 private:

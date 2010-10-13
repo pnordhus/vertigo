@@ -26,10 +26,13 @@ namespace txt {
 QStringList StringTable::m_table;
 
 
-void StringTable::load()
+bool StringTable::load()
 {
     DesFile fileDes("txt:deeptext.des");
     fileDes.beginGroup("Text");
+
+    if (!fileDes.contains("Text190"))
+        return false;
 
     for (int i = 0; ; i++) {
         const QString key = QString("Text%1").arg(i);
@@ -38,6 +41,8 @@ void StringTable::load()
 
         m_table.append(fileDes.value(key).toString());
     }
+
+    return true;
 }
 
 

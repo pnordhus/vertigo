@@ -22,6 +22,7 @@
 #include "window.h"
 #include "txt/stringtable.h"
 #include <QDir>
+#include <QFileDialog>
 #include <QSettings>
 #include <QTimer>
 
@@ -30,30 +31,12 @@ namespace game {
 
 
 Vertigo::Vertigo() :
+    m_window(NULL),
+    m_mainMenu(NULL),
     m_movie(NULL),
     m_desktop(NULL)
 {
-    QSettings s;
 
-    QDir::addSearchPath("data", s.value("datadir").toString());
-    QDir::addSearchPath("dat", "data:dat");
-    QDir::addSearchPath("gfx", "data:gfx");
-    QDir::addSearchPath("sfx", "data:sfx");
-    QDir::addSearchPath("txt", "data:txt");
-    QDir::addSearchPath("vfx", "data:vfx");
-
-    txt::StringTable::load();
-
-    m_window = new Window;
-
-    m_mainMenu = new MainMenu;
-    connect(m_mainMenu, SIGNAL(startGame()), SLOT(startGame()));
-
-    m_window->setRenderer(m_mainMenu);
-
-    QTimer *timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), SLOT(update()));
-    timer->start(20);
 }
 
 
@@ -66,9 +49,37 @@ Vertigo::~Vertigo()
 }
 
 
-void Vertigo::start()
+bool Vertigo::start()
 {
+    QDir::addSearchPath("dat", "data:dat");
+    QDir::addSearchPath("gfx", "data:gfx");
+    QDir::addSearchPath("sfx", "data:sfx");
+    QDir::addSearchPath("txt", "data:txt");
+    QDir::addSearchPath("vfx", "data:vfx");
+
+    QSettings s;
+    QDir::setSearchPaths("data", QStringList() << s.value("datadir").toString());
+    while (!txt::StringTable::load()) {
+        const QString dir = QFileDialog::getExistingDirectory(NULL, "Select Schleichfahrt / Archimedean Dynasty directory", s.value("datadir").toString());
+        if (dir.isNull())
+            return false;
+        s.setValue("datadir", dir);
+        QDir::setSearchPaths("data", QStringList() << s.value("datadir").toString());
+    }
+
+    m_window = new Window;
+
+    m_mainMenu = new MainMenu;
+    connect(m_mainMenu, SIGNAL(startGame()), SLOT(startGame()));
+
+    m_window->setRenderer(m_mainMenu);
+
+    QTimer *timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), SLOT(update()));
+    timer->start(20);
+
     m_window->show();
+    return true;
 }
 
 
