@@ -19,7 +19,7 @@
 #define GAME_VERTIGO_H
 
 
-#include <QObject>
+#include <QStringList>
 
 
 namespace game {
@@ -48,10 +48,14 @@ private slots:
     void movieFinished();
 
 private:
+    void playMovie(const QString &filename);
+
+private:
     Window *m_window;
     MainMenu *m_mainMenu;
     Movie *m_movie;
     Desktop *m_desktop;
+    QStringList m_movies;
 };
 
 

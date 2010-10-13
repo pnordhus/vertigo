@@ -83,23 +83,36 @@ void Vertigo::startGame()
     m_mainMenu->deleteLater();
     m_mainMenu = NULL;
 
+    playMovie("gfx:mvi/film/d02.mvi");
+
+    Q_ASSERT(m_desktop == NULL);
+    m_desktop = new Desktop("st0201");
+
+    m_movies.append(m_desktop->approachMovie());
+}
+
+
+void Vertigo::playMovie(const QString &filename)
+{
     Q_ASSERT(m_movie == NULL);
     m_movie = new Movie;
     connect(m_movie, SIGNAL(finished()), SLOT(movieFinished()));
 
     m_window->setRenderer(m_movie);
-    m_movie->play("gfx:mvi/film/d02.mvi");
-
-    Q_ASSERT(m_desktop == NULL);
-    m_desktop = new Desktop("st0201");
+    m_movie->play(filename);
 }
 
 
 void Vertigo::movieFinished()
 {
-    m_window->setRenderer(m_desktop);
+    m_window->setRenderer(NULL);
     delete m_movie;
     m_movie = NULL;
+
+    if (!m_movies.isEmpty())
+        playMovie(m_movies.takeFirst());
+    else
+        m_window->setRenderer(m_desktop);
 }
 
 

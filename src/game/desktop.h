@@ -40,6 +40,7 @@ public:
 
 public:
     void draw();
+    const QString &approachMovie() const { return m_approachMovie; }
 
 private slots:
     void showNotebook();
@@ -70,6 +71,7 @@ private:
     ui::Button *m_btnQuit;
     QList<Video*> m_videos;
     QTime m_time;
+    QString m_approachMovie;
 };
 
 

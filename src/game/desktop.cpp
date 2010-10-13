@@ -44,6 +44,7 @@ Desktop::Desktop(const QString &name)
     m_background.fromImage(gfx::Image::loadPCX("gfx:pic/bground/" + background + ".pcx"));
     m_backgroundSound.load("sfx:snd/bground/" + backgroundSound + ".pcl", "sfx:snd/bground/" + backgroundSound + ".pcr");
     m_nameSound.load("sfx:snd/names/" + nameSound + ".pcm");
+    m_approachMovie = QString("gfx:mvi/approach/%1.mvi").arg(file.value("ApproachMovie").toString());
 
     m_lblBackground.setTexture(m_background);
     setRootWidget(&m_lblBackground);
