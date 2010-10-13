@@ -35,6 +35,9 @@ public:
 signals:
     void clicked();
 
+public:
+    void setOffset(float offset);
+
 protected:
     void draw();
     bool mousePressEvent(const QPointF &pos, Qt::MouseButton button);
@@ -43,6 +46,7 @@ protected:
 private:
     bool m_pressed;
     QRectF m_drawRect;
+    float m_offset;
 };
 
 

@@ -23,9 +23,16 @@ namespace ui {
 
 Button::Button(Widget *parent) :
     Label(parent),
-    m_pressed(false)
+    m_pressed(false),
+    m_offset(1.0f)
 {
 
+}
+
+
+void Button::setOffset(float offset)
+{
+    m_offset = offset;
 }
 
 
@@ -36,7 +43,7 @@ void Button::draw()
     } else {
         QPointF offset;
         if (m_pressed)
-            offset += QPointF(1, 1);
+            offset += QPointF(m_offset, m_offset);
 
         m_drawRect = m_font.draw(m_text, offset, size(), m_alignment & AlignHCenter, m_alignment & AlignVCenter);
         m_drawRect.setTopLeft(m_drawRect.topLeft() - offset);
