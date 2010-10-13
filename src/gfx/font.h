@@ -35,6 +35,7 @@ public:
     void load(const QString &filename, const QVector<QRgb> &colorTable, bool scale);
     QRectF draw(const QString &text, float x, float y, float w, float h, bool alignHCenter = false, bool alignVCenter = false);
     int height() const { return m_height; }
+    int width(const QString &text) const;
 
 private:
     struct Symbol
@@ -63,6 +64,7 @@ public:
     QRectF draw(const QString &text, const QPointF &pos, const QSizeF &size, bool alignHCenter, bool alignVCenter);
     QRectF draw(const QString &text, const QSizeF &size, bool alignHCenter, bool alignVCenter);
     int height() const;
+    int width(const QString &text) const;
 
 private:
     QExplicitlySharedDataPointer<FontPrivate> d;
@@ -116,6 +118,12 @@ inline QRectF Font::draw(const QString &text, const QSizeF &size, bool alignHCen
 inline int Font::height() const
 {
     return d->height();
+}
+
+
+inline int Font::width(const QString &text) const
+{
+    return d->width(text);
 }
 
 

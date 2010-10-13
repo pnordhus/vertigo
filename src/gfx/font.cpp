@@ -90,13 +90,7 @@ QRectF FontPrivate::draw(const QString &text, float x, float y, float w, float h
     glPushMatrix();
 
     if (alignHCenter) {
-        float totalW = 0.0f;
-        for (int i = 0; i < text.size(); i++) {
-            const quint8 c = text[i].toLatin1() - 32;
-            const Symbol &symbol = m_symbols[c];
-            totalW += symbol.width;
-        }
-
+        const float totalW = width(text);
         if (w > totalW)
             x += (w - totalW) / 2;
     }
@@ -133,6 +127,19 @@ QRectF FontPrivate::draw(const QString &text, float x, float y, float w, float h
     rect.setHeight(m_height);
     rect.setWidth(width);
     return rect;
+}
+
+
+int FontPrivate::width(const QString &text) const
+{
+    int totalW = 0;
+    for (int i = 0; i < text.size(); i++) {
+        const quint8 c = text[i].toLatin1() - 32;
+        const Symbol &symbol = m_symbols[c];
+        totalW += symbol.width;
+    }
+
+    return totalW;
 }
 
 
