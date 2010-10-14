@@ -37,6 +37,7 @@ signals:
 
 public:
     void setOffset(float offset);
+    void setPressedTexture(const gfx::Texture &texture);
 
 protected:
     void draw();
@@ -45,8 +46,8 @@ protected:
 
 private:
     bool m_pressed;
-    QRectF m_drawRect;
     float m_offset;
+    gfx::Texture m_pressedTexture;
 };
 
 

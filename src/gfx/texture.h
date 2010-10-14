@@ -40,6 +40,7 @@ public:
     Texture(const QImage &image);
 
 public:
+    bool isValid() const;
     int width() const;
     int height() const;
     void bind();
@@ -64,6 +65,7 @@ public:
     ~TexturePrivate();
 
 public:
+    bool isValid() const { return m_texture != 0; }
     int width() const { return m_width; }
     int height() const { return m_height; }
     void bind();
@@ -97,6 +99,12 @@ inline Texture::Texture(const QImage &image) :
     d(new TexturePrivate)
 {
     d->fromImage(image);
+}
+
+
+inline bool Texture::isValid() const
+{
+    return d->isValid();
 }
 
 

@@ -36,10 +36,19 @@ void Button::setOffset(float offset)
 }
 
 
+void Button::setPressedTexture(const gfx::Texture &texture)
+{
+    m_pressedTexture = texture;
+}
+
+
 void Button::draw()
 {
     if (m_text.isEmpty()) {
-        m_drawRect = m_texture.draw();
+        if (m_pressed && m_pressedTexture.isValid())
+            m_drawRect = m_pressedTexture.draw();
+        else
+            m_drawRect = m_texture.draw();
     } else {
         QPointF offset;
         if (m_pressed)
