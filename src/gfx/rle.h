@@ -33,9 +33,9 @@ public:
     static QImage decodeImage(const QByteArray &data, int width, int height);
 
 private:
-    qint32 readValue(QDataStream &stream);
-    void increaseBits();
-    bool addEntry(qint32 value, QByteArray &unpacked);
+    inline qint32 readValue(QDataStream &stream);
+    inline void increaseBits();
+    inline bool addEntry(qint32 value, QByteArray &unpacked);
 
 private:
     struct Entry
@@ -44,7 +44,7 @@ private:
         quint32 length;
     };
 
-    QList<Entry> m_entries;
+    QVector<Entry> m_entries;
     quint32 m_value;
     quint8 m_bitsRead;
     quint8 m_bits;
