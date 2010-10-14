@@ -23,18 +23,6 @@
 #include <QFile>
 #include <QPainter>
 #include <QPixmap>
-#include <QtEndian>
-
-
-#ifdef _MSC_VER
-#	pragma pack( push, packing )
-#	pragma pack( 1 )
-#	define PACK_STRUCT
-#elif defined( __GNUC__ )
-#	define PACK_STRUCT	__attribute__((packed))
-#else
-#	error byte-alignment not handled for this compiler
-#endif
 
 
 namespace gfx {
@@ -86,32 +74,33 @@ QImage Image::loadPCX(const QString &filename)
     QFile file(filename);
     file.open(QFile::ReadOnly);
 
-    struct Header
+    struct
     {
-        quint8 manufacturer;
-        quint8 version;
+//        quint8 manufacturer;
+//        quint8 version;
         quint8 encoding;
         quint8 bitsPerPixel;
         qint16 xMin, yMin, xMax, yMax;
-        qint16 hDpi, vDpi;
-        quint8 colormap[48];
-        quint8 reserved;
+//        qint16 hDpi, vDpi;
+//        quint8 colormap[48];
+//        quint8 reserved;
         quint8 nPlanes;
         qint16 bytesPerLine;
-        qint16 paletteInfo;
-        qint16 hScreenSize;
-        qint16 vScreenSize;
-        quint8 filler[54];
-    } PACK_STRUCT;
+//        qint16 paletteInfo;
+//        qint16 hScreenSize;
+//        qint16 vScreenSize;
+//        quint8 filler[54];
+    } header;
 
-    Header header;
-    file.read((char *) &header, sizeof(header));
+    QDataStream stream(&file);
+    stream.setByteOrder(QDataStream::LittleEndian);
 
-    header.xMin = qFromLittleEndian(header.xMin);
-    header.yMin = qFromLittleEndian(header.yMin);
-    header.xMax = qFromLittleEndian(header.xMax);
-    header.yMax = qFromLittleEndian(header.yMax);
-    header.bytesPerLine = qFromLittleEndian(header.bytesPerLine);
+    stream.skipRawData(2);
+    stream >> header.encoding >> header.bitsPerPixel;
+    stream >> header.xMin >> header.yMin >> header.xMax >> header.yMax;
+    stream.skipRawData(53);
+    stream >> header.nPlanes >> header.bytesPerLine;
+    stream.skipRawData(60);
 
     const int width = (header.xMax - header.xMin) + 1;
     const int height = (header.yMax - header.yMin) + 1;
@@ -121,8 +110,6 @@ QImage Image::loadPCX(const QString &filename)
     Q_ASSERT(header.encoding == 1);
 
     QImage image(width, height, QImage::Format_Indexed8);
-
-    QDataStream stream(&file);
 
     for (int y = 0; y < height; y++) {
         quint8 *scanLine = image.scanLine(y);
