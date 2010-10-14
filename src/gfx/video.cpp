@@ -332,25 +332,28 @@ QImage Video::createImage()
 
     const bool wide = (m_width * m_height) != quint32(m_frame.size());
 
-    quint32 pos = 0;
+    const quint8 *index = reinterpret_cast<const quint8*>(m_frame.constData());
     for (unsigned int y = 0; y < m_height; y++) {
         quint8 *line = image.scanLine(y);
-
         if (wide) {
-            if (y % 2 == 1)
-                *line++ = m_frame[pos];
+            const bool even = (y % 2 == 0);
 
-            for (unsigned int x = y % 2; x < m_width; x += 2) {
-                *line++ = m_frame[pos];
-                *line++ = m_indexMap[quint8(m_frame[pos]) * 256 + quint8(m_frame[pos + 1])];
-                pos++;
+            if (!even)
+                *line++ = *index;
+
+            *line++ = *index;
+            quint8 lastIndex = *index++;
+            for (unsigned int x = 1; x < m_width / 2; x++) {
+                *line++ = m_indexMap[lastIndex * 256 + *index];
+                *line++ = *index;
+                lastIndex = *index++;
             }
 
-            if (y % 2 == 0)
-                line[-1] = m_frame[pos - 1];
+            if (even)
+                *line++ = lastIndex;
         } else {
-            qMemCopy(line, &m_frame.data()[pos], m_width);
-            pos += m_width;
+            qMemCopy(line, index, m_width);
+            index += m_width;
         }
     }
 
