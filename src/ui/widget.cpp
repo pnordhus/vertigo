@@ -27,14 +27,16 @@ Widget::Widget(Widget *parent) :
     m_visible(true)
 {
     setSize(640, 480);
-    if (parent)
-        parent->addChild(this);
+    if (m_parent)
+        m_parent->m_children.append(this);
 }
 
 
 Widget::~Widget()
 {
     qDeleteAll(m_children);
+    if (m_parent)
+        m_parent->m_children.removeAll(this);
 }
 
 
@@ -71,12 +73,6 @@ void Widget::setSize(float w, float h)
 void Widget::setWidth(float w)
 {
     m_rect.setWidth(w);
-}
-
-
-void Widget::addChild(Widget *widget)
-{
-    m_children.append(widget);
 }
 
 

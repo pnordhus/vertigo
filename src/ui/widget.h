@@ -51,7 +51,6 @@ public:
     void doMouseMoveEvent(const QPointF &pos);
 
 private:
-    void addChild(Widget*);
     virtual void draw() = 0;
     virtual bool mousePressEvent(const QPointF &pos, Qt::MouseButton button) { return false; }
     virtual void mouseReleaseEvent(const QPointF &pos, Qt::MouseButton button) {}
