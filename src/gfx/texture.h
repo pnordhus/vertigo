@@ -46,6 +46,7 @@ public:
     void bind();
     void fromImage(const QImage &image);
     void createEmpty(int w, int h, Texture::Format format);
+    void createEmpty(const QSize &size, Texture::Format format);
     void update(int x, int y, QImage image);
     QRectF draw();
     QRectF draw(float x, float y);
@@ -135,6 +136,12 @@ inline void Texture::fromImage(const QImage &image)
 inline void Texture::createEmpty(int w, int h, Texture::Format format)
 {
     d->createEmpty(w, h, format);
+}
+
+
+inline void Texture::createEmpty(const QSize &size, Texture::Format format)
+{
+    d->createEmpty(size.width(), size.height(), format);
 }
 
 
