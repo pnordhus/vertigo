@@ -12,6 +12,8 @@ set(SOURCES
     notebook.h
     renderer.cpp
     renderer.h
+    room.cpp
+    room.h
     vertigo.cpp
     vertigo.h
     window.cpp
@@ -23,6 +25,7 @@ set(MOC_SOURCES
     mainmenu.h
     movie.h
     notebook.h
+    room.h
     vertigo.h
     window.h
 )

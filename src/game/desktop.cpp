@@ -26,7 +26,8 @@
 namespace game {
 
 
-Desktop::Desktop(const QString &name)
+Desktop::Desktop(const QString &name) :
+    m_room(NULL)
 {
     const gfx::ColorTable colorTable("gfx:pal/gui/border.pal");
 
@@ -137,6 +138,9 @@ Desktop::Desktop(const QString &name)
         button->setFont(fontMedium);
         button->setText(name);
         button->setPosition(offset.x() + file.value("X").toInt(), offset.y() + file.value("Y").toInt());
+        button->setProperty("name", name);
+        button->setProperty("room", file.value("Room"));
+        connect(button, SIGNAL(clicked()), SLOT(showRoom()));
 
         file.endGroup();
     }
@@ -183,6 +187,8 @@ void Desktop::draw()
 
     setupOrthographicMatrix(640, 480);
     m_lblBackground.doDraw();
+    if (m_room)
+        m_room->doDraw();
     m_notebook.doDraw();
 }
 
@@ -206,6 +212,30 @@ void Desktop::hideNotebook()
 
     m_notebookSound.load("sfx:snd/desktop/noteb3.pcm");
     m_notebookSound.play();
+}
+
+
+void Desktop::showRoom()
+{
+    const QString title = sender()->property("name").toString();
+    const QString name = sender()->property("room").toString();
+
+    Q_ASSERT(!m_room);
+    m_room = new Room(title, name);
+    connect(m_room, SIGNAL(close()), SLOT(hideRoom()));
+    setRootWidget(m_room);
+    m_btnNotebook->hide();
+    m_room->setPosition((640 - m_room->width()) / 2, (480 - m_room->height()) / 2);
+}
+
+
+void Desktop::hideRoom()
+{
+    Q_ASSERT(m_room);
+    setRootWidget(&m_lblBackground);
+    m_room->deleteLater();
+    m_room = NULL;
+    m_btnNotebook->show();
 }
 
 

@@ -64,9 +64,9 @@ void Widget::setPosition(float x, float y)
 }
 
 
-void Widget::setSize(float w, float h)
+void Widget::setSize(const QSizeF &size)
 {
-    m_rect.setSize(QSizeF(w, h));
+    m_rect.setSize(size);
 }
 
 

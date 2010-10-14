@@ -15,71 +15,32 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GAME_DESKTOP_H
-#define GAME_DESKTOP_H
+#ifndef GAME_ROOM_H
+#define GAME_ROOM_H
 
 
-#include "menu.h"
-#include "notebook.h"
-#include "room.h"
-#include "gfx/texture.h"
-#include "gfx/video.h"
-#include "sfx/sound.h"
-#include "ui/button.h"
+#include "ui/label.h"
 
 
 namespace game {
 
 
-class Desktop : public Menu
+class Room : public ui::Label
 {
     Q_OBJECT
 
 public:
-    Desktop(const QString &name);
-    ~Desktop();
+    Room(const QString &title, const QString &name);
 
-public:
-    void draw();
-    const QString &approachMovie() const { return m_approachMovie; }
-
-private slots:
-    void showNotebook();
-    void hideNotebook();
-    void showRoom();
-    void hideRoom();
+signals:
+    void close();
 
 private:
-    void activate();
-    void deactivate();
-
-private:
-    struct Video
-    {
-        gfx::Video video;
-        int x;
-        int y;
-        int rndMax;
-        int time;
-    };
-
-    gfx::Texture m_background;
-    sfx::Sound m_backgroundSound;
-    sfx::Sound m_nameSound;
-    sfx::Sound m_notebookSound;
-    ui::Label m_lblBackground;
-    ui::Widget *m_widgetRooms;
-    ui::Button *m_btnNotebook;
-    Notebook m_notebook;
-    Room *m_room;
-    ui::Button *m_btnQuit;
-    QList<Video*> m_videos;
-    QTime m_time;
-    QString m_approachMovie;
+    bool mousePressEvent(const QPointF &pos, Qt::MouseButton button);
 };
 
 
 } // namespace game
 
 
-#endif // GAME_DESKTOP_H
+#endif // GAME_ROOM_H
