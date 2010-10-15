@@ -50,6 +50,9 @@ private:
     void mousePressEvent(QMouseEvent *);
     void mouseReleaseEvent(QMouseEvent *);
     void mouseMoveEvent(QMouseEvent *);
+    void closeEvent(QCloseEvent *);
+    void saveSettings();
+    void loadSettings();
 
 private:
     QCursor m_cursor;

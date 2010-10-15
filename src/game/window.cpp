@@ -20,6 +20,7 @@
 #include "gfx/colortable.h"
 #include "gfx/image.h"
 #include <QAction>
+#include <QSettings>
 
 
 namespace game {
@@ -37,6 +38,7 @@ Window::Window() :
     m_cursor = gfx::Image::loadCursor("gfx:img/desktop/gui/cur_norm.img", colorTable);
     setWindowTitle("Vertigo");
     makeCurrent();
+    loadSettings();
 }
 
 
@@ -117,6 +119,27 @@ void Window::mouseMoveEvent(QMouseEvent *event)
 {
     if (m_renderer)
         m_renderer->mouseMoveEvent(event);
+}
+
+
+void Window::closeEvent(QCloseEvent *event)
+{
+    saveSettings();
+    QGLWidget::closeEvent(event);
+}
+
+
+void Window::saveSettings()
+{
+    QSettings settings;
+    settings.setValue("MainWindow/geometry", saveGeometry());
+}
+
+
+void Window::loadSettings()
+{
+    QSettings settings;
+    restoreGeometry(settings.value("MainWindow/geometry").toByteArray());
 }
 
 
