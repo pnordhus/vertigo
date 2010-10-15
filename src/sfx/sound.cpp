@@ -104,4 +104,10 @@ QByteArray Sound::loadFile(const QString &filename)
 }
 
 
+void Sound::setVolume(float volume)
+{
+    alSourcef(m_source, AL_GAIN, volume);
+}
+
+
 } // namespace sfx

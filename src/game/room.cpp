@@ -34,7 +34,11 @@ Room::Room(const QString &title, const QString &name) :
     txt::DesFile file("dat:world/" + name + ".des");
     file.beginGroup("Room");
 
-    m_background.fromImage(gfx::Image::loadPCX(QString("gfx:pic/room/%1.pcx").arg(file.value("BackGround").toString())).toRgb565());
+    const QString background = file.value("BackGround").toString();
+    const QString backgroundSound = file.value("Sound").toString();
+    m_background.fromImage(gfx::Image::loadPCX("gfx:pic/room/" + background + ".pcx").toRgb565());
+    m_backgroundSound.load("sfx:snd/room/" + backgroundSound + ".pcm");
+
     QImage left = gfx::Image::load("gfx:img/desktop/gui/borl.img", colorTable);
     QImage right = gfx::Image::load("gfx:img/desktop/gui/borr.img", colorTable);
     QImage bottom = gfx::Image::load("gfx:img/desktop/gui/borb1.img", colorTable);
@@ -88,6 +92,7 @@ Room::Room(const QString &title, const QString &name) :
 
     m_miniMovie.load(file);
     m_miniMovie.start();
+    m_backgroundSound.playLoop();
 }
 
 

@@ -186,6 +186,7 @@ void Desktop::showRoom()
     setRootWidget(m_room);
     m_btnNotebook->hide();
     m_room->setPosition((640 - m_room->width()) / 2, (480 - m_room->height()) / 2);
+    m_backgroundSound.setVolume(0.3f);
 }
 
 
@@ -196,6 +197,7 @@ void Desktop::hideRoom()
     m_room->deleteLater();
     m_room = NULL;
     m_btnNotebook->show();
+    m_backgroundSound.setVolume(1.0f);
 }
 
 

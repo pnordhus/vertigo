@@ -37,6 +37,7 @@ public:
     void playLoop();
     void load(const QString &file);
     void load(const QString &leftFile, const QString &rightFile);
+    void setVolume(float volume);
 
 private:
     Q_DISABLE_COPY(Sound);

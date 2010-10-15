@@ -20,6 +20,7 @@
 
 
 #include "minimovie.h"
+#include "sfx/sound.h"
 #include "ui/label.h"
 
 
@@ -43,6 +44,7 @@ protected:
 private:
     MiniMovie m_miniMovie;
     gfx::Texture m_background;
+    sfx::Sound m_backgroundSound;
 };
 
 
