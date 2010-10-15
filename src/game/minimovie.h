@@ -15,40 +15,48 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "desfile.h"
-#include "stringtable.h"
+
+#ifndef GAME_MINIMOVIE_H
+#define GAME_MINIMOVIE_H
 
 
-namespace txt {
+#include "gfx/texture.h"
+#include "gfx/video.h"
+#include "txt/desfile.h"
 
 
-QStringList StringTable::m_table;
+namespace game {
 
 
-bool StringTable::load()
+class MiniMovie
 {
-    DesFile fileDes("txt:deeptext.des");
-    fileDes.beginGroup("Text");
+public:
+    MiniMovie(const QString &path, bool scaleColorTable = false);
+    ~MiniMovie();
 
-    if (!fileDes.contains("Text190"))
-        return false;
+public:
+    void load(txt::DesFile &file);
+    void start();
+    void update(gfx::Texture texture);
 
-    for (int i = 0; ; i++) {
-        const QString key = QString("Text%1").arg(i);
-        if (!fileDes.contains(key))
-            break;
+private:
+    struct Video
+    {
+        gfx::Video video;
+        int x;
+        int y;
+        int rndMax;
+        int time;
+    };
 
-        m_table.append(fileDes.value(key).toString());
-    }
-
-    return true;
-}
-
-
-QString StringTable::get(String string)
-{
-    return m_table.at(string);
-}
+    QString m_path;
+    QList<Video*> m_videos;
+    QTime m_time;
+    bool m_scaleColorTable;
+};
 
 
-} // namespace txt
+} // namespace game
+
+
+#endif // GAME_MINIMOVIE_H

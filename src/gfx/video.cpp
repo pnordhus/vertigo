@@ -127,7 +127,7 @@ void Video::reset()
 }
 
 
-QImage Video::getFrame()
+Image Video::getFrame()
 {
     if (!m_playing)
         return QImage();

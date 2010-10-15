@@ -19,8 +19,7 @@
 #define GFX_COLORTABLE_H
 
 
-#include <QRgb>
-#include <QVector>
+#include <QImage>
 
 
 namespace gfx {
@@ -30,11 +29,13 @@ class ColorTable : public QVector<QRgb>
 {
 public:
     ColorTable();
+    ColorTable(const QVector<QRgb> &colorTable);
     ColorTable(const QString &filename);
 
 public:
     bool loadFromFile(const QString &filename);
     void load(const QByteArray &data);
+    void toRgb565(bool scale = false);
 };
 
 

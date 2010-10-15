@@ -20,14 +20,14 @@
 #include "gfx/font.h"
 #include "txt/desfile.h"
 #include <QKeyEvent>
-#include <QStringList>
 
 
 namespace game {
 
 
 Desktop::Desktop(const QString &name) :
-    m_room(NULL)
+    m_room(NULL),
+    m_miniMovie("gfx:mvi/desktop")
 {
     const gfx::ColorTable colorTable("gfx:pal/gui/border.pal");
 
@@ -42,7 +42,7 @@ Desktop::Desktop(const QString &name) :
     const QString background = file.value("BackGround").toString();
     const QString backgroundSound = file.value("Sound").toString();
     const QString nameSound = "st" + file.value("SFV").toString().right(4);
-    m_background.fromImage(gfx::Image::loadPCX("gfx:pic/bground/" + background + ".pcx"));
+    m_background.fromImage(gfx::Image::loadPCX("gfx:pic/bground/" + background + ".pcx").toRgb565());
     m_backgroundSound.load("sfx:snd/bground/" + backgroundSound + ".pcl", "sfx:snd/bground/" + backgroundSound + ".pcr");
     m_nameSound.load("sfx:snd/names/" + nameSound + ".pcm");
     m_approachMovie = QString("gfx:mvi/approach/%1.mvi").arg(file.value("ApproachMovie").toString());
@@ -71,33 +71,6 @@ Desktop::Desktop(const QString &name) :
     connect(&m_notebook, SIGNAL(close()), SLOT(hideNotebook()));
 
     file.endGroup();
-
-    foreach (const QString &section, file.childGroups().filter(QRegExp("^MiniMovie"))) {
-        file.beginGroup(section);
-
-        const QString name = file.value("Name").toString();
-        const QString type = file.value("Type").toString().toLower();
-
-        Video *video = new Video;
-        video->video.open("gfx:mvi/desktop/" + name + ".mvi");
-        video->x = file.value("X1").toInt();
-        video->y = file.value("Y1").toInt();
-        video->rndMax = 0;
-
-        if (type == "loop")
-            video->video.playLoop();
-        else if (type == "rnd1")
-            video->rndMax = 15000;
-        else if (type == "rnd2")
-            video->rndMax = 30000;
-
-        video->time = float(qrand()) / RAND_MAX * video->rndMax;
-
-        m_videos.append(video);
-
-        file.endGroup();
-    }
-
 
     m_widgetRooms = new ui::Label(&m_lblBackground);
     foreach (const QString &section, file.childGroups().filter(QRegExp("^Room"))) {
@@ -144,18 +117,20 @@ Desktop::Desktop(const QString &name) :
 
         file.endGroup();
     }
+
+    m_miniMovie.load(file);
 }
 
 
 Desktop::~Desktop()
 {
-    qDeleteAll(m_videos);
+    delete m_room;
 }
 
 
 void Desktop::activate()
 {
-    m_time.start();
+    m_miniMovie.start();
     m_backgroundSound.playLoop();
     m_nameSound.play();
 }
@@ -169,22 +144,7 @@ void Desktop::deactivate()
 
 void Desktop::draw()
 {
-    const quint32 time = m_time.restart();
-
-    foreach (Video *video, m_videos) {
-        if (video->rndMax > 0 && !video->video.isPlaying()) {
-            video->time -= time;
-            if (video->time < 0) {
-                video->video.play();
-                video->time = float(qrand()) / RAND_MAX * video->rndMax;
-            }
-        }
-
-        QImage frame = video->video.getFrame();
-        if (!frame.isNull())
-            m_background.update(video->x, video->y, frame);
-    }
-
+    m_miniMovie.update(m_background);
     setupOrthographicMatrix(640, 480);
     m_lblBackground.doDraw();
     if (m_room)

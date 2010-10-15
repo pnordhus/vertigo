@@ -25,16 +25,23 @@
 namespace gfx {
 
 
-class Image
+class Image : public QImage
 {
 public:
     enum Type { PaletteRLE = 0x0400, Palette = 0x0401, RGB565 = 0x0413 };
 
 public:
-    static QImage load(const QString &filename, const QVector<QRgb> &colorTable = QVector<QRgb>());
-    static QImage load(const QString &filename, int w, int h);
-    static QImage load(QIODevice *device, Type type, const QVector<QRgb> &colorTable);
-    static QImage loadPCX(const QString &filename);
+    Image();
+    Image(const QImage &image);
+
+public:
+    Image& toRgb565(bool scale = false);
+
+public:
+    static Image load(const QString &filename, const QVector<QRgb> &colorTable = QVector<QRgb>());
+    static Image load(const QString &filename, int w, int h);
+    static Image load(QIODevice *device, Type type, const QVector<QRgb> &colorTable);
+    static Image loadPCX(const QString &filename);
     static QCursor loadCursor(const QString &filename, const QVector<QRgb> &colorTable);
 };
 

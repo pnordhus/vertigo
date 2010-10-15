@@ -20,8 +20,8 @@
 
 
 #include "colortable.h"
+#include "image.h"
 #include <QFile>
-#include <QImage>
 #include <QTime>
 
 
@@ -39,7 +39,7 @@ public:
     void play();
     void playLoop();
     bool isPlaying() const { return m_playing; }
-    QImage getFrame();
+    Image getFrame();
     QByteArray getAudio();
     bool atEnd() const;
     quint32 width() const { return m_width; }

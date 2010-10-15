@@ -20,24 +20,28 @@
 #include "gfx/font.h"
 #include "gfx/image.h"
 #include "ui/button.h"
-#include <QDebug>
 
 
 namespace game {
 
 
-Room::Room(const QString &title, const QString &name)
+Room::Room(const QString &title, const QString &name) :
+    m_miniMovie("gfx:mvi/room", true)
 {
     const gfx::ColorTable colorTable("gfx:pal/gui/border.pal");
-    const gfx::ColorTable colorTableBackground("gfx:pal/dialog/diapal.pal");
     const gfx::Font fontMedium("gfx:fnt/dpmedium.fnt", colorTable);
 
-    QImage background = gfx::Image::loadPCX(QString("gfx:pic/room/%1.pcx").arg(name));
+    txt::DesFile file("dat:world/" + name + ".des");
+    file.beginGroup("Room");
+
+    m_background.fromImage(gfx::Image::loadPCX(QString("gfx:pic/room/%1.pcx").arg(file.value("BackGround").toString())).toRgb565());
     QImage left = gfx::Image::load("gfx:img/desktop/gui/borl.img", colorTable);
     QImage right = gfx::Image::load("gfx:img/desktop/gui/borr.img", colorTable);
     QImage bottom = gfx::Image::load("gfx:img/desktop/gui/borb1.img", colorTable);
 
-    const QSize size = background.size() + QSize(18, 24);
+    file.endGroup();
+
+    const QSize size = m_background.size() + QSize(18, 24);
 
     ui::Label *lblTitle = new ui::Label(this);
     lblTitle->setFont(fontMedium);
@@ -77,10 +81,20 @@ Room::Room(const QString &title, const QString &name)
 
     ui::Label *label = new ui::Label(this);
     label->setPosition(9, 15);
-    label->setTexture(background);
+    label->setTexture(m_background);
 
     setTexture(texture);
     setSize(size);
+
+    m_miniMovie.load(file);
+    m_miniMovie.start();
+}
+
+
+void Room::draw()
+{
+    m_miniMovie.update(m_background);
+    ui::Label::draw();
 }
 
 

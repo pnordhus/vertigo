@@ -43,6 +43,7 @@ public:
     bool isValid() const;
     int width() const;
     int height() const;
+    QSize size() const;
     void bind();
     void fromImage(const QImage &image);
     void createEmpty(int w, int h, Texture::Format format);
@@ -118,6 +119,12 @@ inline int Texture::width() const
 inline int Texture::height() const
 {
     return d->height();
+}
+
+
+inline QSize Texture::size() const
+{
+    return QSize(width(), height());
 }
 
 

@@ -6,6 +6,8 @@ set(SOURCES
     mainmenu.h
     menu.cpp
     menu.h
+    minimovie.cpp
+    minimovie.h
     movie.cpp
     movie.h
     notebook.cpp

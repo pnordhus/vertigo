@@ -20,10 +20,10 @@
 
 
 #include "menu.h"
+#include "minimovie.h"
 #include "notebook.h"
 #include "room.h"
 #include "gfx/texture.h"
-#include "gfx/video.h"
 #include "sfx/sound.h"
 #include "ui/button.h"
 
@@ -54,15 +54,6 @@ private:
     void deactivate();
 
 private:
-    struct Video
-    {
-        gfx::Video video;
-        int x;
-        int y;
-        int rndMax;
-        int time;
-    };
-
     gfx::Texture m_background;
     sfx::Sound m_backgroundSound;
     sfx::Sound m_nameSound;
@@ -73,9 +64,8 @@ private:
     Notebook m_notebook;
     Room *m_room;
     ui::Button *m_btnQuit;
-    QList<Video*> m_videos;
-    QTime m_time;
     QString m_approachMovie;
+    MiniMovie m_miniMovie;
 };
 
 

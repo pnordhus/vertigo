@@ -19,6 +19,7 @@
 #define GAME_ROOM_H
 
 
+#include "minimovie.h"
 #include "ui/label.h"
 
 
@@ -35,8 +36,13 @@ public:
 signals:
     void close();
 
-private:
+protected:
+    void draw();
     bool mousePressEvent(const QPointF &pos, Qt::MouseButton button);
+
+private:
+    MiniMovie m_miniMovie;
+    gfx::Texture m_background;
 };
 
 

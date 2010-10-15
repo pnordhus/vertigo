@@ -28,7 +28,30 @@
 namespace gfx {
 
 
-QImage Image::load(const QString &filename, const QVector<QRgb> &colorTable)
+
+Image::Image()
+{
+
+}
+
+
+Image::Image(const QImage &image) :
+    QImage(image)
+{
+
+}
+
+
+Image& Image::toRgb565(bool scale)
+{
+    ColorTable c = colorTable();
+    c.toRgb565(scale);
+    setColorTable(c);
+    return *this;
+}
+
+
+Image Image::load(const QString &filename, const QVector<QRgb> &colorTable)
 {
     QFile file(filename);
     file.open(QFile::ReadOnly);
@@ -43,7 +66,7 @@ QImage Image::load(const QString &filename, const QVector<QRgb> &colorTable)
 }
 
 
-QImage Image::load(const QString &filename, int w, int h)
+Image Image::load(const QString &filename, int w, int h)
 {
     QFile file(filename);
     file.open(QFile::ReadOnly);
@@ -69,7 +92,7 @@ QImage Image::load(const QString &filename, int w, int h)
 }
 
 
-QImage Image::loadPCX(const QString &filename)
+Image Image::loadPCX(const QString &filename)
 {
     QFile file(filename);
     file.open(QFile::ReadOnly);
@@ -168,7 +191,7 @@ QCursor Image::loadCursor(const QString &filename, const QVector<QRgb> &colorTab
 }
 
 
-QImage Image::load(QIODevice *device, Type type, const QVector<QRgb> &colorTable)
+Image Image::load(QIODevice *device, Type type, const QVector<QRgb> &colorTable)
 {
     QDataStream stream(device);
     stream.setByteOrder(QDataStream::LittleEndian);
