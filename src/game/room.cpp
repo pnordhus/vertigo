@@ -26,7 +26,8 @@ namespace game {
 
 
 Room::Room(const QString &title, const QString &name) :
-    m_miniMovie("gfx:mvi/room")
+    m_miniMovie("gfx:mvi/room"),
+    m_name(name)
 {
     txt::DesFile file("dat:world/" + name + ".des");
     file.beginGroup("Room");
@@ -40,7 +41,7 @@ Room::Room(const QString &title, const QString &name) :
 
     file.endGroup();
 
-    setupFrame(m_background.size() + QSize(18, 24), title);
+    setupFrame(m_background.size() + QSize(18, 24), title, true);
 
     ui::Label *label = new ui::Label(this);
     label->setPosition(9, 15);

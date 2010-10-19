@@ -32,13 +32,13 @@ class Frame : public ui::Label
     Q_OBJECT
 
 public:
-    Frame();
+    Frame(ui::Widget *parent = NULL);
 
 signals:
     void close();
 
 public:
-    void setupFrame(const QSize &size, const QString &title);
+    void setupFrame(const QSize &size, const QString &title, bool closable);
 
 private:
     static int updateBorder(gfx::Texture texture, const gfx::ColorTable &colorTable, int x, int id);

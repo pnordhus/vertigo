@@ -34,12 +34,16 @@ class Room : public ui::Frame
 public:
     Room(const QString &title, const QString &name);
 
+signals:
+    void startDialog(const QString &name);
+
 protected:
     void draw();
     bool mousePressEvent(const QPoint &pos, Qt::MouseButton button);
 
 private:
     MiniMovie m_miniMovie;
+    QString m_name;
     gfx::Texture m_background;
     sfx::Sound m_backgroundSound;
 };

@@ -24,13 +24,14 @@
 namespace ui {
 
 
-Frame::Frame()
+Frame::Frame(ui::Widget *parent) :
+    Label(parent)
 {
 
 }
 
 
-void Frame::setupFrame(const QSize &size, const QString &title)
+void Frame::setupFrame(const QSize &size, const QString &title, bool closable)
 {
     const gfx::ColorTable colorTable("gfx:pal/gui/border.pal");
     const gfx::Font fontMedium("gfx:fnt/dpmedium.fnt", colorTable);
@@ -78,10 +79,12 @@ void Frame::setupFrame(const QSize &size, const QString &title)
 
     texture.update(titleLeft, 0, gfx::Image::load("gfx:img/desktop/gui/bortw.img", colorTable));
 
-    ui::Button *buttonClose = new ui::Button(this);
-    buttonClose->setTexture(gfx::Image::load("gfx:img/desktop/gui/gdexitu.img", colorTable));
-    buttonClose->setPressedTexture(gfx::Image::load("gfx:img/desktop/gui/gdexitd.img", colorTable));
-    connect(buttonClose, SIGNAL(clicked()), SIGNAL(close()));
+    if (closable) {
+        ui::Button *buttonClose = new ui::Button(this);
+        buttonClose->setTexture(gfx::Image::load("gfx:img/desktop/gui/gdexitu.img", colorTable));
+        buttonClose->setPressedTexture(gfx::Image::load("gfx:img/desktop/gui/gdexitd.img", colorTable));
+        connect(buttonClose, SIGNAL(clicked()), SIGNAL(close()));
+    }
 
     setTexture(texture);
     setSize(size);

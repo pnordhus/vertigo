@@ -15,65 +15,16 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GAME_DESKTOP_H
-#define GAME_DESKTOP_H
-
-
-#include "dialogframe.h"
-#include "menu.h"
-#include "minimovie.h"
-#include "notebook.h"
-#include "room.h"
-#include "gfx/texture.h"
-#include "sfx/sound.h"
-#include "ui/button.h"
+#include "dialog.h"
 
 
 namespace game {
 
 
-class Desktop : public Menu
+Dialog::Dialog()
 {
-    Q_OBJECT
 
-public:
-    Desktop(const QString &name);
-    ~Desktop();
-
-public:
-    void draw();
-    const QString &approachMovie() const { return m_approachMovie; }
-
-private slots:
-    void showNotebook();
-    void hideNotebook();
-    void showRoom();
-    void hideRoom();
-    void showDialog(const QString &roomName);
-    void hideDialog();
-
-private:
-    void activate();
-    void deactivate();
-
-private:
-    gfx::Texture m_background;
-    sfx::Sound m_backgroundSound;
-    sfx::Sound m_nameSound;
-    sfx::Sound m_notebookSound;
-    ui::Label m_lblBackground;
-    ui::Widget *m_widgetRooms;
-    ui::Button *m_btnNotebook;
-    Notebook m_notebook;
-    Room *m_room;
-    DialogFrame *m_dialog;
-    ui::Button *m_btnQuit;
-    QString m_approachMovie;
-    MiniMovie m_miniMovie;
-};
+}
 
 
 } // namespace game
-
-
-#endif // GAME_DESKTOP_H

@@ -1,6 +1,10 @@
 set(SOURCES
     desktop.cpp
     desktop.h
+    dialog.cpp
+    dialog.h
+    dialogframe.cpp
+    dialogframe.h
     main.cpp
     mainmenu.cpp
     mainmenu.h

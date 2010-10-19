@@ -125,7 +125,7 @@ enum String
     Text95,
     Text96,
     Text97,
-    Text98,
+    DialogTitle,
     Text99,
     Text100,
     Notebook_QuitGame,
