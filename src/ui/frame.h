@@ -15,37 +15,37 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GAME_ROOM_H
-#define GAME_ROOM_H
+#ifndef UI_FRAME_H
+#define UI_FRAME_H
 
 
-#include "minimovie.h"
-#include "sfx/sound.h"
-#include "ui/frame.h"
+#include "label.h"
+#include "gfx/colortable.h"
+#include "gfx/texture.h"
 
 
-namespace game {
+namespace ui {
 
 
-class Room : public ui::Frame
+class Frame : public ui::Label
 {
     Q_OBJECT
 
 public:
-    Room(const QString &title, const QString &name);
+    Frame();
 
-protected:
-    void draw();
-    bool mousePressEvent(const QPoint &pos, Qt::MouseButton button);
+signals:
+    void close();
+
+public:
+    void setupFrame(const QSize &size, const QString &title);
 
 private:
-    MiniMovie m_miniMovie;
-    gfx::Texture m_background;
-    sfx::Sound m_backgroundSound;
+    static int updateBorder(gfx::Texture texture, const gfx::ColorTable &colorTable, int x, int id);
 };
 
 
-} // namespace game
+} // namespace ui
 
 
-#endif // GAME_ROOM_H
+#endif // UI_FRAME_H

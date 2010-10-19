@@ -1,6 +1,8 @@
 set(SOURCES
     button.cpp
     button.h
+    frame.cpp
+    frame.h
     label.cpp
     label.h
     widget.cpp
@@ -9,6 +11,7 @@ set(SOURCES
 
 set(MOC_SOURCES
     button.h
+    frame.h
 )
 
 qt4_wrap_cpp(MOC_SOURCES ${MOC_SOURCES})
