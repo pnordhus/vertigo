@@ -57,15 +57,23 @@ Room::Room(const QString &title, const QString &name) :
     gfx::Texture texture;
     texture.createEmpty(size, gfx::Texture::RGB);
 
-    int total = 0;
-    int pos = 0;
-    while (total < size.width()) {
-        int c = (title[(pos++) % title.length()]).toAscii() % 10;
-        if (c == 0)
-            c = 1;
-        QImage image = gfx::Image::load(QString("gfx:img/desktop/gui/bort%1.img").arg(c), colorTable);
-        texture.update(total, 0, image);
-        total += image.width();
+    const int titleLeft = (size.width() - 170) / 2;
+    const int titleRight = titleLeft + 170;
+
+    {
+        const int total = size.width() - 30;
+        int beg = 13;
+
+        updateBorder(texture, colorTable, beg, 9);
+        beg += (total % 45) / 2;
+        beg += updateBorder(texture, colorTable, beg, 1);
+        beg += updateBorder(texture, colorTable, beg, 2);
+
+        beg += ((titleRight - beg) / 45) * 45;
+        beg += updateBorder(texture, colorTable, beg, 5);
+        if (13 + total - beg >= 45)
+            beg += updateBorder(texture, colorTable, beg, 2);
+        updateBorder(texture, colorTable, beg - 1, 9);
     }
 
     texture.update(                0,                  0, left.copy(0, 0, left.width(), size.height()));
@@ -76,7 +84,7 @@ Room::Room(const QString &title, const QString &name) :
     texture.update(size.width() - 12, size.height() - 17, gfx::Image::load("gfx:img/desktop/gui/edgebr.img", colorTable));
     texture.update(                0, size.height() - 17, gfx::Image::load("gfx:img/desktop/gui/edgebl.img", colorTable));
 
-    texture.update((size.width() - 170) / 2, 0, gfx::Image::load("gfx:img/desktop/gui/bortw.img", colorTable));
+    texture.update(titleLeft, 0, gfx::Image::load("gfx:img/desktop/gui/bortw.img", colorTable));
 
     ui::Button *buttonClose = new ui::Button(this);
     buttonClose->setTexture(gfx::Image::load("gfx:img/desktop/gui/gdexitu.img", colorTable));
@@ -93,6 +101,14 @@ Room::Room(const QString &title, const QString &name) :
     m_miniMovie.load(file);
     m_miniMovie.start();
     m_backgroundSound.playLoop();
+}
+
+
+int Room::updateBorder(gfx::Texture texture, const gfx::ColorTable &colorTable, int x, int id)
+{
+    QImage image = gfx::Image::load(QString("gfx:img/desktop/gui/bort%1.img").arg(id), colorTable);
+    texture.update(x, 0, image);
+    return image.width();
 }
 
 

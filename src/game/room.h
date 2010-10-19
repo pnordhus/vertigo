@@ -42,6 +42,9 @@ protected:
     bool mousePressEvent(const QPointF &pos, Qt::MouseButton button);
 
 private:
+    static int updateBorder(gfx::Texture texture, const gfx::ColorTable &colorTable, int x, int id);
+
+private:
     MiniMovie m_miniMovie;
     gfx::Texture m_background;
     sfx::Sound m_backgroundSound;
