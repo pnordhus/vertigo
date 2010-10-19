@@ -45,7 +45,7 @@ private:
     ui::Button* createButton(ui::Widget *parent, txt::String text, float posY);
 
 private:
-    bool mousePressEvent(const QPointF &pos, Qt::MouseButton button);
+    bool mousePressEvent(const QPoint &pos, Qt::MouseButton button);
 
 private:
     gfx::Font m_fontGreen;

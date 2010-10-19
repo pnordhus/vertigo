@@ -39,7 +39,7 @@ signals:
 
 protected:
     void draw();
-    bool mousePressEvent(const QPointF &pos, Qt::MouseButton button);
+    bool mousePressEvent(const QPoint &pos, Qt::MouseButton button);
 
 private:
     static int updateBorder(gfx::Texture texture, const gfx::ColorTable &colorTable, int x, int id);

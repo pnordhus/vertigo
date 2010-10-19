@@ -33,7 +33,7 @@ public:
 
 public:
     void load(const QString &filename, const QVector<QRgb> &colorTable, bool scale);
-    QRectF draw(const QString &text, float x, float y, float w, float h, bool alignHCenter = false, bool alignVCenter = false);
+    QRect draw(const QString &text, int x, int y, int w, int h, bool alignHCenter = false, bool alignVCenter = false);
     int height() const { return m_height; }
     int width(const QString &text) const;
 
@@ -59,10 +59,10 @@ public:
 
 public:
     void load(const QString &filename, const QVector<QRgb> &colorTable, bool scale = false);
-    QRectF draw(const QString &text, float x, float y);
-    QRectF draw(const QString &text, const QPointF &pos);
-    QRectF draw(const QString &text, const QPointF &pos, const QSizeF &size, bool alignHCenter, bool alignVCenter);
-    QRectF draw(const QString &text, const QSizeF &size, bool alignHCenter, bool alignVCenter);
+    QRect draw(const QString &text, int x, int y);
+    QRect draw(const QString &text, const QPoint &pos);
+    QRect draw(const QString &text, const QPoint &pos, const QSize &size, bool alignHCenter, bool alignVCenter);
+    QRect draw(const QString &text, const QSize &size, bool alignHCenter, bool alignVCenter);
     int height() const;
     int width(const QString &text) const;
 
@@ -91,25 +91,25 @@ inline void Font::load(const QString &filename, const QVector<QRgb> &colorTable,
 }
 
 
-inline QRectF Font::draw(const QString &text, float x, float y)
+inline QRect Font::draw(const QString &text, int x, int y)
 {
-    return d->draw(text, x, y, -1.0f, -1.0f);
+    return d->draw(text, x, y, -1, -1);
 }
 
 
-inline QRectF Font::draw(const QString &text, const QPointF &pos)
+inline QRect Font::draw(const QString &text, const QPoint &pos)
 {
     return draw(text, pos.x(), pos.y());
 }
 
 
-inline QRectF Font::draw(const QString &text, const QPointF &pos, const QSizeF &size, bool alignHCenter, bool alignVCenter)
+inline QRect Font::draw(const QString &text, const QPoint &pos, const QSize &size, bool alignHCenter, bool alignVCenter)
 {
     return d->draw(text, pos.x(), pos.y(), size.width(), size.height(), alignHCenter, alignVCenter);
 }
 
 
-inline QRectF Font::draw(const QString &text, const QSizeF &size, bool alignHCenter, bool alignVCenter)
+inline QRect Font::draw(const QString &text, const QSize &size, bool alignHCenter, bool alignVCenter)
 {
     return d->draw(text, 0, 0, size.width(), size.height(), alignHCenter, alignVCenter);
 }

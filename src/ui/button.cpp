@@ -24,13 +24,13 @@ namespace ui {
 Button::Button(Widget *parent) :
     Label(parent),
     m_pressed(false),
-    m_offset(1.0f)
+    m_offset(1)
 {
 
 }
 
 
-void Button::setOffset(float offset)
+void Button::setOffset(int offset)
 {
     m_offset = offset;
 }
@@ -46,13 +46,13 @@ void Button::draw()
 {
     if (m_text.isEmpty()) {
         if (m_pressed && m_pressedTexture.isValid())
-            m_drawRect = m_pressedTexture.draw();
+            m_drawRect = m_pressedTexture.draw().toRect();
         else
-            m_drawRect = m_texture.draw();
+            m_drawRect = m_texture.draw().toRect();
     } else {
-        QPointF offset;
+        QPoint offset;
         if (m_pressed)
-            offset += QPointF(m_offset, m_offset);
+            offset += QPoint(m_offset, m_offset);
 
         m_drawRect = m_font.draw(m_text, offset, size(), m_alignment & AlignHCenter, m_alignment & AlignVCenter);
         m_drawRect.setTopLeft(m_drawRect.topLeft() - offset);
@@ -60,7 +60,7 @@ void Button::draw()
 }
 
 
-bool Button::mousePressEvent(const QPointF &pos, Qt::MouseButton button)
+bool Button::mousePressEvent(const QPoint &pos, Qt::MouseButton button)
 {
     if (button == Qt::LeftButton && mapToGlobal(m_drawRect).contains(pos)) {
         m_pressed = true;
@@ -71,7 +71,7 @@ bool Button::mousePressEvent(const QPointF &pos, Qt::MouseButton button)
 }
 
 
-void Button::mouseReleaseEvent(const QPointF &pos, Qt::MouseButton button)
+void Button::mouseReleaseEvent(const QPoint &pos, Qt::MouseButton button)
 {
     if (button == Qt::LeftButton) {
         if (m_pressed && mapToGlobal(m_drawRect).contains(pos))

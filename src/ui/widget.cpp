@@ -58,25 +58,25 @@ void Widget::show()
 }
 
 
-void Widget::setPosition(float x, float y)
+void Widget::setPosition(int x, int y)
 {
-    m_rect.moveTopLeft(QPointF(x, y));
+    m_rect.moveTopLeft(QPoint(x, y));
 }
 
 
-void Widget::setSize(const QSizeF &size)
+void Widget::setSize(const QSize &size)
 {
     m_rect.setSize(size);
 }
 
 
-void Widget::setWidth(float w)
+void Widget::setWidth(int w)
 {
     m_rect.setWidth(w);
 }
 
 
-QRectF Widget::mapToGlobal(QRectF rect) const
+QRect Widget::mapToGlobal(QRect rect) const
 {
     rect.moveTopLeft(rect.topLeft() + m_rect.topLeft());
     if (!m_parent)
@@ -101,7 +101,7 @@ void Widget::doDraw()
 }
 
 
-bool Widget::doMousePressEvent(const QPointF &pos, Qt::MouseButton button)
+bool Widget::doMousePressEvent(const QPoint &pos, Qt::MouseButton button)
 {
     if (m_visible && pos.x() >= m_rect.x() && pos.y() >= m_rect.y()) {
         if (mousePressEvent(pos, button))
@@ -117,7 +117,7 @@ bool Widget::doMousePressEvent(const QPointF &pos, Qt::MouseButton button)
 }
 
 
-void Widget::doMouseReleaseEvent(const QPointF &pos, Qt::MouseButton button)
+void Widget::doMouseReleaseEvent(const QPoint &pos, Qt::MouseButton button)
 {
     if (m_visible) {
         mouseReleaseEvent(pos, button);
@@ -127,7 +127,7 @@ void Widget::doMouseReleaseEvent(const QPointF &pos, Qt::MouseButton button)
 }
 
 
-void Widget::doMouseMoveEvent(const QPointF &pos)
+void Widget::doMouseMoveEvent(const QPoint &pos)
 {
     if (m_visible) {
         mouseMoveEvent(pos);

@@ -105,7 +105,7 @@ void Notebook::showMap()
 }
 
 
-bool Notebook::mousePressEvent(const QPointF &pos, Qt::MouseButton button)
+bool Notebook::mousePressEvent(const QPoint &pos, Qt::MouseButton button)
 {
     if (m_lblMap->isVisible()) {
         m_lblMap->hide();

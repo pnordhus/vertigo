@@ -57,7 +57,7 @@ protected:
 
 protected:
     gfx::Font m_font;
-    QRectF m_drawRect;
+    QRect m_drawRect;
     QString m_text;
     gfx::Texture m_texture;
     Alignment m_alignment;

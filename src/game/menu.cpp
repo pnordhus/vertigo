@@ -47,21 +47,21 @@ void Menu::setRootWidget(ui::Widget *widget)
 void Menu::mousePressEvent(QMouseEvent *event)
 {
     if (m_rootWidget)
-        m_rootWidget->doMousePressEvent(screenToImage(event->posF()), event->button());
+        m_rootWidget->doMousePressEvent(screenToImage(event->pos()).toPoint(), event->button());
 }
 
 
 void Menu::mouseReleaseEvent(QMouseEvent *event)
 {
     if (m_rootWidget)
-        m_rootWidget->doMouseReleaseEvent(screenToImage(event->posF()), event->button());
+        m_rootWidget->doMouseReleaseEvent(screenToImage(event->pos()).toPoint(), event->button());
 }
 
 
 void Menu::mouseMoveEvent(QMouseEvent *event)
 {
     if (m_rootWidget)
-        m_rootWidget->doMouseMoveEvent(screenToImage(event->posF()));
+        m_rootWidget->doMouseMoveEvent(screenToImage(event->pos()).toPoint());
 }
 
 

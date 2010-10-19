@@ -36,17 +36,17 @@ signals:
     void clicked();
 
 public:
-    void setOffset(float offset);
+    void setOffset(int offset);
     void setPressedTexture(const gfx::Texture &texture);
 
 protected:
     void draw();
-    bool mousePressEvent(const QPointF &pos, Qt::MouseButton button);
-    void mouseReleaseEvent(const QPointF &pos, Qt::MouseButton button);
+    bool mousePressEvent(const QPoint &pos, Qt::MouseButton button);
+    void mouseReleaseEvent(const QPoint &pos, Qt::MouseButton button);
 
 private:
     bool m_pressed;
-    float m_offset;
+    int m_offset;
     gfx::Texture m_pressedTexture;
 };
 

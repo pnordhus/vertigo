@@ -38,38 +38,38 @@ public:
     void hide();
     void show();
     bool isVisible() const { return m_visible; }
-    void setPosition(float x, float y);
-    void setSize(float w, float h);
-    void setSize(const QSizeF &size);
-    void setWidth(float w);
-    const QRectF& rect() const { return m_rect; }
-    QSizeF size() const { return m_rect.size(); }
+    void setPosition(int x, int y);
+    void setSize(int w, int h);
+    void setSize(const QSize &size);
+    void setWidth(int w);
+    const QRect& rect() const { return m_rect; }
+    QSize size() const { return m_rect.size(); }
     float width() const { return m_rect.width(); }
     float height() const { return m_rect.height(); }
-    QRectF mapToGlobal(QRectF rect) const;
+    QRect mapToGlobal(QRect rect) const;
 
     void doDraw();
-    bool doMousePressEvent(const QPointF &pos, Qt::MouseButton button);
-    void doMouseReleaseEvent(const QPointF &pos, Qt::MouseButton button);
-    void doMouseMoveEvent(const QPointF &pos);
+    bool doMousePressEvent(const QPoint &pos, Qt::MouseButton button);
+    void doMouseReleaseEvent(const QPoint &pos, Qt::MouseButton button);
+    void doMouseMoveEvent(const QPoint &pos);
 
 private:
     virtual void draw() = 0;
-    virtual bool mousePressEvent(const QPointF &pos, Qt::MouseButton button) { return false; }
-    virtual void mouseReleaseEvent(const QPointF &pos, Qt::MouseButton button) {}
-    virtual void mouseMoveEvent(const QPointF &pos) {}
+    virtual bool mousePressEvent(const QPoint &pos, Qt::MouseButton button) { return false; }
+    virtual void mouseReleaseEvent(const QPoint &pos, Qt::MouseButton button) {}
+    virtual void mouseMoveEvent(const QPoint &pos) {}
 
 private:
     Widget *m_parent;
     bool m_visible;
     QList<Widget*> m_children;
-    QRectF m_rect;
+    QRect m_rect;
 };
 
 
-inline void Widget::setSize(float w, float h)
+inline void Widget::setSize(int w, int h)
 {
-    setSize(QSizeF(w, h));
+    setSize(QSize(w, h));
 }
 
 
