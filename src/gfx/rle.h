@@ -29,6 +29,7 @@ class RLE
 {
 public:
     QByteArray decode(const QByteArray & input);
+    static QImage decodeImage(const QByteArray &data, int width, int height, const QRgb &color);
     static QImage decodeImage(const QByteArray &data, int width, int height, const QVector<QRgb> &colorTable);
     static QImage decodeImage(const QByteArray &data, int width, int height);
 

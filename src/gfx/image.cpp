@@ -206,6 +206,11 @@ Image Image::load(QIODevice *device, Type type, const QVector<QRgb> &colorTable)
 
     QImage image;
     switch (type) {
+    case Bitmap:
+        stream >> length;
+        image = RLE::decodeImage(device->read(length), width, height, colorTable[0]);
+        break;
+
     case PaletteRLE:
         stream >> length;
         image = RLE::decodeImage(device->read(length), width, height, colorTable);

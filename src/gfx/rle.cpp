@@ -111,6 +111,32 @@ QByteArray RLE::decode(const QByteArray &input)
 }
 
 
+QImage RLE::decodeImage(const QByteArray &data, int width, int height, const QRgb &color)
+{
+    QDataStream stream(data);
+    stream.setByteOrder(QDataStream::LittleEndian);
+
+    QImage image(width, height, QImage::Format_ARGB32);
+
+    for (int y = 0; y < height; y++) {
+        int x = 0;
+        while (x < width && !stream.atEnd()) {
+            quint16 transparent = 0;
+            quint16 opaque = 0;
+            stream >> transparent >> opaque;
+
+            for (uint i = 0; i < transparent; i++)
+                image.setPixel(x++, y, qRgba(0, 0, 0, 0));
+
+            for (uint i = 0; i < opaque; i++)
+                image.setPixel(x++, y, color);
+        }
+    }
+
+    return image;
+}
+
+
 QImage RLE::decodeImage(const QByteArray &data, int width, int height, const QVector<QRgb> &colorTable)
 {
     QDataStream stream(data);

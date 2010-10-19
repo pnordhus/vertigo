@@ -44,8 +44,12 @@ void FontPrivate::load(const QString &filename, const QVector<QRgb> &colorTable,
 
     QDataStream stream(&file);
     stream.setByteOrder(QDataStream::LittleEndian);
-    stream.skipRawData(6);
+
+    quint8 type;
     quint32 numEntries;
+
+    stream >> type;
+    stream.skipRawData(5);
     stream >> numEntries;
     stream.skipRawData(8);
 
@@ -55,7 +59,25 @@ void FontPrivate::load(const QString &filename, const QVector<QRgb> &colorTable,
     int x = 1;
     int y = 1;
     for (unsigned int i = 0; i < numEntries; i++) {
-        QImage image = Image::load(&file, Image::PaletteRLE, colorTable);
+        QImage image;
+        switch (type) {
+        case 2:
+            image = Image::load(&file, Image::PaletteRLE, colorTable);
+            break;
+
+        case 4:
+        case 18:
+            image = Image::load(&file, Image::Bitmap, colorTable);
+            break;
+
+        case 20:
+            image = Image::load(&file, Image::RGB565, colorTable);
+            break;
+
+        default:
+            qFatal("Unknown font type");
+        }
+
         image = image.scaled(image.width() * scaleFactor, image.height() * scaleFactor);
 
         if (x + image.width() + 1 >= res) {
@@ -101,6 +123,7 @@ QRect FontPrivate::draw(const QString &text, int x, int y, int w, int h, bool al
     for (int i = 0; i < text.size(); i++) {
         const quint8 c = text[i].toLatin1() - 32;
 
+        Q_ASSERT(c < m_symbols.size());
         const Symbol &symbol = m_symbols[c];
         const QRectF &rect = symbol.rect;
 

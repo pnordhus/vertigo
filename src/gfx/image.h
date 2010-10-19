@@ -28,7 +28,7 @@ namespace gfx {
 class Image : public QImage
 {
 public:
-    enum Type { PaletteRLE = 0x0400, Palette = 0x0401, RGB565 = 0x0413 };
+    enum Type { Bitmap = 0x0000, PaletteRLE = 0x0400, Palette = 0x0401, RGB565 = 0x0413 };
 
 public:
     Image();
