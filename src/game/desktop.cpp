@@ -42,7 +42,9 @@ Desktop::Desktop(const QString &name) :
     const QString background = file.value("BackGround").toString();
     const QString backgroundSound = file.value("Sound").toString();
     const QString nameSound = "st" + file.value("SFV").toString().right(4);
-    m_background.fromImage(gfx::Image::loadPCX("gfx:pic/bground/" + background + ".pcx").toRgb565());
+    QImage image = gfx::Image::loadPCX("gfx:pic/bground/" + background + ".pcx").toRgb565();
+    m_miniMovie.setColorTable(image.colorTable());
+    m_background.fromImage(image);
     m_backgroundSound.load("sfx:snd/bground/" + backgroundSound + ".pcl", "sfx:snd/bground/" + backgroundSound + ".pcr");
     m_nameSound.load("sfx:snd/names/" + nameSound + ".pcm");
     m_approachMovie = QString("gfx:mvi/approach/%1.mvi").arg(file.value("ApproachMovie").toString());

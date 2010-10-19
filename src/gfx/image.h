@@ -35,7 +35,7 @@ public:
     Image(const QImage &image);
 
 public:
-    Image& toRgb565(bool scale = false);
+    Image& toRgb565();
 
 public:
     static Image load(const QString &filename, const QVector<QRgb> &colorTable = QVector<QRgb>());

@@ -35,7 +35,7 @@ public:
 public:
     bool loadFromFile(const QString &filename);
     void load(const QByteArray &data);
-    void toRgb565(bool scale = false);
+    void toRgb565();
 };
 
 

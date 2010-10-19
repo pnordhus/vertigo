@@ -23,9 +23,8 @@
 namespace game {
 
 
-MiniMovie::MiniMovie(const QString &path, bool scaleColorTable) :
-    m_path(path),
-    m_scaleColorTable(scaleColorTable)
+MiniMovie::MiniMovie(const QString &path) :
+    m_path(path)
 {
 
 }
@@ -85,10 +84,18 @@ void MiniMovie::update(gfx::Texture texture)
             }
         }
 
-        gfx::Image frame = video->video.getFrame().toRgb565(m_scaleColorTable);
-        if (!frame.isNull())
+        gfx::Image frame = video->video.getFrame();
+        if (!frame.isNull()) {
+            frame.setColorTable(m_colorTable);
             texture.update(video->x, video->y, frame);
+        }
     }
+}
+
+
+void MiniMovie::setColorTable(const gfx::ColorTable &colorTable)
+{
+    m_colorTable = colorTable;
 }
 
 

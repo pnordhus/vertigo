@@ -31,13 +31,14 @@ namespace game {
 class MiniMovie
 {
 public:
-    MiniMovie(const QString &path, bool scaleColorTable = false);
+    MiniMovie(const QString &path);
     ~MiniMovie();
 
 public:
     void load(txt::DesFile &file);
     void start();
     void update(gfx::Texture texture);
+    void setColorTable(const gfx::ColorTable &colorTable);
 
 private:
     struct Video
@@ -52,7 +53,7 @@ private:
     QString m_path;
     QList<Video*> m_videos;
     QTime m_time;
-    bool m_scaleColorTable;
+    gfx::ColorTable m_colorTable;
 };
 
 

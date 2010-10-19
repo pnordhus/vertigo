@@ -52,15 +52,10 @@ bool ColorTable::loadFromFile(const QString &filename)
 }
 
 
-void ColorTable::toRgb565(bool scale)
+void ColorTable::toRgb565()
 {
-    if (scale) {
-        for (int i = 0; i < size(); i++)
-            (*this)[i] = qRgb(qRed(at(i) << 2) & 0xf8, qGreen(at(i) << 2) & 0xfc, qBlue(at(i) << 2) & 0xf8);
-    } else {
-        for (int i = 0; i < size(); i++)
-            (*this)[i] = qRgb(qRed(at(i)) & 0xf8, qGreen(at(i)) & 0xfc, qBlue(at(i)) & 0xf8);
-    }
+    for (int i = 0; i < size(); i++)
+        (*this)[i] = qRgb(qRed(at(i)) & 0xf8, qGreen(at(i)) & 0xfc, qBlue(at(i)) & 0xf8);
 }
 
 

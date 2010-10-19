@@ -26,7 +26,7 @@ namespace game {
 
 
 Room::Room(const QString &title, const QString &name) :
-    m_miniMovie("gfx:mvi/room", true)
+    m_miniMovie("gfx:mvi/room")
 {
     const gfx::ColorTable colorTable("gfx:pal/gui/border.pal");
     const gfx::Font fontMedium("gfx:fnt/dpmedium.fnt", colorTable);
@@ -36,7 +36,9 @@ Room::Room(const QString &title, const QString &name) :
 
     const QString background = file.value("BackGround").toString();
     const QString backgroundSound = file.value("Sound").toString();
-    m_background.fromImage(gfx::Image::loadPCX("gfx:pic/room/" + background + ".pcx").toRgb565());
+    QImage image = gfx::Image::loadPCX("gfx:pic/room/" + background + ".pcx").toRgb565();
+    m_miniMovie.setColorTable(image.colorTable());
+    m_background.fromImage(image);
     m_backgroundSound.load("sfx:snd/room/" + backgroundSound + ".pcm");
 
     QImage left = gfx::Image::load("gfx:img/desktop/gui/borl.img", colorTable);

@@ -42,10 +42,10 @@ Image::Image(const QImage &image) :
 }
 
 
-Image& Image::toRgb565(bool scale)
+Image& Image::toRgb565()
 {
     ColorTable c = colorTable();
-    c.toRgb565(scale);
+    c.toRgb565();
     setColorTable(c);
     return *this;
 }
