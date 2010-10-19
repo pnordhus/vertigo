@@ -76,6 +76,12 @@ void Widget::setWidth(int w)
 }
 
 
+void Widget::setHeight(int h)
+{
+    m_rect.setHeight(h);
+}
+
+
 QRect Widget::mapToGlobal(QRect rect) const
 {
     rect.moveTopLeft(rect.topLeft() + m_rect.topLeft());

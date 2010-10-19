@@ -54,7 +54,7 @@ void Button::draw()
         if (m_pressed)
             offset += QPoint(m_offset, m_offset);
 
-        m_drawRect = m_font.draw(m_text, offset, size(), m_alignment & AlignHCenter, m_alignment & AlignVCenter);
+        m_drawRect = m_font.draw(m_text, offset, size(), m_alignment & AlignHCenter, m_alignment & AlignBottom);
         m_drawRect.setTopLeft(m_drawRect.topLeft() - offset);
     }
 }

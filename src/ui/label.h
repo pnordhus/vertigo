@@ -35,7 +35,7 @@ public:
     {
         AlignNone = 0,
         AlignHCenter = 1,
-        AlignVCenter = 2,
+        AlignBottom = 2,
     };
     Q_DECLARE_FLAGS(Alignment, AlignmentFlags);
 

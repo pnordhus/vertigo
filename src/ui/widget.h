@@ -42,6 +42,7 @@ public:
     void setSize(int w, int h);
     void setSize(const QSize &size);
     void setWidth(int w);
+    void setHeight(int h);
     const QRect& rect() const { return m_rect; }
     QSize size() const { return m_rect.size(); }
     float width() const { return m_rect.width(); }

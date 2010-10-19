@@ -33,8 +33,9 @@ public:
 
 public:
     void load(const QString &filename, const QVector<QRgb> &colorTable, bool scale);
-    QRect draw(const QString &text, int x, int y, int w, int h, bool alignHCenter = false, bool alignVCenter = false);
+    QRect draw(const QString &text, int x, int y, int w, int h, bool alignHCenter = false, bool alignBottom = false);
     int height() const { return m_height; }
+    int height(int w, const QStringList &strings) const;
     int width(const QString &text) const;
 
 private:
@@ -61,8 +62,8 @@ public:
     void load(const QString &filename, const QVector<QRgb> &colorTable, bool scale = false);
     QRect draw(const QString &text, int x, int y);
     QRect draw(const QString &text, const QPoint &pos);
-    QRect draw(const QString &text, const QPoint &pos, const QSize &size, bool alignHCenter, bool alignVCenter);
-    QRect draw(const QString &text, const QSize &size, bool alignHCenter, bool alignVCenter);
+    QRect draw(const QString &text, const QPoint &pos, const QSize &size, bool alignHCenter, bool alignBottom);
+    QRect draw(const QString &text, const QSize &size, bool alignHCenter, bool alignBottom);
     int height() const;
     int width(const QString &text) const;
 
@@ -103,15 +104,15 @@ inline QRect Font::draw(const QString &text, const QPoint &pos)
 }
 
 
-inline QRect Font::draw(const QString &text, const QPoint &pos, const QSize &size, bool alignHCenter, bool alignVCenter)
+inline QRect Font::draw(const QString &text, const QPoint &pos, const QSize &size, bool alignHCenter, bool alignBottom)
 {
-    return d->draw(text, pos.x(), pos.y(), size.width(), size.height(), alignHCenter, alignVCenter);
+    return d->draw(text, pos.x(), pos.y(), size.width(), size.height(), alignHCenter, alignBottom);
 }
 
 
-inline QRect Font::draw(const QString &text, const QSize &size, bool alignHCenter, bool alignVCenter)
+inline QRect Font::draw(const QString &text, const QSize &size, bool alignHCenter, bool alignBottom)
 {
-    return d->draw(text, 0, 0, size.width(), size.height(), alignHCenter, alignVCenter);
+    return d->draw(text, 0, 0, size.width(), size.height(), alignHCenter, alignBottom);
 }
 
 
