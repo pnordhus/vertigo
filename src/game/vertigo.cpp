@@ -68,7 +68,7 @@ bool Vertigo::start()
 
     m_window = new Window;
 
-    m_mainMenu = new MainMenu;
+    m_mainMenu = new MainMenu(false);
     connect(m_mainMenu, SIGNAL(startGame()), SLOT(startGame()));
 
     m_window->setRenderer(m_mainMenu);
@@ -102,6 +102,17 @@ void Vertigo::startGame()
 }
 
 
+void Vertigo::endGame()
+{
+    m_chapter->deleteLater();
+    m_chapter = NULL;
+    Q_ASSERT(m_mainMenu == NULL);
+    m_mainMenu = new MainMenu(true);
+    connect(m_mainMenu, SIGNAL(startGame()), SLOT(startGame()));
+    m_window->setRenderer(m_mainMenu);
+}
+
+
 void Vertigo::introFinished()
 {
     m_window->setRenderer(NULL);
@@ -111,6 +122,7 @@ void Vertigo::introFinished()
     Q_ASSERT(m_chapter == NULL);
     m_chapter = new Chapter;
     connect(m_chapter, SIGNAL(setRenderer(Renderer*)), m_window, SLOT(setRenderer(Renderer*)));
+    connect(m_chapter, SIGNAL(endGame()), SLOT(endGame()));
     m_chapter->load(1);
 }
 

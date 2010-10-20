@@ -22,17 +22,22 @@
 namespace game {
 
 
+Chapter *Chapter::m_singleton = NULL;
+
+
 Chapter::Chapter() :
     m_area(NULL),
     m_desktop(NULL),
     m_movie(NULL)
 {
-
+    Q_ASSERT(m_singleton == NULL);
+    m_singleton = this;
 }
 
 
 Chapter::~Chapter()
 {
+    m_singleton = NULL;
     delete m_movie;
     delete m_desktop;
     delete m_area;
@@ -84,6 +89,12 @@ void Chapter::movieFinished()
     delete m_movie;
     m_movie = NULL;
     playMovies();
+}
+
+
+void Chapter::quit()
+{
+    emit endGame();
 }
 
 

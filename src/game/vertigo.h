@@ -45,6 +45,7 @@ public:
 private slots:
     void update();
     void startGame();
+    void endGame();
     void introFinished();
 
 private:

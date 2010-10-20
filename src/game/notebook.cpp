@@ -15,6 +15,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
+#include "chapter.h"
 #include "notebook.h"
 #include "gfx/colortable.h"
 #include "gfx/image.h"
@@ -63,12 +64,13 @@ Notebook::Notebook()
         connect(widget, SIGNAL(clicked()), SIGNAL(close()));
 
         widget = createButton(m_lblMain, txt::Notebook_QuitGame, 210);
+        connect(widget, SIGNAL(clicked()), Chapter::get(), SLOT(quit()));
     }
 
     {
         m_lblMap = new ui::Label(labelBackground);
         m_lblMap->setPosition(164, 75);
-        m_lblMap->setTexture(gfx::Image::load("gfx:pic/notebook/ar02.r16", 304, 284));
+        m_lblMap->setTexture(Chapter::get()->area()->map());
         m_lblMap->hide();
     }
 }

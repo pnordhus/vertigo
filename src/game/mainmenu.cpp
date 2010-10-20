@@ -28,7 +28,7 @@
 namespace game {
 
 
-MainMenu::MainMenu() :
+MainMenu::MainMenu(bool skipToTitle) :
     m_state(Invalid)
 {
     const gfx::ColorTable colorTable("gfx:pal/gui/border.pal");
@@ -87,7 +87,10 @@ MainMenu::MainMenu() :
     button->setText(txt::StringTable::get(txt::MainMenu_QuitGame));
     connect(button, SIGNAL(clicked()), qApp, SLOT(quit()));
 
-    changeState(Presents);
+    if (skipToTitle)
+        changeState(Title);
+    else
+        changeState(Presents);
 }
 
 

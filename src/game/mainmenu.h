@@ -36,7 +36,7 @@ private:
     enum State { Invalid, Presents, Title };
 
 public:
-    MainMenu();
+    MainMenu(bool skipToTitle);
 
 signals:
     void startGame();

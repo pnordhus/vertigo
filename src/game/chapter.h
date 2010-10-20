@@ -37,6 +37,10 @@ public:
 
 signals:
     void setRenderer(Renderer*);
+    void endGame();
+
+public slots:
+    void quit();
 
 public:
     void load(int chapter);
@@ -48,12 +52,16 @@ private:
 private slots:
     void movieFinished();
 
+public:
+    static Chapter* get() { Q_ASSERT(m_singleton); return m_singleton; }
+
 private:
     int m_code;
     Area *m_area;
     Desktop *m_desktop;
     Movie *m_movie;
     QStringList m_movies;
+    static Chapter *m_singleton;
 };
 
 
