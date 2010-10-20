@@ -29,15 +29,23 @@ namespace ui {
 
 class Widget : public QObject
 {
+    Q_OBJECT
+
 public:
     Widget(Widget *parent = NULL);
     ~Widget();
 
-public:
-    void setParentWidget(Widget *parent);
+public slots:
+    void setEnabled(bool);
+    void enable();
+    void disable();
     void setVisible(bool);
     void hide();
     void show();
+
+public:
+    void setParentWidget(Widget *parent);
+    bool isEnabled() const { return m_enabled; }
     bool isVisible() const { return m_visible; }
     void setPosition(int x, int y);
     void setSize(int w, int h);
@@ -63,6 +71,7 @@ private:
 
 private:
     Widget *m_parent;
+    bool m_enabled;
     bool m_visible;
     QList<Widget*> m_children;
     QRect m_rect;

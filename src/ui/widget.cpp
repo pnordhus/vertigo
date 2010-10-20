@@ -24,6 +24,7 @@ namespace ui {
 
 Widget::Widget(Widget *parent) :
     m_parent(NULL),
+    m_enabled(true),
     m_visible(true)
 {
     setSize(640, 480);
@@ -47,6 +48,24 @@ void Widget::setParentWidget(Widget *parent)
 
     if (m_parent)
         m_parent->m_children.append(this);
+}
+
+
+void Widget::setEnabled(bool enabled)
+{
+    m_enabled = enabled;
+}
+
+
+void Widget::enable()
+{
+    m_enabled = true;
+}
+
+
+void Widget::disable()
+{
+    m_enabled = false;
 }
 
 
@@ -119,7 +138,7 @@ void Widget::doDraw()
 
 bool Widget::doMousePressEvent(const QPoint &pos, Qt::MouseButton button)
 {
-    if (m_visible && pos.x() >= m_rect.x() && pos.y() >= m_rect.y()) {
+    if (m_enabled && m_visible && pos.x() >= m_rect.x() && pos.y() >= m_rect.y()) {
         if (mousePressEvent(pos, button))
             return true;
 
@@ -135,7 +154,7 @@ bool Widget::doMousePressEvent(const QPoint &pos, Qt::MouseButton button)
 
 void Widget::doMouseReleaseEvent(const QPoint &pos, Qt::MouseButton button)
 {
-    if (m_visible) {
+    if (m_enabled && m_visible) {
         mouseReleaseEvent(pos, button);
         foreach (Widget *widget, m_children)
             widget->doMouseReleaseEvent(pos, button);
@@ -145,7 +164,7 @@ void Widget::doMouseReleaseEvent(const QPoint &pos, Qt::MouseButton button)
 
 void Widget::doMouseMoveEvent(const QPoint &pos)
 {
-    if (m_visible) {
+    if (m_enabled && m_visible) {
         mouseMoveEvent(pos);
         foreach (Widget *widget, m_children)
             widget->doMouseMoveEvent(pos);

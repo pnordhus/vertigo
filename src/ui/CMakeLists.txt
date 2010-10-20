@@ -12,6 +12,7 @@ set(SOURCES
 set(MOC_SOURCES
     button.h
     frame.h
+    widget.h
 )
 
 qt4_wrap_cpp(MOC_SOURCES ${MOC_SOURCES})
