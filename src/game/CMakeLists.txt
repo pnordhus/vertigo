@@ -38,6 +38,7 @@ set(MOC_SOURCES
     mainmenu.h
     movie.h
     notebook.h
+    renderer.h
     room.h
     vertigo.h
     window.h

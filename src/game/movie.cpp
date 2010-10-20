@@ -26,7 +26,7 @@ namespace game {
 Movie::Movie() :
     m_pause(false)
 {
-
+    hideCursor();
 }
 
 
@@ -54,12 +54,6 @@ void Movie::play(const QString &filename)
 
     m_texture.update(0, 0, line);
     m_texture.update(0, m_texture.height() - 1, line);
-}
-
-
-bool Movie::showCursor() const
-{
-    return false;
 }
 
 

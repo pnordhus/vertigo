@@ -32,13 +32,23 @@ namespace game {
 
 class Renderer : public QObject
 {
+    Q_OBJECT
+
+public:
+    Renderer();
+
 public:
     virtual void draw() = 0;
     virtual void activate() = 0;
     virtual void deactivate() = 0;
 
+public slots:
+    void setCursorVisible(bool visible);
+    void showCursor();
+    void hideCursor();
+
 public:
-    virtual bool showCursor() const;
+    virtual bool isCursorVisible() const { return m_cursorVisible; }
     void setRect(const QRect &rect);
     QRect rect() const { return m_rect; }
     int width() const { return m_rect.width(); }
@@ -57,6 +67,7 @@ protected:
     void setupOrthographicMatrix(float w, float h);
 
 private:
+    bool m_cursorVisible;
     QRect m_rect;
     QMatrix4x4 m_projection;
 };

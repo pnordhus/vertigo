@@ -76,7 +76,7 @@ void Window::resizeGL(int w, int h)
 void Window::paintGL()
 {
     if (m_renderer) {
-        if (m_renderer->showCursor())
+        if (m_renderer->isCursorVisible())
             setCursor(m_cursor);
         else
             setCursor(Qt::BlankCursor);

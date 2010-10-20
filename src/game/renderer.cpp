@@ -22,15 +22,34 @@
 namespace game {
 
 
+Renderer::Renderer() :
+    m_cursorVisible(true)
+{
+
+}
+
+
 void Renderer::setRect(const QRect &rect)
 {
     m_rect = rect;
 }
 
 
-bool Renderer::showCursor() const
+void Renderer::setCursorVisible(bool visible)
 {
-    return true;
+    m_cursorVisible = visible;
+}
+
+
+void Renderer::showCursor()
+{
+    m_cursorVisible = true;
+}
+
+
+void Renderer::hideCursor()
+{
+    m_cursorVisible = false;
 }
 
 
