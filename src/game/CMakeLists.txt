@@ -1,4 +1,8 @@
 set(SOURCES
+    area.cpp
+    area.h
+    chapter.cpp
+    chapter.h
     desktop.cpp
     desktop.h
     dialog.cpp
@@ -20,6 +24,8 @@ set(SOURCES
     renderer.h
     room.cpp
     room.h
+    station.cpp
+    station.h
     vertigo.cpp
     vertigo.h
     window.cpp
@@ -27,6 +33,7 @@ set(SOURCES
 )
 
 set(MOC_SOURCES
+    chapter.h
     desktop.h
     mainmenu.h
     movie.h

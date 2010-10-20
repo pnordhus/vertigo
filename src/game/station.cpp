@@ -15,47 +15,21 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GAME_VERTIGO_H
-#define GAME_VERTIGO_H
-
-
-#include <QObject>
+#include "station.h"
+#include "txt/desfile.h"
 
 
 namespace game {
 
 
-class Chapter;
-class MainMenu;
-class Movie;
-class Window;
-
-
-class Vertigo : public QObject
+Station::Station(const QString &name)
 {
-    Q_OBJECT
+    txt::DesFile file("dat:world/" + name + ".des");
 
-public:
-    Vertigo();
-    ~Vertigo();
-
-public:
-    bool start();
-
-private slots:
-    void update();
-    void startGame();
-    void introFinished();
-
-private:
-    Window *m_window;
-    MainMenu *m_mainMenu;
-    Movie *m_intro;
-    Chapter *m_chapter;
-};
+    file.beginGroup("Station");
+    m_name = file.value("Name").toString();
+    file.endGroup();
+}
 
 
 } // namespace game
-
-
-#endif // GAME_VERTIGO_H

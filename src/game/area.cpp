@@ -15,47 +15,39 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GAME_VERTIGO_H
-#define GAME_VERTIGO_H
-
-
-#include <QObject>
+#include "area.h"
+#include "desktop.h"
+#include "txt/desfile.h"
 
 
 namespace game {
 
 
-class Chapter;
-class MainMenu;
-class Movie;
-class Window;
-
-
-class Vertigo : public QObject
+Area::Area()
 {
-    Q_OBJECT
 
-public:
-    Vertigo();
-    ~Vertigo();
+}
 
-public:
-    bool start();
 
-private slots:
-    void update();
-    void startGame();
-    void introFinished();
+Area::Area(const QString &name)
+{
+    load(name);
+}
 
-private:
-    Window *m_window;
-    MainMenu *m_mainMenu;
-    Movie *m_intro;
-    Chapter *m_chapter;
-};
+
+void Area::load(const QString &name)
+{
+    txt::DesFile file(QString("dat:world/%1.des").arg(name));
+    file.beginGroup("Area");
+    m_name = file.value("Name").toString();
+    m_code = file.value("Code").toInt();
+    file.endGroup();
+
+    m_map = gfx::Image::load(QString("gfx:pic/notebook/%1.r16").arg(file.value("Map/Name").toString()), 304, 284);
+
+    foreach (const QString &section, file.childGroups().filter(QRegExp("^Station")))
+        m_stations << Station(file.value(section + "/Name").toString());
+}
 
 
 } // namespace game
-
-
-#endif // GAME_VERTIGO_H

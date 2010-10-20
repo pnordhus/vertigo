@@ -15,9 +15,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "desktop.h"
+#include "chapter.h"
 #include "mainmenu.h"
-#include "movie.h"
 #include "vertigo.h"
 #include "window.h"
 #include "txt/stringtable.h"
@@ -33,8 +32,8 @@ namespace game {
 Vertigo::Vertigo() :
     m_window(NULL),
     m_mainMenu(NULL),
-    m_movie(NULL),
-    m_desktop(NULL)
+    m_intro(NULL),
+    m_chapter(NULL)
 {
 
 }
@@ -42,8 +41,8 @@ Vertigo::Vertigo() :
 
 Vertigo::~Vertigo()
 {
-    delete m_desktop;
-    delete m_movie;
+    delete m_chapter;
+    delete m_intro;
     delete m_mainMenu;
     delete m_window;
 }
@@ -94,36 +93,25 @@ void Vertigo::startGame()
     m_mainMenu->deleteLater();
     m_mainMenu = NULL;
 
-    playMovie("gfx:mvi/film/d02.mvi");
+    Q_ASSERT(m_intro == NULL);
+    m_intro = new Movie;
+    connect(m_intro, SIGNAL(finished()), SLOT(introFinished()));
 
-    Q_ASSERT(m_desktop == NULL);
-    m_desktop = new Desktop("st0201");
-
-    m_movies.append(m_desktop->approachMovie());
+    m_window->setRenderer(m_intro);
+    m_intro->play("gfx:mvi/film/d02.mvi");
 }
 
 
-void Vertigo::playMovie(const QString &filename)
-{
-    Q_ASSERT(m_movie == NULL);
-    m_movie = new Movie;
-    connect(m_movie, SIGNAL(finished()), SLOT(movieFinished()));
-
-    m_window->setRenderer(m_movie);
-    m_movie->play(filename);
-}
-
-
-void Vertigo::movieFinished()
+void Vertigo::introFinished()
 {
     m_window->setRenderer(NULL);
-    delete m_movie;
-    m_movie = NULL;
+    delete m_intro;
+    m_intro = NULL;
 
-    if (!m_movies.isEmpty())
-        playMovie(m_movies.takeFirst());
-    else
-        m_window->setRenderer(m_desktop);
+    Q_ASSERT(m_chapter == NULL);
+    m_chapter = new Chapter;
+    connect(m_chapter, SIGNAL(setRenderer(Renderer*)), m_window, SLOT(setRenderer(Renderer*)));
+    m_chapter->load(1);
 }
 
 

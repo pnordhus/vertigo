@@ -35,7 +35,7 @@ class Window : public QGLWidget
 public:
     Window();
 
-public:
+public slots:
     void setRenderer(Renderer *renderer);
 
 private slots:

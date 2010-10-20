@@ -15,47 +15,27 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GAME_VERTIGO_H
-#define GAME_VERTIGO_H
+#ifndef GAME_STATION_H
+#define GAME_STATION_H
 
 
-#include <QObject>
+#include <QString>
 
 
 namespace game {
 
 
-class Chapter;
-class MainMenu;
-class Movie;
-class Window;
-
-
-class Vertigo : public QObject
+class Station
 {
-    Q_OBJECT
-
 public:
-    Vertigo();
-    ~Vertigo();
-
-public:
-    bool start();
-
-private slots:
-    void update();
-    void startGame();
-    void introFinished();
+    Station(const QString &name);
 
 private:
-    Window *m_window;
-    MainMenu *m_mainMenu;
-    Movie *m_intro;
-    Chapter *m_chapter;
+    QString m_name;
 };
 
 
 } // namespace game
 
 
-#endif // GAME_VERTIGO_H
+#endif // GAME_STATION_H

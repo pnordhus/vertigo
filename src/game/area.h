@@ -15,47 +15,41 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GAME_VERTIGO_H
-#define GAME_VERTIGO_H
+#ifndef GAME_AREA_H
+#define GAME_AREA_H
 
 
-#include <QObject>
+#include "station.h"
+#include "gfx/image.h"
+#include <QStringList>
 
 
 namespace game {
 
 
-class Chapter;
-class MainMenu;
-class Movie;
-class Window;
-
-
-class Vertigo : public QObject
+class Area
 {
-    Q_OBJECT
+public:
+    Area();
+    Area(const QString &name);
 
 public:
-    Vertigo();
-    ~Vertigo();
-
-public:
-    bool start();
-
-private slots:
-    void update();
-    void startGame();
-    void introFinished();
+    gfx::Image map() const { return m_map; }
+    QList<Station> stations() const { return m_stations; }
 
 private:
-    Window *m_window;
-    MainMenu *m_mainMenu;
-    Movie *m_intro;
-    Chapter *m_chapter;
+    Q_DISABLE_COPY(Area);
+    void load(const QString &name);
+
+private:
+    int m_code;
+    QString m_name;
+    gfx::Image m_map;
+    QList<Station> m_stations;
 };
 
 
 } // namespace game
 
 
-#endif // GAME_VERTIGO_H
+#endif // GAME_AREA_H

@@ -15,47 +15,49 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GAME_VERTIGO_H
-#define GAME_VERTIGO_H
+#ifndef GAME_CHAPTER_H
+#define GAME_CHAPTER_H
 
 
-#include <QObject>
+#include "area.h"
+#include "desktop.h"
+#include "movie.h"
 
 
 namespace game {
 
 
-class Chapter;
-class MainMenu;
-class Movie;
-class Window;
-
-
-class Vertigo : public QObject
+class Chapter : public QObject
 {
     Q_OBJECT
 
 public:
-    Vertigo();
-    ~Vertigo();
+    Chapter();
+    ~Chapter();
+
+signals:
+    void setRenderer(Renderer*);
 
 public:
-    bool start();
-
-private slots:
-    void update();
-    void startGame();
-    void introFinished();
+    void load(int chapter);
+    Area* area() const { return m_area; }
 
 private:
-    Window *m_window;
-    MainMenu *m_mainMenu;
-    Movie *m_intro;
-    Chapter *m_chapter;
+    void playMovies();
+
+private slots:
+    void movieFinished();
+
+private:
+    int m_code;
+    Area *m_area;
+    Desktop *m_desktop;
+    Movie *m_movie;
+    QStringList m_movies;
 };
 
 
 } // namespace game
 
 
-#endif // GAME_VERTIGO_H
+#endif // GAME_CHAPTER_H
