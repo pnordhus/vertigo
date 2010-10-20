@@ -34,6 +34,7 @@ public:
     ~Widget();
 
 public:
+    void setParentWidget(Widget *parent);
     void setVisible(bool);
     void hide();
     void show();

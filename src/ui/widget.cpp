@@ -23,20 +23,30 @@ namespace ui {
 
 
 Widget::Widget(Widget *parent) :
-    m_parent(parent),
+    m_parent(NULL),
     m_visible(true)
 {
     setSize(640, 480);
-    if (m_parent)
-        m_parent->m_children.append(this);
+    setParentWidget(parent);
 }
 
 
 Widget::~Widget()
 {
     qDeleteAll(m_children);
+    setParentWidget(NULL);
+}
+
+
+void Widget::setParentWidget(Widget *parent)
+{
     if (m_parent)
         m_parent->m_children.removeAll(this);
+
+    m_parent = parent;
+
+    if (m_parent)
+        m_parent->m_children.append(this);
 }
 
 
