@@ -30,6 +30,9 @@ class Station
 public:
     Station(const QString &name);
 
+public:
+    const QString& name() const { return m_name; }
+
 private:
     QString m_name;
 };

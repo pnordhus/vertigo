@@ -57,13 +57,22 @@ void Chapter::load(int chapter)
     file.beginGroup("Chapter");
     m_code = file.value("Code").toInt();
     m_area = new Area(file.value("Area").toString());
+    m_stations = m_area->stations();
     const QString startStation = file.value("StartStation").toString();
     file.endGroup();
 
-    m_desktop = new Desktop(startStation);
+    setStation(startStation);
+}
+
+
+void Chapter::setStation(const QString &station)
+{
+    if (m_desktop)
+        m_desktop->deleteLater();
+    m_currentStation = station;
+    m_desktop = new Desktop(m_currentStation);
 
     QString approachMovie = m_desktop->approachMovie();
-
     m_movies << approachMovie;
     playMovies();
 }

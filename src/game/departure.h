@@ -15,56 +15,35 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
+#ifndef GAME_DEPARTURE_H
+#define GAME_DEPARTURE_H
 
-#ifndef GAME_MINIMOVIE_H
-#define GAME_MINIMOVIE_H
 
-
-#include "gfx/texture.h"
-#include "gfx/video.h"
-#include "txt/desfile.h"
+#include "ui/label.h"
 
 
 namespace game {
 
 
-class MiniMovie : public QObject
+class Departure : public ui::Label
 {
     Q_OBJECT
 
 public:
-    MiniMovie(const QString &path);
-    ~MiniMovie();
+    Departure();
 
 signals:
-    void videoFinished();
-
-public:
-    void load(txt::DesFile &file);
-    void start();
-    void update(gfx::Texture texture);
-    void setColorTable(const gfx::ColorTable &colorTable);
-    void playOneshot();
+    void close();
 
 private:
-    struct Video
-    {
-        gfx::Video video;
-        int x;
-        int y;
-        int rndMax;
-        int time;
-        bool oneShot;
-    };
+    bool mousePressEvent(const QPoint &pos, Qt::MouseButton button);
 
-    QString m_path;
-    QList<Video*> m_videos;
-    QTime m_time;
-    gfx::ColorTable m_colorTable;
+private slots:
+    void select();
 };
 
 
 } // namespace game
 
 
-#endif // GAME_MINIMOVIE_H
+#endif // GAME_DEPARTURE_H

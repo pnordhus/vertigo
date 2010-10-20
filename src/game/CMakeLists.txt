@@ -3,6 +3,8 @@ set(SOURCES
     area.h
     chapter.cpp
     chapter.h
+    departure.cpp
+    departure.h
     desktop.cpp
     desktop.h
     dialog.cpp
@@ -34,8 +36,10 @@ set(SOURCES
 
 set(MOC_SOURCES
     chapter.h
+    departure.h
     desktop.h
     mainmenu.h
+    minimovie.h
     movie.h
     notebook.h
     renderer.h

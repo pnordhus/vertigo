@@ -20,8 +20,7 @@
 
 
 #include "station.h"
-#include "gfx/image.h"
-#include <QStringList>
+#include <QMap>
 
 
 namespace game {
@@ -34,8 +33,8 @@ public:
     Area(const QString &name);
 
 public:
-    gfx::Image map() const { return m_map; }
-    QList<Station> stations() const { return m_stations; }
+    QString map() const { return m_map; }
+    QMap<QString, Station> stations() const { return m_stations; }
 
 private:
     Q_DISABLE_COPY(Area);
@@ -44,8 +43,8 @@ private:
 private:
     int m_code;
     QString m_name;
-    gfx::Image m_map;
-    QList<Station> m_stations;
+    QString m_map;
+    QMap<QString, Station> m_stations;
 };
 
 

@@ -19,6 +19,7 @@
 #define GAME_DESKTOP_H
 
 
+#include "departure.h"
 #include "dialogframe.h"
 #include "menu.h"
 #include "minimovie.h"
@@ -51,6 +52,8 @@ private slots:
     void hideRoom();
     void showDialog(const QString &roomName);
     void hideDialog();
+    void showDeparture();
+    void hideDeparture();
 
 private:
     void activate();
@@ -67,6 +70,7 @@ private:
     Notebook m_notebook;
     Room *m_room;
     DialogFrame *m_dialog;
+    Departure *m_departure;
     ui::Button *m_btnQuit;
     QString m_approachMovie;
     MiniMovie m_miniMovie;

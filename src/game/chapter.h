@@ -44,7 +44,10 @@ public slots:
 
 public:
     void load(int chapter);
+    void setStation(const QString &station);
     Area* area() const { return m_area; }
+    const QMap<QString, Station>& stations() const { return m_stations; }
+    const QString& currentStation() const { return m_currentStation; }
 
 private:
     void playMovies();
@@ -61,6 +64,8 @@ private:
     Desktop *m_desktop;
     Movie *m_movie;
     QStringList m_movies;
+    QMap<QString, Station> m_stations;
+    QString m_currentStation;
     static Chapter *m_singleton;
 };
 

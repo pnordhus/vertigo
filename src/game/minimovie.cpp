@@ -49,6 +49,7 @@ void MiniMovie::load(txt::DesFile &file)
         video->x = file.value("X1").toInt();
         video->y = file.value("Y1").toInt();
         video->rndMax = 0;
+        video->oneShot = false;
 
         if (type == "loop")
             video->video.playLoop();
@@ -56,6 +57,8 @@ void MiniMovie::load(txt::DesFile &file)
             video->rndMax = 15000;
         else if (type == "rnd2")
             video->rndMax = 30000;
+        else if (type == "oneshot")
+            video->oneShot = true;
 
         video->time = float(qrand()) / RAND_MAX * video->rndMax;
 
@@ -75,7 +78,10 @@ void MiniMovie::start()
 void MiniMovie::update(gfx::Texture texture)
 {
     const quint32 time = m_time.restart();
+    bool oneshotPlaying = false;
     foreach (Video *video, m_videos) {
+        if (video->oneShot)
+            oneshotPlaying = video->video.isPlaying();
         if (video->rndMax > 0 && !video->video.isPlaying()) {
             video->time -= time;
             if (video->time < 0) {
@@ -90,12 +96,31 @@ void MiniMovie::update(gfx::Texture texture)
             texture.update(video->x, video->y, frame);
         }
     }
+
+    if (oneshotPlaying) {
+        foreach (Video *video, m_videos) {
+            if (video->oneShot) {
+                if (!video->video.isPlaying())
+                    emit videoFinished();
+                break;
+            }
+        }
+    }
 }
 
 
 void MiniMovie::setColorTable(const gfx::ColorTable &colorTable)
 {
     m_colorTable = colorTable;
+}
+
+
+void MiniMovie::playOneshot()
+{
+    foreach (Video *video, m_videos) {
+        if (video->oneShot)
+            video->video.play();
+    }
 }
 
 

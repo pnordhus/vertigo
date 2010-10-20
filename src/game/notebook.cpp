@@ -70,7 +70,7 @@ Notebook::Notebook()
     {
         m_lblMap = new ui::Label(labelBackground);
         m_lblMap->setPosition(164, 75);
-        m_lblMap->setTexture(Chapter::get()->area()->map());
+        m_lblMap->setTexture(gfx::Image::load(QString("gfx:pic/notebook/%1.r16").arg(Chapter::get()->area()->map()), 304, 284));
         m_lblMap->hide();
     }
 }

@@ -36,16 +36,26 @@ public:
 
 signals:
     void startDialog(const QString &name);
+    void showDeparture();
+    void hideCursor();
+
+public:
+    void restart();
 
 protected:
     void draw();
     bool mousePressEvent(const QPoint &pos, Qt::MouseButton button);
 
+private slots:
+    void showDock();
+
 private:
     MiniMovie m_miniMovie;
     QString m_name;
+    QImage m_backgroundImage;
     gfx::Texture m_background;
     sfx::Sound m_backgroundSound;
+    sfx::Sound m_dockSound;
 };
 
 

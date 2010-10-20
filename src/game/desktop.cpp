@@ -28,6 +28,7 @@ namespace game {
 Desktop::Desktop(const QString &name) :
     m_room(NULL),
     m_dialog(NULL),
+    m_departure(NULL),
     m_miniMovie("gfx:mvi/desktop")
 {
     const gfx::ColorTable colorTable("gfx:pal/gui/border.pal");
@@ -127,6 +128,7 @@ Desktop::Desktop(const QString &name) :
 
 Desktop::~Desktop()
 {
+    delete m_departure;
     delete m_room;
 }
 
@@ -154,6 +156,8 @@ void Desktop::draw()
         m_room->doDraw();
     if (m_dialog)
         m_dialog->doDraw();
+    if (m_departure)
+        m_departure->doDraw();
     m_notebook.doDraw();
 }
 
@@ -189,6 +193,8 @@ void Desktop::showRoom()
     m_room = new Room(title, name);
     connect(m_room, SIGNAL(close()), SLOT(hideRoom()));
     connect(m_room, SIGNAL(startDialog(const QString&)), SLOT(showDialog(const QString&)));
+    connect(m_room, SIGNAL(showDeparture()), SLOT(showDeparture()));
+    connect(m_room, SIGNAL(hideCursor()), SLOT(hideCursor()));
     setRootWidget(m_room);
     m_btnNotebook->hide();
     m_room->setPosition((640 - m_room->width()) / 2, (480 - m_room->height()) / 2);
@@ -225,6 +231,30 @@ void Desktop::hideDialog()
     setRootWidget(m_room);
     m_dialog->deleteLater();
     m_dialog = NULL;
+}
+
+
+void Desktop::showDeparture()
+{
+    Q_ASSERT(m_room);
+    Q_ASSERT(!m_departure);
+    m_departure = new Departure;
+    connect(m_departure, SIGNAL(close()), SLOT(hideDeparture()));
+    setRootWidget(m_departure);
+    showCursor();
+    m_room->hide();
+}
+
+
+void Desktop::hideDeparture()
+{
+    Q_ASSERT(m_room);
+    Q_ASSERT(m_departure);
+    setRootWidget(m_room);
+    m_room->restart();
+    m_room->show();
+    m_departure->deleteLater();
+    m_departure = NULL;
 }
 
 

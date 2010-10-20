@@ -43,10 +43,12 @@ void Area::load(const QString &name)
     m_code = file.value("Code").toInt();
     file.endGroup();
 
-    m_map = gfx::Image::load(QString("gfx:pic/notebook/%1.r16").arg(file.value("Map/Name").toString()), 304, 284);
+    m_map = file.value("Map/Name").toString();
 
-    foreach (const QString &section, file.childGroups().filter(QRegExp("^Station")))
-        m_stations << Station(file.value(section + "/Name").toString());
+    foreach (const QString &section, file.childGroups().filter(QRegExp("^Station"))) {
+        const QString station = file.value(section + "/Name").toString();
+        m_stations.insert(station, Station(station));
+    }
 }
 
 
