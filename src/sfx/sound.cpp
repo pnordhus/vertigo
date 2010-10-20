@@ -59,7 +59,7 @@ void Sound::playLoop()
 }
 
 
-void Sound::load(const QString &file)
+void Sound::load(const QString &file, int rate)
 {
     const QByteArray data = loadFile(file);
 
@@ -68,7 +68,7 @@ void Sound::load(const QString &file)
     if (m_buffer != 0)
         alDeleteBuffers(1, &m_buffer);
     alGenBuffers(1, &m_buffer);
-    alBufferData(m_buffer, AL_FORMAT_MONO8, data.data(), data.size(), 22050);
+    alBufferData(m_buffer, AL_FORMAT_MONO8, data.data(), data.size(), rate <= 0 ? 22050 : rate);
     alSourcei(m_source, AL_BUFFER, m_buffer);
 }
 
