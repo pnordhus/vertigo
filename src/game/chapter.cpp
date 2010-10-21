@@ -69,10 +69,16 @@ void Chapter::setStation(const QString &station)
 {
     if (m_desktop)
         m_desktop->deleteLater();
+
+    const QString previousStation = m_currentStation;
     m_currentStation = station;
     m_desktop = new Desktop(m_currentStation);
 
     QString approachMovie = m_desktop->approachMovie();
+
+    if (!previousStation.isEmpty())
+        m_movies << QString("gfx:mvi/film/%1hf.mvi").arg("hiob");
+    m_movies << QString("gfx:mvi/film/%1fl.mvi").arg("hiob");
     m_movies << approachMovie;
     playMovies();
 }
