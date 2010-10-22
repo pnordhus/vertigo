@@ -2,6 +2,7 @@
 #define GAME_DIALOGFRAME_H
 
 
+#include "dialog.h"
 #include "ui/frame.h"
 
 
@@ -11,7 +12,11 @@ namespace game {
 class DialogFrame : public ui::Frame
 {
 public:
-    DialogFrame(const QString &roomName, ui::Widget *parent = NULL);
+    DialogFrame(Dialog* dialog, const QString &roomName, ui::Widget *parent = NULL);
+    ~DialogFrame();
+
+private:
+    Dialog *m_dialog;
 };
 
 

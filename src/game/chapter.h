@@ -21,6 +21,7 @@
 
 #include "area.h"
 #include "desktop.h"
+#include "dialog.h"
 #include "movie.h"
 
 
@@ -49,6 +50,7 @@ public:
     const QMap<int, Station>& stations() const { return m_stations; }
     int currentStation() const { return m_currentStation; }
     void replaceApproachMovie(int station, const QString &movie);
+    Dialog* dialog(int dialogId) const;
 
 private:
     void playMovies();
@@ -69,6 +71,7 @@ private:
     QMap<int, Station> m_stations;
     int m_currentStation;
     QSet<int> m_playedMovies;
+    QMap<int, Dialog*> m_pendingDialogues;
     static Chapter *m_singleton;
 };
 

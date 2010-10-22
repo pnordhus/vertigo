@@ -50,7 +50,7 @@ private slots:
     void hideNotebook();
     void showRoom();
     void hideRoom();
-    void showDialog(const QString &roomName);
+    void showDialog(const QString &roomName, int dialogId);
     void hideDialog();
     void showDeparture();
     void hideDeparture();

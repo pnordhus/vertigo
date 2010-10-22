@@ -76,6 +76,13 @@ void Chapter::load(int chapter)
             startStationIndex = station.index();
     }
 
+    file.beginGroup("PendingDialogues");
+    foreach (const QString &key, file.allKeys()) {
+        const int dialogId = file.value(key).toInt();
+        m_pendingDialogues.insert(dialogId, new Dialog(dialogId));
+    }
+    file.endGroup();
+
     setStation(startStationIndex);
 }
 
@@ -141,6 +148,12 @@ void Chapter::quit()
 void Chapter::replaceApproachMovie(int station, const QString &movie)
 {
     m_approachMovieReplacement.insert(station, movie);
+}
+
+
+Dialog* Chapter::dialog(int dialogId) const
+{
+    return m_pendingDialogues.value(dialogId);
 }
 
 

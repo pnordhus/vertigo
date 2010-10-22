@@ -169,7 +169,7 @@ enum String
     Text139,
     Departure_Abort,
     Departure_Title,
-    Text142,
+    DialogEnd,
     Text143,
     Text144,
     Text145,

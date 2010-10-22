@@ -19,13 +19,61 @@
 #define GAME_DIALOG_H
 
 
+#include "gfx/font.h"
+#include "ui/widget.h"
+#include <QMap>
+
+
 namespace game {
 
 
-class Dialog
+class Dialog : public ui::Widget
 {
+    Q_OBJECT
+
+private:
+    struct Option
+    {
+        int text;
+        int next;
+    };
+
+    struct Entry
+    {
+        int text;
+        QList<Option> options;
+    };
+
 public:
-    Dialog();
+    Dialog(int id, ui::Widget *parent = NULL);
+
+signals:
+    void close();
+
+private slots:
+    void clicked();
+
+private:
+    void draw();
+    int drawOption(int y, const Option *option);
+    void mouseMoveEvent(const QPoint &pos);
+    bool mousePressEvent(const QPoint &pos, Qt::MouseButton button);
+    void select(int index);
+    void loadTree(const QString &filename);
+    void loadStrings(const QString &filename);
+
+private:
+    gfx::Font m_fontTop;
+    gfx::Font m_fontBottom;
+    gfx::Font m_fontHighlight;
+
+    QMap<int, Entry> m_entries;
+    QMap<int, QString> m_strings;
+    int m_current;
+    int m_optionIndex;
+    QPoint m_mousePos;
+    QRect m_rect;
+    const Option *m_option;
 };
 
 

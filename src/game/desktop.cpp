@@ -15,6 +15,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
+#include "chapter.h"
 #include "desktop.h"
 #include "gfx/image.h"
 #include "gfx/font.h"
@@ -128,6 +129,7 @@ Desktop::Desktop(const QString &name) :
 
 Desktop::~Desktop()
 {
+    delete m_dialog;
     delete m_departure;
     delete m_room;
 }
@@ -192,7 +194,7 @@ void Desktop::showRoom()
     Q_ASSERT(!m_room);
     m_room = new Room(title, name);
     connect(m_room, SIGNAL(close()), SLOT(hideRoom()));
-    connect(m_room, SIGNAL(startDialog(const QString&)), SLOT(showDialog(const QString&)));
+    connect(m_room, SIGNAL(startDialog(const QString&, int)), SLOT(showDialog(const QString&, int)));
     connect(m_room, SIGNAL(showDeparture()), SLOT(showDeparture()));
     connect(m_room, SIGNAL(hideCursor()), SLOT(hideCursor()));
     setRootWidget(m_room);
@@ -213,11 +215,12 @@ void Desktop::hideRoom()
 }
 
 
-void Desktop::showDialog(const QString &roomName)
+void Desktop::showDialog(const QString &roomName, int dialogId)
 {
     Q_ASSERT(m_room);
     Q_ASSERT(!m_dialog);
-    m_dialog = new DialogFrame(roomName);
+
+    m_dialog = new DialogFrame(Chapter::get()->dialog(dialogId), roomName);
     connect(m_dialog, SIGNAL(close()), SLOT(hideDialog()));
     setRootWidget(m_dialog);
     m_dialog->setPosition((640 - m_dialog->width()) / 2, (480 - m_dialog->height()) / 2);

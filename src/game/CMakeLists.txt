@@ -38,6 +38,7 @@ set(MOC_SOURCES
     chapter.h
     departure.h
     desktop.h
+    dialog.h
     mainmenu.h
     minimovie.h
     movie.h

@@ -35,7 +35,7 @@ public:
     Room(const QString &title, const QString &name);
 
 signals:
-    void startDialog(const QString &name);
+    void startDialog(const QString &name, int dialogId);
     void showDeparture();
     void hideCursor();
 

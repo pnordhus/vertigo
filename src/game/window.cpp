@@ -37,6 +37,7 @@ Window::Window() :
     const gfx::ColorTable colorTable("gfx:pal/gui/cursor.pal");
     m_cursor = gfx::Image::loadCursor("gfx:img/desktop/gui/cur_norm.img", colorTable);
     setWindowTitle("Vertigo");
+    setMouseTracking(true);
     makeCurrent();
     loadSettings();
 }
