@@ -44,11 +44,17 @@ private:
         QList<Option> options;
     };
 
+    enum Return
+    {
+        RemoveDialog = -100001,
+    };
+
 public:
     Dialog(int id, ui::Widget *parent = NULL);
 
 signals:
     void close();
+    void remove(int);
 
 public:
     int id() const { return m_id; }
@@ -57,15 +63,12 @@ public:
     int person() const { return m_person; }
     bool matches(int area, int station, int room) const;
 
-private slots:
-    void clicked();
-
 private:
     void draw();
     int drawOption(int y, const Option *option);
     void mouseMoveEvent(const QPoint &pos);
     bool mousePressEvent(const QPoint &pos, Qt::MouseButton button);
-    void select(int index);
+    void select();
     void loadTree(const QString &filename);
     void loadStrings(const QString &filename);
 
@@ -88,6 +91,7 @@ private:
     int m_station;
     int m_room;
     int m_person;
+    bool m_finished;
 };
 
 

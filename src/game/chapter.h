@@ -58,6 +58,7 @@ private:
 
 private slots:
     void movieFinished();
+    void removeDialog(int dialogId);
 
 public:
     static Chapter* get() { Q_ASSERT(m_singleton); return m_singleton; }

@@ -79,7 +79,9 @@ void Chapter::load(int chapter)
     file.beginGroup("PendingDialogues");
     foreach (const QString &key, file.allKeys()) {
         const int dialogId = file.value(key).toInt();
-        m_pendingDialogues.insert(dialogId, new Dialog(dialogId));
+        Dialog *dialog = new Dialog(dialogId);
+        connect(dialog, SIGNAL(remove(int)), SLOT(removeDialog(int)));
+        m_pendingDialogues.insert(dialogId, dialog);
     }
     file.endGroup();
 
@@ -165,6 +167,12 @@ QList<Dialog*> Chapter::dialogs(int room)
             list << dialog;
     }
     return list;
+}
+
+
+void Chapter::removeDialog(int dialogId)
+{
+    m_pendingDialogues.remove(dialogId);
 }
 
 

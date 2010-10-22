@@ -238,6 +238,7 @@ void Desktop::hideDialog()
     Q_ASSERT(m_room);
     Q_ASSERT(m_dialog);
     setRootWidget(m_room);
+    m_room->restart();
     m_dialog->deleteLater();
     m_dialog = NULL;
 }
