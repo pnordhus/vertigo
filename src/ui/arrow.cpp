@@ -72,6 +72,12 @@ void Arrow::show()
 }
 
 
+bool Arrow::isVisible()
+{
+    return m_label->isVisible();
+}
+
+
 void Arrow::setValue(int value)
 {
     m_value = value;

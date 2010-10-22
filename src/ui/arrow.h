@@ -37,6 +37,7 @@ public:
 public:
     void hide();
     void show();
+    bool isVisible();
     void setValue(int value);
     void setText(const QString &text);
 

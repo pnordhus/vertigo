@@ -75,9 +75,12 @@ Room::Room(int index, const QString &title, const QString &name) :
         file.beginGroup(QString("Person%1").arg(personId));
 
         if (file.contains("Arrow")) {
-            ui::Arrow *person = new ui::Arrow(file.value("Arrow").toString(), QPoint(file.value("X").toInt(), file.value("Y").toInt()), false, this);
-            person->hide();
-            connect(person, SIGNAL(clicked(int)), SIGNAL(startDialog(int)));
+
+            Person *person = new Person;
+
+            person->arrow = new ui::Arrow(file.value("Arrow").toString(), QPoint(file.value("X").toInt(), file.value("Y").toInt()), false, this);
+            person->arrow->hide();
+            connect(person->arrow, SIGNAL(clicked(int)), SIGNAL(startDialog(int)));
 
             m_persons.insert(personId, person);
         } else {
@@ -93,19 +96,33 @@ Room::Room(int index, const QString &title, const QString &name) :
 }
 
 
+Room::~Room()
+{
+    qDeleteAll(m_persons);
+}
+
+
 void Room::restart()
 {
     m_background.fromImage(m_backgroundImage);
     const QList<Dialog*> dialogs = Chapter::get()->dialogs(m_index);
 
-    foreach (ui::Arrow* person, m_persons)
-        person->hide();
+    foreach (Person* person, m_persons)
+        person->arrow->hide();
 
     foreach (Dialog* dialog, dialogs) {
-        ui::Arrow *person = m_persons.value(dialog->person());
-        person->show();
-        person->setText(dialog->name());
-        person->setValue(dialog->id());
+        Person *person = m_persons.value(dialog->person());
+        if (!person) {
+            foreach (person, m_persons) {
+                if (person->arrow->isVisible() == false && person->female == dialog->isFemale())
+                    break;
+            }
+        }
+
+        Q_ASSERT(person);
+        person->arrow->show();
+        person->arrow->setText(dialog->name());
+        person->arrow->setValue(dialog->id());
     }
 }
 

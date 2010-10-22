@@ -34,6 +34,7 @@ class Room : public ui::Frame
 
 public:
     Room(int index, const QString &title, const QString &name);
+    ~Room();
 
 signals:
     void startDialog(int dialogId);
@@ -52,6 +53,12 @@ private slots:
     void showDock();
 
 private:
+    struct Person
+    {
+        ui::Arrow *arrow;
+        bool female;
+    };
+
     int m_index;
     MiniMovie m_miniMovie;
     QString m_name;
@@ -59,7 +66,7 @@ private:
     gfx::Texture m_background;
     sfx::Sound m_backgroundSound;
     sfx::Sound m_dockSound;
-    QMap<int, ui::Arrow*> m_persons;
+    QMap<int, Person*> m_persons;
 };
 
 

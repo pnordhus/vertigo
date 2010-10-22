@@ -53,6 +53,7 @@ signals:
 public:
     int id() const { return m_id; }
     const QString& name() const { return m_name; }
+    bool isFemale() const { return m_female; }
     int person() const { return m_person; }
     bool matches(int area, int station, int room) const;
 
@@ -82,6 +83,7 @@ private:
     QRect m_rect;
     const Option *m_option;
     QString m_name;
+    bool m_female;
     int m_area;
     int m_station;
     int m_room;

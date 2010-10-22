@@ -53,6 +53,8 @@ Dialog::Dialog(int id, ui::Widget *parent) :
         m_person = reg.cap(4).toInt();
     }
 
+    m_female = file.value("Sex").toString() == "f";
+
     file.endGroup();
 
     select(1);
