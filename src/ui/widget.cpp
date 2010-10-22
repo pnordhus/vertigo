@@ -144,7 +144,7 @@ void Widget::doDraw()
 
 bool Widget::doMousePressEvent(const QPoint &pos, Qt::MouseButton button)
 {
-    if (m_enabled && m_visible && pos.x() >= m_rect.x() && pos.y() >= m_rect.y()) {
+    if (m_enabled && m_visible) {
         if (mousePressEvent(pos, button))
             return true;
 

@@ -137,10 +137,8 @@ void Room::draw()
 bool Room::mousePressEvent(const QPoint &pos, Qt::MouseButton button)
 {
     if (button == Qt::RightButton) {
-        if (mapToGlobal(m_drawRect).contains(pos)) {
-            emit close();
-            return true;
-        }
+        emit close();
+        return true;
     }
 
     return false;
