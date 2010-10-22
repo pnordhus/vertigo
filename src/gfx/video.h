@@ -38,6 +38,7 @@ public:
     void open(const QString &filename);
     void play();
     void playLoop();
+    void stop();
     bool isPlaying() const { return m_playing; }
     Image getFrame();
     QByteArray getAudio();

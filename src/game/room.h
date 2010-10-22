@@ -63,6 +63,7 @@ private:
     MiniMovie m_miniMovie;
     QString m_name;
     QImage m_backgroundImage;
+    ui::Label *m_backgroundLabel;
     gfx::Texture m_background;
     sfx::Sound m_backgroundSound;
     sfx::Sound m_dockSound;

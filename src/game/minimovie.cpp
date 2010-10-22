@@ -124,4 +124,14 @@ void MiniMovie::playOneshot()
 }
 
 
+void MiniMovie::stopOneshot()
+{
+    foreach (Video *video, m_videos) {
+        if (video->oneShot)
+            video->video.stop();
+    }
+    emit videoFinished();
+}
+
+
 } // namespace game

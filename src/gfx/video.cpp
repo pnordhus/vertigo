@@ -119,6 +119,14 @@ void Video::playLoop()
 }
 
 
+void Video::stop()
+{
+    m_playing = false;
+    m_looping = false;
+    reset();
+}
+
+
 void Video::reset()
 {
     m_videoPos = 0;

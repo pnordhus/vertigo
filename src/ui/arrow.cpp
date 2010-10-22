@@ -87,16 +87,16 @@ void Arrow::setValue(int value)
 void Arrow::setText(const QString &text)
 {
     QPoint offset(9, 2);
-    QPoint offsetArrow(9, 15);
+    QPoint offsetArrow;
     const int width = m_font.width(text);
 
     if (m_left) {
-        offsetArrow.setX(1);
+        offsetArrow.setX(-8);
         offset.setX(-1 - width);
     }
 
     if (m_top) {
-        offsetArrow.setY(7);
+        offsetArrow.setY(-8);
         offset.setY(-2);
     }
 

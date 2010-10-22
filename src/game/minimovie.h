@@ -45,6 +45,7 @@ public:
     void update(gfx::Texture texture);
     void setColorTable(const gfx::ColorTable &colorTable);
     void playOneshot();
+    void stopOneshot();
 
 private:
     struct Video

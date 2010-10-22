@@ -44,14 +44,14 @@ Room::Room(int index, const QString &title, const QString &name) :
 
     setupFrame(m_backgroundImage.size() + QSize(18, 24), title, true);
 
-    ui::Label *label = new ui::Label(this);
-    label->setPosition(9, 15);
-    label->setTexture(m_background);
+    m_backgroundLabel = new ui::Label(this);
+    m_backgroundLabel->setPosition(9, 15);
+    m_backgroundLabel->setTexture(m_background);
 
     m_miniMovie.load(file);
     m_miniMovie.start();
     connect(&m_miniMovie, SIGNAL(videoFinished()), SIGNAL(showDeparture()));
-    connect(&m_miniMovie, SIGNAL(videoFinished()), SLOT(enable()));
+    connect(&m_miniMovie, SIGNAL(videoFinished()), m_backgroundLabel, SLOT(enable()));
 
     m_backgroundSound.playLoop();
 
@@ -63,7 +63,7 @@ Room::Room(int index, const QString &title, const QString &name) :
         const int rate = file.value("Rate", 0).toInt();
         m_dockSound.load("sfx:snd/room/" + sound + ".pcm", rate);
 
-        ui::Arrow *arrow = new ui::Arrow(file.value("Arrow").toString(), QPoint(file.value("X").toInt(), file.value("Y").toInt()), false, this);
+        ui::Arrow *arrow = new ui::Arrow(file.value("Arrow").toString(), QPoint(file.value("X").toInt(), file.value("Y").toInt()), false, m_backgroundLabel);
         arrow->setText(name);
         connect(arrow, SIGNAL(clicked(int)), SLOT(showDock()));
 
@@ -78,7 +78,7 @@ Room::Room(int index, const QString &title, const QString &name) :
 
             Person *person = new Person;
 
-            person->arrow = new ui::Arrow(file.value("Arrow").toString(), QPoint(file.value("X").toInt(), file.value("Y").toInt()), false, this);
+            person->arrow = new ui::Arrow(file.value("Arrow").toString(), QPoint(file.value("X").toInt(), file.value("Y").toInt()), false, m_backgroundLabel);
             person->arrow->hide();
             connect(person->arrow, SIGNAL(clicked(int)), SIGNAL(startDialog(int)));
 
@@ -104,6 +104,7 @@ Room::~Room()
 
 void Room::restart()
 {
+    m_dockSound.stop();
     m_background.fromImage(m_backgroundImage);
     const QList<Dialog*> dialogs = Chapter::get()->dialogs(m_index);
 
@@ -136,6 +137,11 @@ void Room::draw()
 
 bool Room::mousePressEvent(const QPoint &pos, Qt::MouseButton button)
 {
+    if (!m_backgroundLabel->isEnabled()) {
+        m_miniMovie.stopOneshot();
+        return true;
+    }
+
     if (button == Qt::RightButton) {
         emit close();
         return true;
@@ -148,7 +154,7 @@ bool Room::mousePressEvent(const QPoint &pos, Qt::MouseButton button)
 void Room::showDock()
 {
     emit hideCursor();
-    disable();
+    m_backgroundLabel->disable();
     m_dockSound.play();
     m_miniMovie.playOneshot();
 }
