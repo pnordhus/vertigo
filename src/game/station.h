@@ -28,12 +28,17 @@ namespace game {
 class Station
 {
 public:
-    Station(const QString &name);
+    Station();
+    Station(int index, const QString &name);
 
 public:
+    int index() const { return m_index; }
+    const QString& shortName() const { return m_shortName; }
     const QString& name() const { return m_name; }
 
 private:
+    int m_index;
+    QString m_shortName;
     QString m_name;
 };
 

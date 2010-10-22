@@ -44,10 +44,11 @@ public slots:
 
 public:
     void load(int chapter);
-    void setStation(const QString &station);
+    void setStation(int station);
     Area* area() const { return m_area; }
-    const QMap<QString, Station>& stations() const { return m_stations; }
-    const QString& currentStation() const { return m_currentStation; }
+    const QMap<int, Station>& stations() const { return m_stations; }
+    int currentStation() const { return m_currentStation; }
+    void replaceApproachMovie(int station, const QString &movie);
 
 private:
     void playMovies();
@@ -64,8 +65,10 @@ private:
     Desktop *m_desktop;
     Movie *m_movie;
     QStringList m_movies;
-    QMap<QString, Station> m_stations;
-    QString m_currentStation;
+    QMap<int, QString> m_approachMovieReplacement;
+    QMap<int, Station> m_stations;
+    int m_currentStation;
+    QSet<int> m_playedMovies;
     static Chapter *m_singleton;
 };
 

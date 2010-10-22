@@ -34,7 +34,7 @@ public:
 
 public:
     QString map() const { return m_map; }
-    QMap<QString, Station> stations() const { return m_stations; }
+    QMap<int, Station> stations() const { return m_stations; }
 
 private:
     Q_DISABLE_COPY(Area);
@@ -44,7 +44,7 @@ private:
     int m_code;
     QString m_name;
     QString m_map;
-    QMap<QString, Station> m_stations;
+    QMap<int, Station> m_stations;
 };
 
 

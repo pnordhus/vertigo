@@ -22,7 +22,16 @@
 namespace game {
 
 
-Station::Station(const QString &name)
+Station::Station() :
+    m_index(-1)
+{
+
+}
+
+
+Station::Station(int index, const QString &name) :
+    m_index(index),
+    m_shortName(name)
 {
     txt::DesFile file("dat:world/" + name + ".des");
 

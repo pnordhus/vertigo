@@ -28,10 +28,14 @@ Chapter *Chapter::m_singleton = NULL;
 Chapter::Chapter() :
     m_area(NULL),
     m_desktop(NULL),
-    m_movie(NULL)
+    m_movie(NULL),
+    m_currentStation(-1)
 {
     Q_ASSERT(m_singleton == NULL);
     m_singleton = this;
+
+    // the intro has always been played
+    m_playedMovies << 2;
 }
 
 
@@ -61,25 +65,46 @@ void Chapter::load(int chapter)
     const QString startStation = file.value("StartStation").toString();
     file.endGroup();
 
-    setStation(startStation);
+    int startStationIndex = 0;
+    foreach (const Station &station, m_area->stations()) {
+        file.beginGroup(QString("Station%1").arg(station.index()));
+        if (file.contains("ApproachMovieReplacement"))
+            replaceApproachMovie(station.index(), file.value("ApproachMovieReplacement").toString());
+        file.endGroup();
+
+        if (station.shortName() == startStation)
+            startStationIndex = station.index();
+    }
+
+    setStation(startStationIndex);
 }
 
 
-void Chapter::setStation(const QString &station)
+void Chapter::setStation(int stationIndex)
 {
     if (m_desktop)
         m_desktop->deleteLater();
 
-    const QString previousStation = m_currentStation;
-    m_currentStation = station;
-    m_desktop = new Desktop(m_currentStation);
+    int previousStation = m_currentStation;
+    m_currentStation = stationIndex;
 
-    QString approachMovie = m_desktop->approachMovie();
+    const Station station = m_stations[stationIndex];
+    m_desktop = new Desktop(station.shortName());
 
-    if (!previousStation.isEmpty())
+    if (previousStation >= 0)
         m_movies << QString("gfx:mvi/film/%1hf.mvi").arg("hiob");
-    m_movies << QString("gfx:mvi/film/%1fl.mvi").arg("hiob");
-    m_movies << approachMovie;
+
+    if (m_approachMovieReplacement.contains(m_currentStation)) {
+        const QString movie = m_approachMovieReplacement.take(m_currentStation);
+        QRegExp reg("d(\\d*)\\.mvi");
+        if (reg.indexIn(movie) >= 0)
+            m_playedMovies << reg.cap(1).toInt();
+        m_movies << "gfx:mvi/film/" + movie;
+    } else {
+        m_movies << QString("gfx:mvi/film/%1fl.mvi").arg("hiob");
+        m_movies << m_desktop->approachMovie();
+    }
+
     playMovies();
 }
 
@@ -110,6 +135,12 @@ void Chapter::movieFinished()
 void Chapter::quit()
 {
     emit endGame();
+}
+
+
+void Chapter::replaceApproachMovie(int station, const QString &movie)
+{
+    m_approachMovieReplacement.insert(station, movie);
 }
 
 

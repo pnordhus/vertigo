@@ -50,23 +50,18 @@ Departure::Departure()
     label->setWidth(180);
     label->setAlignment(ui::Label::AlignHCenter);
 
-    const QMap<QString, Station> &stations = Chapter::get()->stations();
-
     int y = 30;
-    QMapIterator<QString, Station> it(stations);
-    while (it.hasNext()) {
-        it.next();
-
-        if (it.key() == Chapter::get()->currentStation())
+    foreach (const Station &station, Chapter::get()->stations()) {
+        if (station.index() == Chapter::get()->currentStation())
             continue;
 
         ui::Button *button = new ui::Button(lblMap);
         button->setFont(font);
-        button->setText(it.value().name());
+        button->setText(station.name());
         button->setPosition(0, y);
         button->setWidth(180);
         button->setAlignment(ui::Label::AlignHCenter);
-        button->setProperty("name", it.key());
+        button->setProperty("index", station.index());
         connect(button, SIGNAL(clicked()), SLOT(select()));
 
         y += font.height() + 4;
@@ -98,7 +93,7 @@ bool Departure::mousePressEvent(const QPoint &pos, Qt::MouseButton button)
 
 void Departure::select()
 {
-    Chapter::get()->setStation(sender()->property("name").toString());
+    Chapter::get()->setStation(sender()->property("index").toInt());
 }
 
 

@@ -45,9 +45,13 @@ void Area::load(const QString &name)
 
     m_map = file.value("Map/Name").toString();
 
-    foreach (const QString &section, file.childGroups().filter(QRegExp("^Station"))) {
-        const QString station = file.value(section + "/Name").toString();
-        m_stations.insert(station, Station(station));
+    foreach (const QString &section, file.childGroups()) {
+        QRegExp reg("^Station(\\d*)$");
+        if (reg.indexIn(section) >= 0) {
+            const int index = reg.cap(1).toUInt();
+            const QString station = file.value(section + "/Name").toString();
+            m_stations.insert(index, Station(index, station));
+        }
     }
 }
 
