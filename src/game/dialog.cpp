@@ -122,6 +122,7 @@ int Dialog::drawOption(int y, const Option* option)
     }
 
     QRect rect = m_fontBottom.draw(text, QPoint(0, y), QSize(width(), -1), false, false);
+    rect.setWidth(width());
     if (mapToGlobal(rect).contains(m_mousePos)) {
         m_fontHighlight.draw(text, QPoint(0, y), QSize(width(), -1), false, false);
         m_rect = rect;
