@@ -30,7 +30,7 @@ Window::Window() :
     m_renderer(NULL)
 {
     QAction *actionFullScreen = new QAction(this);
-    actionFullScreen->setShortcuts(QList<QKeySequence>() << (Qt::CTRL + Qt::Key_F) << (Qt::ALT + Qt::Key_Return));
+    actionFullScreen->setShortcuts(QList<QKeySequence>() << (Qt::CTRL + Qt::Key_F) << (Qt::ALT + Qt::Key_Return) << (Qt::ALT + Qt::Key_Enter));
     connect(actionFullScreen, SIGNAL(triggered()), SLOT(toggleFullScreen()));
     addAction(actionFullScreen);
 
