@@ -87,6 +87,12 @@ void Widget::show()
 }
 
 
+void Widget::setPosition(const QPoint &pos)
+{
+    m_rect.moveTopLeft(pos);
+}
+
+
 void Widget::setPosition(int x, int y)
 {
     m_rect.moveTopLeft(QPoint(x, y));

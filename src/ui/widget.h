@@ -48,6 +48,7 @@ public:
     bool isEnabled() const { return m_enabled; }
     bool isVisible() const { return m_visible; }
     void setPosition(int x, int y);
+    void setPosition(const QPoint &pos);
     void setSize(int w, int h);
     void setSize(const QSize &size);
     void setWidth(int w);

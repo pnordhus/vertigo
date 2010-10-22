@@ -1,4 +1,6 @@
 set(SOURCES
+    arrow.cpp
+    arrow.h
     button.cpp
     button.h
     frame.cpp
@@ -10,6 +12,7 @@ set(SOURCES
 )
 
 set(MOC_SOURCES
+    arrow.h
     button.h
     frame.h
     widget.h
