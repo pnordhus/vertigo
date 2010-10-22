@@ -15,6 +15,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
+#include "chapter.h"
 #include "room.h"
 #include "gfx/colortable.h"
 #include "gfx/font.h"
@@ -25,7 +26,8 @@
 namespace game {
 
 
-Room::Room(const QString &title, const QString &name) :
+Room::Room(int index, const QString &title, const QString &name) :
+    m_index(index),
     m_miniMovie("gfx:mvi/room"),
     m_name(name)
 {
@@ -36,12 +38,11 @@ Room::Room(const QString &title, const QString &name) :
     const QString backgroundSound = file.value("Sound").toString();
     m_backgroundImage = gfx::Image::loadPCX("gfx:pic/room/" + background + ".pcx").toRgb565();
     m_miniMovie.setColorTable(m_backgroundImage.colorTable());
-    m_background.fromImage(m_backgroundImage);
     m_backgroundSound.load("sfx:snd/room/" + backgroundSound + ".pcm");
 
     file.endGroup();
 
-    setupFrame(m_background.size() + QSize(18, 24), title, true);
+    setupFrame(m_backgroundImage.size() + QSize(18, 24), title, true);
 
     ui::Label *label = new ui::Label(this);
     label->setPosition(9, 15);
@@ -57,60 +58,55 @@ Room::Room(const QString &title, const QString &name) :
     if (file.contains("Dock/Name")) {
         file.beginGroup("Dock");
 
-        const gfx::ColorTable colorTable("gfx:pal/gui/border.pal");
-        gfx::Font fontSmall("gfx:fnt/dpsmall.fnt", colorTable);
-
         const QString name = file.value("Name").toString();
-        const QString arrow = file.value("Arrow").toString();
         const QString sound = file.value("Sound").toString();
         const int rate = file.value("Rate", 0).toInt();
-        const int width = fontSmall.width(name);
-
         m_dockSound.load("sfx:snd/room/" + sound + ".pcm", rate);
 
-        const bool left = arrow.endsWith("Left");
-        const bool top = arrow.startsWith("Top");
-
-        char arrowX = 'l';
-        char arrowY = 't';
-        QPoint offset(9, 2);
-        QPoint offsetArrow;
-
-        if (left) {
-            offsetArrow.setX(-10);
-            offset.setX(-1 - width);
-            arrowX = 'r';
-        }
-
-        if (top) {
-            offsetArrow.setY(-10);
-            offset.setY(-2);
-            arrowY = 'b';
-        }
-
-        offset += offsetArrow;
-
-        ui::Label *lblArrow = new ui::Label(this);
-        lblArrow->setTexture(gfx::Image::load(QString("gfx:img/desktop/gui/arr%1%2sma.img").arg(arrowY).arg(arrowX), colorTable));
-        lblArrow->setPosition(offsetArrow.x() + file.value("X").toInt(), offsetArrow.y() + file.value("Y").toInt());
-
-        ui::Button *button = new ui::Button(this);
-        button->setOffset(0);
-        button->setFont(fontSmall);
-        button->setText(name);
-        button->setPosition(offset.x() + file.value("X").toInt(), offset.y() + file.value("Y").toInt());
-        button->setProperty("name", name);
-        button->setProperty("room", file.value("Room"));
-        connect(button, SIGNAL(clicked()), SLOT(showDock()));
+        ui::Arrow *arrow = new ui::Arrow(file.value("Arrow").toString(), QPoint(file.value("X").toInt(), file.value("Y").toInt()), false, this);
+        arrow->setText(name);
+        connect(arrow, SIGNAL(clicked(int)), SLOT(showDock()));
 
         file.endGroup();
     }
+
+    int personId = 1;
+    for (;;) {
+        file.beginGroup(QString("Person%1").arg(personId));
+
+        if (file.contains("Arrow")) {
+            ui::Arrow *person = new ui::Arrow(file.value("Arrow").toString(), QPoint(file.value("X").toInt(), file.value("Y").toInt()), false, this);
+            person->hide();
+            connect(person, SIGNAL(clicked(int)), SIGNAL(startDialog(int)));
+
+            m_persons.insert(personId, person);
+        } else {
+            file.endGroup();
+            break;
+        }
+
+        file.endGroup();
+        personId++;
+    }
+
+    restart();
 }
 
 
 void Room::restart()
 {
     m_background.fromImage(m_backgroundImage);
+    const QList<Dialog*> dialogs = Chapter::get()->dialogs(m_index);
+
+    foreach (ui::Arrow* person, m_persons)
+        person->hide();
+
+    foreach (Dialog* dialog, dialogs) {
+        ui::Arrow *person = m_persons.value(dialog->person());
+        person->show();
+        person->setText(dialog->name());
+        person->setValue(dialog->id());
+    }
 }
 
 

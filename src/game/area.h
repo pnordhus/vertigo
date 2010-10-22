@@ -33,6 +33,7 @@ public:
     Area(const QString &name);
 
 public:
+    int code() const { return m_code; }
     QString map() const { return m_map; }
     QMap<int, Station> stations() const { return m_stations; }
 

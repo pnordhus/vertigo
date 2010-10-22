@@ -21,6 +21,7 @@
 
 #include "minimovie.h"
 #include "sfx/sound.h"
+#include "ui/arrow.h"
 #include "ui/frame.h"
 
 
@@ -32,14 +33,15 @@ class Room : public ui::Frame
     Q_OBJECT
 
 public:
-    Room(const QString &title, const QString &name);
+    Room(int index, const QString &title, const QString &name);
 
 signals:
-    void startDialog(const QString &name, int dialogId);
+    void startDialog(int dialogId);
     void showDeparture();
     void hideCursor();
 
 public:
+    const QString& name() const { return m_name; }
     void restart();
 
 protected:
@@ -50,12 +52,14 @@ private slots:
     void showDock();
 
 private:
+    int m_index;
     MiniMovie m_miniMovie;
     QString m_name;
     QImage m_backgroundImage;
     gfx::Texture m_background;
     sfx::Sound m_backgroundSound;
     sfx::Sound m_dockSound;
+    QMap<int, ui::Arrow*> m_persons;
 };
 
 

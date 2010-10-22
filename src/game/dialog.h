@@ -50,6 +50,12 @@ public:
 signals:
     void close();
 
+public:
+    int id() const { return m_id; }
+    const QString& name() const { return m_name; }
+    int person() const { return m_person; }
+    bool matches(int area, int station, int room) const;
+
 private slots:
     void clicked();
 
@@ -67,6 +73,7 @@ private:
     gfx::Font m_fontBottom;
     gfx::Font m_fontHighlight;
 
+    int m_id;
     QMap<int, Entry> m_entries;
     QMap<int, QString> m_strings;
     int m_current;
@@ -74,6 +81,11 @@ private:
     QPoint m_mousePos;
     QRect m_rect;
     const Option *m_option;
+    QString m_name;
+    int m_area;
+    int m_station;
+    int m_room;
+    int m_person;
 };
 
 

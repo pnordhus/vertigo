@@ -157,4 +157,15 @@ Dialog* Chapter::dialog(int dialogId) const
 }
 
 
+QList<Dialog*> Chapter::dialogs(int room)
+{
+    QList<Dialog*> list;
+    foreach (Dialog *dialog, m_pendingDialogues) {
+        if (dialog->matches(m_area->code(), m_currentStation, room))
+            list << dialog;
+    }
+    return list;
+}
+
+
 } // namespace game

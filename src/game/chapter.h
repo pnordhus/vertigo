@@ -51,6 +51,7 @@ public:
     int currentStation() const { return m_currentStation; }
     void replaceApproachMovie(int station, const QString &movie);
     Dialog* dialog(int dialogId) const;
+    QList<Dialog*> dialogs(int room);
 
 private:
     void playMovies();

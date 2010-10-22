@@ -81,6 +81,10 @@ Desktop::Desktop(const QString &name) :
     foreach (const QString &section, file.childGroups().filter(QRegExp("^Room"))) {
         file.beginGroup(section);
 
+        QRegExp reg("^Room(\\d*)$");
+        reg.indexIn(section);
+        const int index = reg.cap(1).toInt();
+
         const QString name = file.value("Name").toString();
         const QString arrow = file.value("Arrow").toString();
         const int width = fontMedium.width(name);
@@ -116,6 +120,7 @@ Desktop::Desktop(const QString &name) :
         button->setFont(fontMedium);
         button->setText(name);
         button->setPosition(offset.x() + file.value("X").toInt(), offset.y() + file.value("Y").toInt());
+        button->setProperty("index", index);
         button->setProperty("name", name);
         button->setProperty("room", file.value("Room"));
         connect(button, SIGNAL(clicked()), SLOT(showRoom()));
@@ -188,13 +193,14 @@ void Desktop::hideNotebook()
 
 void Desktop::showRoom()
 {
+    const int index = sender()->property("index").toInt();
     const QString title = sender()->property("name").toString();
     const QString name = sender()->property("room").toString();
 
     Q_ASSERT(!m_room);
-    m_room = new Room(title, name);
+    m_room = new Room(index, title, name);
     connect(m_room, SIGNAL(close()), SLOT(hideRoom()));
-    connect(m_room, SIGNAL(startDialog(const QString&, int)), SLOT(showDialog(const QString&, int)));
+    connect(m_room, SIGNAL(startDialog(int)), SLOT(showDialog(int)));
     connect(m_room, SIGNAL(showDeparture()), SLOT(showDeparture()));
     connect(m_room, SIGNAL(hideCursor()), SLOT(hideCursor()));
     setRootWidget(m_room);
@@ -215,12 +221,12 @@ void Desktop::hideRoom()
 }
 
 
-void Desktop::showDialog(const QString &roomName, int dialogId)
+void Desktop::showDialog(int dialogId)
 {
     Q_ASSERT(m_room);
     Q_ASSERT(!m_dialog);
 
-    m_dialog = new DialogFrame(Chapter::get()->dialog(dialogId), roomName);
+    m_dialog = new DialogFrame(Chapter::get()->dialog(dialogId), m_room->name());
     connect(m_dialog, SIGNAL(close()), SLOT(hideDialog()));
     setRootWidget(m_dialog);
     m_dialog->setPosition((640 - m_dialog->width()) / 2, (480 - m_dialog->height()) / 2);

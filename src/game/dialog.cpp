@@ -27,6 +27,7 @@ namespace game {
 
 Dialog::Dialog(int id, ui::Widget *parent) :
     ui::Widget(parent),
+    m_id(id),
     m_option(NULL)
 {
     m_fontTop.load("gfx:fnt/dpsmamon.fnt", gfx::ColorTable() << 0xffb89c00, true);
@@ -42,7 +43,15 @@ Dialog::Dialog(int id, ui::Widget *parent) :
 
     file.beginGroup("Person");
 
-    const QString personName = file.value("Name").toString();
+    m_name = file.value("Name").toString();
+
+    QRegExp reg("(\\d*)\\/(\\d*)\\/(\\d*)\\/(\\d*)");
+    if (reg.indexIn(file.value("Position").toString()) >= 0) {
+        m_area = reg.cap(1).toInt();
+        m_station = reg.cap(2).toInt();
+        m_room = reg.cap(3).toInt();
+        m_person = reg.cap(4).toInt();
+    }
 
     file.endGroup();
 
@@ -72,12 +81,12 @@ void Dialog::draw()
     m_fontTop.draw(m_strings[entry.text], QSize(width(), 36), false, true);
 
     int y = 57;
-    if (entry.options.isEmpty()) {
+    if (entry.options.isEmpty() || m_optionIndex < 0) {
         y += drawOption(y, NULL);
-    }
-
-    foreach (const Option &option, entry.options) {
-        y += drawOption(y, &option);
+    } else {
+        foreach (const Option &option, entry.options) {
+            y += drawOption(y, &option);
+        }
     }
 }
 
@@ -110,9 +119,10 @@ void Dialog::mouseMoveEvent(const QPoint &pos)
 bool Dialog::mousePressEvent(const QPoint &pos, Qt::MouseButton button)
 {
     if (button == Qt::LeftButton && mapToGlobal(m_rect).contains(pos)) {
-        if (!m_option)
+        if (!m_option) {
+            select(1);
             emit close();
-        else
+        } else
             select(m_option->next);
         return true;
     }
@@ -179,6 +189,12 @@ void Dialog::loadStrings(const QString &filename)
             m_strings.insert(index, text);
         }
     }
+}
+
+
+bool Dialog::matches(int area, int station, int room) const
+{
+    return m_area == area && m_station == station && m_room == room;
 }
 
 
