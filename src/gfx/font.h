@@ -49,6 +49,9 @@ private:
     Texture m_texture;
     QVector<Symbol> m_symbols;
     int m_height;
+    bool m_alpha;
+    QRgb m_colorNormal;
+    QRgb m_colorHighlight;
 };
 
 
@@ -57,9 +60,11 @@ class Font
 public:
     Font();
     Font(const QString &filename, const QVector<QRgb> &colorTable, bool scale = false);
+    Font(const QString &filename, const QRgb &colorNormal, const QRgb &colorHighlight, bool scale = false);
 
 public:
     void load(const QString &filename, const QVector<QRgb> &colorTable, bool scale = false);
+    void load(const QString &filename, const QRgb &colorNormal, const QRgb &colorHighlight, bool scale = false);
     QRect draw(const QString &text, int x, int y);
     QRect draw(const QString &text, const QPoint &pos);
     QRect draw(const QString &text, const QPoint &pos, const QSize &size, bool alignHCenter, bool alignBottom);
@@ -86,9 +91,22 @@ inline Font::Font(const QString &filename, const QVector<QRgb> &colorTable, bool
 }
 
 
+inline Font::Font(const QString &filename, const QRgb &colorNormal, const QRgb &colorHighlight, bool scale) :
+    d(new FontPrivate)
+{
+    load(filename, colorNormal, colorHighlight, scale);
+}
+
+
 inline void Font::load(const QString &filename, const QVector<QRgb> &colorTable, bool scale)
 {
     d->load(filename, colorTable, scale);
+}
+
+
+inline void Font::load(const QString &filename, const QRgb &colorNormal, const QRgb &colorHighlight, bool scale)
+{
+    d->load(filename, QVector<QRgb>() << colorNormal << colorHighlight, scale);
 }
 
 

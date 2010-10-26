@@ -33,7 +33,7 @@ class TexturePrivate;
 class Texture
 {
 public:
-    enum Format { RGB, RGBA };
+    enum Format { RGB, RGBA, Alpha };
 
 public:
     Texture();

@@ -53,7 +53,15 @@ void FontPrivate::load(const QString &filename, const QVector<QRgb> &colorTable,
     stream >> numEntries;
     stream.skipRawData(8);
 
-    m_texture.createEmpty(res, res, Texture::RGBA);
+    if (colorTable.size() == 2) {
+        m_texture.createEmpty(res, res, Texture::Alpha);
+        m_colorNormal = colorTable[0];
+        m_colorHighlight = colorTable[1];
+        m_alpha = true;
+    } else {
+        m_texture.createEmpty(res, res, Texture::RGBA);
+        m_alpha = false;
+    }
 
     int maxHeight = 0;
     int x = 1;
@@ -126,6 +134,7 @@ QRect FontPrivate::draw(const QString &text, int x, int y, int w, int h, bool al
 
     glTranslatef(x, y, 0);
 
+    bool highlight = false;
     int totalHeight = m_height;
     int totalWidth = 0.0f;
     int lineWidth = 0.0f;
@@ -140,11 +149,34 @@ QRect FontPrivate::draw(const QString &text, int x, int y, int w, int h, bool al
         }
 
         for (int i = 0; i < word.length(); i++) {
-            const quint8 c = word[i].toLatin1() - 32;
+            quint8 c = word[i].toLatin1();
+            if (c == '~') {
+                i++;
+                c = word[i].toLatin1();
+                switch (c) {
+                case '0':
+                    highlight = false;
+                    break;
+
+                case '1':
+                    highlight = true;
+                    break;
+                }
+                continue;
+            }
+
+            c -= 32;
 
             Q_ASSERT(c < m_symbols.size());
             const Symbol &symbol = m_symbols[c];
             const QRectF &rect = symbol.rect;
+
+            if (m_alpha) {
+                if (highlight)
+                    glColor4f(qRed(m_colorHighlight) / 255.0f, qGreen(m_colorHighlight) / 255.0f, qBlue(m_colorHighlight) / 255.0f, qAlpha(m_colorHighlight) / 255.0f);
+                else
+                    glColor4f(qRed(m_colorNormal) / 255.0f, qGreen(m_colorNormal) / 255.0f, qBlue(m_colorNormal) / 255.0f, qAlpha(m_colorNormal) / 255.0f);
+            }
 
             glBegin(GL_QUADS);
                 glTexCoord2f(rect.left(), rect.top());
@@ -164,6 +196,7 @@ QRect FontPrivate::draw(const QString &text, int x, int y, int w, int h, bool al
     totalWidth = qMax(totalWidth, lineWidth);
 
     glPopMatrix();
+    glColor3f(1, 1, 1);
 
     QRect rect;
     rect.setLeft(x);
@@ -186,13 +219,7 @@ int FontPrivate::height(int w, const QStringList &strings) const
             lineWidth = 0;
         }
 
-        for (int i = 0; i < word.length(); i++) {
-            const quint8 c = word[i].toLatin1() - 32;
-
-            Q_ASSERT(c < m_symbols.size());
-            const Symbol &symbol = m_symbols[c];
-            lineWidth += symbol.width;
-        }
+        lineWidth += wordWidth;
     }
 
     return totalHeight;
@@ -203,7 +230,12 @@ int FontPrivate::width(const QString &text) const
 {
     int totalW = 0;
     for (int i = 0; i < text.size(); i++) {
-        const quint8 c = text[i].toLatin1() - 32;
+        quint8 c = text[i].toLatin1();
+        if (c == '~') {
+            i++;
+            continue;
+        }
+        c -= 32;
         const Symbol &symbol = m_symbols[c];
         totalW += symbol.width;
     }

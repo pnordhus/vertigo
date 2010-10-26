@@ -41,6 +41,9 @@ inline static GLenum formatToGL(Texture::Format format)
     case Texture::RGBA:
         return GL_RGBA;
 
+    case Texture::Alpha:
+        return GL_ALPHA;
+
     default:
         return GL_RGB;
     }

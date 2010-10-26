@@ -31,9 +31,9 @@ Dialog::Dialog(int id, ui::Widget *parent) :
     m_option(NULL),
     m_finished(false)
 {
-    m_fontTop.load("gfx:fnt/dpsmamon.fnt", gfx::ColorTable() << 0xffb89c00, true);
-    m_fontBottom.load("gfx:fnt/dpsmamon.fnt", gfx::ColorTable() << 0xff00a8d0, true);
-    m_fontHighlight.load("gfx:fnt/dpsmamon.fnt", gfx::ColorTable() << 0xff00e4f8, true);
+    m_fontTop.load("gfx:fnt/dpsmamon.fnt", 0xffb89c00, 0xffc0c400, true);
+    m_fontBottom.load("gfx:fnt/dpsmamon.fnt", 0xff00a8d0, 0xff00a8d0, true);
+    m_fontHighlight.load("gfx:fnt/dpsmamon.fnt", 0xff00e4f8, 0xff00e4f8, true);
 
     const QString baseName = QString("txt:dia/%1/%2").arg(id / 1000, 3, 10, QChar('0')).arg(id, 6, 10, QChar('0'));
 
