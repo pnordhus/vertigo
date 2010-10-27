@@ -59,6 +59,12 @@ private:
 private slots:
     void movieFinished();
     void removeDialog(int dialogId);
+    void addMessage(int message);
+    void addTask(int task);
+    void removeTask(int task);
+    void changeChapter(int chapter);
+    void addDialog(int dialogId);
+    void addCredit(int credit);
 
 public:
     static Chapter* get() { Q_ASSERT(m_singleton); return m_singleton; }
@@ -75,6 +81,8 @@ private:
     QSet<int> m_playedMovies;
     QMap<int, Dialog*> m_pendingDialogues;
     static Chapter *m_singleton;
+    QSet<int> m_messages;
+    int m_credits;
 };
 
 

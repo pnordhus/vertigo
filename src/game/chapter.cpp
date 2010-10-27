@@ -29,7 +29,8 @@ Chapter::Chapter() :
     m_area(NULL),
     m_desktop(NULL),
     m_movie(NULL),
-    m_currentStation(-1)
+    m_currentStation(-1),
+    m_credits(0)
 {
     Q_ASSERT(m_singleton == NULL);
     m_singleton = this;
@@ -52,9 +53,11 @@ void Chapter::load(int chapter)
 {
     m_movies.clear();
     delete m_area;
-    delete m_desktop;
+    if (m_desktop)
+        m_desktop->deleteLater();
     delete m_movie;
     m_movie = NULL;
+    m_currentStation = -1;
 
     txt::DesFile file(QString("dat:story/ch%1.des").arg(chapter));
 
@@ -77,12 +80,8 @@ void Chapter::load(int chapter)
     }
 
     file.beginGroup("PendingDialogues");
-    foreach (const QString &key, file.allKeys()) {
-        const int dialogId = file.value(key).toInt();
-        Dialog *dialog = new Dialog(dialogId);
-        connect(dialog, SIGNAL(remove(int)), SLOT(removeDialog(int)));
-        m_pendingDialogues.insert(dialogId, dialog);
-    }
+    foreach (const QString &key, file.allKeys())
+        addDialog(file.value(key).toInt());
     file.endGroup();
 
     setStation(startStationIndex);
@@ -173,6 +172,55 @@ QList<Dialog*> Chapter::dialogs(int room)
 void Chapter::removeDialog(int dialogId)
 {
     m_pendingDialogues.remove(dialogId);
+}
+
+
+void Chapter::addMessage(int message)
+{
+    qDebug() << "Add message" << message;
+    m_messages.insert(message);
+}
+
+
+void Chapter::addTask(int task)
+{
+    qDebug() << "Add task" << task;
+}
+
+
+void Chapter::removeTask(int task)
+{
+    qDebug() << "Remove task" << task;
+}
+
+
+void Chapter::changeChapter(int chapter)
+{
+    load(chapter);
+}
+
+
+void Chapter::addDialog(int dialogId)
+{
+    Q_ASSERT(!m_pendingDialogues.contains(dialogId));
+
+    Dialog *dialog = new Dialog(dialogId);
+    connect(dialog, SIGNAL(remove(int)), SLOT(removeDialog(int)));
+    connect(dialog, SIGNAL(addMessage(int)), SLOT(addMessage(int)));
+    connect(dialog, SIGNAL(addTask(int)), SLOT(addTask(int)));
+    connect(dialog, SIGNAL(removeTask(int)), SLOT(removeTask(int)));
+    connect(dialog, SIGNAL(changeChapter(int)), SLOT(changeChapter(int)));
+    connect(dialog, SIGNAL(addDialog(int)), SLOT(addDialog(int)));
+    connect(dialog, SIGNAL(addCredit(int)), SLOT(addCredit(int)));
+    m_pendingDialogues.insert(dialogId, dialog);
+}
+
+
+void Chapter::addCredit(int credit)
+{
+    m_credits += credit;
+    if (m_credits < 0)
+        m_credits = 0;
 }
 
 

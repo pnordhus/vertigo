@@ -55,6 +55,30 @@ Dialog::Dialog(int id, ui::Widget *parent) :
 
     file.endGroup();
 
+    foreach (const QString &section, file.childGroups().filter(QRegExp("^Message"))) {
+        file.beginGroup(section);
+        const int id = file.value("Id").toInt();
+        const QString type = file.value("Type").toString();
+
+        Message message;
+        if (type == "addtask") {
+            message.type = Message::AddTask;
+            message.value = file.value("TaskCode").toInt();
+        } else if (type == "subtask") {
+            message.type = Message::RemoveTask;
+            message.value = file.value("TaskCode").toInt();
+        } else if (type == "chapter") {
+            message.type = Message::ChangeChapter;
+            message.value = file.value("ChapterCode").toInt();
+        } else if (type == "addperson") {
+            message.type = Message::AddDialog;
+            message.value = file.value("Name").toInt();
+        }
+
+        m_messages.insertMulti(id, message);
+        file.endGroup();
+    }
+
     loadTree(baseName + ".dia");
     loadStrings(baseName + ".sen");
 
@@ -66,6 +90,31 @@ void Dialog::select()
 {
     m_optionIndex = 0;
     if (m_option) {
+        if (m_option->message > 0) {
+            if (m_messages.contains(m_option->message)) {
+                foreach (const Message &message, m_messages.values(m_option->message)) {
+                    switch (message.type) {
+                    case Message::AddTask:
+                        emit addTask(message.value);
+                        break;
+
+                    case Message::RemoveTask:
+                        emit removeTask(message.value);
+                        break;
+
+                    case Message::ChangeChapter:
+                        emit changeChapter(message.value);
+                        break;
+
+                    case Message::AddDialog:
+                        emit addDialog(message.value);
+                        break;
+                    }
+                }
+            } else {
+                emit addMessage(m_option->message);
+            }
+        }
         switch (m_option->next) {
         case RemoveDialog:
             emit remove(m_id);
@@ -171,17 +220,16 @@ void Dialog::loadTree(const QString &filename)
 
         for (int x = 0; x < 4; x++) {
             qint32 text;
+            qint32 message;
             qint32 next;
-
-            stream >> text;
-            stream.skipRawData(4);
-            stream >> next;
+            stream >> text >> message >> next;
             stream.skipRawData(4 * 4);
 
             if (entry.options.isEmpty() || text != -1) {
                 Option option;
                 option.text = text;
                 option.next = next;
+                option.message = message;
                 entry.options << option;
             }
         }

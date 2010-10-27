@@ -36,12 +36,32 @@ private:
     {
         int text;
         int next;
+        int message;
     };
 
     struct Entry
     {
         int text;
         QList<Option> options;
+    };
+
+    struct Message
+    {
+        enum Type
+        {
+            AddTask,
+            RemoveTask,
+            ChangeChapter,
+            AddDialog,
+            AddCredit,
+            EnableStation,
+            DisableStation,
+            AddMissionStation,
+            AddMissionArea
+        };
+
+        Type type;
+        int value;
     };
 
     enum Return
@@ -55,6 +75,12 @@ public:
 signals:
     void close();
     void remove(int);
+    void addMessage(int);
+    void addTask(int);
+    void removeTask(int);
+    void changeChapter(int);
+    void addDialog(int);
+    void addCredit(int);
 
 public:
     int id() const { return m_id; }
@@ -92,6 +118,7 @@ private:
     int m_room;
     int m_person;
     bool m_finished;
+    QMap<int, Message> m_messages;
 };
 
 
