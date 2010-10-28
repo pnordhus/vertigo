@@ -70,6 +70,20 @@ private:
         int value;
     };
 
+    struct Precondition
+    {
+        enum Type
+        {
+            None,
+            NumSmallTalks,
+        };
+
+        Precondition() : type(None), amount(0) {}
+
+        Type type;
+        int amount;
+    };
+
     enum Return
     {
         RemoveDialog = -100001,
@@ -95,6 +109,7 @@ public:
     int person() const { return m_person; }
     bool matches(int area, int station, int room) const;
     bool matchesEnCom(int area, int station, bool room) const;
+    bool isSmallTalk() const { return m_isSmallTalk; }
 
 private:
     void draw();
@@ -104,6 +119,7 @@ private:
     void select();
     void loadTree(const QString &filename);
     void loadStrings(const QString &filename);
+    bool testPreconditions() const;
 
 private:
     gfx::Font m_fontTop;
@@ -127,6 +143,8 @@ private:
     bool m_finished;
     QMap<int, Message> m_messages;
     int m_changeChapter;
+    bool m_isSmallTalk;
+    QList<Precondition> m_preconditions;
 };
 
 

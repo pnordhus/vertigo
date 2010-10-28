@@ -54,6 +54,7 @@ public:
     QList<Dialog*> dialogs(int room);
     QList<Dialog*> dialogsEnCom(bool room);
     const QSet<int>& messages() const { return m_messages; }
+    int numSmallTalks() const { return m_numSmallTalks; }
 
 private:
     void playMovies();
@@ -85,6 +86,7 @@ private:
     static Chapter *m_singleton;
     QSet<int> m_messages;
     int m_credits;
+    int m_numSmallTalks;
 };
 
 

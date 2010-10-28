@@ -58,6 +58,7 @@ void Chapter::load(int chapter)
     delete m_movie;
     m_movie = NULL;
     m_currentStation = -1;
+    m_numSmallTalks = 0;
 
     txt::DesFile file(QString("dat:story/ch%1.des").arg(chapter));
 
@@ -182,7 +183,9 @@ QList<Dialog*> Chapter::dialogsEnCom(bool room)
 
 void Chapter::removeDialog(int dialogId)
 {
-    m_pendingDialogues.remove(dialogId);
+    Dialog *dialog = m_pendingDialogues.take(dialogId);
+    if (dialog && dialog->isSmallTalk())
+        m_numSmallTalks++;
 }
 
 

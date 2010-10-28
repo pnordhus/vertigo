@@ -54,10 +54,11 @@ Dialog::Dialog(int id, ui::Widget *parent) :
     }
 
     m_female = file.value("Sex").toString() == "f";
+    m_isSmallTalk = file.value("Type").toString() == "smalltalk";
 
     file.endGroup();
 
-    foreach (const QString &section, file.childGroups().filter(QRegExp("^Message"))) {
+    foreach (const QString &section, file.childGroups().filter(QRegExp("^Message", Qt::CaseInsensitive))) {
         file.beginGroup(section);
         const int id = file.value("Id").toInt();
         const QString type = file.value("Type").toString();
@@ -78,6 +79,22 @@ Dialog::Dialog(int id, ui::Widget *parent) :
         }
 
         m_messages.insertMulti(id, message);
+        file.endGroup();
+    }
+
+    foreach (const QString &section, file.childGroups().filter(QRegExp("^Precondition", Qt::CaseInsensitive))) {
+        file.beginGroup(section);
+
+        const QString type = file.value("Type").toString().toLower();
+
+        Precondition precondition;
+        if (type == "numofsmalltalk") {
+            precondition.type = Precondition::NumSmallTalks;
+            precondition.amount = file.value("Amount").toInt();
+        }
+
+        m_preconditions.append(precondition);
+
         file.endGroup();
     }
 
@@ -278,19 +295,45 @@ void Dialog::loadStrings(const QString &filename)
     }
 }
 
-
 bool Dialog::matches(int area, int station, int room) const
 {
-    return m_area == area && m_station == station && m_room == room;
+    if (m_area != area || m_station != station || m_room != room)
+        return false;
+
+    return testPreconditions();
 }
 
 
 bool Dialog::matchesEnCom(int area, int station, bool room) const
 {
-    return (m_area == 0 || m_area == area) &&
-            (m_station == 0 || m_station == station) &&
-            (m_room == 1 || !room) &&
-            (m_person == 99);
+    if (m_area != 0 && m_area != area)
+        return false;
+    if (m_station != 0 && m_station != station)
+        return false;
+    if (m_room != 1 && room)
+        return false;
+    if (m_person != 99)
+        return false;
+
+    return testPreconditions();
+}
+
+
+bool Dialog::testPreconditions() const
+{
+    foreach (const Precondition &precondition, m_preconditions) {
+        switch (precondition.type) {
+        case Precondition::None:
+            break;
+
+        case Precondition::NumSmallTalks:
+            if (Chapter::get()->numSmallTalks() < precondition.amount)
+                return false;
+            break;
+        }
+    }
+
+    return true;
 }
 
 
