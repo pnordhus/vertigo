@@ -12,7 +12,7 @@ namespace game {
 class DialogFrame : public ui::Frame
 {
 public:
-    DialogFrame(Dialog* dialog, const QString &roomName, ui::Widget *parent = NULL);
+    DialogFrame(Dialog* dialog, const QString &roomName);
     ~DialogFrame();
 
 private:

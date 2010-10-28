@@ -80,7 +80,7 @@ Room::Room(int index, const QString &title, const QString &name) :
 
             person->arrow = new ui::Arrow(file.value("Arrow").toString(), QPoint(file.value("X").toInt(), file.value("Y").toInt()), false, m_backgroundLabel);
             person->arrow->hide();
-            connect(person->arrow, SIGNAL(clicked(int)), SIGNAL(startDialog(int)));
+            connect(person->arrow, SIGNAL(clicked(int)), SLOT(startDialog(int)));
 
             m_persons.insert(personId, person);
         } else {
@@ -106,7 +106,7 @@ void Room::restart()
 {
     m_dockSound.stop();
     m_background.fromImage(m_backgroundImage);
-    const QList<Dialog*> dialogs = Chapter::get()->dialogs(m_index);
+    QList<Dialog*> dialogs = Chapter::get()->dialogs(m_index);
 
     foreach (Person* person, m_persons)
         person->arrow->hide();
@@ -125,6 +125,10 @@ void Room::restart()
         person->arrow->setText(dialog->name());
         person->arrow->setValue(dialog->id());
     }
+
+    dialogs = Chapter::get()->dialogsEnCom(true);
+    if (!dialogs.isEmpty())
+        emit startEnCom(dialogs.first());
 }
 
 
@@ -157,6 +161,12 @@ void Room::showDock()
     m_backgroundLabel->disable();
     m_dockSound.play();
     m_miniMovie.playOneshot();
+}
+
+
+void Room::startDialog(int dialogId)
+{
+    emit startDialog(Chapter::get()->dialog(dialogId));
 }
 
 

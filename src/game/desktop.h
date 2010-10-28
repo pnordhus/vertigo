@@ -21,6 +21,7 @@
 
 #include "departure.h"
 #include "dialogframe.h"
+#include "encom.h"
 #include "menu.h"
 #include "minimovie.h"
 #include "notebook.h"
@@ -50,14 +51,17 @@ private slots:
     void hideNotebook();
     void showRoom();
     void hideRoom();
-    void showDialog(int dialogId);
+    void showDialog(Dialog *dialog);
     void hideDialog();
+    void showEnCom(Dialog *dialog);
+    void hideEnCom();
     void showDeparture();
     void hideDeparture();
 
 private:
     void activate();
     void deactivate();
+    void checkEnCom();
 
 private:
     gfx::Texture m_background;
@@ -70,6 +74,7 @@ private:
     Notebook m_notebook;
     Room *m_room;
     DialogFrame *m_dialog;
+    EnCom *m_enCom;
     Departure *m_departure;
     ui::Button *m_btnQuit;
     QString m_approachMovie;

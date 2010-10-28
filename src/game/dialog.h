@@ -49,6 +49,7 @@ private:
     {
         enum Type
         {
+            None,
             AddTask,
             RemoveTask,
             ChangeChapter,
@@ -59,6 +60,8 @@ private:
             AddMissionStation,
             AddMissionArea
         };
+
+        Message() : type(None), value(0) {}
 
         Type type;
         int value;
@@ -88,6 +91,7 @@ public:
     bool isFemale() const { return m_female; }
     int person() const { return m_person; }
     bool matches(int area, int station, int room) const;
+    bool matchesEnCom(int area, int station, bool room) const;
 
 private:
     void draw();
@@ -119,6 +123,7 @@ private:
     int m_person;
     bool m_finished;
     QMap<int, Message> m_messages;
+    int m_changeChapter;
 };
 
 

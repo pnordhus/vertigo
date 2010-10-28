@@ -169,6 +169,17 @@ QList<Dialog*> Chapter::dialogs(int room)
 }
 
 
+QList<Dialog*> Chapter::dialogsEnCom(bool room)
+{
+    QList<Dialog*> list;
+    foreach (Dialog *dialog, m_pendingDialogues) {
+        if (dialog->matchesEnCom(m_area->code(), m_currentStation, room))
+            list << dialog;
+    }
+    return list;
+}
+
+
 void Chapter::removeDialog(int dialogId)
 {
     m_pendingDialogues.remove(dialogId);

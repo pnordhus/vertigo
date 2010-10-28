@@ -29,7 +29,8 @@ Dialog::Dialog(int id, ui::Widget *parent) :
     ui::Widget(parent),
     m_id(id),
     m_option(NULL),
-    m_finished(false)
+    m_finished(false),
+    m_changeChapter(-1)
 {
     m_fontTop.load("gfx:fnt/dpsmamon.fnt", 0xffb89c00, 0xffc0c400, true);
     m_fontBottom.load("gfx:fnt/dpsmamon.fnt", 0xff00a8d0, 0xff00a8d0, true);
@@ -103,7 +104,7 @@ void Dialog::select()
                         break;
 
                     case Message::ChangeChapter:
-                        emit changeChapter(message.value);
+                        m_changeChapter = message.value;
                         break;
 
                     case Message::AddDialog:
@@ -127,8 +128,11 @@ void Dialog::select()
         }
     }
 
-    if (m_finished)
+    if (m_finished) {
+        if (m_changeChapter != -1)
+            emit changeChapter(m_changeChapter);
         emit close();
+    }
 
     if (!m_option || m_finished) {
         m_current = 1;
@@ -262,6 +266,15 @@ void Dialog::loadStrings(const QString &filename)
 bool Dialog::matches(int area, int station, int room) const
 {
     return m_area == area && m_station == station && m_room == room;
+}
+
+
+bool Dialog::matchesEnCom(int area, int station, bool room) const
+{
+    return (m_area == 0 || m_area == area) &&
+            (m_station == 0 || m_station == station) &&
+            (m_room == 1 || !room) &&
+            (m_person == 99);
 }
 
 

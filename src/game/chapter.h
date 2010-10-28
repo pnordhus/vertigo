@@ -52,6 +52,7 @@ public:
     void replaceApproachMovie(int station, const QString &movie);
     Dialog* dialog(int dialogId) const;
     QList<Dialog*> dialogs(int room);
+    QList<Dialog*> dialogsEnCom(bool room);
 
 private:
     void playMovies();
