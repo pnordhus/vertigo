@@ -22,6 +22,7 @@
 #include "gfx/font.h"
 #include "ui/widget.h"
 #include <QMap>
+#include <QSet>
 
 
 namespace game {
@@ -37,6 +38,8 @@ private:
         int text;
         int next;
         int message;
+        QSet<int> onlyIf;
+        QSet<int> notIf;
     };
 
     struct Entry

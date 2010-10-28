@@ -188,7 +188,6 @@ void Chapter::removeDialog(int dialogId)
 
 void Chapter::addMessage(int message)
 {
-    qDebug() << "Add message" << message;
     m_messages.insert(message);
 }
 

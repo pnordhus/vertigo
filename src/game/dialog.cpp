@@ -15,6 +15,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
+#include "chapter.h"
 #include "dialog.h"
 #include "gfx/colortable.h"
 #include "txt/desfile.h"
@@ -157,8 +158,10 @@ void Dialog::draw()
     if (m_optionIndex == 0) {
         y += drawOption(y, NULL);
     } else {
+        const QSet<int>& messages = Chapter::get()->messages();
         foreach (const Option &option, entry.options) {
-            y += drawOption(y, &option);
+            if (messages.contains(option.onlyIf) && (messages & option.notIf).isEmpty())
+                y += drawOption(y, &option);
         }
     }
 }
@@ -226,14 +229,27 @@ void Dialog::loadTree(const QString &filename)
             qint32 text;
             qint32 message;
             qint32 next;
+            qint32 onlyIf1;
+            qint32 onlyIf2;
+            qint32 notIf1;
+            qint32 notIf2;
+
             stream >> text >> message >> next;
-            stream.skipRawData(4 * 4);
+            stream >> onlyIf1 >> onlyIf2 >> notIf1 >> notIf2;
 
             if (entry.options.isEmpty() || text != -1) {
                 Option option;
                 option.text = text;
                 option.next = next;
                 option.message = message;
+                if (onlyIf1 != -1)
+                    option.onlyIf << onlyIf1;
+                if (onlyIf2 != -1)
+                    option.onlyIf << onlyIf2;
+                if (notIf1 != -1)
+                    option.notIf << notIf1;
+                if (notIf2 != -1)
+                    option.notIf << notIf2;
                 entry.options << option;
             }
         }

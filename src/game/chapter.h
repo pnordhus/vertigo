@@ -53,6 +53,7 @@ public:
     Dialog* dialog(int dialogId) const;
     QList<Dialog*> dialogs(int room);
     QList<Dialog*> dialogsEnCom(bool room);
+    const QSet<int>& messages() const { return m_messages; }
 
 private:
     void playMovies();
