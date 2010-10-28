@@ -49,7 +49,6 @@ public:
     Area* area() const { return m_area; }
     const QMap<int, Station>& stations() const { return m_stations; }
     int currentStation() const { return m_currentStation; }
-    void replaceApproachMovie(int station, const QString &movie);
     Dialog* dialog(int dialogId) const;
     QList<Dialog*> dialogs(int room);
     QList<Dialog*> dialogsEnCom(bool room);
@@ -68,6 +67,7 @@ private slots:
     void changeChapter(int chapter);
     void addDialog(int dialogId);
     void addCredit(int credit);
+    void replaceApproachMovie(int station, const QString &movie);
 
 public:
     static Chapter* get() { Q_ASSERT(m_singleton); return m_singleton; }

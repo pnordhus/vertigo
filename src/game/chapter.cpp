@@ -225,6 +225,7 @@ void Chapter::addDialog(int dialogId)
     connect(dialog, SIGNAL(changeChapter(int)), SLOT(changeChapter(int)));
     connect(dialog, SIGNAL(addDialog(int)), SLOT(addDialog(int)));
     connect(dialog, SIGNAL(addCredit(int)), SLOT(addCredit(int)));
+    connect(dialog, SIGNAL(replaceApproachMovie(int,QString)), SLOT(replaceApproachMovie(int,QString)));
     m_pendingDialogues.insert(dialogId, dialog);
 }
 

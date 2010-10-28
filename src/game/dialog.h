@@ -61,13 +61,15 @@ private:
             EnableStation,
             DisableStation,
             AddMissionStation,
-            AddMissionArea
+            AddMissionArea,
+            ReplaceApproachMovie
         };
 
         Message() : type(None), value(0) {}
 
         Type type;
         int value;
+        QString name;
     };
 
     struct Precondition
@@ -101,6 +103,7 @@ signals:
     void changeChapter(int);
     void addDialog(int);
     void addCredit(int);
+    void replaceApproachMovie(int, const QString&);
 
 public:
     int id() const { return m_id; }

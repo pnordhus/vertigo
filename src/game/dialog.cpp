@@ -76,6 +76,10 @@ Dialog::Dialog(int id, ui::Widget *parent) :
         } else if (type == "addperson") {
             message.type = Message::AddDialog;
             message.value = file.value("Name").toInt();
+        } else if (type == "replaceapproachmovie") {
+            message.type = Message::ReplaceApproachMovie;
+            message.value = file.value("Station").toInt();
+            message.name = file.value("Name").toString();
         }
 
         m_messages.insertMulti(id, message);
@@ -110,28 +114,34 @@ void Dialog::select()
     m_optionIndex = 0;
     if (m_option) {
         if (m_option->message > 0) {
-            if (m_messages.contains(m_option->message)) {
-                foreach (const Message &message, m_messages.values(m_option->message)) {
-                    switch (message.type) {
-                    case Message::AddTask:
-                        emit addTask(message.value);
-                        break;
-
-                    case Message::RemoveTask:
-                        emit removeTask(message.value);
-                        break;
-
-                    case Message::ChangeChapter:
-                        m_changeChapter = message.value;
-                        break;
-
-                    case Message::AddDialog:
-                        emit addDialog(message.value);
-                        break;
-                    }
-                }
-            } else {
+            if (m_option->message < 9999000)
                 emit addMessage(m_option->message);
+
+            foreach (const Message &message, m_messages.values(m_option->message)) {
+                switch (message.type) {
+                case Message::None:
+                    break;
+
+                case Message::AddTask:
+                    emit addTask(message.value);
+                    break;
+
+                case Message::RemoveTask:
+                    emit removeTask(message.value);
+                    break;
+
+                case Message::ChangeChapter:
+                    m_changeChapter = message.value;
+                    break;
+
+                case Message::AddDialog:
+                    emit addDialog(message.value);
+                    break;
+
+                case Message::ReplaceApproachMovie:
+                    emit replaceApproachMovie(message.value, message.name + ".mvi");
+                    break;
+                }
             }
         }
         switch (m_option->next) {
