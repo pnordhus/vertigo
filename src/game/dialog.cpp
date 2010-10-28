@@ -41,7 +41,7 @@ Dialog::Dialog(int id, ui::Widget *parent) :
 
     txt::DesFile file(baseName + ".des");
 
-    file.beginGroup("Person");
+    file.setSection("Person");
 
     m_name = file.value("Name").toString();
 
@@ -56,10 +56,8 @@ Dialog::Dialog(int id, ui::Widget *parent) :
     m_female = file.value("Sex").toString() == "f";
     m_isSmallTalk = file.value("Type").toString() == "smalltalk";
 
-    file.endGroup();
-
-    foreach (const QString &section, file.childGroups().filter(QRegExp("^Message", Qt::CaseInsensitive))) {
-        file.beginGroup(section);
+    foreach (const QString &section, file.sections().filter(QRegExp("^message"))) {
+        file.setSection(section);
         const int id = file.value("Id").toInt();
         const QString type = file.value("Type").toString();
 
@@ -83,11 +81,10 @@ Dialog::Dialog(int id, ui::Widget *parent) :
         }
 
         m_messages.insertMulti(id, message);
-        file.endGroup();
     }
 
-    foreach (const QString &section, file.childGroups().filter(QRegExp("^Precondition", Qt::CaseInsensitive))) {
-        file.beginGroup(section);
+    foreach (const QString &section, file.sections().filter(QRegExp("^precondition"))) {
+        file.setSection(section);
 
         const QString type = file.value("Type").toString().toLower();
 
@@ -98,8 +95,6 @@ Dialog::Dialog(int id, ui::Widget *parent) :
         }
 
         m_preconditions.append(precondition);
-
-        file.endGroup();
     }
 
     loadTree(baseName + ".dia");

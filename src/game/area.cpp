@@ -38,18 +38,19 @@ Area::Area(const QString &name)
 void Area::load(const QString &name)
 {
     txt::DesFile file(QString("dat:world/%1.des").arg(name));
-    file.beginGroup("Area");
+    file.setSection("Area");
     m_name = file.value("Name").toString();
     m_code = file.value("Code").toInt();
-    file.endGroup();
 
-    m_map = file.value("Map/Name").toString();
+    file.setSection("Map");
+    m_map = file.value("Name").toString();
 
-    foreach (const QString &section, file.childGroups()) {
-        QRegExp reg("^Station(\\d*)$");
+    foreach (const QString &section, file.sections()) {
+        QRegExp reg("^station(\\d*)$");
         if (reg.indexIn(section) >= 0) {
+            file.setSection(section);
             const int index = reg.cap(1).toUInt();
-            const QString station = file.value(section + "/Name").toString();
+            const QString station = file.value("Name").toString();
             m_stations.insert(index, Station(index, station));
         }
     }

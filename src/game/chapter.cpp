@@ -62,28 +62,25 @@ void Chapter::load(int chapter)
 
     txt::DesFile file(QString("dat:story/ch%1.des").arg(chapter));
 
-    file.beginGroup("Chapter");
+    file.setSection("Chapter");
     m_code = file.value("Code").toInt();
     m_area = new Area(file.value("Area").toString());
     m_stations = m_area->stations();
     const QString startStation = file.value("StartStation").toString();
-    file.endGroup();
 
     int startStationIndex = 0;
     foreach (const Station &station, m_area->stations()) {
-        file.beginGroup(QString("Station%1").arg(station.index()));
+        file.setSection(QString("Station%1").arg(station.index()));
         if (file.contains("ApproachMovieReplacement"))
             replaceApproachMovie(station.index(), file.value("ApproachMovieReplacement").toString());
-        file.endGroup();
 
         if (station.shortName() == startStation)
             startStationIndex = station.index();
     }
 
-    file.beginGroup("PendingDialogues");
-    foreach (const QString &key, file.allKeys())
+    file.setSection("PendingDialogues");
+    foreach (const QString &key, file.keys())
         addDialog(file.value(key).toInt());
-    file.endGroup();
 
     setStation(startStationIndex);
 }

@@ -41,7 +41,7 @@ Desktop::Desktop(const QString &name) :
 
     txt::DesFile file("dat:world/" + name + ".des");
 
-    file.beginGroup("Station");
+    file.setSection("Station");
 
     const QString background = file.value("BackGround").toString();
     const QString backgroundSound = file.value("Sound").toString();
@@ -66,7 +66,7 @@ Desktop::Desktop(const QString &name) :
     label = new ui::Label(&m_lblBackground);
     label->setFont(fontSmall);
     label->setPosition(8, 10 + fontLarge.height());
-    label->setText(file.value("Description").toStringList().join(", "));
+    label->setText(file.value("Description").toString());
 
     m_btnNotebook = new ui::Button(&m_lblBackground);
     m_btnNotebook->setTexture(gfx::Image::loadPCX("gfx:pic/notebook/nbklein.pcx"));
@@ -76,13 +76,11 @@ Desktop::Desktop(const QString &name) :
     m_notebook.hide();
     connect(&m_notebook, SIGNAL(close()), SLOT(hideNotebook()));
 
-    file.endGroup();
-
     m_widgetRooms = new ui::Label(&m_lblBackground);
-    foreach (const QString &section, file.childGroups().filter(QRegExp("^Room"))) {
-        file.beginGroup(section);
+    foreach (const QString &section, file.sections().filter(QRegExp("^room"))) {
+        file.setSection(section);
 
-        QRegExp reg("^Room(\\d*)$");
+        QRegExp reg("^room(\\d*)$");
         reg.indexIn(section);
         const int index = reg.cap(1).toInt();
 
@@ -125,8 +123,6 @@ Desktop::Desktop(const QString &name) :
         button->setProperty("name", name);
         button->setProperty("room", file.value("Room"));
         connect(button, SIGNAL(clicked()), SLOT(showRoom()));
-
-        file.endGroup();
     }
 
     m_miniMovie.load(file);

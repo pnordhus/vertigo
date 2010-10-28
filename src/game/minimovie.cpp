@@ -38,8 +38,8 @@ MiniMovie::~MiniMovie()
 
 void MiniMovie::load(txt::DesFile &file)
 {
-    foreach (const QString &section, file.childGroups().filter(QRegExp("^MiniMovie"))) {
-        file.beginGroup(section);
+    foreach (const QString &section, file.sections().filter(QRegExp("^minimovie"))) {
+        file.setSection(section);
 
         const QString name = file.value("Name").toString();
         const QString type = file.value("Type").toString().toLower();
@@ -63,8 +63,6 @@ void MiniMovie::load(txt::DesFile &file)
         video->time = float(qrand()) / RAND_MAX * video->rndMax;
 
         m_videos.append(video);
-
-        file.endGroup();
     }
 }
 

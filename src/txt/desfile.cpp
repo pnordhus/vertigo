@@ -16,15 +16,82 @@
  ***************************************************************************/
 
 #include "desfile.h"
+#include <QFile>
+#include <QStringList>
 
 
 namespace txt {
 
 
-DesFile::DesFile(const QString &filename) :
-    QSettings(filename, QSettings::IniFormat)
+DesFile::DesFile(const QString &filename)
 {
+    load(filename);
+}
 
+
+bool DesFile::load(const QString &filename)
+{
+    m_sections.clear();
+    setSection("Global");
+
+    QFile file(filename);
+    if (!file.open(QFile::ReadOnly))
+        return false;
+
+    QRegExp regSection("\\[(.*)\\]");
+    QRegExp regKey("(.*)=(.*)");
+
+    while (!file.atEnd()) {
+        const QString line = file.readLine();
+
+        if (regSection.indexIn(line) >= 0)
+            setSection(regSection.cap(1).trimmed().toLower());
+
+        if (regKey.indexIn(line) >= 0) {
+            const QString key = regKey.cap(1).trimmed().toLower();
+            if (!key.startsWith(";"))
+                setValue(key, regKey.cap(2).trimmed());
+        }
+    }
+
+    setSection("Global");
+    return true;
+}
+
+
+void DesFile::setSection(const QString &section)
+{
+    m_section = &m_sections[section.toLower()];
+}
+
+
+bool DesFile::contains(const QString &key) const
+{
+    return m_section->contains(key.toLower());
+}
+
+
+QVariant DesFile::value(const QString &key, const QVariant &defaultValue) const
+{
+    return m_section->value(key.toLower(), defaultValue);
+}
+
+
+void DesFile::setValue(const QString &key, const QVariant &value)
+{
+    m_section->insert(key.toLower(), value);
+}
+
+
+QStringList DesFile::sections() const
+{
+    return m_sections.keys();
+}
+
+
+QStringList DesFile::keys() const
+{
+    return m_section->keys();
 }
 
 

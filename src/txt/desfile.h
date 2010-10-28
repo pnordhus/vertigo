@@ -19,16 +19,30 @@
 #define TXT_DESFILE_H
 
 
-#include <QSettings>
+#include <QVariant>
 
 
 namespace txt {
 
 
-class DesFile : public QSettings
+class DesFile
 {
 public:
     DesFile(const QString &filename);
+
+public:
+    bool load(const QString &filename);
+    bool save(const QString &filename);
+    void setSection(const QString &section);
+    bool contains(const QString &key) const;
+    QVariant value(const QString &key, const QVariant &defaultValue = QVariant()) const;
+    void setValue(const QString &key, const QVariant &value);
+    QStringList sections() const;
+    QStringList keys() const;
+
+private:
+    QMap<QString, QVariantMap> m_sections;
+    QVariantMap *m_section;
 };
 
 
