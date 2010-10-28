@@ -18,6 +18,7 @@
 #include "encom.h"
 #include "gfx/colortable.h"
 #include "gfx/image.h"
+#include "txt/stringtable.h"
 
 
 namespace game {
@@ -29,6 +30,7 @@ EnCom::EnCom(Dialog *dialog) :
     const gfx::ColorTable colorTableBorder("gfx:pal/gui/border.pal");
     const gfx::ColorTable colorTable("gfx:pal/notebook/notebook.pal");
     gfx::Texture noteback(gfx::Image::load("gfx:img/desktop/notebook/noteback.img", colorTable));
+    gfx::Font font("gfx:fnt/dpsmamon.fnt", 0xffb0b800, 0xffb0b800, true);
 
     QImage image(640, 480, QImage::Format_Indexed8);
     image.fill(0);
@@ -43,9 +45,23 @@ EnCom::EnCom(Dialog *dialog) :
     labelMain->setPosition(162, 73);
     labelMain->setTexture(noteback);
 
+    QImage line = gfx::Image::load("gfx:img/desktop/gui/horline2.img", colorTableBorder).copy(0, 0, 304, 3);
+
     ui::Label *label;
 
-    QImage line = gfx::Image::load("gfx:img/desktop/gui/horline2.img", colorTableBorder).copy(0, 0, 304, 3);
+    label = new ui::Label(labelMain);
+    label->setPosition(0, 24);
+    label->setWidth(304);
+    label->setAlignment(ui::Label::AlignHCenter);
+    label->setFont(font);
+    label->setText(txt::StringTable::get(txt::EnCom_Via));
+
+    label = new ui::Label(labelMain);
+    label->setPosition(0, 36);
+    label->setWidth(304);
+    label->setAlignment(ui::Label::AlignHCenter);
+    label->setFont(font);
+    label->setText(QString("%1 %2").arg(txt::StringTable::get(txt::EnCom_Person), m_dialog->name()));
 
     label = new ui::Label(labelMain);
     label->setPosition(0, 56);
