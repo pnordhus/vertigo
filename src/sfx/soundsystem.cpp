@@ -16,6 +16,7 @@
  ***************************************************************************/
 
 #include "soundsystem.h"
+#include <al.h>
 #include <alc.h>
 
 
@@ -56,6 +57,9 @@ SoundSystem::SoundSystem()
 SoundSystem::~SoundSystem()
 {
     qDeleteAll(m_standardSounds);
+
+    Q_ASSERT(m_sources.isEmpty());
+
     alcDestroyContext(d->context);
     alcCloseDevice(d->device);
     delete d;
@@ -68,6 +72,38 @@ Sound* SoundSystem::sound(StandardSound snd)
     Sound *sound = m_standardSounds.value(snd);
     Q_ASSERT(sound);
     return sound;
+}
+
+
+quint32 SoundSystem::acquire(Sound *sound)
+{
+    // stop all Sounds with stopped sources
+    // this implicitly frees the sources
+    QMapIterator<quint32, Sound*> it(m_sources);
+    while (it.hasNext()) {
+        it.next();
+
+        ALint state;
+        alGetSourcei(it.key(), AL_SOURCE_STATE, &state);
+        if (state == AL_STOPPED)
+            it.value()->stop();
+    }
+
+    if (m_sources.size() == 32)
+        return 0;
+
+    quint32 source;
+    alGenSources(1, &source);
+    m_sources.insert(source, sound);
+    return source;
+}
+
+
+void SoundSystem::release(quint32 source)
+{
+    alSourceStop(source);
+    alDeleteSources(1, &source);
+    m_sources.remove(source);
 }
 
 

@@ -16,6 +16,7 @@
  ***************************************************************************/
 
 #include "sound.h"
+#include "soundsystem.h"
 #include <al.h>
 #include <QFile>
 
@@ -24,24 +25,26 @@ namespace sfx {
 
 
 Sound::Sound() :
-    m_buffer(0)
+    m_source(0),
+    m_buffer(0),
+    m_volume(1.0f)
 {
-    alGenSources(1, &m_source);
+
 }
 
 
 Sound::Sound(const QString &file) :
-    m_buffer(0)
+    m_source(0),
+    m_buffer(0),
+    m_volume(1.0f)
 {
-    alGenSources(1, &m_source);
     load(file);
 }
 
 
 Sound::~Sound()
 {
-    alSourceStop(m_source);
-    alDeleteSources(1, &m_source);
+    stop();
     if (m_buffer != 0)
         alDeleteBuffers(1, &m_buffer);
 }
@@ -49,20 +52,45 @@ Sound::~Sound()
 
 void Sound::stop()
 {
-    alSourceStop(m_source);
+    if (m_source > 0) {
+        alSourceStop(m_source);
+        SoundSystem::get()->release(m_source);
+        m_source = 0;
+    }
+}
+
+
+bool Sound::acquire()
+{
+    if (m_source == 0) {
+        m_source = SoundSystem::get()->acquire(this);
+        if (m_source == 0)
+            return false;
+    }
+
+    alSourcef(m_source, AL_GAIN, m_volume);
+    return true;
 }
 
 
 void Sound::play()
 {
+    if (!acquire())
+        return;
+
     alSourcei(m_source, AL_LOOPING, AL_FALSE);
+    alSourcei(m_source, AL_BUFFER, m_buffer);
     alSourcePlay(m_source);
 }
 
 
 void Sound::playLoop()
 {
+    if (!acquire())
+        return;
+
     alSourcei(m_source, AL_LOOPING, AL_TRUE);
+    alSourcei(m_source, AL_BUFFER, m_buffer);
     alSourcePlay(m_source);
 }
 
@@ -71,13 +99,11 @@ void Sound::load(const QString &file, int rate)
 {
     const QByteArray data = loadFile(file);
 
-    alSourceStop(m_source);
-    alSourcei(m_source, AL_BUFFER, 0);
+    stop();
     if (m_buffer != 0)
         alDeleteBuffers(1, &m_buffer);
     alGenBuffers(1, &m_buffer);
     alBufferData(m_buffer, AL_FORMAT_MONO8, data.data(), data.size(), rate <= 0 ? 22050 : rate);
-    alSourcei(m_source, AL_BUFFER, m_buffer);
 }
 
 
@@ -93,13 +119,11 @@ void Sound::load(const QString &leftFile, const QString &rightFile)
         data[i * 2 + 1] = right[i];
     }
 
-    alSourceStop(m_source);
-    alSourcei(m_source, AL_BUFFER, 0);
+    stop();
     if (m_buffer != 0)
         alDeleteBuffers(1, &m_buffer);
     alGenBuffers(1, &m_buffer);
     alBufferData(m_buffer, AL_FORMAT_STEREO8, data.data(), data.size(), 22050);
-    alSourcei(m_source, AL_BUFFER, m_buffer);
 }
 
 
@@ -114,7 +138,9 @@ QByteArray Sound::loadFile(const QString &filename)
 
 void Sound::setVolume(float volume)
 {
-    alSourcef(m_source, AL_GAIN, volume);
+    m_volume = volume;
+    if (m_source > 0)
+        alSourcef(m_source, AL_GAIN, volume);
 }
 
 

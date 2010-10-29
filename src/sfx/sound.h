@@ -43,10 +43,12 @@ public:
 private:
     Q_DISABLE_COPY(Sound);
     QByteArray loadFile(const QString &filename);
+    bool acquire();
 
 private:
     quint32 m_source;
     quint32 m_buffer;
+    float m_volume;
 };
 
 

@@ -26,6 +26,7 @@
 namespace sfx {
 
 
+class Sound;
 struct SoundSystemPrivate;
 
 
@@ -49,6 +50,8 @@ public:
 
 public:
     Sound* sound(StandardSound);
+    quint32 acquire(Sound* sound);
+    void release(quint32 source);
 
 public:
     static SoundSystem *get() { Q_ASSERT(m_singleton); return m_singleton; }
@@ -60,6 +63,7 @@ private:
     static SoundSystem *m_singleton;
     SoundSystemPrivate *d;
     QMap<StandardSound, Sound*> m_standardSounds;
+    QMap<quint32, Sound*> m_sources;
 };
 
 
