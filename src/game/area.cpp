@@ -37,6 +37,7 @@ Area::Area(const QString &name)
 
 void Area::load(const QString &name)
 {
+    m_shortName = name;
     txt::DesFile file(QString("dat:world/%1.des").arg(name));
     file.setSection("Area");
     m_name = file.value("Name").toString();

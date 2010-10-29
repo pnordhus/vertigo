@@ -17,6 +17,7 @@
 
 #include "chapter.h"
 #include "txt/desfile.h"
+#include <QDesktopServices>
 
 
 namespace game {
@@ -34,9 +35,6 @@ Chapter::Chapter() :
 {
     Q_ASSERT(m_singleton == NULL);
     m_singleton = this;
-
-    // the intro has always been played
-    m_playedMovies << 2;
 }
 
 
@@ -49,7 +47,14 @@ Chapter::~Chapter()
 }
 
 
-void Chapter::load(int chapter)
+
+void Chapter::loadChapter(int chapter)
+{
+    load(QString("dat:story/ch%1.des").arg(chapter));
+}
+
+
+void Chapter::load(const QString &filename)
 {
     m_movies.clear();
     delete m_area;
@@ -58,31 +63,104 @@ void Chapter::load(int chapter)
     delete m_movie;
     m_movie = NULL;
     m_currentStation = -1;
-    m_numSmallTalks = 0;
+    m_approachMovieReplacement.clear();
 
-    txt::DesFile file(QString("dat:story/ch%1.des").arg(chapter));
+    txt::DesFile file(filename);
 
-    file.setSection("Chapter");
-    m_code = file.value("Code").toInt();
-    m_area = new Area(file.value("Area").toString());
+    if (file.contains("credit"))
+        m_credits = file.value("credit").toInt();
+
+    file.setSection("chapter");
+    m_code = file.value("code").toInt();
+    m_area = new Area(file.value("area").toString());
     m_stations = m_area->stations();
-    const QString startStation = file.value("StartStation").toString();
+    const QString startStation = file.value("startstation").toString();
 
     int startStationIndex = 0;
     foreach (const Station &station, m_area->stations()) {
-        file.setSection(QString("Station%1").arg(station.index()));
-        if (file.contains("ApproachMovieReplacement"))
-            replaceApproachMovie(station.index(), file.value("ApproachMovieReplacement").toString());
+        file.setSection(QString("station%1").arg(station.index()));
+        if (file.contains("approachmoviereplacement"))
+            replaceApproachMovie(station.index(), file.value("approachmoviereplacement").toString());
 
         if (station.shortName() == startStation)
             startStationIndex = station.index();
     }
 
-    file.setSection("PendingDialogues");
-    foreach (const QString &key, file.keys())
+    file.setSection("pendingdialogues");
+    foreach (const QString &key, file.keys().filter(QRegExp("^dialogue\\d*")))
         addDialog(file.value(key).toInt());
 
+    file.setSection("messageboard");
+    if (file.value("clearboard").toBool())
+        m_messages.clear();
+    foreach (const QString &key, file.keys().filter(QRegExp("^message\\d*")))
+        addMessage(file.value(key).toInt());
+
+    file.setSection("statistics");
+    m_numSmallTalks = file.value("numofsmalltalkssincelaststory", 0).toInt();
+
+    file.setSection("movies");
+    foreach (const QString &key, file.keys().filter(QRegExp("^movie\\d*")))
+        m_playedMovies << file.value(key).toInt();
+
+    // the intro has always been played
+    m_playedMovies << 2;
+
     setStation(startStationIndex);
+}
+
+
+void Chapter::save(int slot, const QString &name) const
+{
+    txt::DesFile file;
+
+    file.setValue("name", name);
+    file.setValue("credit", m_credits);
+
+    file.setSection("chapter");
+    file.setValue("code", m_code);
+    file.setValue("area", m_area->shortName());
+    file.setValue("startstation", m_currentStationName);
+
+    file.setSection("statistics");
+    file.setValue("numofsmalltalkssincelaststory", m_numSmallTalks);
+    int i = 1;
+    file.setSection("pendingdialogues");
+    foreach (int dialog, m_pendingDialogues.keys()) {
+        file.setValue(QString("dialogue%1").arg(i++), dialog);
+    }
+
+    file.setSection("runningtasks");
+    file.setValue("cleartasks", "yes");
+
+    file.setSection("messageboard");
+    file.setValue("clearboard", "yes");
+    i = 1;
+    foreach (int message, m_messages) {
+        file.setValue(QString("message%1").arg(i++), message);
+    }
+
+    QMapIterator<int, QString> it(m_approachMovieReplacement);
+    while (it.hasNext()) {
+        it.next();
+        file.setSection(QString("station%1").arg(it.key()));
+        file.setValue("approachmoviereplacement", it.value());
+    }
+
+    file.setSection("movies");
+    i = 0;
+    foreach (int movie, m_playedMovies)
+        file.setValue(QString("movie%1").arg(i++), movie);
+
+    const QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+    file.save(QString("%1/save%2.des").arg(path).arg(slot));
+}
+
+
+void Chapter::load(int slot)
+{
+    const QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+    load(QString("%1/save%2.des").arg(path).arg(slot));
 }
 
 
@@ -95,7 +173,8 @@ void Chapter::setStation(int stationIndex)
     m_currentStation = stationIndex;
 
     const Station station = m_stations[stationIndex];
-    m_desktop = new Desktop(station.shortName());
+    m_currentStationName = station.shortName();
+    m_desktop = new Desktop(m_currentStationName);
 
     if (previousStation >= 0)
         m_movies << QString("gfx:mvi/film/%1hf.mvi").arg("hiob");
@@ -140,6 +219,7 @@ void Chapter::movieFinished()
 
 void Chapter::quit()
 {
+    save(99, "autosave");
     emit endGame();
 }
 
@@ -206,7 +286,7 @@ void Chapter::removeTask(int task)
 
 void Chapter::changeChapter(int chapter)
 {
-    load(chapter);
+    loadChapter(chapter);
 }
 
 

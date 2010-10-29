@@ -34,6 +34,7 @@ public:
 
 public:
     int code() const { return m_code; }
+    const QString& shortName() const { return m_shortName; }
     QString map() const { return m_map; }
     QMap<int, Station> stations() const { return m_stations; }
 
@@ -43,6 +44,7 @@ private:
 
 private:
     int m_code;
+    QString m_shortName;
     QString m_name;
     QString m_map;
     QMap<int, Station> m_stations;

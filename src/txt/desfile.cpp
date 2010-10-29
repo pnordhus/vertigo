@@ -16,11 +16,19 @@
  ***************************************************************************/
 
 #include "desfile.h"
+#include <QDir>
 #include <QFile>
 #include <QStringList>
+#include <QTextStream>
 
 
 namespace txt {
+
+
+DesFile::DesFile()
+{
+    setSection("Global");
+}
 
 
 DesFile::DesFile(const QString &filename)
@@ -55,6 +63,39 @@ bool DesFile::load(const QString &filename)
     }
 
     setSection("Global");
+    return true;
+}
+
+
+bool DesFile::save(const QString &filename) const
+{
+    QDir dir;
+    dir.mkpath(QFileInfo(filename).path());
+
+    QFile file(filename);
+    if (!file.open(QFile::WriteOnly))
+        return false;
+
+    QTextStream stream(&file);
+
+    QMapIterator<QString, QVariantMap> itSections(m_sections);
+    while (itSections.hasNext()) {
+        itSections.next();
+        if (itSections.value().isEmpty())
+            continue;
+
+        stream << "[" << itSections.key() << "]" << endl;
+
+        QMapIterator<QString, QVariant> itValues(itSections.value());
+        while (itValues.hasNext()) {
+            itValues.next();
+
+            stream << itValues.key() << " = " << itValues.value().toString() << endl;
+        }
+
+        stream << endl;
+    }
+
     return true;
 }
 

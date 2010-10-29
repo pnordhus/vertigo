@@ -28,11 +28,12 @@ namespace txt {
 class DesFile
 {
 public:
+    DesFile();
     DesFile(const QString &filename);
 
 public:
     bool load(const QString &filename);
-    bool save(const QString &filename);
+    bool save(const QString &filename) const;
     void setSection(const QString &section);
     bool contains(const QString &key) const;
     QVariant value(const QString &key, const QVariant &defaultValue = QVariant()) const;

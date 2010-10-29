@@ -123,7 +123,7 @@ void Vertigo::introFinished()
     m_chapter = new Chapter;
     connect(m_chapter, SIGNAL(setRenderer(Renderer*)), m_window, SLOT(setRenderer(Renderer*)));
     connect(m_chapter, SIGNAL(endGame()), SLOT(endGame()));
-    m_chapter->load(1);
+    m_chapter->loadChapter(1);
 }
 
 
