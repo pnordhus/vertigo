@@ -91,6 +91,9 @@ private:
     QSet<int> m_messages;
     int m_credits;
     int m_numSmallTalks;
+    bool m_movieAutopilot;
+    bool m_movieApproach;
+    bool m_movieHarbour;
 };
 
 

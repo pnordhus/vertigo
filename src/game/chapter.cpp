@@ -18,6 +18,7 @@
 #include "chapter.h"
 #include "txt/desfile.h"
 #include <QDesktopServices>
+#include <QSettings>
 
 
 namespace game {
@@ -35,11 +36,25 @@ Chapter::Chapter() :
 {
     Q_ASSERT(m_singleton == NULL);
     m_singleton = this;
+
+    QSettings s;
+    s.beginGroup("Movie");
+    m_movieAutopilot = s.value("autopilot", true).toBool();
+    m_movieApproach = s.value("approach", true).toBool();
+    m_movieHarbour = s.value("harbour", true).toBool();
+    s.endGroup();
 }
 
 
 Chapter::~Chapter()
 {
+    QSettings s;
+    s.beginGroup("Movie");
+    s.setValue("autopilot", m_movieAutopilot);
+    s.setValue("approach", m_movieApproach);
+    s.setValue("harbour", m_movieHarbour);
+    s.endGroup();
+
     qDeleteAll(m_pendingDialogues);
     m_singleton = NULL;
     delete m_movie;
@@ -179,7 +194,7 @@ void Chapter::setStation(int stationIndex)
     m_currentStationName = station.shortName();
     m_desktop = new Desktop(m_currentStationName);
 
-    if (previousStation >= 0)
+    if (m_movieHarbour && previousStation >= 0)
         m_movies << QString("gfx:mvi/film/%1hf.mvi").arg("hiob");
 
     if (m_approachMovieReplacement.contains(m_currentStation)) {
@@ -189,8 +204,10 @@ void Chapter::setStation(int stationIndex)
             m_playedMovies << reg.cap(1).toInt();
         m_movies << "gfx:mvi/film/" + movie;
     } else {
-        m_movies << QString("gfx:mvi/film/%1fl.mvi").arg("hiob");
-        m_movies << m_desktop->approachMovie();
+        if (m_movieAutopilot)
+            m_movies << QString("gfx:mvi/film/%1fl.mvi").arg("hiob");
+        if (m_movieApproach)
+            m_movies << m_desktop->approachMovie();
     }
 
     playMovies();
