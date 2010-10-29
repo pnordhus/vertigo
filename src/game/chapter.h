@@ -65,6 +65,8 @@ public:
     bool movieHarbour() const { return m_movieHarbour; }
     const QSet<int>& playedMovies() const { return m_playedMovies; }
     void playMovie(int movie);
+    const QList<Mission*>& missions() const { return m_missions; }
+    void startMission(const QString &name);
 
 private:
     void load(const QString &filename);

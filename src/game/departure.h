@@ -40,6 +40,7 @@ private:
 
 private slots:
     void select();
+    void startMission();
 };
 
 

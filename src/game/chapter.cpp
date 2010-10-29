@@ -233,16 +233,48 @@ void Chapter::setStation(int stationIndex)
 }
 
 
+void Chapter::startMission(const QString &name)
+{
+    QMutableListIterator<Mission*> it(m_missions);
+    while (it.hasNext()) {
+        it.next();
+        if (it.value()->shortName() == name) {
+            m_mission = it.value();
+            it.remove();
+            break;
+        }
+    }
+
+    if (m_desktop)
+        m_desktop->deleteLater();
+    m_desktop = NULL;
+    m_currentStation = -1;
+
+    startMission();
+}
+
+
 void Chapter::startMission()
 {
     Q_ASSERT(m_mission);
-    qDebug() << "Start mission" << m_mission->name();
+    qDebug() << "Start mission" << m_mission->shortName();
 
-    m_successfulMissions.append(m_mission->name());
+    m_successfulMissions.append(m_mission->shortName());
     delete m_mission;
     m_mission = NULL;
-    playApproach(false);
-    playMovies();
+
+    if (m_currentStation < 0) {
+        //TODO: this should be selectable from within the mission
+        foreach (const Station& station, m_stations) {
+            if (station.isEnabled()) {
+                setStation(station.index());
+                break;
+            }
+        }
+    } else {
+        playApproach(false);
+        playMovies();
+    }
 }
 
 

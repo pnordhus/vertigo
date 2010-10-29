@@ -16,16 +16,19 @@
  ***************************************************************************/
 
 #include "mission.h"
+#include "txt/desfile.h"
 
 
 namespace game {
 
 
 Mission::Mission(const QString &name, int station) :
-    m_name(name),
+    m_shortName(name),
     m_station(station)
 {
-
+    txt::DesFile file(QString("dat:mission/%1.des").arg(name));
+    file.setSection("areamap");
+    m_name = file.value("name").toString();
 }
 
 

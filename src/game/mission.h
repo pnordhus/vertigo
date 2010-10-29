@@ -31,10 +31,12 @@ public:
     Mission(const QString &name, int station);
 
 public:
+    const QString& shortName() const { return m_shortName; }
     const QString& name() const { return m_name; }
     int station() const { return m_station; }
 
 private:
+    QString m_shortName;
     QString m_name;
     int m_station;
 };

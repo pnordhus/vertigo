@@ -69,7 +69,24 @@ Departure::Departure()
         y += font.height() + 4;
     }
 
-    y += 8;
+    y += 4;
+
+    foreach (Mission* mission, Chapter::get()->missions()) {
+        if (mission->station() == -1) {
+            ui::Button *button = new ui::Button(lblMap);
+            button->setFont(font);
+            button->setText(mission->name());
+            button->setPosition(0, y);
+            button->setWidth(180);
+            button->setAlignment(ui::Label::AlignHCenter);
+            button->setProperty("mission", mission->shortName());
+            connect(button, SIGNAL(clicked()), SLOT(startMission()));
+
+            y += font.height() + 4;
+        }
+    }
+
+    y += 4;
 
     ui::Button *button = new ui::Button(lblMap);
     button->setFont(font);
@@ -96,6 +113,12 @@ bool Departure::mousePressEvent(const QPoint &pos, Qt::MouseButton button)
 void Departure::select()
 {
     Chapter::get()->setStation(sender()->property("index").toInt());
+}
+
+
+void Departure::startMission()
+{
+    Chapter::get()->startMission(sender()->property("mission").toString());
 }
 
 
