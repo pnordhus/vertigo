@@ -29,7 +29,8 @@ Chapter::Chapter() :
     m_area(NULL),
     m_desktop(NULL),
     m_movie(NULL),
-    m_currentStation(-1)
+    m_currentStation(-1),
+    m_credits(0)
 {
     Q_ASSERT(m_singleton == NULL);
     m_singleton = this;
@@ -52,38 +53,34 @@ void Chapter::load(int chapter)
 {
     m_movies.clear();
     delete m_area;
-    delete m_desktop;
+    if (m_desktop)
+        m_desktop->deleteLater();
     delete m_movie;
     m_movie = NULL;
+    m_currentStation = -1;
+    m_numSmallTalks = 0;
 
     txt::DesFile file(QString("dat:story/ch%1.des").arg(chapter));
 
-    file.beginGroup("Chapter");
+    file.setSection("Chapter");
     m_code = file.value("Code").toInt();
     m_area = new Area(file.value("Area").toString());
     m_stations = m_area->stations();
     const QString startStation = file.value("StartStation").toString();
-    file.endGroup();
 
     int startStationIndex = 0;
     foreach (const Station &station, m_area->stations()) {
-        file.beginGroup(QString("Station%1").arg(station.index()));
+        file.setSection(QString("Station%1").arg(station.index()));
         if (file.contains("ApproachMovieReplacement"))
             replaceApproachMovie(station.index(), file.value("ApproachMovieReplacement").toString());
-        file.endGroup();
 
         if (station.shortName() == startStation)
             startStationIndex = station.index();
     }
 
-    file.beginGroup("PendingDialogues");
-    foreach (const QString &key, file.allKeys()) {
-        const int dialogId = file.value(key).toInt();
-        Dialog *dialog = new Dialog(dialogId);
-        connect(dialog, SIGNAL(remove(int)), SLOT(removeDialog(int)));
-        m_pendingDialogues.insert(dialogId, dialog);
-    }
-    file.endGroup();
+    file.setSection("PendingDialogues");
+    foreach (const QString &key, file.keys())
+        addDialog(file.value(key).toInt());
 
     setStation(startStationIndex);
 }
@@ -170,9 +167,71 @@ QList<Dialog*> Chapter::dialogs(int room)
 }
 
 
+QList<Dialog*> Chapter::dialogsEnCom(bool room)
+{
+    QList<Dialog*> list;
+    foreach (Dialog *dialog, m_pendingDialogues) {
+        if (dialog->matchesEnCom(m_area->code(), m_currentStation, room))
+            list << dialog;
+    }
+    return list;
+}
+
+
 void Chapter::removeDialog(int dialogId)
 {
-    m_pendingDialogues.remove(dialogId);
+    Dialog *dialog = m_pendingDialogues.take(dialogId);
+    if (dialog && dialog->isSmallTalk())
+        m_numSmallTalks++;
+}
+
+
+void Chapter::addMessage(int message)
+{
+    m_messages.insert(message);
+}
+
+
+void Chapter::addTask(int task)
+{
+    qDebug() << "Add task" << task;
+}
+
+
+void Chapter::removeTask(int task)
+{
+    qDebug() << "Remove task" << task;
+}
+
+
+void Chapter::changeChapter(int chapter)
+{
+    load(chapter);
+}
+
+
+void Chapter::addDialog(int dialogId)
+{
+    Q_ASSERT(!m_pendingDialogues.contains(dialogId));
+
+    Dialog *dialog = new Dialog(dialogId);
+    connect(dialog, SIGNAL(remove(int)), SLOT(removeDialog(int)));
+    connect(dialog, SIGNAL(addMessage(int)), SLOT(addMessage(int)));
+    connect(dialog, SIGNAL(addTask(int)), SLOT(addTask(int)));
+    connect(dialog, SIGNAL(removeTask(int)), SLOT(removeTask(int)));
+    connect(dialog, SIGNAL(changeChapter(int)), SLOT(changeChapter(int)));
+    connect(dialog, SIGNAL(addDialog(int)), SLOT(addDialog(int)));
+    connect(dialog, SIGNAL(addCredit(int)), SLOT(addCredit(int)));
+    connect(dialog, SIGNAL(replaceApproachMovie(int,QString)), SLOT(replaceApproachMovie(int,QString)));
+    m_pendingDialogues.insert(dialogId, dialog);
+}
+
+
+void Chapter::addCredit(int credit)
+{
+    m_credits += credit;
+    if (m_credits < 0)
+        m_credits = 0;
 }
 
 

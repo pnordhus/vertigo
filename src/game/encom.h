@@ -15,68 +15,33 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GAME_ROOM_H
-#define GAME_ROOM_H
+#ifndef GAME_ENCOM_H
+#define GAME_ENCOM_H
 
 
-#include "minimovie.h"
-#include "sfx/sound.h"
-#include "ui/arrow.h"
-#include "ui/frame.h"
+#include "dialog.h"
+#include "ui/label.h"
 
 
 namespace game {
 
 
-class Dialog;
-
-
-class Room : public ui::Frame
+class EnCom : public ui::Label
 {
     Q_OBJECT
 
 public:
-    Room(int index, const QString &title, const QString &name);
-    ~Room();
+    EnCom(Dialog *dialog);
 
 signals:
-    void startDialog(Dialog*);
-    void startEnCom(Dialog*);
-    void showDeparture();
-    void hideCursor();
-
-public:
-    const QString& name() const { return m_name; }
-    void restart();
-
-protected:
-    void draw();
-    bool mousePressEvent(const QPoint &pos, Qt::MouseButton button);
-
-private slots:
-    void showDock();
-    void startDialog(int dialogId);
+    void close();
 
 private:
-    struct Person
-    {
-        ui::Arrow *arrow;
-        bool female;
-    };
-
-    int m_index;
-    MiniMovie m_miniMovie;
-    QString m_name;
-    QImage m_backgroundImage;
-    ui::Label *m_backgroundLabel;
-    gfx::Texture m_background;
-    sfx::Sound m_backgroundSound;
-    sfx::Sound m_dockSound;
-    QMap<int, Person*> m_persons;
+    Dialog *m_dialog;
 };
 
 
 } // namespace game
 
 
-#endif // GAME_ROOM_H
+#endif // GAME_ENCOM_H

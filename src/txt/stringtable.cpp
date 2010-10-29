@@ -28,7 +28,7 @@ QStringList StringTable::m_table;
 bool StringTable::load()
 {
     DesFile fileDes("txt:deeptext.des");
-    fileDes.beginGroup("Text");
+    fileDes.setSection("Text");
 
     if (!fileDes.contains("Text190"))
         return false;

@@ -35,9 +35,8 @@ Station::Station(int index, const QString &name) :
 {
     txt::DesFile file("dat:world/" + name + ".des");
 
-    file.beginGroup("Station");
+    file.setSection("Station");
     m_name = file.value("Name").toString();
-    file.endGroup();
 }
 
 

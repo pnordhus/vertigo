@@ -11,6 +11,8 @@ set(SOURCES
     dialog.h
     dialogframe.cpp
     dialogframe.h
+    encom.cpp
+    encom.h
     main.cpp
     mainmenu.cpp
     mainmenu.h
@@ -39,6 +41,7 @@ set(MOC_SOURCES
     departure.h
     desktop.h
     dialog.h
+    encom.h
     mainmenu.h
     minimovie.h
     movie.h

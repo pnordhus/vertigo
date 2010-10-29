@@ -32,15 +32,13 @@ Room::Room(int index, const QString &title, const QString &name) :
     m_name(name)
 {
     txt::DesFile file("dat:world/" + name + ".des");
-    file.beginGroup("Room");
+    file.setSection("Room");
 
     const QString background = file.value("BackGround").toString();
     const QString backgroundSound = file.value("Sound").toString();
     m_backgroundImage = gfx::Image::loadPCX("gfx:pic/room/" + background + ".pcx").toRgb565();
     m_miniMovie.setColorTable(m_backgroundImage.colorTable());
     m_backgroundSound.load("sfx:snd/room/" + backgroundSound + ".pcm");
-
-    file.endGroup();
 
     setupFrame(m_backgroundImage.size() + QSize(18, 24), title, true);
 
@@ -55,9 +53,8 @@ Room::Room(int index, const QString &title, const QString &name) :
 
     m_backgroundSound.playLoop();
 
-    if (file.contains("Dock/Name")) {
-        file.beginGroup("Dock");
-
+    file.setSection("Dock");
+    if (file.contains("Name")) {
         const QString name = file.value("Name").toString();
         const QString sound = file.value("Sound").toString();
         const int rate = file.value("Rate", 0).toInt();
@@ -66,29 +63,23 @@ Room::Room(int index, const QString &title, const QString &name) :
         ui::Arrow *arrow = new ui::Arrow(file.value("Arrow").toString(), QPoint(file.value("X").toInt(), file.value("Y").toInt()), false, m_backgroundLabel);
         arrow->setText(name);
         connect(arrow, SIGNAL(clicked(int)), SLOT(showDock()));
-
-        file.endGroup();
     }
 
     int personId = 1;
     for (;;) {
-        file.beginGroup(QString("Person%1").arg(personId));
+        file.setSection(QString("Person%1").arg(personId));
 
-        if (file.contains("Arrow")) {
-
-            Person *person = new Person;
-
-            person->arrow = new ui::Arrow(file.value("Arrow").toString(), QPoint(file.value("X").toInt(), file.value("Y").toInt()), false, m_backgroundLabel);
-            person->arrow->hide();
-            connect(person->arrow, SIGNAL(clicked(int)), SIGNAL(startDialog(int)));
-
-            m_persons.insert(personId, person);
-        } else {
-            file.endGroup();
+        if (!file.contains("Arrow"))
             break;
-        }
 
-        file.endGroup();
+        Person *person = new Person;
+
+        person->arrow = new ui::Arrow(file.value("Arrow").toString(), QPoint(file.value("X").toInt(), file.value("Y").toInt()), false, m_backgroundLabel);
+        person->arrow->hide();
+        connect(person->arrow, SIGNAL(clicked(int)), SLOT(startDialog(int)));
+
+        m_persons.insert(personId, person);
+
         personId++;
     }
 
@@ -106,7 +97,7 @@ void Room::restart()
 {
     m_dockSound.stop();
     m_background.fromImage(m_backgroundImage);
-    const QList<Dialog*> dialogs = Chapter::get()->dialogs(m_index);
+    QList<Dialog*> dialogs = Chapter::get()->dialogs(m_index);
 
     foreach (Person* person, m_persons)
         person->arrow->hide();
@@ -125,6 +116,10 @@ void Room::restart()
         person->arrow->setText(dialog->name());
         person->arrow->setValue(dialog->id());
     }
+
+    dialogs = Chapter::get()->dialogsEnCom(true);
+    if (!dialogs.isEmpty())
+        emit startEnCom(dialogs.first());
 }
 
 
@@ -157,6 +152,12 @@ void Room::showDock()
     m_backgroundLabel->disable();
     m_dockSound.play();
     m_miniMovie.playOneshot();
+}
+
+
+void Room::startDialog(int dialogId)
+{
+    emit startDialog(Chapter::get()->dialog(dialogId));
 }
 
 

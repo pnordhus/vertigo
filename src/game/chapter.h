@@ -49,9 +49,11 @@ public:
     Area* area() const { return m_area; }
     const QMap<int, Station>& stations() const { return m_stations; }
     int currentStation() const { return m_currentStation; }
-    void replaceApproachMovie(int station, const QString &movie);
     Dialog* dialog(int dialogId) const;
     QList<Dialog*> dialogs(int room);
+    QList<Dialog*> dialogsEnCom(bool room);
+    const QSet<int>& messages() const { return m_messages; }
+    int numSmallTalks() const { return m_numSmallTalks; }
 
 private:
     void playMovies();
@@ -59,6 +61,13 @@ private:
 private slots:
     void movieFinished();
     void removeDialog(int dialogId);
+    void addMessage(int message);
+    void addTask(int task);
+    void removeTask(int task);
+    void changeChapter(int chapter);
+    void addDialog(int dialogId);
+    void addCredit(int credit);
+    void replaceApproachMovie(int station, const QString &movie);
 
 public:
     static Chapter* get() { Q_ASSERT(m_singleton); return m_singleton; }
@@ -75,6 +84,9 @@ private:
     QSet<int> m_playedMovies;
     QMap<int, Dialog*> m_pendingDialogues;
     static Chapter *m_singleton;
+    QSet<int> m_messages;
+    int m_credits;
+    int m_numSmallTalks;
 };
 
 

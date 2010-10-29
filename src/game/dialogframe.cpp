@@ -6,8 +6,7 @@
 namespace game {
 
 
-DialogFrame::DialogFrame(Dialog* dialog, const QString &roomName, ui::Widget *parent) :
-    ui::Frame(parent),
+DialogFrame::DialogFrame(Dialog* dialog, const QString &roomName) :
     m_dialog(dialog)
 {
     Q_ASSERT(dialog);

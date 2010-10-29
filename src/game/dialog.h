@@ -23,6 +23,7 @@
 #include "ui/widget.h"
 #include "sfx/sound.h"
 #include <QMap>
+#include <QSet>
 
 
 namespace game {
@@ -37,12 +38,53 @@ private:
     {
         int text;
         int next;
+        int message;
+        QSet<int> onlyIf;
+        QSet<int> notIf;
     };
 
     struct Entry
     {
         int text;
         QList<Option> options;
+    };
+
+    struct Message
+    {
+        enum Type
+        {
+            None,
+            AddTask,
+            RemoveTask,
+            ChangeChapter,
+            AddDialog,
+            AddCredit,
+            EnableStation,
+            DisableStation,
+            AddMissionStation,
+            AddMissionArea,
+            ReplaceApproachMovie
+        };
+
+        Message() : type(None), value(0) {}
+
+        Type type;
+        int value;
+        QString name;
+    };
+
+    struct Precondition
+    {
+        enum Type
+        {
+            None,
+            NumSmallTalks,
+        };
+
+        Precondition() : type(None), amount(0) {}
+
+        Type type;
+        int amount;
     };
 
     enum Return
@@ -56,6 +98,13 @@ public:
 signals:
     void close();
     void remove(int);
+    void addMessage(int);
+    void addTask(int);
+    void removeTask(int);
+    void changeChapter(int);
+    void addDialog(int);
+    void addCredit(int);
+    void replaceApproachMovie(int, const QString&);
 
 public:
     int id() const { return m_id; }
@@ -63,6 +112,8 @@ public:
     bool isFemale() const { return m_female; }
     int person() const { return m_person; }
     bool matches(int area, int station, int room) const;
+    bool matchesEnCom(int area, int station, bool room) const;
+    bool isSmallTalk() const { return m_isSmallTalk; }
 
 private:
     void draw();
@@ -72,6 +123,7 @@ private:
     void select();
     void loadTree(const QString &filename);
     void loadStrings(const QString &filename);
+    bool testPreconditions() const;
 
 private:
     gfx::Font m_fontTop;
@@ -94,6 +146,10 @@ private:
     int m_room;
     int m_person;
     bool m_finished;
+    QMap<int, Message> m_messages;
+    int m_changeChapter;
+    bool m_isSmallTalk;
+    QList<Precondition> m_preconditions;
 };
 
 

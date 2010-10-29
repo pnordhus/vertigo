@@ -29,6 +29,7 @@ namespace game {
 Desktop::Desktop(const QString &name) :
     m_room(NULL),
     m_dialog(NULL),
+    m_enCom(NULL),
     m_departure(NULL),
     m_miniMovie("gfx:mvi/desktop")
 {
@@ -40,7 +41,7 @@ Desktop::Desktop(const QString &name) :
 
     txt::DesFile file("dat:world/" + name + ".des");
 
-    file.beginGroup("Station");
+    file.setSection("Station");
 
     const QString background = file.value("BackGround").toString();
     const QString backgroundSound = file.value("Sound").toString();
@@ -69,7 +70,7 @@ Desktop::Desktop(const QString &name) :
     label = new ui::Label(&m_lblBackground);
     label->setFont(fontSmall);
     label->setPosition(8, 10 + fontLarge.height());
-    label->setText(file.value("Description").toStringList().join(", "));
+    label->setText(file.value("Description").toString());
 
     m_btnNotebook = new ui::Button(&m_lblBackground);
     m_btnNotebook->setTexture(gfx::Image::loadPCX("gfx:pic/notebook/nbklein.pcx"));
@@ -79,13 +80,11 @@ Desktop::Desktop(const QString &name) :
     m_notebook.hide();
     connect(&m_notebook, SIGNAL(close()), SLOT(hideNotebook()));
 
-    file.endGroup();
-
     m_widgetRooms = new ui::Label(&m_lblBackground);
-    foreach (const QString &section, file.childGroups().filter(QRegExp("^Room"))) {
-        file.beginGroup(section);
+    foreach (const QString &section, file.sections().filter(QRegExp("^room"))) {
+        file.setSection(section);
 
-        QRegExp reg("^Room(\\d*)$");
+        QRegExp reg("^room(\\d*)$");
         reg.indexIn(section);
         const int index = reg.cap(1).toInt();
 
@@ -128,8 +127,6 @@ Desktop::Desktop(const QString &name) :
         button->setProperty("name", name);
         button->setProperty("room", file.value("Room"));
         connect(button, SIGNAL(clicked()), SLOT(showRoom()));
-
-        file.endGroup();
     }
 
     m_miniMovie.load(file);
@@ -138,6 +135,7 @@ Desktop::Desktop(const QString &name) :
 
 Desktop::~Desktop()
 {
+    delete m_enCom;
     delete m_dialog;
     delete m_departure;
     delete m_room;
@@ -149,6 +147,7 @@ void Desktop::activate()
     m_miniMovie.start();
     m_backgroundSound.playLoop();
     m_nameSound.play();
+    checkEnCom();
 }
 
 
@@ -167,6 +166,8 @@ void Desktop::draw()
         m_room->doDraw();
     if (m_dialog)
         m_dialog->doDraw();
+    if (m_enCom)
+        m_enCom->doDraw();
     if (m_departure)
         m_departure->doDraw();
     m_notebook.doDraw();
@@ -207,7 +208,8 @@ void Desktop::showRoom()
     Q_ASSERT(!m_room);
     m_room = new Room(index, title, name);
     connect(m_room, SIGNAL(close()), SLOT(hideRoom()));
-    connect(m_room, SIGNAL(startDialog(int)), SLOT(showDialog(int)));
+    connect(m_room, SIGNAL(startDialog(Dialog*)), SLOT(showDialog(Dialog*)));
+    connect(m_room, SIGNAL(startEnCom(Dialog*)), SLOT(showEnCom(Dialog*)));
     connect(m_room, SIGNAL(showDeparture()), SLOT(showDeparture()));
     connect(m_room, SIGNAL(hideCursor()), SLOT(hideCursor()));
     setRootWidget(m_room);
@@ -225,15 +227,16 @@ void Desktop::hideRoom()
     m_room = NULL;
     m_btnNotebook->show();
     m_backgroundSound.setVolume(1.0f);
+    checkEnCom();
 }
 
 
-void Desktop::showDialog(int dialogId)
+void Desktop::showDialog(Dialog *dialog)
 {
     Q_ASSERT(m_room);
     Q_ASSERT(!m_dialog);
 
-    m_dialog = new DialogFrame(Chapter::get()->dialog(dialogId), m_room->name());
+    m_dialog = new DialogFrame(dialog, m_room->name());
     connect(m_dialog, SIGNAL(close()), SLOT(hideDialog()));
     setRootWidget(m_dialog);
     m_dialog->setPosition((640 - m_dialog->width()) / 2, (480 - m_dialog->height()) / 2);
@@ -248,6 +251,41 @@ void Desktop::hideDialog()
     m_room->restart();
     m_dialog->deleteLater();
     m_dialog = NULL;
+}
+
+
+void Desktop::showEnCom(Dialog *dialog)
+{
+    Q_ASSERT(!m_enCom);
+
+    m_enCom = new EnCom(dialog);
+    connect(m_enCom, SIGNAL(close()), SLOT(hideEnCom()));
+    setRootWidget(m_enCom);
+
+    m_btnNotebook->hide();
+    m_notebookSound.load("sfx:snd/desktop/noteb2.pcm");
+    m_notebookSound.play();
+}
+
+
+void Desktop::hideEnCom()
+{
+    Q_ASSERT(m_enCom);
+    if (m_room) {
+        setRootWidget(m_room);
+        m_room->restart();
+    } else {
+        setRootWidget(&m_lblBackground);
+    }
+
+    m_enCom->deleteLater();
+    m_enCom = NULL;
+
+    m_btnNotebook->show();
+    m_notebookSound.load("sfx:snd/desktop/noteb3.pcm");
+    m_notebookSound.play();
+
+    checkEnCom();
 }
 
 
@@ -272,6 +310,14 @@ void Desktop::hideDeparture()
     m_room->show();
     m_departure->deleteLater();
     m_departure = NULL;
+}
+
+
+void Desktop::checkEnCom()
+{
+    const QList<Dialog*> dialogs = Chapter::get()->dialogsEnCom(false);
+    if (!dialogs.isEmpty())
+        showEnCom(dialogs.first());
 }
 
 
