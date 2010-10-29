@@ -20,6 +20,8 @@ set(SOURCES
     menu.h
     minimovie.cpp
     minimovie.h
+    mission.cpp
+    mission.h
     movie.cpp
     movie.h
     notebook.cpp

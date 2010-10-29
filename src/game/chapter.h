@@ -22,6 +22,7 @@
 #include "area.h"
 #include "desktop.h"
 #include "dialog.h"
+#include "mission.h"
 #include "movie.h"
 
 
@@ -67,7 +68,9 @@ public:
 
 private:
     void load(const QString &filename);
+    void playApproach(bool autopilot);
     void playMovies();
+    void startMission();
 
 private slots:
     void movieFinished();
@@ -101,11 +104,14 @@ private:
     static Chapter *m_singleton;
     QSet<int> m_messages;
     QList<int> m_tasks;
+    QList<Mission*> m_missions;
+    QStringList m_successfulMissions;
     int m_credits;
     int m_numSmallTalks;
     bool m_movieAutopilot;
     bool m_movieApproach;
     bool m_movieHarbour;
+    Mission *m_mission;
 };
 
 

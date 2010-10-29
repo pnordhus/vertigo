@@ -33,7 +33,8 @@ Chapter::Chapter() :
     m_desktop(NULL),
     m_movie(NULL),
     m_currentStation(-1),
-    m_credits(0)
+    m_credits(0),
+    m_mission(NULL)
 {
     Q_ASSERT(m_singleton == NULL);
     m_singleton = this;
@@ -57,10 +58,12 @@ Chapter::~Chapter()
     s.endGroup();
 
     qDeleteAll(m_pendingDialogues);
-    m_singleton = NULL;
+    qDeleteAll(m_missions);
+    delete m_mission;
     delete m_movie;
     delete m_desktop;
     delete m_area;
+    m_singleton = NULL;
 }
 
 
@@ -83,6 +86,10 @@ void Chapter::load(const QString &filename)
     m_approachMovieReplacement.clear();
     qDeleteAll(m_pendingDialogues);
     m_pendingDialogues.clear();
+    qDeleteAll(m_missions);
+    m_missions.clear();
+    delete m_mission;
+    m_mission = NULL;
 
     txt::DesFile file(filename);
 
@@ -206,9 +213,41 @@ void Chapter::setStation(int stationIndex)
     m_currentStationName = station.shortName();
     m_desktop = new Desktop(m_currentStationName);
 
+    QMutableListIterator<Mission*> it(m_missions);
+    while (it.hasNext()) {
+        it.next();
+        if (it.value()->station() == m_currentStation) {
+            m_mission = it.value();
+            it.remove();
+            break;
+        }
+    }
+
     if (m_movieHarbour && previousStation >= 0)
         m_movies << QString("gfx:mvi/film/%1hf.mvi").arg("hiob");
 
+    if (!m_mission)
+        playApproach(true);
+
+    playMovies();
+}
+
+
+void Chapter::startMission()
+{
+    Q_ASSERT(m_mission);
+    qDebug() << "Start mission" << m_mission->name();
+
+    m_successfulMissions.append(m_mission->name());
+    delete m_mission;
+    m_mission = NULL;
+    playApproach(false);
+    playMovies();
+}
+
+
+void Chapter::playApproach(bool autopilot)
+{
     if (m_approachMovieReplacement.contains(m_currentStation)) {
         const QString movie = m_approachMovieReplacement.take(m_currentStation);
         QRegExp reg("d(\\d*)\\.mvi");
@@ -216,13 +255,11 @@ void Chapter::setStation(int stationIndex)
             m_playedMovies << reg.cap(1).toInt();
         m_movies << "gfx:mvi/film/" + movie;
     } else {
-        if (m_movieAutopilot)
+        if (m_movieAutopilot && autopilot)
             m_movies << QString("gfx:mvi/film/%1fl.mvi").arg("hiob");
         if (m_movieApproach)
             m_movies << m_desktop->approachMovie();
     }
-
-    playMovies();
 }
 
 
@@ -237,7 +274,10 @@ void Chapter::playMovies()
 {
     if (m_movies.isEmpty()) {
         sfx::SoundSystem::get()->resumeAll();
-        emit setRenderer(m_desktop);
+        if (m_mission)
+            startMission();
+        else
+            emit setRenderer(m_desktop);
     } else {
         sfx::SoundSystem::get()->pauseAll();
         Q_ASSERT(m_movie == NULL);
@@ -375,7 +415,7 @@ void Chapter::disableStation(int station)
 
 void Chapter::addMission(const QString &mission, int station)
 {
-    qDebug() << "Add mission" << mission << station;
+    m_missions.append(new Mission(mission, station));
 }
 
 
