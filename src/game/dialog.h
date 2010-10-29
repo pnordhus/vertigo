@@ -114,6 +114,7 @@ public:
     bool matches(int area, int station, int room) const;
     bool matchesEnCom(int area, int station, bool room) const;
     bool isSmallTalk() const { return m_isSmallTalk; }
+    bool remove() const { return m_remove; }
 
 private:
     void draw();
@@ -146,6 +147,7 @@ private:
     int m_room;
     int m_person;
     bool m_finished;
+    bool m_remove;
     QMap<int, Message> m_messages;
     int m_changeChapter;
     bool m_isSmallTalk;

@@ -40,6 +40,7 @@ Chapter::Chapter() :
 
 Chapter::~Chapter()
 {
+    qDeleteAll(m_pendingDialogues);
     m_singleton = NULL;
     delete m_movie;
     delete m_desktop;
@@ -64,6 +65,8 @@ void Chapter::load(const QString &filename)
     m_movie = NULL;
     m_currentStation = -1;
     m_approachMovieReplacement.clear();
+    qDeleteAll(m_pendingDialogues);
+    m_pendingDialogues.clear();
 
     txt::DesFile file(filename);
 

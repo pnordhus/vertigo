@@ -37,6 +37,8 @@ DialogFrame::DialogFrame(Dialog* dialog, const QString &roomName) :
 DialogFrame::~DialogFrame()
 {
     m_dialog->setParentWidget(NULL);
+    if (m_dialog->remove())
+        delete m_dialog;
 }
 
 

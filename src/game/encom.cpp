@@ -78,4 +78,12 @@ EnCom::EnCom(Dialog *dialog) :
 }
 
 
+EnCom::~EnCom()
+{
+    m_dialog->setParentWidget(NULL);
+    if (m_dialog->remove())
+        delete m_dialog;
+}
+
+
 } // namespace game

@@ -31,6 +31,7 @@ Dialog::Dialog(int id, ui::Widget *parent) :
     m_id(id),
     m_option(NULL),
     m_finished(false),
+    m_remove(false),
     m_changeChapter(-1)
 {
     m_fontTop.load("gfx:fnt/dpsmamon.fnt", 0xffb89c00, 0xffc0c400, true);
@@ -143,6 +144,7 @@ void Dialog::select()
         }
         switch (m_option->next) {
         case RemoveDialog:
+            m_remove = true;
             emit remove(m_id);
             break;
         }

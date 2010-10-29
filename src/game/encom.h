@@ -32,6 +32,7 @@ class EnCom : public ui::Label
 
 public:
     EnCom(Dialog *dialog);
+    ~EnCom();
 
 signals:
     void close();
