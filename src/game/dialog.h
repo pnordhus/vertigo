@@ -78,12 +78,14 @@ private:
         {
             None,
             NumSmallTalks,
+            Mission,
         };
 
         Precondition() : type(None), amount(0) {}
 
         Type type;
         int amount;
+        QString name;
     };
 
     enum Return

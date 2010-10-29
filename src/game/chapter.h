@@ -66,6 +66,7 @@ public:
     const QSet<int>& playedMovies() const { return m_playedMovies; }
     void playMovie(int movie);
     const QList<Mission*>& missions() const { return m_missions; }
+    const QStringList& successfulMissions() const { return m_successfulMissions; }
     void startMission(const QString &name);
 
 private:

@@ -110,6 +110,9 @@ Dialog::Dialog(int id, ui::Widget *parent) :
         if (type == "numofsmalltalk") {
             precondition.type = Precondition::NumSmallTalks;
             precondition.amount = file.value("Amount").toInt();
+        } else if (type == "mission") {
+            precondition.type = Precondition::Mission;
+            precondition.name = file.value("Name").toString();
         }
 
         m_preconditions.append(precondition);
@@ -375,6 +378,11 @@ bool Dialog::testPreconditions() const
 
         case Precondition::NumSmallTalks:
             if (Chapter::get()->numSmallTalks() < precondition.amount)
+                return false;
+            break;
+
+        case Precondition::Mission:
+            if (!Chapter::get()->successfulMissions().contains(precondition.name))
                 return false;
             break;
         }
