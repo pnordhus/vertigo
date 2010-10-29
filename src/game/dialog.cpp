@@ -18,6 +18,7 @@
 #include "chapter.h"
 #include "dialog.h"
 #include "gfx/colortable.h"
+#include "sfx/soundsystem.h"
 #include "txt/desfile.h"
 #include "txt/stringtable.h"
 #include <QFile>
@@ -37,8 +38,6 @@ Dialog::Dialog(int id, ui::Widget *parent) :
     m_fontTop.load("gfx:fnt/dpsmamon.fnt", 0xffb89c00, 0xffc0c400, true);
     m_fontBottom.load("gfx:fnt/dpsmamon.fnt", 0xff00a8d0, 0xff00a8d0, true);
     m_fontHighlight.load("gfx:fnt/dpsmamon.fnt", 0xff00e4f8, 0xff00e4f8, true);
-
-    m_woopSound.load("sfx:snd/desktop/woop.pcm");
 
     const QString baseName = QString("txt:dia/%1/%2").arg(id / 1000, 3, 10, QChar('0')).arg(id, 6, 10, QChar('0'));
 
@@ -192,7 +191,7 @@ void Dialog::draw()
         }
     }
     if (m_option != NULL && m_option != lastOption)
-        m_woopSound.play();
+        sfx::SoundSystem::get()->sound(sfx::Woop)->play();
 }
 
 

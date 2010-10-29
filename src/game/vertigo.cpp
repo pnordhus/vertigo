@@ -33,7 +33,8 @@ Vertigo::Vertigo() :
     m_window(NULL),
     m_mainMenu(NULL),
     m_intro(NULL),
-    m_chapter(NULL)
+    m_chapter(NULL),
+    m_soundSystem(NULL)
 {
 
 }
@@ -45,6 +46,7 @@ Vertigo::~Vertigo()
     delete m_intro;
     delete m_mainMenu;
     delete m_window;
+    delete m_soundSystem;
 }
 
 
@@ -65,6 +67,8 @@ bool Vertigo::start()
         s.setValue("datadir", dir);
         QDir::setSearchPaths("data", QStringList() << s.value("datadir").toString());
     }
+
+    m_soundSystem = new sfx::SoundSystem;
 
     m_window = new Window;
 

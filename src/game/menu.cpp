@@ -16,6 +16,7 @@
  ***************************************************************************/
 
 #include "menu.h"
+#include "sfx/soundsystem.h"
 #include <QMouseEvent>
 
 
@@ -25,7 +26,7 @@ namespace game {
 Menu::Menu() :
     m_rootWidget(NULL)
 {
-    m_clickSound.load("sfx:snd/desktop/click.pcm");
+
 }
 
 
@@ -48,7 +49,7 @@ void Menu::mousePressEvent(QMouseEvent *event)
 {
     if (m_rootWidget)
         if (m_rootWidget->doMousePressEvent(screenToImage(event->pos()).toPoint(), event->button()))
-           m_clickSound.play();
+            sfx::SoundSystem::get()->sound(sfx::Click)->play();
 }
 
 

@@ -19,6 +19,7 @@
 #define GAME_VERTIGO_H
 
 
+#include "sfx/soundsystem.h"
 #include <QObject>
 
 
@@ -53,6 +54,7 @@ private:
     MainMenu *m_mainMenu;
     Movie *m_intro;
     Chapter *m_chapter;
+    sfx::SoundSystem *m_soundSystem;
 };
 
 

@@ -21,7 +21,6 @@
 
 #include "gfx/font.h"
 #include "ui/widget.h"
-#include "sfx/sound.h"
 #include <QMap>
 #include <QSet>
 
@@ -130,7 +129,6 @@ private:
     gfx::Font m_fontTop;
     gfx::Font m_fontBottom;
     gfx::Font m_fontHighlight;
-    sfx::Sound m_woopSound;
 
     int m_id;
     QMap<int, Entry> m_entries;

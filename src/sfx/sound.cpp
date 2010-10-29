@@ -30,6 +30,14 @@ Sound::Sound() :
 }
 
 
+Sound::Sound(const QString &file) :
+    m_buffer(0)
+{
+    alGenSources(1, &m_source);
+    load(file);
+}
+
+
 Sound::~Sound()
 {
     alSourceStop(m_source);

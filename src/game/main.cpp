@@ -16,7 +16,6 @@
  ***************************************************************************/
 
 #include "vertigo.h"
-#include "sfx/soundsystem.h"
 #include <QApplication>
 #include <QTime>
 
@@ -29,7 +28,6 @@ int main(int argc, char *argv[])
     app.setOrganizationName("Vertigo");
     app.setApplicationName("Vertigo");
 
-    sfx::SoundSystem soundSystem;
     game::Vertigo vertigo;
     if (!vertigo.start())
         return 1;

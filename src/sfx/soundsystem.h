@@ -19,7 +19,8 @@
 #define SFX_SOUNDSYSTEM_H
 
 
-#include <QtGlobal>
+#include "sound.h"
+#include <QMap>
 
 
 namespace sfx {
@@ -28,11 +29,29 @@ namespace sfx {
 struct SoundSystemPrivate;
 
 
+enum StandardSound
+{
+    Click,
+    Woop,
+    NotebookShow,
+    NotebookHide,
+    NotebookBackground,
+    EnComShow,
+    EnComHide = NotebookHide,
+};
+
+
 class SoundSystem
 {
 public:
     SoundSystem();
     ~SoundSystem();
+
+public:
+    Sound* sound(StandardSound);
+
+public:
+    static SoundSystem *get() { Q_ASSERT(m_singleton); return m_singleton; }
 
 private:
     Q_DISABLE_COPY(SoundSystem);
@@ -40,6 +59,7 @@ private:
 private:
     static SoundSystem *m_singleton;
     SoundSystemPrivate *d;
+    QMap<StandardSound, Sound*> m_standardSounds;
 };
 
 

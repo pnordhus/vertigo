@@ -41,15 +41,33 @@ SoundSystem::SoundSystem()
     d->device = alcOpenDevice(NULL);
     d->context = alcCreateContext(d->device, NULL);
     alcMakeContextCurrent(d->context);
+
+    m_standardSounds.insert(Click, new Sound("sfx:snd/desktop/click.pcm"));
+    m_standardSounds.insert(Woop, new Sound("sfx:snd/desktop/woop.pcm"));
+
+    m_standardSounds.insert(NotebookShow, new Sound("sfx:snd/desktop/noteb1.pcm"));
+    m_standardSounds.insert(NotebookHide, new Sound("sfx:snd/desktop/noteb3.pcm"));
+    m_standardSounds.insert(EnComShow, new Sound("sfx:snd/desktop/noteb2.pcm"));
+    m_standardSounds.insert(NotebookBackground, new Sound("sfx:snd/desktop/noteback.pcm"));
+    m_standardSounds.value(NotebookBackground)->setVolume(0.033f);
 }
 
 
 SoundSystem::~SoundSystem()
 {
+    qDeleteAll(m_standardSounds);
     alcDestroyContext(d->context);
     alcCloseDevice(d->device);
     delete d;
     m_singleton = NULL;
+}
+
+
+Sound* SoundSystem::sound(StandardSound snd)
+{
+    Sound *sound = m_standardSounds.value(snd);
+    Q_ASSERT(sound);
+    return sound;
 }
 
 

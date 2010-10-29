@@ -19,7 +19,7 @@
 #define SFX_SOUND_H
 
 
-#include <QtGlobal>
+#include <QString>
 
 
 namespace sfx {
@@ -29,6 +29,7 @@ class Sound
 {
 public:
     Sound();
+    Sound(const QString &file);
     ~Sound();
 
 public:
