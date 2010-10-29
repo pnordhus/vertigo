@@ -76,6 +76,22 @@ Dialog::Dialog(int id, ui::Widget *parent) :
         } else if (type == "addperson") {
             message.type = Message::AddDialog;
             message.value = file.value("Name").toInt();
+        } else if (type == "credit") {
+            message.type = Message::AddCredit;
+            message.value = file.value("amount").toInt();
+        } else if (type == "enablestation") {
+            message.type = Message::EnableStation;
+            message.value = file.value("station").toInt();
+        } else if (type == "disablestation") {
+            message.type = Message::DisableStation;
+            message.value = file.value("station").toInt();
+        } else if (type == "mission2station") {
+            message.type = Message::AddMissionStation;
+            message.value = file.value("station").toInt();
+            message.name = file.value("mission").toString();
+        } else if (type == "mission2area") {
+            message.type = Message::AddMissionArea;
+            message.name = file.value("mission").toString();
         } else if (type == "replaceapproachmovie") {
             message.type = Message::ReplaceApproachMovie;
             message.value = file.value("Station").toInt();
@@ -133,6 +149,26 @@ void Dialog::select()
 
                 case Message::AddDialog:
                     emit addDialog(message.value);
+                    break;
+
+                case Message::AddCredit:
+                    emit addCredit(message.value);
+                    break;
+
+                case Message::EnableStation:
+                    emit enableStation(message.value);
+                    break;
+
+                case Message::DisableStation:
+                    emit disableStation(message.value);
+                    break;
+
+                case Message::AddMissionStation:
+                    emit addMission(message.name, message.value);
+                    break;
+
+                case Message::AddMissionArea:
+                    emit addMission(message.name);
                     break;
 
                 case Message::ReplaceApproachMovie:

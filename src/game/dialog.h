@@ -103,6 +103,9 @@ signals:
     void changeChapter(int);
     void addDialog(int);
     void addCredit(int);
+    void enableStation(int);
+    void disableStation(int);
+    void addMission(const QString&, int = -1);
     void replaceApproachMovie(int, const QString&);
 
 public:

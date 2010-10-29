@@ -304,13 +304,13 @@ void Chapter::addMessage(int message)
 
 void Chapter::addTask(int task)
 {
-    qDebug() << "Add task" << task;
+    m_tasks.append(task);
 }
 
 
 void Chapter::removeTask(int task)
 {
-    qDebug() << "Remove task" << task;
+    m_tasks.removeAll(task);
 }
 
 
@@ -332,6 +332,9 @@ void Chapter::addDialog(int dialogId)
     connect(dialog, SIGNAL(changeChapter(int)), SLOT(changeChapter(int)));
     connect(dialog, SIGNAL(addDialog(int)), SLOT(addDialog(int)));
     connect(dialog, SIGNAL(addCredit(int)), SLOT(addCredit(int)));
+    connect(dialog, SIGNAL(enableStation(int)), SLOT(enableStation(int)));
+    connect(dialog, SIGNAL(disableStation(int)), SLOT(disableStation(int)));
+    connect(dialog, SIGNAL(addMission(QString,int)), SLOT(addMission(QString,int)));
     connect(dialog, SIGNAL(replaceApproachMovie(int,QString)), SLOT(replaceApproachMovie(int,QString)));
     m_pendingDialogues.insert(dialogId, dialog);
 }
@@ -342,6 +345,24 @@ void Chapter::addCredit(int credit)
     m_credits += credit;
     if (m_credits < 0)
         m_credits = 0;
+}
+
+
+void Chapter::enableStation(int station)
+{
+    qDebug() << "Enable station" << station;
+}
+
+
+void Chapter::disableStation(int station)
+{
+    qDebug() << "Disable station" << station;
+}
+
+
+void Chapter::addMission(const QString &mission, int station)
+{
+    qDebug() << "Add mission" << mission << station;
 }
 
 

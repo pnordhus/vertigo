@@ -78,6 +78,9 @@ private slots:
     void changeChapter(int chapter);
     void addDialog(int dialogId);
     void addCredit(int credit);
+    void enableStation(int station);
+    void disableStation(int station);
+    void addMission(const QString &mission, int station);
     void replaceApproachMovie(int station, const QString &movie);
 
 public:
@@ -97,6 +100,7 @@ private:
     QMap<int, Dialog*> m_pendingDialogues;
     static Chapter *m_singleton;
     QSet<int> m_messages;
+    QList<int> m_tasks;
     int m_credits;
     int m_numSmallTalks;
     bool m_movieAutopilot;
