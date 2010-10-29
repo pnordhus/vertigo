@@ -48,14 +48,15 @@ Notebook::Notebook()
         ui::Widget *widget;
 
         widget = createLabel(m_lblMain, txt::Notebook_Title, 30);
-
         widget = createLabel(m_lblMain, txt::Notebook_TitleLine, 40);
 
         widget = createButton(m_lblMain, txt::Notebook_Missions, 90);
+        connect(widget, SIGNAL(clicked()), SLOT(showMissions()));
 
         widget = createButton(m_lblMain, txt::Notebook_LoadSave, 110);
 
         widget = createButton(m_lblMain, txt::Notebook_Options, 130);
+        connect(widget, SIGNAL(clicked()), SLOT(showOptions()));
 
         widget = createButton(m_lblMain, txt::Notebook_Map, 150);
         connect(widget, SIGNAL(clicked()), SLOT(showMap()));
@@ -65,6 +66,53 @@ Notebook::Notebook()
 
         widget = createButton(m_lblMain, txt::Notebook_QuitGame, 210);
         connect(widget, SIGNAL(clicked()), Chapter::get(), SLOT(quit()));
+    }
+
+    {
+        m_lblMissions = new ui::Label(labelBackground);
+        m_lblMissions->setPosition(162, 73);
+        m_lblMissions->setTexture(noteback);
+
+        ui::Widget *widget;
+
+        widget = createLabel(m_lblMissions, txt::Notebook_Missions_Title, 10);
+        widget = createLabel(m_lblMissions, txt::Notebook_Missions_TitleLine, 20);
+
+        widget = createLabel(m_lblMissions, txt::Notebook_Missions_TitleLine, 20);
+
+        ui::Button *button = new ui::Button(m_lblMissions);
+        button->setFont(m_fontGreen);
+        button->setText(txt::StringTable::get(txt::Notebook_Back));
+        button->setPosition(180, 270);
+        connect(button, SIGNAL(clicked()), SLOT(hideMissions()));
+
+        m_lblMissions->hide();
+    }
+
+    {
+        m_lblOptions = new ui::Label(labelBackground);
+        m_lblOptions->setPosition(162, 73);
+        m_lblOptions->setTexture(noteback);
+
+        ui::Widget *widget;
+
+        widget = createLabel(m_lblOptions, txt::Notebook_Options_Title, 30);
+        widget = createLabel(m_lblOptions, txt::Notebook_Options_TitleLine, 40);
+
+        widget = createButton(m_lblOptions, txt::Notebook_Sound, 90);
+
+        widget = createButton(m_lblOptions, txt::Notebook_Graphics, 110);
+
+        widget = createButton(m_lblOptions, txt::Notebook_Movies, 130);
+
+        widget = createButton(m_lblOptions, txt::Notebook_InputDevices, 150);
+
+        widget = createButton(m_lblOptions, txt::Notebook_MoviePlayer, 170);
+
+        widget = createButton(m_lblOptions, txt::Notebook_Back, 220);
+        connect(widget, SIGNAL(clicked()), SLOT(hideOptions()));
+
+        m_lblOptions->hide();
     }
 
     {
@@ -100,6 +148,34 @@ ui::Button* Notebook::createButton(ui::Widget *parent, txt::String text, float p
 }
 
 
+void Notebook::showMissions()
+{
+    m_lblMain->hide();
+    m_lblMissions->show();
+}
+
+
+void Notebook::hideMissions()
+{
+    m_lblMissions->hide();
+    m_lblMain->show();
+}
+
+
+void Notebook::showOptions()
+{
+    m_lblMain->hide();
+    m_lblOptions->show();
+}
+
+
+void Notebook::hideOptions()
+{
+    m_lblOptions->hide();
+    m_lblMain->show();
+}
+
+
 void Notebook::showMap()
 {
     m_lblMain->hide();
@@ -107,15 +183,29 @@ void Notebook::showMap()
 }
 
 
+void Notebook::hideMap()
+{
+    m_lblMap->hide();
+    m_lblMain->show();
+}
+
+
 bool Notebook::mousePressEvent(const QPoint &pos, Qt::MouseButton button)
 {
     if (m_lblMap->isVisible()) {
-        m_lblMap->hide();
-        m_lblMain->show();
+        hideMap();
         return true;
     }
 
     if (button == Qt::RightButton) {
+        if (m_lblMissions->isVisible()) {
+            hideMissions();
+            return true;
+        }
+        if (m_lblOptions->isVisible()) {
+            hideOptions();
+            return true;
+        }
         if (m_lblMain->isVisible()) {
             emit close();
             return true;

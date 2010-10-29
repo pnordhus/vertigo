@@ -38,7 +38,12 @@ signals:
     void close();
 
 private slots:
+    void showMissions();
+    void hideMissions();
+    void showOptions();
+    void hideOptions();
     void showMap();
+    void hideMap();
 
 private:
     ui::Label* createLabel(ui::Widget *parent, txt::String text, float posY);
@@ -51,6 +56,8 @@ private:
     gfx::Font m_fontGreen;
     gfx::Font m_fontYellow;
     ui::Label *m_lblMain;
+    ui::Label *m_lblMissions;
+    ui::Label *m_lblOptions;
     ui::Label *m_lblMap;
 };
 
