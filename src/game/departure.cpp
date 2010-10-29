@@ -54,6 +54,8 @@ Departure::Departure()
     foreach (const Station &station, Chapter::get()->stations()) {
         if (station.index() == Chapter::get()->currentStation())
             continue;
+        if (!station.isEnabled())
+            continue;
 
         ui::Button *button = new ui::Button(lblMap);
         button->setFont(font);

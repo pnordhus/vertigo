@@ -23,7 +23,8 @@ namespace game {
 
 
 Station::Station() :
-    m_index(-1)
+    m_index(-1),
+    m_enabled(false)
 {
 
 }
@@ -31,12 +32,25 @@ Station::Station() :
 
 Station::Station(int index, const QString &name) :
     m_index(index),
-    m_shortName(name)
+    m_shortName(name),
+    m_enabled(true)
 {
     txt::DesFile file("dat:world/" + name + ".des");
 
     file.setSection("Station");
     m_name = file.value("Name").toString();
+}
+
+
+void Station::enable()
+{
+    m_enabled = true;
+}
+
+
+void Station::disable()
+{
+    m_enabled = false;
 }
 
 

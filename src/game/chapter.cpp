@@ -115,6 +115,10 @@ void Chapter::load(const QString &filename)
     foreach (const QString &key, file.keys().filter(QRegExp("^message\\d*")))
         addMessage(file.value(key).toInt());
 
+    file.setSection("disabledstations");
+    foreach (const QString &key, file.keys().filter(QRegExp("^station\\d*")))
+        disableStation(file.value(key).toInt());
+
     file.setSection("statistics");
     m_numSmallTalks = file.value("numofsmalltalkssincelaststory", 0).toInt();
 
@@ -164,6 +168,13 @@ void Chapter::save(int slot, const QString &name) const
         it.next();
         file.setSection(QString("station%1").arg(it.key()));
         file.setValue("approachmoviereplacement", it.value());
+    }
+
+    file.setSection("disabledstations");
+    i = 0;
+    foreach (const Station &station, m_stations) {
+        if (!station.isEnabled())
+            file.setValue(QString("station%1").arg(i++), station.index());
     }
 
     file.setSection("movies");
@@ -350,13 +361,15 @@ void Chapter::addCredit(int credit)
 
 void Chapter::enableStation(int station)
 {
-    qDebug() << "Enable station" << station;
+    Q_ASSERT(m_stations.contains(station));
+    m_stations[station].enable();
 }
 
 
 void Chapter::disableStation(int station)
 {
-    qDebug() << "Disable station" << station;
+    Q_ASSERT(m_stations.contains(station));
+    m_stations[station].disable();
 }
 
 

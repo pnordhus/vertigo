@@ -32,6 +32,9 @@ public:
     Station(int index, const QString &name);
 
 public:
+    void enable();
+    void disable();
+    bool isEnabled() const { return m_enabled; }
     int index() const { return m_index; }
     const QString& shortName() const { return m_shortName; }
     const QString& name() const { return m_name; }
@@ -40,6 +43,7 @@ private:
     int m_index;
     QString m_shortName;
     QString m_name;
+    bool m_enabled;
 };
 
 
