@@ -63,7 +63,9 @@ private:
     gfx::Texture m_background;
     sfx::Sound m_backgroundSound;
     sfx::Sound m_nameSound;
-    sfx::Sound m_notebookSound;
+    sfx::Sound m_notebookShowSound;
+    sfx::Sound m_notebookBackgroundSound;
+    sfx::Sound m_notebookHideSound;
     ui::Label m_lblBackground;
     ui::Widget *m_widgetRooms;
     ui::Button *m_btnNotebook;

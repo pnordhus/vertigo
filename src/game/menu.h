@@ -21,6 +21,7 @@
 
 #include "renderer.h"
 #include "ui/widget.h"
+#include "sfx/sound.h"
 
 
 namespace game {
@@ -42,6 +43,7 @@ protected:
 
 private:
     ui::Widget *m_rootWidget;
+    sfx::Sound m_clickSound;
 };
 
 

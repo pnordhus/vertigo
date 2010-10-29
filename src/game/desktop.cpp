@@ -52,6 +52,10 @@ Desktop::Desktop(const QString &name) :
     m_nameSound.load("sfx:snd/names/" + nameSound + ".pcm");
     m_approachMovie = QString("gfx:mvi/approach/%1.mvi").arg(file.value("ApproachMovie").toString());
 
+    m_notebookShowSound.load("sfx:snd/desktop/noteb1.pcm");
+    m_notebookBackgroundSound.load("sfx:snd/desktop/noteback.pcm");
+    m_notebookHideSound.load("sfx:snd/desktop/noteb3.pcm");
+
     m_lblBackground.setTexture(m_background);
     setRootWidget(&m_lblBackground);
 
@@ -175,8 +179,10 @@ void Desktop::showNotebook()
     m_notebook.show();
     setRootWidget(&m_notebook);
 
-    m_notebookSound.load("sfx:snd/desktop/noteb1.pcm");
-    m_notebookSound.play();
+    m_backgroundSound.setVolume(0.3f);
+    m_notebookShowSound.play();
+    m_notebookBackgroundSound.playLoop();
+    m_notebookBackgroundSound.setVolume(0.033f);
 }
 
 
@@ -186,8 +192,9 @@ void Desktop::hideNotebook()
     m_notebook.hide();
     setRootWidget(&m_lblBackground);
 
-    m_notebookSound.load("sfx:snd/desktop/noteb3.pcm");
-    m_notebookSound.play();
+    m_notebookBackgroundSound.stop();
+    m_notebookHideSound.play();
+    m_backgroundSound.setVolume(1.0f);
 }
 
 
