@@ -75,7 +75,7 @@ Sound* SoundSystem::sound(StandardSound snd)
 }
 
 
-quint32 SoundSystem::acquire(Sound *sound)
+void SoundSystem::releaseUnused()
 {
     // stop all Sounds with stopped sources
     // this implicitly frees the sources
@@ -88,7 +88,12 @@ quint32 SoundSystem::acquire(Sound *sound)
         if (state == AL_STOPPED)
             it.value()->stop();
     }
+}
 
+
+quint32 SoundSystem::acquire(Sound *sound)
+{
+    releaseUnused();
     if (m_sources.size() == 32)
         return 0;
 
@@ -104,6 +109,22 @@ void SoundSystem::release(quint32 source)
     alSourceStop(source);
     alDeleteSources(1, &source);
     m_sources.remove(source);
+}
+
+
+void SoundSystem::pauseAll()
+{
+    releaseUnused();
+
+    foreach (Sound* sound, m_sources)
+        sound->pause();
+}
+
+
+void SoundSystem::resumeAll()
+{
+    foreach (Sound* sound, m_sources)
+        sound->resume();
 }
 
 

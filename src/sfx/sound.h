@@ -36,6 +36,8 @@ public:
     void stop();
     void play();
     void playLoop();
+    void pause();
+    void resume();
     void load(const QString &file, int rate = 0);
     void load(const QString &leftFile, const QString &rightFile);
     void setVolume(float volume);

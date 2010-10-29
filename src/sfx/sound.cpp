@@ -95,6 +95,24 @@ void Sound::playLoop()
 }
 
 
+void Sound::pause()
+{
+    if (m_source > 0)
+        alSourcePause(m_source);
+}
+
+
+void Sound::resume()
+{
+    if (m_source > 0) {
+        ALint state;
+        alGetSourcei(m_source, AL_SOURCE_STATE, &state);
+        if (state == AL_PAUSED)
+            alSourcePlay(m_source);
+    }
+}
+
+
 void Sound::load(const QString &file, int rate)
 {
     const QByteArray data = loadFile(file);

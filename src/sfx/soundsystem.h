@@ -52,12 +52,15 @@ public:
     Sound* sound(StandardSound);
     quint32 acquire(Sound* sound);
     void release(quint32 source);
+    void pauseAll();
+    void resumeAll();
 
 public:
     static SoundSystem *get() { Q_ASSERT(m_singleton); return m_singleton; }
 
 private:
     Q_DISABLE_COPY(SoundSystem);
+    void releaseUnused();
 
 private:
     static SoundSystem *m_singleton;
