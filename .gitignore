@@ -1,2 +1,5 @@
 /build*
 /CMakeLists.txt.user
+/Debug*
+/AD*
+*moc_*.cpp
