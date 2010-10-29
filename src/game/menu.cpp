@@ -25,7 +25,7 @@ namespace game {
 Menu::Menu() :
     m_rootWidget(NULL)
 {
-
+    m_clickSound.load("sfx:snd/desktop/click.pcm");
 }
 
 
@@ -47,7 +47,8 @@ void Menu::setRootWidget(ui::Widget *widget)
 void Menu::mousePressEvent(QMouseEvent *event)
 {
     if (m_rootWidget)
-        m_rootWidget->doMousePressEvent(screenToImage(event->pos()).toPoint(), event->button());
+        if (m_rootWidget->doMousePressEvent(screenToImage(event->pos()).toPoint(), event->button()))
+           m_clickSound.play();
 }
 
 

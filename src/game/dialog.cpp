@@ -37,6 +37,8 @@ Dialog::Dialog(int id, ui::Widget *parent) :
     m_fontBottom.load("gfx:fnt/dpsmamon.fnt", 0xff00a8d0, 0xff00a8d0, true);
     m_fontHighlight.load("gfx:fnt/dpsmamon.fnt", 0xff00e4f8, 0xff00e4f8, true);
 
+    m_woopSound.load("sfx:snd/desktop/woop.pcm");
+
     const QString baseName = QString("txt:dia/%1/%2").arg(id / 1000, 3, 10, QChar('0')).arg(id, 6, 10, QChar('0'));
 
     txt::DesFile file(baseName + ".des");
@@ -172,6 +174,7 @@ void Dialog::draw()
     const Entry &entry = m_entries[m_current];
 
     m_rect = QRect();
+    const Option *lastOption = m_option;
     m_option = NULL;
 
     m_fontTop.draw(m_strings[entry.text], QSize(width(), 36), false, true);
@@ -186,6 +189,8 @@ void Dialog::draw()
                 y += drawOption(y, &option);
         }
     }
+    if (m_option != NULL && m_option != lastOption)
+        m_woopSound.play();
 }
 
 
