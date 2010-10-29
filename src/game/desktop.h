@@ -43,6 +43,7 @@ public:
     ~Desktop();
 
 public:
+    void start();
     void draw();
     const QString &approachMovie() const { return m_approachMovie; }
 
@@ -78,6 +79,7 @@ private:
     ui::Button *m_btnQuit;
     QString m_approachMovie;
     MiniMovie m_miniMovie;
+    bool m_first;
 };
 
 

@@ -24,26 +24,27 @@
 namespace game {
 
 
-Notebook::Notebook()
+Notebook::Notebook() :
+    m_lblMoviePlayer(NULL)
 {
     const gfx::ColorTable colorTable("gfx:pal/notebook/notebook.pal");
     m_fontGreen.load("gfx:fnt/nfont1a.fnt", colorTable, true);
     m_fontYellow.load("gfx:fnt/nfont1b.fnt", colorTable, true);
-    gfx::Texture noteback(gfx::Image::load("gfx:img/desktop/notebook/noteback.img", colorTable));
+    m_background.fromImage(gfx::Image::load("gfx:img/desktop/notebook/noteback.img", colorTable));
 
     QImage image(640, 480, QImage::Format_Indexed8);
     image.fill(0);
     image.setColorTable(QVector<QRgb>() << qRgba(0, 0, 0, 128));
     setTexture(image);
 
-    ui::Label *labelBackground = new ui::Label(this);
-    labelBackground->setPosition(48, 48);
-    labelBackground->setTexture(gfx::Image::loadPCX("gfx:pic/notebook/notebook.pcx"));
+    m_lblBackground = new ui::Label(this);
+    m_lblBackground->setPosition(48, 48);
+    m_lblBackground->setTexture(gfx::Image::loadPCX("gfx:pic/notebook/notebook.pcx"));
 
     {
-        m_lblMain = new ui::Label(labelBackground);
+        m_lblMain = new ui::Label(m_lblBackground);
         m_lblMain->setPosition(162, 73);
-        m_lblMain->setTexture(noteback);
+        m_lblMain->setTexture(m_background);
 
         ui::Widget *widget;
 
@@ -69,9 +70,9 @@ Notebook::Notebook()
     }
 
     {
-        m_lblMissions = new ui::Label(labelBackground);
+        m_lblMissions = new ui::Label(m_lblBackground);
         m_lblMissions->setPosition(162, 73);
-        m_lblMissions->setTexture(noteback);
+        m_lblMissions->setTexture(m_background);
 
         ui::Widget *widget;
 
@@ -90,9 +91,9 @@ Notebook::Notebook()
     }
 
     {
-        m_lblOptions = new ui::Label(labelBackground);
+        m_lblOptions = new ui::Label(m_lblBackground);
         m_lblOptions->setPosition(162, 73);
-        m_lblOptions->setTexture(noteback);
+        m_lblOptions->setTexture(m_background);
 
         ui::Widget *widget;
 
@@ -109,6 +110,7 @@ Notebook::Notebook()
         widget = createButton(m_lblOptions, txt::Notebook_InputDevices, 150);
 
         widget = createButton(m_lblOptions, txt::Notebook_MoviePlayer, 170);
+        connect(widget, SIGNAL(clicked()), SLOT(showMoviePlayer()));
 
         widget = createButton(m_lblOptions, txt::Notebook_Back, 220);
         connect(widget, SIGNAL(clicked()), SLOT(hideOptions()));
@@ -117,9 +119,9 @@ Notebook::Notebook()
     }
 
     {
-        m_lblMovies = new ui::Label(labelBackground);
+        m_lblMovies = new ui::Label(m_lblBackground);
         m_lblMovies->setPosition(162, 73);
-        m_lblMovies->setTexture(noteback);
+        m_lblMovies->setTexture(m_background);
 
         ui::Widget *widget;
 
@@ -146,7 +148,7 @@ Notebook::Notebook()
     }
 
     {
-        m_lblMap = new ui::Label(labelBackground);
+        m_lblMap = new ui::Label(m_lblBackground);
         m_lblMap->setPosition(164, 75);
         m_lblMap->setTexture(gfx::Image::load(QString("gfx:pic/notebook/%1.r16").arg(Chapter::get()->area()->map()), 304, 284));
         m_lblMap->hide();
@@ -220,6 +222,50 @@ void Notebook::hideMovies()
 }
 
 
+void Notebook::showMoviePlayer()
+{
+    m_lblOptions->hide();
+
+    Q_ASSERT(!m_lblMoviePlayer);
+    m_lblMoviePlayer = new ui::Label(m_lblBackground);
+    m_lblMoviePlayer->setPosition(162, 73);
+    m_lblMoviePlayer->setTexture(m_background);
+
+    ui::Widget *widget;
+
+    widget = createLabel(m_lblMoviePlayer, txt::Notebook_MoviePlayer_Title, 10);
+    widget = createLabel(m_lblMoviePlayer, txt::Notebook_MoviePlayer_TitleLine, 20);
+
+    const QSet<int>& movies = Chapter::get()->playedMovies();
+    int y = 40;
+
+    foreach (int movie, movies) {
+        ui::Button *button = createButton(m_lblMoviePlayer, txt::String(txt::FirstMovie + movie), y);
+        button->setProperty("movie", movie);
+        connect(button, SIGNAL(clicked()), SLOT(playMovie()));
+        y += 10;
+    }
+
+    widget = createButton(m_lblMoviePlayer, txt::Notebook_Back, y + 10);
+    connect(widget, SIGNAL(clicked()), SLOT(hideMoviePlayer()));
+}
+
+
+void Notebook::hideMoviePlayer()
+{
+    Q_ASSERT(m_lblMoviePlayer);
+    delete m_lblMoviePlayer;
+    m_lblMoviePlayer = NULL;
+    m_lblOptions->show();
+}
+
+
+void Notebook::playMovie()
+{
+    Chapter::get()->playMovie(sender()->property("movie").toInt());
+}
+
+
 void Notebook::showMap()
 {
     m_lblMain->hide();
@@ -272,6 +318,10 @@ bool Notebook::mousePressEvent(const QPoint &pos, Qt::MouseButton button)
         }
         if (m_lblMovies->isVisible()) {
             hideMovies();
+            return true;
+        }
+        if (m_lblMoviePlayer && m_lblMoviePlayer->isVisible()) {
+            hideMoviePlayer();
             return true;
         }
         if (m_lblMain->isVisible()) {

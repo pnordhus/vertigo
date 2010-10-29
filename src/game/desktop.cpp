@@ -32,7 +32,8 @@ Desktop::Desktop(const QString &name) :
     m_dialog(NULL),
     m_enCom(NULL),
     m_departure(NULL),
-    m_miniMovie("gfx:mvi/desktop")
+    m_miniMovie("gfx:mvi/desktop"),
+    m_first(true)
 {
     const gfx::ColorTable colorTable("gfx:pal/gui/border.pal");
 
@@ -143,8 +144,12 @@ void Desktop::activate()
 {
     m_miniMovie.start();
     m_backgroundSound.playLoop();
-    m_nameSound.play();
-    checkEnCom();
+
+    if (m_first) {
+        m_first = false;
+        m_nameSound.play();
+        checkEnCom();
+    }
 }
 
 

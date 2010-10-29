@@ -62,6 +62,8 @@ public:
     bool movieAutopilot() const { return m_movieAutopilot; }
     bool movieApproach() const { return m_movieApproach; }
     bool movieHarbour() const { return m_movieHarbour; }
+    const QSet<int>& playedMovies() const { return m_playedMovies; }
+    void playMovie(int movie);
 
 private:
     void load(const QString &filename);

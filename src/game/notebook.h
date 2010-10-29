@@ -44,9 +44,12 @@ private slots:
     void hideOptions();
     void showMovies();
     void hideMovies();
+    void showMoviePlayer();
+    void hideMoviePlayer();
     void showMap();
     void hideMap();
     void updateMovies();
+    void playMovie();
 
 private:
     ui::Label* createLabel(ui::Widget *parent, txt::String text, float posY);
@@ -58,10 +61,13 @@ private:
 private:
     gfx::Font m_fontGreen;
     gfx::Font m_fontYellow;
+    gfx::Texture m_background;
+    ui::Label *m_lblBackground;
     ui::Label *m_lblMain;
     ui::Label *m_lblMissions;
     ui::Label *m_lblOptions;
     ui::Label *m_lblMovies;
+    ui::Label *m_lblMoviePlayer;
     ui::Label *m_lblMap;
     ui::Button *m_btnMoviesAutopilot;
     ui::Button *m_btnMoviesApproach;

@@ -16,6 +16,7 @@
  ***************************************************************************/
 
 #include "chapter.h"
+#include "sfx/soundsystem.h"
 #include "txt/desfile.h"
 #include <QDesktopServices>
 #include <QSettings>
@@ -214,11 +215,20 @@ void Chapter::setStation(int stationIndex)
 }
 
 
+void Chapter::playMovie(int movie)
+{
+    m_movies << QString("gfx:mvi/film/d%1.mvi").arg(movie, 2, 10, QChar('0'));
+    playMovies();
+}
+
+
 void Chapter::playMovies()
 {
     if (m_movies.isEmpty()) {
+        sfx::SoundSystem::get()->resumeAll();
         emit setRenderer(m_desktop);
     } else {
+        sfx::SoundSystem::get()->pauseAll();
         Q_ASSERT(m_movie == NULL);
         m_movie = new Movie;
         connect(m_movie, SIGNAL(finished()), SLOT(movieFinished()));
