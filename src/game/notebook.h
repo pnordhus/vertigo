@@ -42,8 +42,11 @@ private slots:
     void hideMissions();
     void showOptions();
     void hideOptions();
+    void showMovies();
+    void hideMovies();
     void showMap();
     void hideMap();
+    void updateMovies();
 
 private:
     ui::Label* createLabel(ui::Widget *parent, txt::String text, float posY);
@@ -58,7 +61,11 @@ private:
     ui::Label *m_lblMain;
     ui::Label *m_lblMissions;
     ui::Label *m_lblOptions;
+    ui::Label *m_lblMovies;
     ui::Label *m_lblMap;
+    ui::Button *m_btnMoviesAutopilot;
+    ui::Button *m_btnMoviesApproach;
+    ui::Button *m_btnMoviesHarbour;
 };
 
 

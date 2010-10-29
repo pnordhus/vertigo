@@ -104,6 +104,7 @@ Notebook::Notebook()
         widget = createButton(m_lblOptions, txt::Notebook_Graphics, 110);
 
         widget = createButton(m_lblOptions, txt::Notebook_Movies, 130);
+        connect(widget, SIGNAL(clicked()), SLOT(showMovies()));
 
         widget = createButton(m_lblOptions, txt::Notebook_InputDevices, 150);
 
@@ -113,6 +114,35 @@ Notebook::Notebook()
         connect(widget, SIGNAL(clicked()), SLOT(hideOptions()));
 
         m_lblOptions->hide();
+    }
+
+    {
+        m_lblMovies = new ui::Label(labelBackground);
+        m_lblMovies->setPosition(162, 73);
+        m_lblMovies->setTexture(noteback);
+
+        ui::Widget *widget;
+
+        widget = createLabel(m_lblMovies, txt::Notebook_Movies_Title, 30);
+        widget = createLabel(m_lblMovies, txt::Notebook_Movies_TitleLine, 40);
+
+        m_btnMoviesAutopilot = createButton(m_lblMovies, txt::Notebook_Movies_Autopilot_Yes, 90);
+        connect(m_btnMoviesAutopilot, SIGNAL(clicked()), Chapter::get(), SLOT(toggleMovieAutopilot()));
+        connect(m_btnMoviesAutopilot, SIGNAL(clicked()), SLOT(updateMovies()));
+
+        m_btnMoviesApproach = createButton(m_lblMovies, txt::Notebook_Movies_Approach_Yes, 110);
+        connect(m_btnMoviesApproach, SIGNAL(clicked()), Chapter::get(), SLOT(toggleMovieApproach()));
+        connect(m_btnMoviesApproach, SIGNAL(clicked()), SLOT(updateMovies()));
+
+        m_btnMoviesHarbour = createButton(m_lblMovies, txt::Notebook_Movies_Harbour_Yes, 130);
+        connect(m_btnMoviesHarbour, SIGNAL(clicked()), Chapter::get(), SLOT(toggleMovieHarbour()));
+        connect(m_btnMoviesHarbour, SIGNAL(clicked()), SLOT(updateMovies()));
+
+        widget = createButton(m_lblMovies, txt::Notebook_Back, 170);
+        connect(widget, SIGNAL(clicked()), SLOT(hideMovies()));
+
+        m_lblMovies->hide();
+        updateMovies();
     }
 
     {
@@ -176,6 +206,20 @@ void Notebook::hideOptions()
 }
 
 
+void Notebook::showMovies()
+{
+    m_lblOptions->hide();
+    m_lblMovies->show();
+}
+
+
+void Notebook::hideMovies()
+{
+    m_lblMovies->hide();
+    m_lblOptions->show();
+}
+
+
 void Notebook::showMap()
 {
     m_lblMain->hide();
@@ -187,6 +231,26 @@ void Notebook::hideMap()
 {
     m_lblMap->hide();
     m_lblMain->show();
+}
+
+
+
+void Notebook::updateMovies()
+{
+    txt::String autopilot = txt::Notebook_Movies_Autopilot_No;
+    if (Chapter::get()->movieAutopilot())
+        autopilot = txt::Notebook_Movies_Autopilot_Yes;
+    m_btnMoviesAutopilot->setText(txt::StringTable::get(autopilot));
+
+    txt::String approach = txt::Notebook_Movies_Approach_No;
+    if (Chapter::get()->movieApproach())
+        approach = txt::Notebook_Movies_Approach_Yes;
+    m_btnMoviesApproach->setText(txt::StringTable::get(approach));
+
+    txt::String harbour = txt::Notebook_Movies_Harbour_No;
+    if (Chapter::get()->movieHarbour())
+        harbour = txt::Notebook_Movies_Harbour_Yes;
+    m_btnMoviesHarbour->setText(txt::StringTable::get(harbour));
 }
 
 
@@ -204,6 +268,10 @@ bool Notebook::mousePressEvent(const QPoint &pos, Qt::MouseButton button)
         }
         if (m_lblOptions->isVisible()) {
             hideOptions();
+            return true;
+        }
+        if (m_lblMovies->isVisible()) {
+            hideMovies();
             return true;
         }
         if (m_lblMain->isVisible()) {

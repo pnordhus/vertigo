@@ -42,6 +42,9 @@ signals:
 
 public slots:
     void quit();
+    void toggleMovieAutopilot();
+    void toggleMovieApproach();
+    void toggleMovieHarbour();
 
 public:
     void save(int slot, const QString &name) const;
@@ -56,6 +59,9 @@ public:
     QList<Dialog*> dialogsEnCom(bool room);
     const QSet<int>& messages() const { return m_messages; }
     int numSmallTalks() const { return m_numSmallTalks; }
+    bool movieAutopilot() const { return m_movieAutopilot; }
+    bool movieApproach() const { return m_movieApproach; }
+    bool movieHarbour() const { return m_movieHarbour; }
 
 private:
     void load(const QString &filename);

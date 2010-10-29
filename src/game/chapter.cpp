@@ -335,4 +335,22 @@ void Chapter::addCredit(int credit)
 }
 
 
+void Chapter::toggleMovieAutopilot()
+{
+    m_movieAutopilot = !m_movieAutopilot;
+}
+
+
+void Chapter::toggleMovieApproach()
+{
+    m_movieApproach = !m_movieApproach;
+}
+
+
+void Chapter::toggleMovieHarbour()
+{
+    m_movieHarbour = !m_movieHarbour;
+}
+
+
 } // namespace game
