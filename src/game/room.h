@@ -73,6 +73,8 @@ private:
     sfx::Sound m_backgroundSound;
     sfx::Sound m_dockSound;
     QMap<int, Person*> m_persons;
+    Person* m_dockMan;
+    QString m_dockManName;
 };
 
 

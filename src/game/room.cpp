@@ -28,7 +28,8 @@ namespace game {
 Room::Room(int index, const QString &title, const QString &name) :
     m_index(index),
     m_miniMovie("gfx:mvi/room"),
-    m_name(name)
+    m_name(name),
+    m_dockMan(NULL)
 {
     txt::DesFile file("dat:world/" + name + ".des");
     file.setSection("Room");
@@ -82,6 +83,22 @@ Room::Room(int index, const QString &title, const QString &name) :
         personId++;
     }
 
+    file.setSection("DockMan");
+    if (!file.contains("Name"))
+        file.setSection("WeaponMan");
+    if (file.contains("Name"))
+    {
+        Person *person = new Person;
+
+        person->arrow = new ui::Arrow(file.value("Arrow").toString(), QPoint(file.value("X").toInt(), file.value("Y").toInt()), false, m_backgroundLabel);
+        person->arrow->hide();
+        connect(person->arrow, SIGNAL(clicked(int)), SLOT(startDialog(int)));
+
+        m_persons.insert(20, person);
+        m_dockMan = person;
+        m_dockManName = file.value("Name").toString();
+    }
+
     restart();
 }
 
@@ -114,6 +131,13 @@ void Room::restart()
         person->arrow->show();
         person->arrow->setText(dialog->name());
         person->arrow->setValue(dialog->id());
+    }
+
+    if (m_dockMan && !m_dockMan->arrow->isVisible())
+    {
+        m_dockMan->arrow->show();
+        m_dockMan->arrow->setText(m_dockManName);
+        m_dockMan->arrow->setValue(0);
     }
 
     dialogs = Chapter::get()->dialogsEnCom(true);
@@ -156,7 +180,8 @@ void Room::showDock()
 
 void Room::startDialog(int dialogId)
 {
-    emit startDialog(Chapter::get()->dialog(dialogId));
+    if (dialogId > 0)
+        emit startDialog(Chapter::get()->dialog(dialogId));
 }
 
 
