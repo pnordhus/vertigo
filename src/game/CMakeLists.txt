@@ -1,6 +1,8 @@
 set(SOURCES
     area.cpp
     area.h
+    briefing.cpp
+    briefing.h
     chapter.cpp
     chapter.h
     departure.cpp
@@ -39,6 +41,7 @@ set(SOURCES
 )
 
 set(MOC_SOURCES
+    briefing.h
     chapter.h
     departure.h
     desktop.h
