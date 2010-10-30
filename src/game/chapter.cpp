@@ -30,6 +30,7 @@ Chapter *Chapter::m_singleton = NULL;
 
 
 Chapter::Chapter() :
+    m_code(-1),
     m_area(NULL),
     m_desktop(NULL),
     m_briefing(NULL),
@@ -75,6 +76,12 @@ Chapter::~Chapter()
 
 void Chapter::loadChapter(int chapter)
 {
+    if (m_code != -1) {
+        m_tasksFile.setSection(QString("localtask_%1").arg(m_code));
+        foreach (const QString &key, m_tasksFile.keys().filter(QRegExp("^task\\d*")))
+            m_runningTasks.removeAll(m_tasksFile.value(key).toInt());
+    }
+
     load(QString("dat:story/ch%1.des").arg(chapter));
 }
 
@@ -125,7 +132,7 @@ void Chapter::load(const QString &filename)
         addDialog(file.value(key).toInt());
 
     file.setSection("successmissions");
-    if (file.value("clearmissions").toBool())
+    if (file.value("clearmissions").toString().toLower() == "yes")
         m_successfulMissions.clear();
     foreach (const QString &key, file.keys().filter(QRegExp("^mission\\d*")))
         m_successfulMissions.append(file.value(key).toString());
@@ -135,13 +142,13 @@ void Chapter::load(const QString &filename)
         addMission(file.value(key).toString(), -1);
 
     file.setSection("runningtasks");
-    if (file.value("cleartasks").toBool())
+    if (file.value("cleartasks").toString().toLower() == "yes")
         m_runningTasks.clear();
     foreach (const QString &key, file.keys().filter(QRegExp("^task\\d*")))
         addTask(file.value(key).toInt());
 
     file.setSection("messageboard");
-    if (file.value("clearboard").toBool())
+    if (file.value("clearboard").toString().toLower() == "yes")
         m_messages.clear();
     foreach (const QString &key, file.keys().filter(QRegExp("^message\\d*")))
         addMessage(file.value(key).toInt());
