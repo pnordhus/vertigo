@@ -20,7 +20,6 @@
 #include "gfx/image.h"
 #include "txt/stringtable.h"
 #include "ui/button.h"
-#include <QApplication>
 #include <QGLContext>
 #include <QKeyEvent>
 
@@ -85,7 +84,7 @@ MainMenu::MainMenu(bool skipToTitle) :
     button->setWidth(640);
     button->setAlignment(ui::Label::AlignHCenter);
     button->setText(txt::StringTable::get(txt::MainMenu_QuitGame));
-    connect(button, SIGNAL(clicked()), qApp, SLOT(quit()));
+    connect(button, SIGNAL(clicked()), SIGNAL(quit()));
 
     if (skipToTitle)
         changeState(Title);

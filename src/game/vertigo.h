@@ -51,6 +51,9 @@ private slots:
     void introFinished();
 
 private:
+    void createMainMenu(bool skipToTitle);
+
+private:
     Window *m_window;
     MainMenu *m_mainMenu;
     Movie *m_intro;

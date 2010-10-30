@@ -75,10 +75,7 @@ bool Vertigo::start()
     m_window = new Window;
     m_fontManager = new gfx::FontManager;
 
-    m_mainMenu = new MainMenu(false);
-    connect(m_mainMenu, SIGNAL(startGame()), SLOT(startGame()));
-
-    m_window->setRenderer(m_mainMenu);
+    createMainMenu(false);
 
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), SLOT(update()));
@@ -86,6 +83,16 @@ bool Vertigo::start()
 
     m_window->show();
     return true;
+}
+
+
+void Vertigo::createMainMenu(bool skipToTitle)
+{
+    Q_ASSERT(!m_mainMenu);
+    m_mainMenu = new MainMenu(skipToTitle);
+    connect(m_mainMenu, SIGNAL(startGame()), SLOT(startGame()));
+    connect(m_mainMenu, SIGNAL(quit()), m_window, SLOT(close()));
+    m_window->setRenderer(m_mainMenu);
 }
 
 
@@ -113,10 +120,7 @@ void Vertigo::endGame()
 {
     m_chapter->deleteLater();
     m_chapter = NULL;
-    Q_ASSERT(m_mainMenu == NULL);
-    m_mainMenu = new MainMenu(true);
-    connect(m_mainMenu, SIGNAL(startGame()), SLOT(startGame()));
-    m_window->setRenderer(m_mainMenu);
+    createMainMenu(true);
 }
 
 

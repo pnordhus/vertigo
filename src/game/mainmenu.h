@@ -40,6 +40,7 @@ public:
 
 signals:
     void startGame();
+    void quit();
 
 private:
     void activate();
