@@ -40,7 +40,13 @@ public:
 
 signals:
     void startGame();
+    void loadGame(int);
     void quit();
+
+private slots:
+    void showLoad();
+    void hideLoad();
+    void loadGame();
 
 private:
     void activate();
@@ -52,6 +58,8 @@ private:
     State m_state;
     ui::Label m_presents;
     ui::Label m_title;
+    ui::Label *m_lblMain;
+    ui::Label *m_lblLoad;
     sfx::Sound m_backgroundSound;
 };
 

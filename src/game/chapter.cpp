@@ -19,6 +19,7 @@
 #include "sfx/soundsystem.h"
 #include "txt/desfile.h"
 #include <QDesktopServices>
+#include <QDir>
 #include <QSettings>
 
 
@@ -114,11 +115,30 @@ void Chapter::load(const QString &filename)
 
         if (station.shortName() == startStation)
             startStationIndex = station.index();
+
+        foreach (const QString &key, file.keys().filter(QRegExp("^mission\\d*")))
+            addMission(file.value(key).toString(), station.index());
     }
 
     file.setSection("pendingdialogues");
     foreach (const QString &key, file.keys().filter(QRegExp("^dialogue\\d*")))
         addDialog(file.value(key).toInt());
+
+    file.setSection("successmissions");
+    if (file.value("clearmissions").toBool())
+        m_successfulMissions.clear();
+    foreach (const QString &key, file.keys().filter(QRegExp("^mission\\d*")))
+        m_successfulMissions.append(file.value(key).toString());
+
+    file.setSection("area2");
+    foreach (const QString &key, file.keys().filter(QRegExp("^mission\\d*")))
+        addMission(file.value(key).toString(), -1);
+
+    file.setSection("runningtasks");
+    if (file.value("cleartasks").toBool())
+        m_runningTasks.clear();
+    foreach (const QString &key, file.keys().filter(QRegExp("^task\\d*")))
+        addTask(file.value(key).toInt());
 
     file.setSection("messageboard");
     if (file.value("clearboard").toBool())
@@ -166,13 +186,21 @@ void Chapter::save(int slot, const QString &name) const
 
     file.setSection("runningtasks");
     file.setValue("cleartasks", "yes");
+    i = 1;
+    foreach (int task, m_runningTasks)
+        file.setValue(QString("task%1").arg(i++), task);
 
     file.setSection("messageboard");
     file.setValue("clearboard", "yes");
     i = 1;
-    foreach (int message, m_messages) {
+    foreach (int message, m_messages)
         file.setValue(QString("message%1").arg(i++), message);
-    }
+
+    file.setSection("successmissions");
+    file.setValue("clearmissions", "yes");
+    i = 1;
+    foreach (const QString &mission, m_successfulMissions)
+        file.setValue(QString("mission%1").arg(i++), mission);
 
     QMapIterator<int, QString> it(m_approachMovieReplacement);
     while (it.hasNext()) {
@@ -186,6 +214,17 @@ void Chapter::save(int slot, const QString &name) const
     foreach (const Station &station, m_stations) {
         if (!station.isEnabled())
             file.setValue(QString("station%1").arg(i++), station.index());
+    }
+
+    i = 1;
+    foreach (const Mission *mission, m_missions) {
+        if (mission->station() == -1) {
+            file.setSection("area2");
+            file.setValue(QString("mission%1").arg(i++), mission->shortName());
+        } else {
+            file.setSection(QString("station%1").arg(mission->station()));
+            file.setValue("mission1", mission->shortName());
+        }
     }
 
     file.setSection("movies");
@@ -493,6 +532,28 @@ QList<Task> Chapter::tasks()
     foreach (int id, m_runningTasks)
         t.append(Task(m_tasksFile.value(QString("Task_%1").arg(id)).toString()));
     return t;
+}
+
+
+QMap<int, QString> Chapter::savedGames()
+{
+    QMap<int, QString> saves;
+
+    const QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+    QDir dir(path);
+    QRegExp reg("save(\\d*)\\.des");
+    foreach (const QString &save, dir.entryList()) {
+        if (reg.indexIn(save) >= 0) {
+            const QString filename = dir.filePath(save);
+            const int id = reg.cap(1).toInt();
+
+            txt::DesFile file(filename);
+            const QString name = file.value("name").toString();
+            saves.insert(id, name);
+        }
+    }
+
+    return saves;
 }
 
 

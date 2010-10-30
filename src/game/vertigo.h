@@ -47,11 +47,13 @@ public:
 private slots:
     void update();
     void startGame();
+    void loadGame(int);
     void endGame();
     void introFinished();
 
 private:
     void createMainMenu(bool skipToTitle);
+    void createChapter();
 
 private:
     Window *m_window;

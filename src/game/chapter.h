@@ -96,6 +96,7 @@ private slots:
 
 public:
     static Chapter* get() { Q_ASSERT(m_singleton); return m_singleton; }
+    static QMap<int, QString> savedGames();
 
 private:
     int m_code;

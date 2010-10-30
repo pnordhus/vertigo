@@ -15,6 +15,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
+#include "chapter.h"
 #include "mainmenu.h"
 #include "gfx/colortable.h"
 #include "gfx/image.h"
@@ -28,7 +29,8 @@ namespace game {
 
 
 MainMenu::MainMenu(bool skipToTitle) :
-    m_state(Invalid)
+    m_state(Invalid),
+    m_lblLoad(NULL)
 {
     const gfx::ColorTable colorTable("gfx:pal/gui/border.pal");
 
@@ -62,29 +64,34 @@ MainMenu::MainMenu(bool skipToTitle) :
     label->setTexture(texBar);
     label->setPosition(140, 448);
 
-    ui::Button *button;
-    button = new ui::Button(&m_title);
-    button->setFont(fontLarge);
-    button->setPosition(0, 288);
-    button->setWidth(640);
-    button->setAlignment(ui::Label::AlignHCenter);
-    button->setText(txt::StringTable::get(txt::MainMenu_NewGame));
-    connect(button, SIGNAL(clicked()), SIGNAL(startGame()));
+    {
+        m_lblMain = new ui::Label(&m_title);
 
-    button = new ui::Button(&m_title);
-    button->setFont(fontLarge);
-    button->setPosition(0, 308);
-    button->setWidth(640);
-    button->setAlignment(ui::Label::AlignHCenter);
-    button->setText(txt::StringTable::get(txt::MainMenu_Load));
+        ui::Button *button;
+        button = new ui::Button(m_lblMain);
+        button->setFont(fontLarge);
+        button->setPosition(0, 288);
+        button->setWidth(640);
+        button->setAlignment(ui::Label::AlignHCenter);
+        button->setText(txt::StringTable::get(txt::MainMenu_NewGame));
+        connect(button, SIGNAL(clicked()), SIGNAL(startGame()));
 
-    button = new ui::Button(&m_title);
-    button->setFont(fontLarge);
-    button->setPosition(0, 408);
-    button->setWidth(640);
-    button->setAlignment(ui::Label::AlignHCenter);
-    button->setText(txt::StringTable::get(txt::MainMenu_QuitGame));
-    connect(button, SIGNAL(clicked()), SIGNAL(quit()));
+        button = new ui::Button(m_lblMain);
+        button->setFont(fontLarge);
+        button->setPosition(0, 308);
+        button->setWidth(640);
+        button->setAlignment(ui::Label::AlignHCenter);
+        button->setText(txt::StringTable::get(txt::MainMenu_Load));
+        connect(button, SIGNAL(clicked()), SLOT(showLoad()));
+
+        button = new ui::Button(m_lblMain);
+        button->setFont(fontLarge);
+        button->setPosition(0, 408);
+        button->setWidth(640);
+        button->setAlignment(ui::Label::AlignHCenter);
+        button->setText(txt::StringTable::get(txt::MainMenu_QuitGame));
+        connect(button, SIGNAL(clicked()), SIGNAL(quit()));
+    }
 
     if (skipToTitle)
         changeState(Title);
@@ -136,6 +143,59 @@ void MainMenu::mousePressEvent(QMouseEvent *event)
     default:
         ; // nothing to do
     }
+
+    if (event->button() == Qt::RightButton) {
+        if (m_lblLoad && m_lblLoad->isVisible())
+            hideLoad();
+    }
+}
+
+
+void MainMenu::showLoad()
+{
+    m_lblMain->hide();
+
+    Q_ASSERT(!m_lblLoad);
+    m_lblLoad = new ui::Label(&m_title);
+
+    int y = 282;
+    QMapIterator<int, QString> it(Chapter::savedGames());
+    while (it.hasNext()) {
+        it.next();
+
+        ui::Button *button = new ui::Button(m_lblLoad);
+        button->setPosition(0, y);
+        button->setWidth(640);
+        button->setAlignment(ui::Button::AlignHCenter);
+        button->setFont(gfx::Font::Large);
+        button->setText(it.value());
+        button->setProperty("id", it.key());
+        connect(button, SIGNAL(clicked()), SLOT(loadGame()));
+        y += 20;
+    }
+
+    ui::Button *button = new ui::Button(m_lblLoad);
+    button->setPosition(0, 428);
+    button->setWidth(640);
+    button->setAlignment(ui::Button::AlignHCenter);
+    button->setFont(gfx::Font::Large);
+    button->setText(txt::StringTable::get(txt::MainMenu));
+    connect(button, SIGNAL(clicked()), SLOT(hideLoad()));
+}
+
+
+void MainMenu::hideLoad()
+{
+    Q_ASSERT(m_lblLoad);
+    m_lblLoad->deleteLater();
+    m_lblLoad = NULL;
+    m_lblMain->show();
+}
+
+
+void MainMenu::loadGame()
+{
+    emit loadGame(sender()->property("id").toInt());
 }
 
 
