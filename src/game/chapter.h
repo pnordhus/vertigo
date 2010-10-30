@@ -20,11 +20,12 @@
 
 
 #include "area.h"
+#include "briefing.h"
 #include "desktop.h"
 #include "dialog.h"
 #include "mission.h"
 #include "movie.h"
-#include "briefing.h"
+#include "task.h"
 
 
 namespace game {
@@ -70,6 +71,7 @@ public:
     const QStringList& successfulMissions() const { return m_successfulMissions; }
     void startMission(const QString &name);
     const Mission* mission() const { return m_mission; }
+    QList<Task> tasks();
 
 private:
     void load(const QString &filename);
@@ -110,7 +112,7 @@ private:
     QMap<int, Dialog*> m_pendingDialogues;
     static Chapter *m_singleton;
     QSet<int> m_messages;
-    QList<int> m_tasks;
+    QList<int> m_runningTasks;
     QList<Mission*> m_missions;
     QStringList m_successfulMissions;
     int m_credits;
@@ -119,6 +121,7 @@ private:
     bool m_movieApproach;
     bool m_movieHarbour;
     Mission *m_mission;
+    txt::DesFile m_tasksFile;
 };
 
 

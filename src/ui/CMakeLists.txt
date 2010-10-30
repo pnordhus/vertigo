@@ -7,6 +7,8 @@ set(SOURCES
     frame.h
     label.cpp
     label.h
+    list.cpp
+    list.h
     widget.cpp
     widget.h
 )

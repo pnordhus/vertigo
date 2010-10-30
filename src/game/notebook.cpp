@@ -19,12 +19,14 @@
 #include "notebook.h"
 #include "gfx/colortable.h"
 #include "gfx/image.h"
+#include "ui/list.h"
 
 
 namespace game {
 
 
 Notebook::Notebook() :
+    m_lblMissions(NULL),
     m_lblMoviePlayer(NULL)
 {
     const gfx::ColorTable colorTable("gfx:pal/notebook/notebook.pal");
@@ -67,27 +69,6 @@ Notebook::Notebook() :
 
         widget = createButton(m_lblMain, txt::Notebook_QuitGame, 210);
         connect(widget, SIGNAL(clicked()), Chapter::get(), SLOT(quit()));
-    }
-
-    {
-        m_lblMissions = new ui::Label(m_lblBackground);
-        m_lblMissions->setPosition(162, 73);
-        m_lblMissions->setTexture(m_background);
-
-        ui::Widget *widget;
-
-        widget = createLabel(m_lblMissions, txt::Notebook_Missions_Title, 10);
-        widget = createLabel(m_lblMissions, txt::Notebook_Missions_TitleLine, 20);
-
-        widget = createLabel(m_lblMissions, txt::Notebook_Missions_TitleLine, 20);
-
-        ui::Button *button = new ui::Button(m_lblMissions);
-        button->setFont(m_fontGreen);
-        button->setText(txt::StringTable::get(txt::Notebook_Back));
-        button->setPosition(180, 270);
-        connect(button, SIGNAL(clicked()), SLOT(hideMissions()));
-
-        m_lblMissions->hide();
     }
 
     {
@@ -183,13 +164,56 @@ ui::Button* Notebook::createButton(ui::Widget *parent, txt::String text, float p
 void Notebook::showMissions()
 {
     m_lblMain->hide();
-    m_lblMissions->show();
+
+    Q_ASSERT(!m_lblMissions);
+    m_lblMissions = new ui::Label(m_lblBackground);
+    m_lblMissions->setPosition(162, 73);
+    m_lblMissions->setTexture(m_background);
+
+    ui::Widget *widget;
+
+    widget = createLabel(m_lblMissions, txt::Notebook_Missions_Title, 10);
+    widget = createLabel(m_lblMissions, txt::Notebook_Missions_TitleLine, 20);
+
+    QStringList tasks;
+    foreach (const Task &task, Chapter::get()->tasks()) {
+        switch (task.type()) {
+        case Task::Tip:
+            tasks.append(txt::StringTable::get(txt::Notebook_Tip));
+            break;
+
+        case Task::Job:
+            tasks.append(txt::StringTable::get(txt::Notebook_Job));
+            break;
+
+        case Task::Mission:
+            tasks.append(txt::StringTable::get(txt::Notebook_Mission));
+            break;
+        }
+
+        tasks.append(task.text());
+        tasks.append("");
+    }
+
+    ui::List *list = new ui::List(m_lblMissions);
+    list->setFont(m_fontYellow);
+    list->setPosition(0, 50);
+    list->setSize(304, 220);
+    list->setText(tasks);
+
+    ui::Button *button = new ui::Button(m_lblMissions);
+    button->setFont(m_fontGreen);
+    button->setText(txt::StringTable::get(txt::Notebook_Back));
+    button->setPosition(180, 270);
+    connect(button, SIGNAL(clicked()), SLOT(hideMissions()));
 }
 
 
 void Notebook::hideMissions()
 {
-    m_lblMissions->hide();
+    Q_ASSERT(m_lblMissions);
+    m_lblMissions->deleteLater();
+    m_lblMissions = NULL;
     m_lblMain->show();
 }
 
@@ -254,7 +278,7 @@ void Notebook::showMoviePlayer()
 void Notebook::hideMoviePlayer()
 {
     Q_ASSERT(m_lblMoviePlayer);
-    delete m_lblMoviePlayer;
+    m_lblMoviePlayer->deleteLater();
     m_lblMoviePlayer = NULL;
     m_lblOptions->show();
 }
@@ -308,7 +332,7 @@ bool Notebook::mousePressEvent(const QPoint &pos, Qt::MouseButton button)
     }
 
     if (button == Qt::RightButton) {
-        if (m_lblMissions->isVisible()) {
+        if (m_lblMissions && m_lblMissions->isVisible()) {
             hideMissions();
             return true;
         }

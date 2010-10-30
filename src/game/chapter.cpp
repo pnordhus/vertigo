@@ -46,6 +46,8 @@ Chapter::Chapter() :
     m_movieApproach = s.value("approach", true).toBool();
     m_movieHarbour = s.value("harbour", true).toBool();
     s.endGroup();
+
+    m_tasksFile.load("dat:story/tasks.des");
 }
 
 
@@ -402,13 +404,13 @@ void Chapter::addMessage(int message)
 
 void Chapter::addTask(int task)
 {
-    m_tasks.append(task);
+    m_runningTasks.append(task);
 }
 
 
 void Chapter::removeTask(int task)
 {
-    m_tasks.removeAll(task);
+    m_runningTasks.removeAll(task);
 }
 
 
@@ -481,6 +483,16 @@ void Chapter::toggleMovieApproach()
 void Chapter::toggleMovieHarbour()
 {
     m_movieHarbour = !m_movieHarbour;
+}
+
+
+QList<Task> Chapter::tasks()
+{
+    m_tasksFile.setSection("Task");
+    QList<Task> t;
+    foreach (int id, m_runningTasks)
+        t.append(Task(m_tasksFile.value(QString("Task_%1").arg(id)).toString()));
+    return t;
 }
 
 
