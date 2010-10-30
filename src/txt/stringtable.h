@@ -220,15 +220,111 @@ enum String
     Text190,
 };
 
+enum StringFight
+{
+    Briefing_Targets,
+    Briefing_TargetsLine,
+    Briefing_Hints,
+    Briefing_HintsLine,
+    Briefing_PressAnyKey,
+    Fight5,
+    Fight6,
+    Fight7,
+    Fight8,
+    Fight9,
+    Fight10,
+    Fight11,
+    Fight12,
+    Fight13,
+    Fight14,
+    Fight15,
+    Fight16,
+    Fight17,
+    Fight18,
+    Fight19,
+    Fight20,
+    Fight21,
+    Fight22,
+    Fight23,
+    Fight24,
+    Fight25,
+    Fight26,
+    Fight27,
+    Fight28,
+    Fight29,
+    Fight30,
+    Fight31,
+    Fight32,
+    Fight33,
+    Fight34,
+    Fight35,
+    Fight36,
+    Fight37,
+    Fight38,
+    Fight39,
+    Fight40,
+    Fight41,
+    Fight42,
+    Fight43,
+    Fight44,
+    Fight45,
+    Fight46,
+    Fight47,
+    Fight48,
+    Fight49,
+    Fight50,
+    Fight51,
+    Fight52,
+    Fight53,
+    Fight54,
+    Fight55,
+    Fight56,
+    Fight57,
+    Fight58,
+    Fight59,
+    Fight60,
+    Fight61,
+    Fight62,
+    Fight63,
+    Fight64,
+    Fight65,
+    Fight66,
+    Fight67,
+    Fight68,
+    Fight69,
+    Fight70,
+    Fight71,
+    Fight72,
+    Fight73,
+    Fight74,
+    Fight75,
+    Fight76,
+    Fight77,
+    Fight78,
+    Fight79,
+    Fight80,
+    Fight81,
+    Fight82,
+    Fight83,
+    Fight84,
+    Fight85,
+    Fight86,
+    Fight87,
+    Fight88,
+    Fight89,
+};
+
 
 class StringTable
 {
 public:
     static bool load();
     static QString get(String string);
+    static QString get(StringFight string);
 
 private:
-    static QStringList m_table;
+    static QStringList m_tableDesktop;
+    static QStringList m_tableFight;
 };
 
 

@@ -44,8 +44,12 @@ private:
     void keyPressEvent(QKeyEvent *);
 
 private:
-    ui::Label m_background;
+    gfx::Font m_font;
     sfx::Sound m_backgroundSound;
+    ui::Label m_background;
+    ui::Label *m_lblMain;
+    ui::Label *m_lblMap;
+    ui::Label *m_lblArrow;
 };
 
 

@@ -69,6 +69,7 @@ public:
     const QList<Mission*>& missions() const { return m_missions; }
     const QStringList& successfulMissions() const { return m_successfulMissions; }
     void startMission(const QString &name);
+    const Mission* mission() const { return m_mission; }
 
 private:
     void load(const QString &filename);
