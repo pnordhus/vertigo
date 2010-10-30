@@ -202,6 +202,7 @@ void Dialog::select()
     }
 
     m_option = NULL;
+    m_rect = QRect();
 }
 
 
