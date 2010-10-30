@@ -39,7 +39,7 @@ public:
 
 public:
     static Image load(const QString &filename, const QVector<QRgb> &colorTable = QVector<QRgb>());
-    static Image load(const QString &filename, int w, int h);
+    static Image load(const QString &filename, int w, int h, bool colorKey = false);
     static Image load(QIODevice *device, Type type, const QVector<QRgb> &colorTable);
     static Image loadPCX(const QString &filename);
     static QCursor loadCursor(const QString &filename, const QVector<QRgb> &colorTable);

@@ -24,6 +24,7 @@
 #include "dialog.h"
 #include "mission.h"
 #include "movie.h"
+#include "briefing.h"
 
 
 namespace game {
@@ -68,6 +69,7 @@ public:
     const QList<Mission*>& missions() const { return m_missions; }
     const QStringList& successfulMissions() const { return m_successfulMissions; }
     void startMission(const QString &name);
+    const Mission* mission() const { return m_mission; }
 
 private:
     void load(const QString &filename);
@@ -88,6 +90,7 @@ private slots:
     void disableStation(int station);
     void addMission(const QString &mission, int station);
     void replaceApproachMovie(int station, const QString &movie);
+    void finishMission();
 
 public:
     static Chapter* get() { Q_ASSERT(m_singleton); return m_singleton; }
@@ -96,6 +99,7 @@ private:
     int m_code;
     Area *m_area;
     Desktop *m_desktop;
+    Briefing *m_briefing;
     Movie *m_movie;
     QStringList m_movies;
     QMap<int, QString> m_approachMovieReplacement;

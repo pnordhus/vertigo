@@ -15,29 +15,58 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "mission.h"
-#include "txt/desfile.h"
+#ifndef GAME_BRIEFING_H
+#define GAME_BRIEFING_H
+
+
+#include "menu.h"
+#include "gfx/texture.h"
+#include "sfx/sound.h"
+#include "ui/label.h"
+#include <QTime>
 
 
 namespace game {
 
 
-Mission::Mission(const QString &name, int station) :
-    m_shortName(name),
-    m_station(station)
+class Briefing : public Menu
 {
-    txt::DesFile file(QString("dat:mission/%1.des").arg(name));
-    file.setSection("areamap");
-    m_name = file.value("name").toString();
-    m_pos = QPoint(file.value("X").toInt(), file.value("Y").toInt());
+    Q_OBJECT
 
-    file.setSection("B");
-    m_textB = file.value("{text}").toStringList();
-    file.setSection("P");
-    m_textP = file.value("{text}").toStringList();
-    file.setSection("S");
-    m_textS = file.value("{text}").toStringList();
-}
+private:
+    enum State { Init, Text, Targets, Hints, Arrow, PressKey };
+
+public:
+    Briefing();
+
+signals:
+    void startEngine();
+
+private:
+    void activate();
+    void deactivate();
+    void draw();
+    void keyPressEvent(QKeyEvent *);
+
+private:
+    gfx::Font m_font;
+    sfx::Sound m_backgroundSound;
+    sfx::Sound m_openSound;
+    sfx::Sound m_woopSound;
+    ui::Label m_background;
+    ui::Label *m_lblMain;
+    ui::Label *m_lblMap;
+    ui::Label *m_lblArrow;
+    ui::Label *m_lblPressKey;
+
+    QTime m_time;
+    State m_state;
+    bool m_toggleState;
+    int m_nextLine;
+};
 
 
 } // namespace game
+
+
+#endif // GAME_BRIEFING_H

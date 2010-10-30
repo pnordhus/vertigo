@@ -66,7 +66,7 @@ Image Image::load(const QString &filename, const QVector<QRgb> &colorTable)
 }
 
 
-Image Image::load(const QString &filename, int w, int h)
+Image Image::load(const QString &filename, int w, int h, bool colorKey)
 {
     QFile file(filename);
     file.open(QFile::ReadOnly);
@@ -74,7 +74,7 @@ Image Image::load(const QString &filename, int w, int h)
     QDataStream stream(&file);
     stream.setByteOrder(QDataStream::LittleEndian);
 
-    QImage image(w, h, QImage::Format_RGB888);
+    QImage image(w, h, colorKey ? QImage::Format_ARGB32 : QImage::Format_RGB888);
 
     for (int y = 0; y < h; y++) {
         for (int x = 0; x < w; x++) {
@@ -84,7 +84,10 @@ Image Image::load(const QString &filename, int w, int h)
             const quint8 r = (value >> 8) & 0xf8;
             const quint8 g = (value >> 3) & 0xfc;
             const quint8 b = (value << 3) & 0xf8;
-            image.setPixel(x, y, qRgb(r, g, b));
+            if (colorKey && r == 0 && g == 0 && b == 0)
+                image.setPixel(x, y, qRgba(0,0,0,0));
+            else
+                image.setPixel(x, y, qRgb(r, g, b));
         }
     }
 

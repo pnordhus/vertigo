@@ -37,6 +37,15 @@ DesFile::DesFile(const QString &filename)
 }
 
 
+QString trimEnd(const QString& str)
+{
+    int i;
+    for (i = str.length() - 1; i >= 0 && str[i].isSpace(); i--);
+    QString res = str;
+    res.truncate(i + 1);
+    return res;
+}
+
 bool DesFile::load(const QString &filename)
 {
     m_sections.clear();
@@ -60,12 +69,23 @@ bool DesFile::load(const QString &filename)
             if (!key.startsWith(";"))
                 setValue(key, regKey.cap(2).trimmed());
         }
+
+        if (line.trimmed() == "{")
+        {
+            QStringList text;
+            QString textLine = trimEnd(file.readLine());
+            while (!file.atEnd() && textLine != "}")
+            {
+                text.append(textLine);
+                textLine = trimEnd(file.readLine());
+            }
+            setValue("{text}", text);
+        }
     }
 
     setSection("Global");
     return true;
 }
-
 
 bool DesFile::save(const QString &filename) const
 {

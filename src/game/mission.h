@@ -20,6 +20,8 @@
 
 
 #include <QString>
+#include <QPoint>
+#include <QStringList>
 
 
 namespace game {
@@ -34,11 +36,19 @@ public:
     const QString& shortName() const { return m_shortName; }
     const QString& name() const { return m_name; }
     int station() const { return m_station; }
+    const QPoint& pos() const { return m_pos; }
+    const QStringList& textB() const { return m_textB; }
+    const QStringList& textP() const { return m_textP; }
+    const QStringList& textS() const { return m_textS; }
 
 private:
     QString m_shortName;
     QString m_name;
     int m_station;
+    QPoint m_pos;
+    QStringList m_textB;
+    QStringList m_textP;
+    QStringList m_textS;
 };
 
 

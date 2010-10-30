@@ -22,7 +22,8 @@
 namespace txt {
 
 
-QStringList StringTable::m_table;
+QStringList StringTable::m_tableDesktop;
+QStringList StringTable::m_tableFight;
 
 
 bool StringTable::load()
@@ -38,7 +39,18 @@ bool StringTable::load()
         if (!fileDes.contains(key))
             break;
 
-        m_table.append(fileDes.value(key).toString());
+        m_tableDesktop.append(fileDes.value(key).toString());
+    }
+
+    fileDes.load("txt:fightext.des");
+    fileDes.setSection("Text");
+
+    for (int i = 0; ; i++) {
+        const QString key = QString("Text%1").arg(i);
+        if (!fileDes.contains(key))
+            break;
+
+        m_tableFight.append(fileDes.value(key).toString());
     }
 
     return true;
@@ -47,7 +59,12 @@ bool StringTable::load()
 
 QString StringTable::get(String string)
 {
-    return m_table.at(string);
+    return m_tableDesktop.at(string);
+}
+
+QString StringTable::get(StringFight string)
+{
+    return m_tableFight.at(string);
 }
 
 
