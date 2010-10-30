@@ -20,6 +20,7 @@
 #include "gfx/colortable.h"
 #include "gfx/image.h"
 #include "txt/stringtable.h"
+#include "sfx/soundsystem.h"
 #include <QApplication>
 #include <QGLContext>
 #include <QKeyEvent>
@@ -28,7 +29,9 @@
 namespace game {
 
 
-Briefing::Briefing()
+Briefing::Briefing() :
+    m_state(Init),
+    m_toggleState(false) 
 {
     hideCursor();
 
@@ -37,6 +40,9 @@ Briefing::Briefing()
     m_font.load("gfx:fnt/nfont1a.fnt", colorTable, true);
 
     m_backgroundSound.load("sfx:snd/vfx/inter.pcm", 11025);
+    m_openSound.load("sfx:snd/desktop/areamap.pcm");
+    m_woopSound.load("sfx:snd/desktop/woop.pcm", 33075);
+    m_woopSound.setVolume(0.1f);
 
     // TODO: Choose cockpit
     m_background.setTexture(gfx::Image::load("vfx:cockpit/000/cockpit.r16", 640, 480));
@@ -55,84 +61,13 @@ Briefing::Briefing()
     m_lblArrow = new ui::Label(m_lblMap);
     m_lblArrow->setPosition(Chapter::get()->mission()->pos() - QPoint(7, 7));
     m_lblArrow->setTexture(gfx::Image::load("gfx:img/connect/areapoin.img", colorTableArrow));
-
-    ui::Label *label;
-
-    float posY = 64;
-    foreach (const QString &textLine, Chapter::get()->mission()->textB())
-    {
-        label = new ui::Label(m_lblMain);
-        label->setFont(m_font);
-        label->setText(textLine);
-        label->setPosition(0, posY);
-        label->setWidth(304);
-        label->setAlignment(ui::Label::AlignHCenter);
-        posY += 11;
-    }
-
-    if (Chapter::get()->mission()->textP().count() > 0)
-    {
-        posY = 332;
-        label = new ui::Label(m_lblMain);
-        label->setFont(m_font);
-        label->setText(txt::StringTable::get(txt::Briefing_Targets));
-        label->setPosition(18, posY);
-        label->setWidth(304);
-        posY += 11;
-        label = new ui::Label(m_lblMain);
-        label->setFont(m_font);
-        label->setText(txt::StringTable::get(txt::Briefing_TargetsLine));
-        label->setPosition(18, posY);
-        label->setWidth(304);
-        posY += 11;
-        foreach (const QString &textLine, Chapter::get()->mission()->textP())
-        {
-            label = new ui::Label(m_lblMain);
-            label->setFont(m_font);
-            label->setText(textLine);
-            label->setPosition(18, posY);
-            label->setWidth(304);
-            posY += 11;
-        }
-    }
-
-    if (Chapter::get()->mission()->textS().count() > 0)
-    {
-        posY = 332;
-        label = new ui::Label(m_lblMain);
-        label->setFont(m_font);
-        label->setText(txt::StringTable::get(txt::Briefing_Hints));
-        label->setPosition(322, posY);
-        label->setWidth(304);
-        posY += 11;
-        label = new ui::Label(m_lblMain);
-        label->setFont(m_font);
-        label->setText(txt::StringTable::get(txt::Briefing_HintsLine));
-        label->setPosition(322, posY);
-        label->setWidth(304);
-        posY += 11;
-        foreach (const QString &textLine, Chapter::get()->mission()->textS())
-        {
-            label = new ui::Label(m_lblMain);
-            label->setFont(m_font);
-            label->setText(textLine);
-            label->setPosition(322, posY);
-            label->setWidth(304);
-            posY += 11;
-        }
-    }
-
-    label = new ui::Label(m_lblMain);
-    label->setFont(m_font);
-    label->setText(txt::StringTable::get(txt::Briefing_PressAnyKey));
-    label->setPosition(0, 454);
-    label->setWidth(640);
-    label->setAlignment(ui::Label::AlignHCenter);
+    m_lblArrow->setVisible(false);
 }
 
 void Briefing::activate()
 {
     m_backgroundSound.playLoop();
+    m_openSound.play();
 }
 
 
@@ -141,9 +76,142 @@ void Briefing::deactivate()
     m_backgroundSound.stop();
 }
 
+void Briefing::draw()
+{
+    Menu::draw();
+
+    switch (m_state)
+    {
+    case Text:
+    case Targets:
+    case Hints:
+        if (m_time.elapsed() < 75)
+            return;
+        break;
+    case Arrow:
+    case PressKey:
+        if (m_time.elapsed() < 500)
+            return;
+        m_toggleState = !m_toggleState;
+        break;
+    }
+
+    m_time.restart();
+
+    ui::Label *label;
+
+    if (m_state == Init)
+    {
+        m_state = Text;
+        m_nextLine = 0;
+    }
+
+    if (m_state == Text)
+    {
+        if (m_nextLine < Chapter::get()->mission()->textB().count())
+        {
+            label = new ui::Label(m_lblMain);
+            label->setFont(m_font);
+            label->setText(Chapter::get()->mission()->textB().at(m_nextLine));
+            label->setPosition(0, 64 + m_nextLine*11);
+            label->setWidth(304);
+            label->setAlignment(ui::Label::AlignHCenter);
+            m_woopSound.play();
+            m_nextLine++;
+        }
+        else
+        {
+            m_state = Targets;
+            m_nextLine = -3;
+        }
+    }
+
+    if (m_state == Targets)
+    {
+        if (Chapter::get()->mission()->textP().count() > 0 &&
+            m_nextLine < Chapter::get()->mission()->textP().count())
+        {
+            if (m_nextLine >= -2)
+            {
+                label = new ui::Label(m_lblMain);
+                label->setFont(m_font);
+                if (m_nextLine == -2)
+                    label->setText(txt::StringTable::get(txt::Briefing_Targets));
+                else if (m_nextLine == -1)
+                    label->setText(txt::StringTable::get(txt::Briefing_TargetsLine));
+                else
+                    label->setText(Chapter::get()->mission()->textP().at(m_nextLine));
+                label->setPosition(18, 354 + m_nextLine*11);
+                label->setWidth(304);
+                m_woopSound.play();
+            }
+            m_nextLine++;
+        }
+        else
+        {
+            m_state = Hints;
+            m_nextLine = -3;
+        }
+    }
+
+    if (m_state == Hints)
+    {
+        if (Chapter::get()->mission()->textS().count() > 0 &&
+            m_nextLine < Chapter::get()->mission()->textS().count())
+        {
+            if (m_nextLine >= -2)
+            {
+                label = new ui::Label(m_lblMain);
+                label->setFont(m_font);
+                if (m_nextLine == -2)
+                    label->setText(txt::StringTable::get(txt::Briefing_Hints));
+                else if (m_nextLine == -1)
+                    label->setText(txt::StringTable::get(txt::Briefing_HintsLine));
+                else
+                    label->setText(Chapter::get()->mission()->textS().at(m_nextLine));
+                label->setPosition(322, 354 + m_nextLine*11);
+                label->setWidth(304);
+                m_woopSound.play();
+            }
+            m_nextLine++;
+        }
+        else
+        {
+            m_state = Arrow;
+            m_nextLine = 0;
+        }
+    }
+
+    if (m_state == Arrow)
+    {
+        m_lblArrow->setVisible(m_toggleState);
+        m_nextLine++;
+        if (m_nextLine > 5)
+        {
+            m_lblPressKey = new ui::Label(m_lblMain);
+            m_lblPressKey->setFont(m_font);
+            m_lblPressKey->setText(txt::StringTable::get(txt::Briefing_PressAnyKey));
+            m_lblPressKey->setPosition(0, 454);
+            m_lblPressKey->setWidth(640);
+            m_lblPressKey->setAlignment(ui::Label::AlignHCenter);
+
+            m_state = PressKey;
+        }
+    }
+
+    if (m_state == PressKey)
+    {
+        m_lblArrow->setVisible(m_toggleState);
+        m_lblPressKey->setVisible(m_toggleState);
+        if (m_toggleState)
+            m_woopSound.play();
+    }
+}
+
 void Briefing::keyPressEvent(QKeyEvent *event)
 {
-    emit startEngine();
+    if (m_state == PressKey)
+        emit startEngine();
 }
 
 

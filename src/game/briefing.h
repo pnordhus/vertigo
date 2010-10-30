@@ -23,6 +23,7 @@
 #include "gfx/texture.h"
 #include "sfx/sound.h"
 #include "ui/label.h"
+#include <QTime>
 
 
 namespace game {
@@ -31,6 +32,9 @@ namespace game {
 class Briefing : public Menu
 {
     Q_OBJECT
+
+private:
+    enum State { Init, Text, Targets, Hints, Arrow, PressKey };
 
 public:
     Briefing();
@@ -41,15 +45,24 @@ signals:
 private:
     void activate();
     void deactivate();
+    void draw();
     void keyPressEvent(QKeyEvent *);
 
 private:
     gfx::Font m_font;
     sfx::Sound m_backgroundSound;
+    sfx::Sound m_openSound;
+    sfx::Sound m_woopSound;
     ui::Label m_background;
     ui::Label *m_lblMain;
     ui::Label *m_lblMap;
     ui::Label *m_lblArrow;
+    ui::Label *m_lblPressKey;
+
+    QTime m_time;
+    State m_state;
+    bool m_toggleState;
+    int m_nextLine;
 };
 
 
