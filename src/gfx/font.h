@@ -58,7 +58,19 @@ private:
 class Font
 {
 public:
+    enum Name
+    {
+        Small,
+        Medium,
+        Large,
+        DialogTop,
+        DialogBottom,
+        DialogHighlight,
+    };
+
+public:
     Font();
+    Font(Name name);
     Font(const QString &filename, const QVector<QRgb> &colorTable, bool scale = false);
     Font(const QString &filename, const QRgb &colorNormal, const QRgb &colorHighlight, bool scale = false);
 

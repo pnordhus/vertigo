@@ -15,52 +15,39 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GAME_VERTIGO_H
-#define GAME_VERTIGO_H
+#ifndef GFX_FONTMANAGER_H
+#define GFX_FONTMANAGER_H
 
 
-#include "gfx/fontmanager.h"
-#include "sfx/soundsystem.h"
-#include <QObject>
+#include "font.h"
+#include <QMap>
 
 
-namespace game {
+namespace gfx {
 
 
-class Chapter;
-class MainMenu;
-class Movie;
-class Window;
-
-
-class Vertigo : public QObject
+class FontManager
 {
-    Q_OBJECT
+public:
+    FontManager();
+    ~FontManager();
 
 public:
-    Vertigo();
-    ~Vertigo();
+    Font font(Font::Name name) const;
 
 public:
-    bool start();
-
-private slots:
-    void update();
-    void startGame();
-    void endGame();
-    void introFinished();
+    static FontManager* get() { Q_ASSERT(m_singleton); return m_singleton; }
 
 private:
-    Window *m_window;
-    MainMenu *m_mainMenu;
-    Movie *m_intro;
-    Chapter *m_chapter;
-    sfx::SoundSystem *m_soundSystem;
-    gfx::FontManager *m_fontManager;
+    Q_DISABLE_COPY(FontManager);
+    QMap<Font::Name, Font> m_fonts;
+
+private:
+    static FontManager *m_singleton;
 };
 
 
-} // namespace game
+} // namespace gfx
 
 
-#endif // GAME_VERTIGO_H
+#endif // GFX_FONTMANAGER_H

@@ -15,7 +15,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "font.h"
+#include "fontmanager.h"
 #include "image.h"
 #include "rle.h"
 #include <QFile>
@@ -24,6 +24,11 @@
 
 namespace gfx {
 
+
+Font::Font(Name name)
+{
+    *this = FontManager::get()->font(name);
+}
 
 
 FontPrivate::FontPrivate() :

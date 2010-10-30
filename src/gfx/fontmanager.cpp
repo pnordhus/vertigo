@@ -15,52 +15,44 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GAME_VERTIGO_H
-#define GAME_VERTIGO_H
+#include "colortable.h"
+#include "fontmanager.h"
 
 
-#include "gfx/fontmanager.h"
-#include "sfx/soundsystem.h"
-#include <QObject>
+namespace gfx {
 
 
-namespace game {
+FontManager *FontManager::m_singleton = NULL;
 
 
-class Chapter;
-class MainMenu;
-class Movie;
-class Window;
-
-
-class Vertigo : public QObject
+FontManager::FontManager()
 {
-    Q_OBJECT
+    Q_ASSERT(m_singleton == NULL);
+    m_singleton = this;
 
-public:
-    Vertigo();
-    ~Vertigo();
+    const gfx::ColorTable colorTable("gfx:pal/gui/border.pal");
 
-public:
-    bool start();
+    m_fonts.insert(Font::Small, Font("gfx:fnt/dpsmall.fnt", colorTable));
+    m_fonts.insert(Font::Medium, Font("gfx:fnt/dpmedium.fnt", colorTable));
+    m_fonts.insert(Font::Large, Font("gfx:fnt/dplarge.fnt", colorTable));
 
-private slots:
-    void update();
-    void startGame();
-    void endGame();
-    void introFinished();
-
-private:
-    Window *m_window;
-    MainMenu *m_mainMenu;
-    Movie *m_intro;
-    Chapter *m_chapter;
-    sfx::SoundSystem *m_soundSystem;
-    gfx::FontManager *m_fontManager;
-};
+    m_fonts.insert(Font::DialogTop, Font("gfx:fnt/dpsmamon.fnt", 0xffb89c00, 0xffc0c400, true));
+    m_fonts.insert(Font::DialogBottom, Font("gfx:fnt/dpsmamon.fnt", 0xff00a8d0, 0xff00a8d0, true));
+    m_fonts.insert(Font::DialogHighlight, Font("gfx:fnt/dpsmamon.fnt", 0xff00e4f8, 0xff00e4f8, true));
+}
 
 
-} // namespace game
+FontManager::~FontManager()
+{
+    m_singleton = NULL;
+}
 
 
-#endif // GAME_VERTIGO_H
+Font FontManager::font(Font::Name name) const
+{
+    Q_ASSERT(m_fonts.contains(name));
+    return m_fonts.value(name);
+}
+
+
+} // namespace gfx

@@ -35,10 +35,6 @@ Dialog::Dialog(int id, ui::Widget *parent) :
     m_remove(false),
     m_changeChapter(-1)
 {
-    m_fontTop.load("gfx:fnt/dpsmamon.fnt", 0xffb89c00, 0xffc0c400, true);
-    m_fontBottom.load("gfx:fnt/dpsmamon.fnt", 0xff00a8d0, 0xff00a8d0, true);
-    m_fontHighlight.load("gfx:fnt/dpsmamon.fnt", 0xff00e4f8, 0xff00e4f8, true);
-
     const QString baseName = QString("txt:dia/%1/%2").arg(id / 1000, 3, 10, QChar('0')).arg(id, 6, 10, QChar('0'));
 
     txt::DesFile file(baseName + ".des");
@@ -217,7 +213,7 @@ void Dialog::draw()
     const Option *lastOption = m_option;
     m_option = NULL;
 
-    m_fontTop.draw(m_strings[entry.text], QSize(width(), 36), false, true);
+    gfx::Font(gfx::Font::DialogTop).draw(m_strings[entry.text], QSize(width(), 36), false, true);
 
     int y = 57;
     if (m_optionIndex == 0) {
@@ -244,10 +240,10 @@ int Dialog::drawOption(int y, const Option* option)
         m_finished = true;
     }
 
-    QRect rect = m_fontBottom.draw(text, QPoint(0, y), QSize(width(), -1), false, false);
+    QRect rect = gfx::Font(gfx::Font::DialogBottom).draw(text, QPoint(0, y), QSize(width(), -1), false, false);
     rect.setWidth(width());
     if (mapToGlobal(rect).contains(m_mousePos)) {
-        m_fontHighlight.draw(text, QPoint(0, y), QSize(width(), -1), false, false);
+        gfx::Font(gfx::Font::DialogHighlight).draw(text, QPoint(0, y), QSize(width(), -1), false, false);
         m_rect = rect;
         m_option = option;
     }

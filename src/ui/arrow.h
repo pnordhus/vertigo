@@ -50,7 +50,6 @@ private slots:
 private:
     Label *m_label;
     Button *m_button;
-    gfx::Font m_font;
     bool m_left;
     bool m_top;
     QPoint m_position;

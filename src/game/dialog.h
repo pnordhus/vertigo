@@ -19,7 +19,6 @@
 #define GAME_DIALOG_H
 
 
-#include "gfx/font.h"
 #include "ui/widget.h"
 #include <QMap>
 #include <QSet>
@@ -131,10 +130,6 @@ private:
     bool testPreconditions() const;
 
 private:
-    gfx::Font m_fontTop;
-    gfx::Font m_fontBottom;
-    gfx::Font m_fontHighlight;
-
     int m_id;
     QMap<int, Entry> m_entries;
     QMap<int, QString> m_strings;

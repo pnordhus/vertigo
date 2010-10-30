@@ -3,6 +3,8 @@ set(SOURCES
 	colortable.h
     font.cpp
     font.h
+    fontmanager.cpp
+    fontmanager.h
     image.cpp
     image.h
 	rle.cpp

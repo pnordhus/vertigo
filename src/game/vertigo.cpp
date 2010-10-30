@@ -34,7 +34,8 @@ Vertigo::Vertigo() :
     m_mainMenu(NULL),
     m_intro(NULL),
     m_chapter(NULL),
-    m_soundSystem(NULL)
+    m_soundSystem(NULL),
+    m_fontManager(NULL)
 {
 
 }
@@ -47,6 +48,7 @@ Vertigo::~Vertigo()
     delete m_mainMenu;
     delete m_window;
     delete m_soundSystem;
+    delete m_fontManager;
 }
 
 
@@ -71,6 +73,7 @@ bool Vertigo::start()
     m_soundSystem = new sfx::SoundSystem;
 
     m_window = new Window;
+    m_fontManager = new gfx::FontManager;
 
     m_mainMenu = new MainMenu(false);
     connect(m_mainMenu, SIGNAL(startGame()), SLOT(startGame()));

@@ -18,7 +18,6 @@
 #include "chapter.h"
 #include "room.h"
 #include "gfx/colortable.h"
-#include "gfx/font.h"
 #include "gfx/image.h"
 #include "ui/button.h"
 

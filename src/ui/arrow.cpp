@@ -28,7 +28,6 @@ Arrow::Arrow(const QString &dir, const QPoint &pos, bool large, Widget *parent) 
     m_value(0)
 {
     const gfx::ColorTable colorTable("gfx:pal/gui/border.pal");
-    m_font.load("gfx:fnt/dpsmall.fnt", colorTable);
 
     m_left = dir.endsWith("Left");
     m_top = dir.startsWith("Top");
@@ -45,7 +44,7 @@ Arrow::Arrow(const QString &dir, const QPoint &pos, bool large, Widget *parent) 
     m_label->setPosition(pos);
 
     m_button = new Button(parent);
-    m_button->setFont(m_font);
+    m_button->setFont(gfx::Font::Small);
     m_button->setOffset(0);
     connect(m_button, SIGNAL(clicked()), SLOT(clicked()));
 }
@@ -88,7 +87,7 @@ void Arrow::setText(const QString &text)
 {
     QPoint offset(9, 2);
     QPoint offsetArrow;
-    const int width = m_font.width(text);
+    const int width = gfx::Font(gfx::Font::Small).width(text);
 
     if (m_left) {
         offsetArrow.setX(-8);

@@ -37,10 +37,6 @@ Desktop::Desktop(const QString &name) :
 {
     const gfx::ColorTable colorTable("gfx:pal/gui/border.pal");
 
-    gfx::Font fontSmall("gfx:fnt/dpsmall.fnt", colorTable);
-    gfx::Font fontMedium("gfx:fnt/dpmedium.fnt", colorTable);
-    gfx::Font fontLarge("gfx:fnt/dplarge.fnt", colorTable);
-
     txt::DesFile file("dat:world/" + name + ".des");
 
     file.setSection("Station");
@@ -61,13 +57,13 @@ Desktop::Desktop(const QString &name) :
     ui::Label *label;
 
     label = new ui::Label(&m_lblBackground);
-    label->setFont(fontLarge);
+    label->setFont(gfx::Font::Large);
     label->setPosition(8, 8);
     label->setText(file.value("Name").toString());
 
     label = new ui::Label(&m_lblBackground);
-    label->setFont(fontSmall);
-    label->setPosition(8, 10 + fontLarge.height());
+    label->setFont(gfx::Font::Small);
+    label->setPosition(8, 10 + gfx::Font(gfx::Font::Large).height());
     label->setText(file.value("Description").toString());
 
     m_btnNotebook = new ui::Button(&m_lblBackground);
@@ -88,7 +84,7 @@ Desktop::Desktop(const QString &name) :
 
         const QString name = file.value("Name").toString();
         const QString arrow = file.value("Arrow").toString();
-        const int width = fontMedium.width(name);
+        const int width = gfx::Font(gfx::Font::Medium).width(name);
 
         const bool left = arrow.endsWith("Left");
         const bool top = arrow.startsWith("Top");
@@ -118,7 +114,7 @@ Desktop::Desktop(const QString &name) :
 
         ui::Button *button = new ui::Button(m_widgetRooms);
         button->setOffset(0);
-        button->setFont(fontMedium);
+        button->setFont(gfx::Font::Medium);
         button->setText(name);
         button->setPosition(offset.x() + file.value("X").toInt(), offset.y() + file.value("Y").toInt());
         button->setProperty("index", index);
