@@ -31,6 +31,7 @@ Chapter *Chapter::m_singleton = NULL;
 Chapter::Chapter() :
     m_area(NULL),
     m_desktop(NULL),
+    m_briefing(NULL),
     m_movie(NULL),
     m_currentStation(-1),
     m_credits(0),
@@ -61,6 +62,7 @@ Chapter::~Chapter()
     qDeleteAll(m_missions);
     delete m_mission;
     delete m_movie;
+    delete m_briefing;
     delete m_desktop;
     delete m_area;
     m_singleton = NULL;
@@ -258,6 +260,19 @@ void Chapter::startMission()
 {
     Q_ASSERT(m_mission);
     qDebug() << "Start mission" << m_mission->shortName();
+
+    if (m_briefing)
+        m_briefing->deleteLater();
+    m_briefing = new Briefing();
+    connect(m_briefing, SIGNAL(startEngine()), SLOT(finishMission()));
+    emit setRenderer(m_briefing);
+}
+
+void Chapter::finishMission()
+{
+    if (m_briefing)
+        m_briefing->deleteLater();
+    m_briefing = NULL;
 
     m_successfulMissions.append(m_mission->shortName());
     delete m_mission;
