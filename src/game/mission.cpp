@@ -29,6 +29,14 @@ Mission::Mission(const QString &name, int station) :
     txt::DesFile file(QString("dat:mission/%1.des").arg(name));
     file.setSection("areamap");
     m_name = file.value("name").toString();
+    m_pos = QPoint(file.value("X").toInt(), file.value("Y").toInt());
+
+    file.setSection("B");
+    m_textB = file.value("{text}").toStringList();
+    file.setSection("P");
+    m_textP = file.value("{text}").toStringList();
+    file.setSection("S");
+    m_textS = file.value("{text}").toStringList();
 }
 
 

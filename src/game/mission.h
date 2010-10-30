@@ -20,6 +20,8 @@
 
 
 #include <QString>
+#include <QPoint>
+#include <QStringList>
 
 
 namespace game {
@@ -39,6 +41,10 @@ private:
     QString m_shortName;
     QString m_name;
     int m_station;
+    QPoint m_pos;
+    QStringList m_textB;
+    QStringList m_textP;
+    QStringList m_textS;
 };
 
 

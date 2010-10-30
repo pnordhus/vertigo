@@ -60,6 +60,18 @@ bool DesFile::load(const QString &filename)
             if (!key.startsWith(";"))
                 setValue(key, regKey.cap(2).trimmed());
         }
+
+        if (line.trimmed() == "{")
+        {
+            QStringList text;
+            QString textLine = file.readLine().trimmed();
+            while (!file.atEnd() && textLine != "}")
+            {
+                text.append(textLine);
+                textLine = file.readLine().trimmed();
+            }
+            setValue("{text}", text);
+        }
     }
 
     setSection("Global");
