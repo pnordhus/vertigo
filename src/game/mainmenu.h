@@ -40,7 +40,7 @@ public:
 
 signals:
     void startGame();
-    void loadGame(int);
+    void loadGame(const QString &name);
     void quit();
 
 private slots:

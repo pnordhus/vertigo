@@ -37,7 +37,16 @@ class Chapter : public QObject
     Q_OBJECT
 
 public:
-    Chapter();
+    struct SavedGame
+    {
+        int slot;
+        QString name;
+        QString station;
+        QDateTime time;
+    };
+
+public:
+    Chapter(const QString &name);
     ~Chapter();
 
 signals:
@@ -51,8 +60,8 @@ public slots:
     void toggleMovieHarbour();
 
 public:
-    void save(int slot, const QString &name) const;
-    void load(int slot);
+    void save() const;
+    void load(const QString &name);
     void loadChapter(int chapter);
     void setStation(int station, bool load = false);
     Area* area() const { return m_area; }
@@ -101,7 +110,7 @@ private slots:
 
 public:
     static Chapter* get() { Q_ASSERT(m_singleton); return m_singleton; }
-    static QMap<int, QString> savedGames();
+    static QList<SavedGame> savedGames();
 
 private:
     int m_code;
@@ -131,6 +140,7 @@ private:
     bool m_save;
     Boat *m_boat;
     bool m_end;
+    QString m_name;
 };
 
 

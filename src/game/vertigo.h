@@ -47,7 +47,7 @@ public:
 private slots:
     void update();
     void startGame();
-    void loadGame(int);
+    void loadGame(const QString &name);
     void endGame();
     void introFinished();
 

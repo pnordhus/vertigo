@@ -91,7 +91,7 @@ void Vertigo::createMainMenu(bool skipToTitle)
     Q_ASSERT(!m_mainMenu);
     m_mainMenu = new MainMenu(skipToTitle);
     connect(m_mainMenu, SIGNAL(startGame()), SLOT(startGame()));
-    connect(m_mainMenu, SIGNAL(loadGame(int)), SLOT(loadGame(int)));
+    connect(m_mainMenu, SIGNAL(loadGame(QString)), SLOT(loadGame(QString)));
     connect(m_mainMenu, SIGNAL(quit()), m_window, SLOT(close()));
     m_window->setRenderer(m_mainMenu);
 }
@@ -100,7 +100,7 @@ void Vertigo::createMainMenu(bool skipToTitle)
 void Vertigo::createChapter()
 {
     Q_ASSERT(m_chapter == NULL);
-    m_chapter = new Chapter;
+    m_chapter = new Chapter("default");
     connect(m_chapter, SIGNAL(setRenderer(Renderer*)), m_window, SLOT(setRenderer(Renderer*)));
     connect(m_chapter, SIGNAL(endGame()), SLOT(endGame()));
 }
@@ -126,13 +126,13 @@ void Vertigo::startGame()
 }
 
 
-void Vertigo::loadGame(int slot)
+void Vertigo::loadGame(const QString &name)
 {
     m_mainMenu->deleteLater();
     m_mainMenu = NULL;
 
     createChapter();
-    m_chapter->load(slot);
+    m_chapter->load(name);
 }
 
 

@@ -29,7 +29,7 @@ namespace game {
 Chapter *Chapter::m_singleton = NULL;
 
 
-Chapter::Chapter() :
+Chapter::Chapter(const QString &name) :
     m_code(-1),
     m_area(NULL),
     m_desktop(NULL),
@@ -39,7 +39,8 @@ Chapter::Chapter() :
     m_credits(0),
     m_mission(NULL),
     m_boat(NULL),
-    m_end(false)
+    m_end(false),
+    m_name(name)
 {
     Q_ASSERT(m_singleton == NULL);
     m_singleton = this;
@@ -111,6 +112,9 @@ void Chapter::load(const QString &filename, bool load)
 
     txt::DesFile file(filename);
 
+    if (file.contains("name"))
+        m_name = file.value("name").toString();
+
     if (file.contains("credit"))
         m_credits = file.value("credit").toInt();
 
@@ -177,11 +181,13 @@ void Chapter::load(const QString &filename, bool load)
 }
 
 
-void Chapter::save(int slot, const QString &name) const
+void Chapter::save() const
 {
     txt::DesFile file;
 
-    file.setValue("name", name);
+    file.setValue("name", m_name);
+    file.setValue("station", m_desktop->name());
+    file.setValue("time", QDateTime::currentDateTime());
     file.setValue("credit", m_credits);
 
     file.setSection("chapter");
@@ -246,21 +252,21 @@ void Chapter::save(int slot, const QString &name) const
         file.setValue(QString("movie%1").arg(i++), movie);
 
     const QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
-    file.save(QString("%1/save%2.des").arg(path).arg(slot));
+    file.save(QString("%1/save_%2.des").arg(path, m_name));
 }
 
 
-void Chapter::load(int slot)
+void Chapter::load(const QString &name)
 {
     const QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
-    load(QString("%1/save%2.des").arg(path).arg(slot), true);
+    load(QString("%1/save_%2.des").arg(path, name), true);
 }
 
 
 void Chapter::setStation(int stationIndex, bool load)
 {
     if (m_desktop) {
-        save(99, m_desktop->name());
+        save();
         m_desktop->deleteLater();
         m_save = true;
     }
@@ -295,7 +301,7 @@ void Chapter::setStation(int stationIndex, bool load)
 void Chapter::startMission(const QString &name)
 {
     if (m_desktop) {
-        save(99, m_desktop->name());
+        save();
         m_desktop->deleteLater();
         m_desktop = NULL;
     }
@@ -391,7 +397,7 @@ void Chapter::playMovies()
             emit endGame();
         } else {
             if (m_save) {
-                save(99, m_desktop->name());
+                save();
                 m_save = false;
             }
             emit setRenderer(m_desktop);
@@ -479,7 +485,7 @@ void Chapter::finishDialog(int dialogId)
     if (dialog && dialog->isSmallTalk())
         m_numSmallTalks++;
 
-    save(99, m_desktop->name());
+    save();
 }
 
 
@@ -591,21 +597,25 @@ QList<Task> Chapter::tasks()
 }
 
 
-QMap<int, QString> Chapter::savedGames()
+QList<Chapter::SavedGame> Chapter::savedGames()
 {
-    QMap<int, QString> saves;
+    QList<SavedGame> saves;
 
     const QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
     QDir dir(path);
-    QRegExp reg("save(\\d*)\\.des");
+    QRegExp reg("save_(\\w*)\\.des");
     foreach (const QString &save, dir.entryList()) {
         if (reg.indexIn(save) >= 0) {
             const QString filename = dir.filePath(save);
-            const int id = reg.cap(1).toInt();
 
             txt::DesFile file(filename);
-            const QString name = file.value("name").toString();
-            saves.insert(id, name);
+
+            SavedGame game;
+            game.slot = reg.cap(1).toInt();
+            game.name = file.value("name").toString();
+            game.station = file.value("station").toString();
+            game.time = file.value("time").toDateTime();
+            saves << game;
         }
     }
 

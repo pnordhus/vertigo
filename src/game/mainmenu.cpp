@@ -159,19 +159,26 @@ void MainMenu::showLoad()
     m_lblLoad = new ui::Label(&m_title);
 
     int y = 282;
-    QMapIterator<int, QString> it(Chapter::savedGames());
-    while (it.hasNext()) {
-        it.next();
-
+    foreach (const Chapter::SavedGame &game, Chapter::savedGames()) {
         ui::Button *button = new ui::Button(m_lblLoad);
         button->setPosition(0, y);
         button->setWidth(640);
         button->setAlignment(ui::Button::AlignHCenter);
         button->setFont(gfx::Font::Large);
-        button->setText(it.value());
-        button->setProperty("id", it.key());
+        button->setText(QString("%1: %2").arg(game.name, game.station));
+        button->setProperty("name", game.name);
         connect(button, SIGNAL(clicked()), SLOT(loadGame()));
-        y += 20;
+
+        y += 13;
+
+        ui::Label *label = new ui::Label(m_lblLoad);
+        label->setPosition(0, y);
+        label->setWidth(640);
+        label->setAlignment(ui::Button::AlignHCenter);
+        label->setFont(gfx::Font::Small);
+        label->setText(game.time.toString(Qt::DefaultLocaleShortDate));
+
+        y += 10;
     }
 
     ui::Button *button = new ui::Button(m_lblLoad);
@@ -195,7 +202,7 @@ void MainMenu::hideLoad()
 
 void MainMenu::loadGame()
 {
-    emit loadGame(sender()->property("id").toInt());
+    emit loadGame(sender()->property("name").toString());
 }
 
 
