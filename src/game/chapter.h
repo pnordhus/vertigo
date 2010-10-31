@@ -26,6 +26,7 @@
 #include "mission.h"
 #include "movie.h"
 #include "task.h"
+#include "boat.h"
 
 
 namespace game {
@@ -73,6 +74,7 @@ public:
     void startMission(const QString &name);
     const Mission* mission() const { return m_mission; }
     QList<Task> tasks();
+    const Boat* boat() const { return m_boat; }
 
 private:
     void load(const QString &filename);
@@ -125,6 +127,7 @@ private:
     bool m_movieHarbour;
     Mission *m_mission;
     txt::DesFile m_tasksFile;
+    Boat *m_boat;
 };
 
 

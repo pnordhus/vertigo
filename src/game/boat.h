@@ -15,46 +15,36 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GAME_DEPOT_H
-#define GAME_DEPOT_H
+#ifndef GAME_BOAT_H
+#define GAME_BOAT_H
 
 
-#include "gfx/video.h"
-#include "sfx/sound.h"
-#include "ui/arrow.h"
-#include "ui/frame.h"
+#include <QString>
 
 
 namespace game {
 
 
-class Depot : public ui::Frame
+class Boat
 {
-    Q_OBJECT
+public:
+    Boat(int id);
 
 public:
-    Depot();
-    ~Depot();
-
-private slots:
-    void flip();
-
-protected:
-    void draw();
-    bool mousePressEvent(const QPoint &pos, Qt::MouseButton button);
+    const QString& name() const { return m_name; }
+    const QString& cockpit() const { return m_cockpit; }
+    const QString& flipMovie1() const { return m_flipMovie1; }
+    const QString& flipMovie2() const { return m_flipMovie2; }
 
 private:
-    ui::Label *m_backgroundLabel;
-    sfx::Sound m_backgroundSound;
-    gfx::Video m_videoFlip1;
-    gfx::Video m_videoFlip2;
-    gfx::Texture m_flip;
-    ui::Button *m_btnFlip;
-    bool m_flipped;
+    QString m_name;
+    QString m_cockpit;
+    QString m_flipMovie1;
+    QString m_flipMovie2;
 };
 
 
 } // namespace game
 
 
-#endif // GAME_DEPOT_H
+#endif // GAME_BOAT_H
