@@ -72,6 +72,9 @@ Dialog::Dialog(int id, ui::Widget *parent) :
         } else if (type == "addperson") {
             message.type = Message::AddDialog;
             message.value = file.value("Name").toInt();
+        } else if (type == "subperson") {
+            message.type = Message::RemoveDialog;
+            message.value = file.value("Name").toInt();
         } else if (type == "credit") {
             message.type = Message::AddCredit;
             message.value = file.value("amount").toInt();
@@ -148,6 +151,10 @@ void Dialog::select()
 
                 case Message::AddDialog:
                     emit addDialog(message.value);
+                    break;
+
+                case Message::RemoveDialog:
+                    emit removeDialog(message.value);
                     break;
 
                 case Message::AddCredit:

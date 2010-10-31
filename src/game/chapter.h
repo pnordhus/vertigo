@@ -81,12 +81,13 @@ private:
 
 private slots:
     void movieFinished();
-    void removeDialog(int dialogId);
+    void finishDialog(int dialogId);
     void addMessage(int message);
     void addTask(int task);
     void removeTask(int task);
     void changeChapter(int chapter);
     void addDialog(int dialogId);
+    void removeDialog(int dialogId);
     void addCredit(int credit);
     void enableStation(int station);
     void disableStation(int station);

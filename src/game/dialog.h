@@ -56,6 +56,7 @@ private:
             RemoveTask,
             ChangeChapter,
             AddDialog,
+            RemoveDialog,
             AddCredit,
             EnableStation,
             DisableStation,
@@ -103,6 +104,7 @@ signals:
     void removeTask(int);
     void changeChapter(int);
     void addDialog(int);
+    void removeDialog(int);
     void addCredit(int);
     void enableStation(int);
     void disableStation(int);

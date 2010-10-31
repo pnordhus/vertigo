@@ -434,7 +434,7 @@ QList<Dialog*> Chapter::dialogsEnCom(bool room)
 }
 
 
-void Chapter::removeDialog(int dialogId)
+void Chapter::finishDialog(int dialogId)
 {
     Dialog *dialog = m_pendingDialogues.take(dialogId);
     if (dialog && dialog->isSmallTalk())
@@ -471,18 +471,25 @@ void Chapter::addDialog(int dialogId)
     Q_ASSERT(!m_pendingDialogues.contains(dialogId));
 
     Dialog *dialog = new Dialog(dialogId);
-    connect(dialog, SIGNAL(remove(int)), SLOT(removeDialog(int)));
+    connect(dialog, SIGNAL(remove(int)), SLOT(finishDialog(int)));
     connect(dialog, SIGNAL(addMessage(int)), SLOT(addMessage(int)));
     connect(dialog, SIGNAL(addTask(int)), SLOT(addTask(int)));
     connect(dialog, SIGNAL(removeTask(int)), SLOT(removeTask(int)));
     connect(dialog, SIGNAL(changeChapter(int)), SLOT(changeChapter(int)));
     connect(dialog, SIGNAL(addDialog(int)), SLOT(addDialog(int)));
+    connect(dialog, SIGNAL(removeDialog(int)), SLOT(removeDialog(int)));
     connect(dialog, SIGNAL(addCredit(int)), SLOT(addCredit(int)));
     connect(dialog, SIGNAL(enableStation(int)), SLOT(enableStation(int)));
     connect(dialog, SIGNAL(disableStation(int)), SLOT(disableStation(int)));
     connect(dialog, SIGNAL(addMission(QString,int)), SLOT(addMission(QString,int)));
     connect(dialog, SIGNAL(replaceApproachMovie(int,QString)), SLOT(replaceApproachMovie(int,QString)));
     m_pendingDialogues.insert(dialogId, dialog);
+}
+
+
+void Chapter::removeDialog(int dialogId)
+{
+    delete m_pendingDialogues.take(dialogId);
 }
 
 
