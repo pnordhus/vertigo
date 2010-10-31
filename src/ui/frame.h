@@ -45,6 +45,7 @@ protected slots:
 
 private:
     static int updateBorder(gfx::Texture texture, const gfx::ColorTable &colorTable, int x, int id);
+    static QImage getBorder(const gfx::ColorTable &colorTable, int id);
 };
 
 

@@ -35,10 +35,9 @@ Frame::Frame(ui::Widget *parent) :
 void Frame::setupFrame(const QSize &size, const QString &title, bool closable)
 {
     const gfx::ColorTable colorTable("gfx:pal/gui/border.pal");
-    const gfx::Font fontMedium("gfx:fnt/dpmedium.fnt", colorTable);
 
     ui::Label *lblTitle = new ui::Label(this);
-    lblTitle->setFont(fontMedium);
+    lblTitle->setFont(gfx::Font::Medium);
     lblTitle->setText(title);
     lblTitle->setAlignment(ui::Label::AlignHCenter);
     lblTitle->setPosition(0, 1);
@@ -51,22 +50,31 @@ void Frame::setupFrame(const QSize &size, const QString &title, bool closable)
     gfx::Texture texture;
     texture.createEmpty(size, gfx::Texture::RGB);
 
-    const int titleLeft = (size.width() - 170) / 2;
-    const int titleRight = titleLeft + 170;
-
     {
+        QList<QImage> images;
         const int total = size.width() - 30;
+        static const int id[] = { 1,2,3,3,4,5,2,4,3,1 };
+        int sum = 0;
+        for (int i = 0; i < 10; i++) {
+            if (i == 3 && total < 270)
+                continue;
+
+            QImage image = getBorder(colorTable, id[i]);
+            if (sum + image.width() > total)
+                break;
+            sum += image.width();
+            images << image;
+        }
+
         int beg = 13;
-
         updateBorder(texture, colorTable, beg, 9);
-        beg += (total % 45) / 2;
-        beg += updateBorder(texture, colorTable, beg, 1);
-        beg += updateBorder(texture, colorTable, beg, 2);
+        beg += 2 + (total - sum) / 2;
 
-        beg += ((titleRight - beg) / 45) * 45;
-        beg += updateBorder(texture, colorTable, beg, 5);
-        if (13 + total - beg >= 45)
-            beg += updateBorder(texture, colorTable, beg, 2);
+        foreach (QImage image, images) {
+            texture.update(beg, 0, image);
+            beg += image.width();
+        }
+
         updateBorder(texture, colorTable, beg - 1, 9);
     }
 
@@ -78,7 +86,7 @@ void Frame::setupFrame(const QSize &size, const QString &title, bool closable)
     texture.update(size.width() - 12, size.height() - 17, gfx::Image::load("gfx:img/desktop/gui/edgebr.img", colorTable));
     texture.update(                0, size.height() - 17, gfx::Image::load("gfx:img/desktop/gui/edgebl.img", colorTable));
 
-    texture.update(titleLeft, 0, gfx::Image::load("gfx:img/desktop/gui/bortw.img", colorTable));
+    texture.update((size.width() - 170) / 2, 0, gfx::Image::load("gfx:img/desktop/gui/bortw.img", colorTable));
 
     if (closable) {
         ui::Button *buttonClose = new ui::Button(this);
@@ -112,5 +120,11 @@ void Frame::closeFrame()
     sfx::SoundSystem::get()->sound(sfx::FrameClose)->play();
     emit close();
 }
+
+QImage Frame::getBorder(const gfx::ColorTable &colorTable, int id)
+{
+    return gfx::Image::load(QString("gfx:img/desktop/gui/bort%1.img").arg(id), colorTable);
+}
+
 
 } // namespace ui
