@@ -62,7 +62,8 @@ private:
             DisableStation,
             AddMissionStation,
             AddMissionArea,
-            ReplaceApproachMovie
+            ReplaceApproachMovie,
+            GameOver
         };
 
         Message() : type(None), value(0) {}
@@ -110,6 +111,7 @@ signals:
     void disableStation(int);
     void addMission(const QString&, int = -1);
     void replaceApproachMovie(int, const QString&);
+    void gameOver();
 
 public:
     int id() const { return m_id; }
@@ -152,6 +154,7 @@ private:
     bool m_remove;
     QMap<int, Message> m_messages;
     int m_changeChapter;
+    bool m_gameOver;
     bool m_isSmallTalk;
     QList<Precondition> m_preconditions;
 };

@@ -428,6 +428,12 @@ void Chapter::replaceApproachMovie(int station, const QString &movie)
 }
 
 
+void Chapter::gameOver()
+{
+    emit endGame();
+}
+
+
 Dialog* Chapter::dialog(int dialogId) const
 {
     return m_pendingDialogues.value(dialogId);
@@ -518,6 +524,7 @@ void Chapter::addDialog(int dialogId)
     connect(dialog, SIGNAL(disableStation(int)), SLOT(disableStation(int)));
     connect(dialog, SIGNAL(addMission(QString,int)), SLOT(addMission(QString,int)));
     connect(dialog, SIGNAL(replaceApproachMovie(int,QString)), SLOT(replaceApproachMovie(int,QString)));
+    connect(dialog, SIGNAL(gameOver()), SLOT(gameOver()));
     m_pendingDialogues.insert(dialogId, dialog);
 }
 

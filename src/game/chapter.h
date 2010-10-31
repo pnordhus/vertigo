@@ -96,6 +96,7 @@ private slots:
     void disableStation(int station);
     void addMission(const QString &mission, int station);
     void replaceApproachMovie(int station, const QString &movie);
+    void gameOver();
     void finishMission();
 
 public:
