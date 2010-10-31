@@ -51,6 +51,7 @@ Desktop::Desktop(const QString &name) :
     m_backgroundSound.load("sfx:snd/bground/" + backgroundSound + ".pcl", "sfx:snd/bground/" + backgroundSound + ".pcr");
     m_nameSound.load("sfx:snd/names/" + nameSound + ".pcm");
     m_approachMovie = QString("gfx:mvi/approach/%1.mvi").arg(file.value("ApproachMovie").toString());
+    m_name = file.value("Name").toString();
 
     m_lblBackground.setTexture(m_background);
     setRootWidget(&m_lblBackground);
@@ -60,7 +61,7 @@ Desktop::Desktop(const QString &name) :
     label = new ui::Label(&m_lblBackground);
     label->setFont(gfx::Font::Large);
     label->setPosition(8, 8);
-    label->setText(file.value("Name").toString());
+    label->setText(m_name);
 
     label = new ui::Label(&m_lblBackground);
     label->setFont(gfx::Font::Small);

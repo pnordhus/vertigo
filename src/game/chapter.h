@@ -125,6 +125,7 @@ private:
     bool m_movieHarbour;
     Mission *m_mission;
     txt::DesFile m_tasksFile;
+    bool m_save;
 };
 
 

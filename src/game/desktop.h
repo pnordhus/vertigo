@@ -46,7 +46,8 @@ public:
 public:
     void start();
     void draw();
-    const QString &approachMovie() const { return m_approachMovie; }
+    const QString& name() const { return m_name; }
+    const QString& approachMovie() const { return m_approachMovie; }
 
 private slots:
     void showNotebook();
@@ -87,6 +88,7 @@ private:
     EnCom *m_enCom;
     Departure *m_departure;
     ui::Button *m_btnQuit;
+    QString m_name;
     QString m_approachMovie;
     MiniMovie m_miniMovie;
     bool m_first;

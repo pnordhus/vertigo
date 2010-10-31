@@ -253,8 +253,12 @@ void Chapter::load(int slot)
 
 void Chapter::setStation(int stationIndex)
 {
-    if (m_desktop)
+    if (m_desktop) {
+        save(98, QString("AutoSave: %1").arg(m_desktop->name()));
         m_desktop->deleteLater();
+    }
+
+    m_save = m_desktop;
 
     int previousStation = m_currentStation;
     m_currentStation = stationIndex;
@@ -295,9 +299,11 @@ void Chapter::startMission(const QString &name)
         }
     }
 
-    if (m_desktop)
+    if (m_desktop) {
+        save(98, QString("AutoSave: %1").arg(m_desktop->name()));
         m_desktop->deleteLater();
-    m_desktop = NULL;
+        m_desktop = NULL;
+    }
     m_currentStation = -1;
 
     startMission();
@@ -369,10 +375,15 @@ void Chapter::playMovies()
 {
     if (m_movies.isEmpty()) {
         sfx::SoundSystem::get()->resumeAll();
-        if (m_mission)
+        if (m_mission) {
             startMission();
-        else
+        } else {
+            if (m_save) {
+                save(98, QString("AutoSave: %1").arg(m_desktop->name()));
+                m_save = false;
+            }
             emit setRenderer(m_desktop);
+        }
     } else {
         sfx::SoundSystem::get()->pauseAll();
         Q_ASSERT(m_movie == NULL);
@@ -395,7 +406,6 @@ void Chapter::movieFinished()
 
 void Chapter::quit()
 {
-    save(99, "autosave");
     emit endGame();
 }
 
@@ -450,6 +460,8 @@ void Chapter::finishDialog(int dialogId)
     Dialog *dialog = m_pendingDialogues.take(dialogId);
     if (dialog && dialog->isSmallTalk())
         m_numSmallTalks++;
+
+    save(99, QString("AutoSave"));
 }
 
 
