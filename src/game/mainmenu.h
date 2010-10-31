@@ -23,6 +23,7 @@
 #include "gfx/texture.h"
 #include "sfx/sound.h"
 #include "ui/label.h"
+#include <QTime>
 
 
 namespace game {
@@ -51,6 +52,7 @@ private slots:
     void loadGame();
 
 private:
+    void draw();
     void activate();
     void deactivate();
     void changeState(State state);
@@ -63,10 +65,11 @@ private:
     ui::Label m_title;
     ui::Label *m_lblMain;
     ui::Label *m_lblNew;
-    ui::Label *m_lblName;
     ui::Label *m_lblLoad;
     sfx::Sound m_backgroundSound;
     QString m_name;
+    bool m_cursor;
+    QTime m_time;
 };
 
 

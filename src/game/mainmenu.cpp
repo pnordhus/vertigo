@@ -32,7 +32,7 @@ MainMenu::MainMenu(bool skipToTitle) :
     m_state(Invalid),
     m_lblNew(NULL),
     m_lblLoad(NULL),
-    m_name("deadeye")
+    m_cursor(false)
 {
     const gfx::ColorTable colorTable("gfx:pal/gui/border.pal");
 
@@ -102,6 +102,23 @@ MainMenu::MainMenu(bool skipToTitle) :
 }
 
 
+void MainMenu::draw()
+{
+    Menu::draw();
+
+    if (m_lblNew) {
+        if (m_time.elapsed() > 300) {
+            m_time.start();
+            m_cursor = !m_cursor;
+        }
+
+        QRect rect = gfx::Font(gfx::Font::Large).draw(m_name, QPoint(0, 328), QSize(640, -1), true, false);
+        if (m_cursor)
+            gfx::Font(gfx::Font::Large).draw("_", rect.topRight() + QPoint(0, 2));
+    }
+}
+
+
 void MainMenu::activate()
 {
     m_backgroundSound.playLoop();
@@ -167,14 +184,12 @@ void MainMenu::keyPressEvent(QKeyEvent *event)
             m_name.chop(1);
 
         QString text = event->text().toLower().toAscii();
-        text.remove(QRegExp("[^a-z0-9 ]*"));
+        text.remove(QRegExp("[^a-z\\-0-9 ]*"));
         if (!text.isEmpty())
             m_name += text;
 
-        if (m_name.length() > 16)
-            m_name.chop(m_name.length() - 16);
-
-        m_lblName->setText(m_name);
+        if (m_name.length() > 20)
+            m_name.chop(m_name.length() - 20);
     }
 }
 
@@ -185,18 +200,12 @@ void MainMenu::showNew()
 
     Q_ASSERT(!m_lblNew);
     m_lblNew = new ui::Label(&m_title);
+    m_name = "dead-eye";
 
     ui::Label *label = new ui::Label(m_lblNew);
     label->setFont(gfx::Font::Medium);
     label->setPosition(145, 256 - gfx::Font(gfx::Font::Medium).height() - 2);
     label->setText(txt::StringTable::get(txt::MainMenu_NewGame));
-
-    m_lblName = new ui::Label(m_lblNew);
-    m_lblName->setPosition(0, 328);
-    m_lblName->setWidth(640);
-    m_lblName->setAlignment(ui::Button::AlignHCenter);
-    m_lblName->setFont(gfx::Font::Large);
-    m_lblName->setText(m_name);
 
     ui::Button *button = new ui::Button(m_lblNew);
     button->setPosition(0, 428);
