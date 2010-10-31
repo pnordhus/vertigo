@@ -25,7 +25,8 @@
 namespace game {
 
 
-Depot::Depot()
+Depot::Depot() :
+    m_flipped(false)
 {
     const gfx::ColorTable colorTable("gfx:pal/gui/border.pal");
     gfx::Image backgroundImage = gfx::Image::load("gfx:img/desktop/depot/depoback.img", colorTable);
@@ -36,76 +37,61 @@ Depot::Depot()
     m_backgroundLabel->setPosition(9, 15);
     m_backgroundLabel->setTexture(backgroundImage);
 
-/*
-    txt::DesFile file("dat:world/" + name + ".des");
-    file.setSection("Room");
+    ui::Label *label;
 
-    const QString background = file.value("BackGround").toString();
-    const QString backgroundSound = file.value("Sound").toString();
-    m_backgroundImage = gfx::Image::loadPCX("gfx:pic/room/" + background + ".pcx").toRgb565();
-    m_miniMovie.setColorTable(m_backgroundImage.colorTable());
-    m_backgroundSound.load("sfx:snd/room/" + backgroundSound + ".pcm");
+    gfx::Image horline = gfx::Image::load("gfx:img/desktop/gui/horline.img", colorTable);
 
-    setupFrame(m_backgroundImage.size() + QSize(18, 24), title, true);
+    label = new ui::Label(m_backgroundLabel);
+    label->setTexture(horline);
+    label->setPosition(8, 64);
 
-    m_backgroundLabel = new ui::Label(this);
-    m_backgroundLabel->setPosition(9, 15);
-    m_backgroundLabel->setTexture(m_background);
+    label = new ui::Label(m_backgroundLabel);
+    label->setTexture(horline);
+    label->setPosition(8, 283);
 
-    m_miniMovie.load(file);
-    m_miniMovie.start();
-    connect(&m_miniMovie, SIGNAL(videoFinished()), SIGNAL(showDeparture()));
-    connect(&m_miniMovie, SIGNAL(videoFinished()), m_backgroundLabel, SLOT(enable()));
+    label = new ui::Label(m_backgroundLabel);
+    label->setTexture(gfx::Image::load("gfx:img/desktop/gui/verline.img", colorTable));
+    label->setPosition(352, 75);
 
-    m_backgroundSound.playLoop();
+    label = new ui::Label(m_backgroundLabel);
+    label->setFont(gfx::Font::Large);
+    label->setPosition(16, 75);
+    label->setText(Chapter::get()->boat()->name());
 
-    file.setSection("Dock");
-    if (file.contains("Name")) {
-        const QString name = file.value("Name").toString();
-        const QString sound = file.value("Sound").toString();
-        const int rate = file.value("Rate", 0).toInt();
-        m_dockSound.load("sfx:snd/room/" + sound + ".pcm", rate);
+    m_videoFlip1.open(QString("gfx:mvi/sflip/%1").arg(Chapter::get()->boat()->flipMovie1()));
+    m_videoFlip2.open(QString("gfx:mvi/sflip/%1").arg(Chapter::get()->boat()->flipMovie2()));
+    m_videoFlip2.play();
 
-        ui::Arrow *arrow = new ui::Arrow(file.value("Arrow").toString(), QPoint(file.value("X").toInt(), file.value("Y").toInt()), false, m_backgroundLabel);
-        arrow->setText(name);
-        connect(arrow, SIGNAL(clicked(int)), SLOT(showDock()));
-    }
+    Q_ASSERT(m_videoFlip1.width() == m_videoFlip2.width());
+    Q_ASSERT(m_videoFlip1.height() == m_videoFlip2.height());
+    m_flip.createEmpty(m_videoFlip1.width(), m_videoFlip1.height(), gfx::Texture::RGBA);
 
-    int personId = 1;
-    for (;;) {
-        file.setSection(QString("Person%1").arg(personId));
+    label = new ui::Label(m_backgroundLabel);
+    label->setTexture(m_flip);
+    label->setPosition(16, 85);
 
-        if (!file.contains("Arrow"))
-            break;
+    m_btnFlip = new ui::Button(m_backgroundLabel);
+    m_btnFlip->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdfliu.img", colorTable));
+    m_btnFlip->setPosition(304, 243);
+    m_btnFlip->setOffset(2);
+    connect(m_btnFlip, SIGNAL(clicked()), SLOT(flip()));
 
-        Person *person = new Person;
-
-        person->arrow = new ui::Arrow(file.value("Arrow").toString(), QPoint(file.value("X").toInt(), file.value("Y").toInt()), false, m_backgroundLabel);
-        person->arrow->hide();
-        connect(person->arrow, SIGNAL(clicked(int)), SLOT(startDialog(int)));
-
-        m_persons.insert(personId, person);
-
-        personId++;
-    }
-
-    file.setSection("DockMan");
-    if (!file.contains("Name"))
-        file.setSection("WeaponMan");
-    if (file.contains("Name"))
-    {
-        Person *person = new Person;
-
-        person->arrow = new ui::Arrow(file.value("Arrow").toString(), QPoint(file.value("X").toInt(), file.value("Y").toInt()), false, m_backgroundLabel);
-        person->arrow->hide();
-        connect(person->arrow, SIGNAL(clicked(int)), SLOT(startDialog(int)));
-
-        m_persons.insert(personId, person);
-        m_dockMan = person;
-        m_dockManName = file.value("Name").toString();
-    }
-*/
-    restart();
+    //gdlefd.img    Arrow left disabled
+    //gdlefu.img    Arrow left active
+    //gdrigd.img    Arrow right disabled
+    //gdrigu.img    Arrow right active
+    //gdflid.img    Flip disabled
+    //gdfliu.img    Flip active
+    //gdammod.img   Repair disabled (same as active)
+    //gdammou.img   Repair active
+    //gdbuyd.img    Buy disabled (same as active)
+    //gdbuyu.img    Buy active
+    //gdtinfd.img   Info disabled
+    //gdtinfu.img   Info active
+    //gdseld.img    Sell disabled (same as active)
+    //gdselu.img    Sell active
+    //chkgre.img    Check green
+    //chkred.img    Check red
 }
 
 
@@ -114,45 +100,31 @@ Depot::~Depot()
 }
 
 
-void Depot::restart()
+void Depot::flip()
 {
-/*    m_dockSound.stop();
-    m_background.fromImage(m_backgroundImage);
-    QList<Dialog*> dialogs = Chapter::get()->dialogs(m_index);
-
-    foreach (Person* person, m_persons)
-        person->arrow->hide();
-
-    foreach (Dialog* dialog, dialogs) {
-        Person *person = m_persons.value(dialog->person());
-        if (!person) {
-            foreach (person, m_persons) {
-                if (person->arrow->isVisible() == false && person->female == dialog->isFemale())
-                    break;
-            }
-        }
-
-        Q_ASSERT(person);
-        person->arrow->show();
-        person->arrow->setText(dialog->name());
-        person->arrow->setValue(dialog->id());
-    }
-
-    if (m_dockMan && !m_dockMan->arrow->isVisible())
-    {
-        m_dockMan->arrow->show();
-        m_dockMan->arrow->setText(m_dockManName);
-        m_dockMan->arrow->setValue(0);
-    }
-
-    dialogs = Chapter::get()->dialogsEnCom(true);
-    if (!dialogs.isEmpty())
-        emit startEnCom(dialogs.first());*/
+    m_flipped = !m_flipped;
+    if (m_flipped)
+        m_videoFlip1.play();
+    else
+        m_videoFlip2.play();
 }
 
 
 void Depot::draw()
 {
+    gfx::Image frame;
+    if (m_flipped)
+        frame = m_videoFlip1.getFrame();
+    else
+        frame = m_videoFlip2.getFrame();
+    if (!frame.isNull())
+    {
+        gfx::ColorTable colorTable = frame.colorTable();
+        colorTable[0] = qRgba(0, 0, 0, 0);
+        frame.setColorTable(colorTable);
+        m_flip.update(0, 0, frame);
+    }
+
     ui::Label::draw();
 }
 

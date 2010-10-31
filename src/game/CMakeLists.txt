@@ -1,6 +1,8 @@
 set(SOURCES
     area.cpp
     area.h
+    boat.cpp
+    boat.h
     briefing.cpp
     briefing.h
     chapter.cpp

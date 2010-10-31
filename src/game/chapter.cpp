@@ -37,7 +37,8 @@ Chapter::Chapter() :
     m_movie(NULL),
     m_currentStation(-1),
     m_credits(0),
-    m_mission(NULL)
+    m_mission(NULL),
+    m_boat(NULL)
 {
     Q_ASSERT(m_singleton == NULL);
     m_singleton = this;
@@ -50,6 +51,8 @@ Chapter::Chapter() :
     s.endGroup();
 
     m_tasksFile.load("dat:story/tasks.des");
+
+    m_boat = new Boat(0);
 }
 
 
@@ -65,6 +68,7 @@ Chapter::~Chapter()
     qDeleteAll(m_pendingDialogues);
     qDeleteAll(m_missions);
     delete m_mission;
+    delete m_boat;
     delete m_movie;
     delete m_briefing;
     delete m_desktop;

@@ -15,46 +15,26 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GAME_DEPOT_H
-#define GAME_DEPOT_H
-
-
-#include "gfx/video.h"
-#include "sfx/sound.h"
-#include "ui/arrow.h"
-#include "ui/frame.h"
+#include "boat.h"
+#include "txt/desfile.h"
 
 
 namespace game {
 
 
-class Depot : public ui::Frame
+Boat::Boat(int id)
 {
-    Q_OBJECT
-
-public:
-    Depot();
-    ~Depot();
-
-private slots:
-    void flip();
-
-protected:
-    void draw();
-    bool mousePressEvent(const QPoint &pos, Qt::MouseButton button);
-
-private:
-    ui::Label *m_backgroundLabel;
-    sfx::Sound m_backgroundSound;
-    gfx::Video m_videoFlip1;
-    gfx::Video m_videoFlip2;
-    gfx::Texture m_flip;
-    ui::Button *m_btnFlip;
-    bool m_flipped;
-};
+    if (id == 0)
+    {
+        txt::DesFile file("vfx:sobjects/hiob.des");
+        file.setSection("Ship");
+        m_name = file.value("Name").toString();
+        file.setSection("Cockpit");
+        m_cockpit = file.value("Name").toString();
+        m_flipMovie1 = "hiob1.mvi";
+        m_flipMovie2 = "hiob2.mvi";
+    }
+}
 
 
 } // namespace game
-
-
-#endif // GAME_DEPOT_H
