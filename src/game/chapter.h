@@ -60,6 +60,7 @@ public:
     Dialog* dialog(int dialogId) const;
     QList<Dialog*> dialogs(int room);
     QList<Dialog*> dialogsEnCom(bool room);
+    QList<Dialog*> dialogsDirect();
     const QSet<int>& messages() const { return m_messages; }
     int numSmallTalks() const { return m_numSmallTalks; }
     bool movieAutopilot() const { return m_movieAutopilot; }

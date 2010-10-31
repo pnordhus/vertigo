@@ -434,6 +434,17 @@ QList<Dialog*> Chapter::dialogsEnCom(bool room)
 }
 
 
+QList<Dialog*> Chapter::dialogsDirect()
+{
+    QList<Dialog*> list;
+    foreach (Dialog *dialog, m_pendingDialogues) {
+        if (dialog->matchesDirect(m_area->code(), m_currentStation))
+            list << dialog;
+    }
+    return list;
+}
+
+
 void Chapter::finishDialog(int dialogId)
 {
     Dialog *dialog = m_pendingDialogues.take(dialogId);

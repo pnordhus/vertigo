@@ -351,7 +351,7 @@ void Dialog::loadStrings(const QString &filename)
 
 bool Dialog::matches(int area, int station, int room) const
 {
-    if (m_area != area || m_station != station || m_room != room)
+    if (m_area != area || m_station != station || m_room != room || m_person >= 20)
         return false;
 
     return testPreconditions();
@@ -367,6 +367,19 @@ bool Dialog::matchesEnCom(int area, int station, bool room) const
     if (m_room != 1 && room)
         return false;
     if (m_person != 99)
+        return false;
+
+    return testPreconditions();
+}
+
+
+bool Dialog::matchesDirect(int area, int station) const
+{
+    if (m_area != 0 && m_area != area)
+        return false;
+    if (m_station != 0 && m_station != station)
+        return false;
+    if (m_person != 20)
         return false;
 
     return testPreconditions();
