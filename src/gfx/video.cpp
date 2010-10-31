@@ -343,7 +343,7 @@ QImage Video::createImage()
     image.fill(0);
     image.setColorTable(m_colorTable);
 
-    const bool wide = (m_width * m_height) != quint32(m_frame.size());
+    const bool wide = (m_width * m_height) > quint32(m_frame.size());
 
     const quint8 *index = reinterpret_cast<const quint8*>(m_frame.constData());
     for (unsigned int y = 0; y < m_height; y++) {
