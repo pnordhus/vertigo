@@ -260,8 +260,9 @@ void Chapter::load(int slot)
 void Chapter::setStation(int stationIndex, bool load)
 {
     if (m_desktop) {
-        save(98, QString("AutoSave: %1").arg(m_desktop->name()));
+        save(99, m_desktop->name());
         m_desktop->deleteLater();
+        m_save = true;
     }
 
     int previousStation = m_currentStation;
@@ -294,7 +295,7 @@ void Chapter::setStation(int stationIndex, bool load)
 void Chapter::startMission(const QString &name)
 {
     if (m_desktop) {
-        save(98, QString("AutoSave: %1").arg(m_desktop->name()));
+        save(99, m_desktop->name());
         m_desktop->deleteLater();
         m_desktop = NULL;
     }
@@ -390,7 +391,7 @@ void Chapter::playMovies()
             emit endGame();
         } else {
             if (m_save) {
-                save(98, QString("AutoSave: %1").arg(m_desktop->name()));
+                save(99, m_desktop->name());
                 m_save = false;
             }
             emit setRenderer(m_desktop);
@@ -472,7 +473,7 @@ void Chapter::finishDialog(int dialogId)
     if (dialog && dialog->isSmallTalk())
         m_numSmallTalks++;
 
-    save(99, QString("AutoSave"));
+    save(99, m_desktop->name());
 }
 
 
