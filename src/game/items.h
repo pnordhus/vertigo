@@ -15,72 +15,55 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GAME_DEPOT_H
-#define GAME_DEPOT_H
+#ifndef GAME_ITEMS_H
+#define GAME_ITEMS_H
 
 
-#include "gfx/video.h"
-#include "sfx/sound.h"
-#include "ui/arrow.h"
-#include "ui/frame.h"
+#include <QString>
+#include <QStringList>
+#include <QMap>
 
 
 namespace game {
 
 
-class Depot : public ui::Frame
+class Items
 {
-    Q_OBJECT
-
-private:
-    enum State { Flipping, Loading, Ready, Scrolling, Repair };
-    enum LoadingState { Arrows, List1, List2 };
+public:
+    enum Type { Torpedo, Magazine, Gun, Engine, Booster, Silator, Armor, NRSkin, Sensor, Software, Buzzer, Fixer };
 
 public:
-    Depot();
-    ~Depot();
+    Items();
+    ~Items();
 
-private slots:
-    void flip();
+public:
+    struct Item
+    {
+        int model;
+        Type type;
+        int cost;
+        QString longname;
+        QString imgname;
+        QStringList text;
+    };
 
-protected:
-    void draw();
-    bool mousePressEvent(const QPoint &pos, Qt::MouseButton button);
+
+public:
+    Item* get(int model);
+    Item* getType(Type type);
+
+public:
+    static Items* get();
 
 private:
-    ui::Label *m_backgroundLabel;
-    sfx::Sound m_backgroundSound;
-    gfx::Video m_videoFlip1;
-    gfx::Video m_videoFlip2;
-    gfx::Texture m_boatTexture;
-    ui::Label *m_boatLabel;
-    ui::Button *m_btnFlip;
-    ui::Button *m_btnRepair;
-    ui::Button *m_btnLeft1;
-    ui::Button *m_btnRight1;
-    ui::Button *m_btnLeft2;
-    ui::Button *m_btnRight2;
-    ui::Button *m_btnBuy;
-    ui::Button *m_btnSell;
-    ui::Button *m_btnInfo;
+    void addItem(int model, Type type, const QString &name, const QString &imgname, const QString &txtname);
 
-    ui::Label *m_lblFlip;
-    ui::Label *m_lblLeft1;
-    ui::Label *m_lblRight1;
-    ui::Label *m_lblLeft2;
-    ui::Label *m_lblRight2;
-    ui::Label *m_lblBuy;
-    ui::Label *m_lblSell;
-
-    QTime m_time;
-    State m_state;
-    int m_side;
-    LoadingState m_loadingState;
-    int m_loadingItem;
+private:
+    QMap<int, Item*> m_items;
 };
 
 
 } // namespace game
 
 
-#endif // GAME_DEPOT_H
+#endif // GAME_ITEMS_H

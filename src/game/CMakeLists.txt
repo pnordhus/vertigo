@@ -19,6 +19,8 @@ set(SOURCES
     dialogframe.h
     encom.cpp
     encom.h
+    items.cpp
+    items.h
     main.cpp
     mainmenu.cpp
     mainmenu.h

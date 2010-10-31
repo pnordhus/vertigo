@@ -22,6 +22,16 @@
 #include <QTextStream>
 
 
+QString trimEnd(const QString& str)
+{
+    int i;
+    for (i = str.length() - 1; i >= 0 && str[i].isSpace(); i--);
+    QString res = str;
+    res.truncate(i + 1);
+    return res;
+}
+
+
 namespace txt {
 
 
@@ -36,15 +46,6 @@ DesFile::DesFile(const QString &filename)
     load(filename);
 }
 
-
-QString trimEnd(const QString& str)
-{
-    int i;
-    for (i = str.length() - 1; i >= 0 && str[i].isSpace(); i--);
-    QString res = str;
-    res.truncate(i + 1);
-    return res;
-}
 
 bool DesFile::load(const QString &filename)
 {
