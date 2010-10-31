@@ -517,7 +517,7 @@ void Chapter::addDialog(int dialogId)
 {
     Q_ASSERT(!m_pendingDialogues.contains(dialogId));
 
-    Dialog *dialog = new Dialog(dialogId);
+    Dialog *dialog = new Dialog(m_code, dialogId);
     connect(dialog, SIGNAL(remove(int)), SLOT(finishDialog(int)));
     connect(dialog, SIGNAL(addMessage(int)), SLOT(addMessage(int)));
     connect(dialog, SIGNAL(addTask(int)), SLOT(addTask(int)));

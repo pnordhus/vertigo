@@ -95,7 +95,7 @@ private:
     };
 
 public:
-    Dialog(int id, ui::Widget *parent = NULL);
+    Dialog(int chapter, int id, ui::Widget *parent = NULL);
 
 signals:
     void close();

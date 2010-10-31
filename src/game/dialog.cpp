@@ -27,7 +27,7 @@
 namespace game {
 
 
-Dialog::Dialog(int id, ui::Widget *parent) :
+Dialog::Dialog(int chapter, int id, ui::Widget *parent) :
     ui::Widget(parent),
     m_id(id),
     m_option(NULL),
@@ -36,7 +36,7 @@ Dialog::Dialog(int id, ui::Widget *parent) :
     m_changeChapter(-1),
     m_gameOver(false)
 {
-    const QString baseName = QString("txt:dia/%1/%2").arg(id / 1000, 3, 10, QChar('0')).arg(id, 6, 10, QChar('0'));
+    const QString baseName = QString("txt:dia/%1/%2").arg(chapter, 3, 10, QChar('0')).arg(id, 6, 10, QChar('0'));
 
     txt::DesFile file(baseName + ".des");
 
