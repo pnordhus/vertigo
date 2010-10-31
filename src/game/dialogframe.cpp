@@ -16,6 +16,8 @@ DialogFrame::DialogFrame(Dialog* dialog, const QString &roomName) :
     const gfx::ColorTable colorTable("gfx:pal/gui/border.pal");
 
     QImage image = gfx::Image::load(QString("gfx:img/desktop/bground/d_%1.img").arg(roomName), colorTable);
+    if (image.isNull())
+        image = gfx::Image::load("gfx:img/desktop/bground/d_ew1.img", colorTable);
 
     ui::Label *label;
 

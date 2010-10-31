@@ -94,8 +94,14 @@ void Frame::setupFrame(const QSize &size, const QString &title, bool closable)
 int Frame::updateBorder(gfx::Texture texture, const gfx::ColorTable &colorTable, int x, int id)
 {
     QImage image = gfx::Image::load(QString("gfx:img/desktop/gui/bort%1.img").arg(id), colorTable);
-    texture.update(x, 0, image);
-    return image.width();
+    if (texture.width() - (x + image.width()) < 0) {
+        const int width = texture.width() - x;
+        texture.update(x, 0, image.copy(0, 0, width, image.height()));
+        return width;
+    } else {
+        texture.update(x, 0, image);
+        return image.width();
+    }
 }
 
 

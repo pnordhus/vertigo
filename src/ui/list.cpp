@@ -15,57 +15,40 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GAME_VERTIGO_H
-#define GAME_VERTIGO_H
+#include "list.h"
+#include "gfx/font.h"
 
 
-#include "gfx/fontmanager.h"
-#include "sfx/soundsystem.h"
-#include <QObject>
+namespace ui {
 
 
-namespace game {
-
-
-class Chapter;
-class MainMenu;
-class Movie;
-class Window;
-
-
-class Vertigo : public QObject
+List::List(Widget *parent) :
+    Widget(parent)
 {
-    Q_OBJECT
 
-public:
-    Vertigo();
-    ~Vertigo();
-
-public:
-    bool start();
-
-private slots:
-    void update();
-    void startGame();
-    void loadGame(int);
-    void endGame();
-    void introFinished();
-
-private:
-    void createMainMenu(bool skipToTitle);
-    void createChapter();
-
-private:
-    Window *m_window;
-    MainMenu *m_mainMenu;
-    Movie *m_intro;
-    Chapter *m_chapter;
-    sfx::SoundSystem *m_soundSystem;
-    gfx::FontManager *m_fontManager;
-};
+}
 
 
-} // namespace game
+void List::setText(const QStringList &text)
+{
+    m_text = text;
+}
 
 
-#endif // GAME_VERTIGO_H
+void List::setFont(const gfx::Font &font)
+{
+    m_font = font;
+}
+
+
+void List::draw()
+{
+    int y = 0;
+    foreach (const QString &line, m_text) {
+        QRect rect = m_font.draw(line, QPoint(0, y), QSize(width(), -1), true, false);
+        y += rect.height();
+    }
+}
+
+
+} // namespace ui

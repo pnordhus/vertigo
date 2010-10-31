@@ -20,11 +20,12 @@
 
 
 #include "area.h"
+#include "briefing.h"
 #include "desktop.h"
 #include "dialog.h"
 #include "mission.h"
 #include "movie.h"
-#include "briefing.h"
+#include "task.h"
 
 
 namespace game {
@@ -59,6 +60,7 @@ public:
     Dialog* dialog(int dialogId) const;
     QList<Dialog*> dialogs(int room);
     QList<Dialog*> dialogsEnCom(bool room);
+    QList<Dialog*> dialogsDirect();
     const QSet<int>& messages() const { return m_messages; }
     int numSmallTalks() const { return m_numSmallTalks; }
     bool movieAutopilot() const { return m_movieAutopilot; }
@@ -70,6 +72,7 @@ public:
     const QStringList& successfulMissions() const { return m_successfulMissions; }
     void startMission(const QString &name);
     const Mission* mission() const { return m_mission; }
+    QList<Task> tasks();
 
 private:
     void load(const QString &filename);
@@ -79,12 +82,13 @@ private:
 
 private slots:
     void movieFinished();
-    void removeDialog(int dialogId);
+    void finishDialog(int dialogId);
     void addMessage(int message);
     void addTask(int task);
     void removeTask(int task);
     void changeChapter(int chapter);
     void addDialog(int dialogId);
+    void removeDialog(int dialogId);
     void addCredit(int credit);
     void enableStation(int station);
     void disableStation(int station);
@@ -94,6 +98,7 @@ private slots:
 
 public:
     static Chapter* get() { Q_ASSERT(m_singleton); return m_singleton; }
+    static QMap<int, QString> savedGames();
 
 private:
     int m_code;
@@ -110,7 +115,7 @@ private:
     QMap<int, Dialog*> m_pendingDialogues;
     static Chapter *m_singleton;
     QSet<int> m_messages;
-    QList<int> m_tasks;
+    QList<int> m_runningTasks;
     QList<Mission*> m_missions;
     QStringList m_successfulMissions;
     int m_credits;
@@ -119,6 +124,7 @@ private:
     bool m_movieApproach;
     bool m_movieHarbour;
     Mission *m_mission;
+    txt::DesFile m_tasksFile;
 };
 
 

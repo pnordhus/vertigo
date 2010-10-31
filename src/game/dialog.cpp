@@ -72,6 +72,9 @@ Dialog::Dialog(int id, ui::Widget *parent) :
         } else if (type == "addperson") {
             message.type = Message::AddDialog;
             message.value = file.value("Name").toInt();
+        } else if (type == "subperson") {
+            message.type = Message::RemoveDialog;
+            message.value = file.value("Name").toInt();
         } else if (type == "credit") {
             message.type = Message::AddCredit;
             message.value = file.value("amount").toInt();
@@ -148,6 +151,10 @@ void Dialog::select()
 
                 case Message::AddDialog:
                     emit addDialog(message.value);
+                    break;
+
+                case Message::RemoveDialog:
+                    emit removeDialog(message.value);
                     break;
 
                 case Message::AddCredit:
@@ -344,7 +351,7 @@ void Dialog::loadStrings(const QString &filename)
 
 bool Dialog::matches(int area, int station, int room) const
 {
-    if (m_area != area || m_station != station || m_room != room)
+    if (m_area != area || m_station != station || m_room != room || m_person >= 20)
         return false;
 
     return testPreconditions();
@@ -360,6 +367,19 @@ bool Dialog::matchesEnCom(int area, int station, bool room) const
     if (m_room != 1 && room)
         return false;
     if (m_person != 99)
+        return false;
+
+    return testPreconditions();
+}
+
+
+bool Dialog::matchesDirect(int area, int station) const
+{
+    if (m_area != 0 && m_area != area)
+        return false;
+    if (m_station != 0 && m_station != station)
+        return false;
+    if (m_person != 20)
         return false;
 
     return testPreconditions();

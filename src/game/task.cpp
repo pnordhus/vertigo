@@ -15,57 +15,25 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GAME_VERTIGO_H
-#define GAME_VERTIGO_H
-
-
-#include "gfx/fontmanager.h"
-#include "sfx/soundsystem.h"
-#include <QObject>
+#include "task.h"
+#include <QRegExp>
 
 
 namespace game {
 
 
-class Chapter;
-class MainMenu;
-class Movie;
-class Window;
-
-
-class Vertigo : public QObject
+Task::Task(const QString &text)
 {
-    Q_OBJECT
-
-public:
-    Vertigo();
-    ~Vertigo();
-
-public:
-    bool start();
-
-private slots:
-    void update();
-    void startGame();
-    void loadGame(int);
-    void endGame();
-    void introFinished();
-
-private:
-    void createMainMenu(bool skipToTitle);
-    void createChapter();
-
-private:
-    Window *m_window;
-    MainMenu *m_mainMenu;
-    Movie *m_intro;
-    Chapter *m_chapter;
-    sfx::SoundSystem *m_soundSystem;
-    gfx::FontManager *m_fontManager;
-};
+    QRegExp reg("(\\w): (.*)");
+    reg.indexIn(text);
+    if (reg.cap(1) == "T")
+        m_type = Tip;
+    else if (reg.cap(1) == "A")
+        m_type = Job;
+    else if (reg.cap(1) == "M")
+        m_type = Mission;
+    m_text = reg.cap(2);
+}
 
 
 } // namespace game
-
-
-#endif // GAME_VERTIGO_H

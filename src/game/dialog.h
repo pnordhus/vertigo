@@ -56,6 +56,7 @@ private:
             RemoveTask,
             ChangeChapter,
             AddDialog,
+            RemoveDialog,
             AddCredit,
             EnableStation,
             DisableStation,
@@ -103,6 +104,7 @@ signals:
     void removeTask(int);
     void changeChapter(int);
     void addDialog(int);
+    void removeDialog(int);
     void addCredit(int);
     void enableStation(int);
     void disableStation(int);
@@ -113,9 +115,11 @@ public:
     int id() const { return m_id; }
     const QString& name() const { return m_name; }
     bool isFemale() const { return m_female; }
+    int room() const { return m_room; }
     int person() const { return m_person; }
     bool matches(int area, int station, int room) const;
     bool matchesEnCom(int area, int station, bool room) const;
+    bool matchesDirect(int area, int station) const;
     bool isSmallTalk() const { return m_isSmallTalk; }
     bool remove() const { return m_remove; }
 

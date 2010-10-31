@@ -118,9 +118,12 @@ Desktop::Desktop(const QString &name) :
         button->setText(name);
         button->setPosition(offset.x() + file.value("X").toInt(), offset.y() + file.value("Y").toInt());
         button->setProperty("index", index);
-        button->setProperty("name", name);
-        button->setProperty("room", file.value("Room"));
         connect(button, SIGNAL(clicked()), SLOT(showRoom()));
+
+        RoomEntry room;
+        room.name = file.value("room").toString();
+        room.title = name;
+        m_rooms.insert(index, room);
     }
 
     m_miniMovie.load(file);
@@ -144,7 +147,7 @@ void Desktop::activate()
     if (m_first) {
         m_first = false;
         m_nameSound.play();
-        checkEnCom();
+        checkDialogs();
     }
 }
 
@@ -198,12 +201,14 @@ void Desktop::hideNotebook()
 
 void Desktop::showRoom()
 {
-    const int index = sender()->property("index").toInt();
-    const QString title = sender()->property("name").toString();
-    const QString name = sender()->property("room").toString();
+    showRoom(sender()->property("index").toInt());
+}
 
+
+void Desktop::showRoom(int index)
+{
     Q_ASSERT(!m_room);
-    m_room = new Room(index, title, name);
+    m_room = new Room(index, m_rooms[index].title, m_rooms[index].name);
     connect(m_room, SIGNAL(close()), SLOT(hideRoom()));
     connect(m_room, SIGNAL(startDialog(Dialog*)), SLOT(showDialog(Dialog*)));
     connect(m_room, SIGNAL(startEnCom(Dialog*)), SLOT(showEnCom(Dialog*)));
@@ -224,7 +229,7 @@ void Desktop::hideRoom()
     m_room = NULL;
     m_btnNotebook->show();
     m_backgroundSound.setVolume(1.0f);
-    checkEnCom();
+    checkDialogs();
 }
 
 
@@ -284,7 +289,7 @@ void Desktop::hideEnCom()
     sfx::SoundSystem::get()->sound(sfx::EnComHide)->play();
     m_backgroundSound.setVolume(1.0f);
 
-    checkEnCom();
+    checkDialogs();
 }
 
 
@@ -312,9 +317,17 @@ void Desktop::hideDeparture()
 }
 
 
-void Desktop::checkEnCom()
+void Desktop::checkDialogs()
 {
-    const QList<Dialog*> dialogs = Chapter::get()->dialogsEnCom(false);
+    QList<Dialog*> dialogs = Chapter::get()->dialogsDirect();
+    if (!dialogs.isEmpty()) {
+        Dialog* dialog = dialogs.first();
+        showRoom(dialog->room());
+        showDialog(dialog);
+        return;
+    }
+
+    dialogs = Chapter::get()->dialogsEnCom(false);
     if (!dialogs.isEmpty())
         showEnCom(dialogs.first());
 }

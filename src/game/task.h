@@ -15,57 +15,35 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GAME_VERTIGO_H
-#define GAME_VERTIGO_H
+#ifndef GAME_TASK_H
+#define GAME_TASK_H
 
 
-#include "gfx/fontmanager.h"
-#include "sfx/soundsystem.h"
-#include <QObject>
+#include <QString>
 
 
 namespace game {
 
 
-class Chapter;
-class MainMenu;
-class Movie;
-class Window;
-
-
-class Vertigo : public QObject
+class Task
 {
-    Q_OBJECT
+public:
+    enum Type { Tip, Job, Mission };
 
 public:
-    Vertigo();
-    ~Vertigo();
+    Task(const QString &text);
 
 public:
-    bool start();
-
-private slots:
-    void update();
-    void startGame();
-    void loadGame(int);
-    void endGame();
-    void introFinished();
+    Type type() const { return m_type; }
+    const QString& text() const { return m_text; }
 
 private:
-    void createMainMenu(bool skipToTitle);
-    void createChapter();
-
-private:
-    Window *m_window;
-    MainMenu *m_mainMenu;
-    Movie *m_intro;
-    Chapter *m_chapter;
-    sfx::SoundSystem *m_soundSystem;
-    gfx::FontManager *m_fontManager;
+    Type m_type;
+    QString m_text;
 };
 
 
 } // namespace game
 
 
-#endif // GAME_VERTIGO_H
+#endif // GAME_TASK_H

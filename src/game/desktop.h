@@ -62,9 +62,16 @@ private slots:
 private:
     void activate();
     void deactivate();
-    void checkEnCom();
+    void showRoom(int index);
+    void checkDialogs();
 
 private:
+    struct RoomEntry
+    {
+        QString name;
+        QString title;
+    };
+
     gfx::Texture m_background;
     sfx::Sound m_backgroundSound;
     sfx::Sound m_nameSound;
@@ -80,6 +87,7 @@ private:
     QString m_approachMovie;
     MiniMovie m_miniMovie;
     bool m_first;
+    QMap<int, RoomEntry> m_rooms;
 };
 
 

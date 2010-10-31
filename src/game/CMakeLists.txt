@@ -34,6 +34,8 @@ set(SOURCES
     room.h
     station.cpp
     station.h
+    task.cpp
+    task.h
     vertigo.cpp
     vertigo.h
     window.cpp
