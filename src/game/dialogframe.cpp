@@ -32,7 +32,7 @@ DialogFrame::DialogFrame(Dialog* dialog, const QString &roomName) :
     m_dialog->setParentWidget(this);
     m_dialog->setPosition(25, 23);
     m_dialog->setWidth(360 - 32);
-    connect(m_dialog, SIGNAL(close()), SIGNAL(close()));
+    connect(m_dialog, SIGNAL(close()), SLOT(closeFrame()));
 }
 
 

@@ -34,6 +34,8 @@ enum StandardSound
 {
     Click,
     Woop,
+    FrameOpen,
+    FrameClose,
     NotebookShow,
     NotebookHide,
     NotebookBackground,

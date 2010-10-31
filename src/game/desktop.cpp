@@ -155,6 +155,7 @@ void Desktop::activate()
 void Desktop::deactivate()
 {
     m_backgroundSound.stop();
+    sfx::SoundSystem::get()->sound(sfx::NotebookBackground)->stop();
 }
 
 

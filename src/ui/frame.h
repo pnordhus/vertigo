@@ -40,6 +40,9 @@ signals:
 public:
     void setupFrame(const QSize &size, const QString &title, bool closable);
 
+protected slots:
+    void closeFrame();
+
 private:
     static int updateBorder(gfx::Texture texture, const gfx::ColorTable &colorTable, int x, int id);
 };

@@ -46,6 +46,10 @@ SoundSystem::SoundSystem()
     m_standardSounds.insert(Click, new Sound("sfx:snd/desktop/click.pcm"));
     m_standardSounds.insert(Woop, new Sound("sfx:snd/desktop/woop.pcm"));
     m_standardSounds.value(Woop)->setVolume(0.1f);
+    m_standardSounds.insert(FrameOpen, new Sound("sfx:snd/desktop/fopen.pcm"));
+    m_standardSounds.value(FrameOpen)->setVolume(0.1f);
+    m_standardSounds.insert(FrameClose, new Sound("sfx:snd/desktop/fclose.pcm"));
+    m_standardSounds.value(FrameClose)->setVolume(0.1f);
 
     m_standardSounds.insert(NotebookShow, new Sound("sfx:snd/desktop/noteb1.pcm"));
     m_standardSounds.insert(NotebookHide, new Sound("sfx:snd/desktop/noteb3.pcm"));

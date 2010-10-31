@@ -19,6 +19,7 @@
 #include "frame.h"
 #include "gfx/font.h"
 #include "gfx/image.h"
+#include "sfx/soundsystem.h"
 
 
 namespace ui {
@@ -83,11 +84,13 @@ void Frame::setupFrame(const QSize &size, const QString &title, bool closable)
         ui::Button *buttonClose = new ui::Button(this);
         buttonClose->setTexture(gfx::Image::load("gfx:img/desktop/gui/gdexitu.img", colorTable));
         buttonClose->setPressedTexture(gfx::Image::load("gfx:img/desktop/gui/gdexitd.img", colorTable));
-        connect(buttonClose, SIGNAL(clicked()), SIGNAL(close()));
+        connect(buttonClose, SIGNAL(clicked()), SLOT(closeFrame()));
     }
 
     setTexture(texture);
     setSize(size);
+
+    sfx::SoundSystem::get()->sound(sfx::FrameOpen)->play();
 }
 
 
@@ -104,5 +107,10 @@ int Frame::updateBorder(gfx::Texture texture, const gfx::ColorTable &colorTable,
     }
 }
 
+void Frame::closeFrame()
+{
+    sfx::SoundSystem::get()->sound(sfx::FrameClose)->play();
+    emit close();
+}
 
 } // namespace ui
