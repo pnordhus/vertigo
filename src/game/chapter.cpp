@@ -112,9 +112,6 @@ void Chapter::load(const QString &filename, bool load)
 
     txt::DesFile file(filename);
 
-    if (file.contains("name"))
-        m_name = file.value("name").toString();
-
     if (file.contains("credit"))
         m_credits = file.value("credit").toInt();
 
@@ -185,8 +182,7 @@ void Chapter::save() const
 {
     txt::DesFile file;
 
-    file.setValue("name", m_name);
-    file.setValue("station", m_desktop->name());
+    file.setValue("name", m_desktop->name());
     file.setValue("time", QDateTime::currentDateTime());
     file.setValue("credit", m_credits);
 
@@ -252,14 +248,15 @@ void Chapter::save() const
         file.setValue(QString("movie%1").arg(i++), movie);
 
     const QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
-    file.save(QString("%1/save_%2.des").arg(path, m_name));
+    file.save(QString("%1/save/%2.des").arg(path, m_name));
 }
 
 
 void Chapter::load(const QString &name)
 {
+    m_name = name;
     const QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
-    load(QString("%1/save_%2.des").arg(path, name), true);
+    load(QString("%1/save/%2.des").arg(path, name), true);
 }
 
 
@@ -602,8 +599,8 @@ QList<Chapter::SavedGame> Chapter::savedGames()
     QList<SavedGame> saves;
 
     const QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
-    QDir dir(path);
-    QRegExp reg("save_(\\w*)\\.des");
+    QDir dir(path + "/save");
+    QRegExp reg("(.*)\\.des");
     foreach (const QString &save, dir.entryList()) {
         if (reg.indexIn(save) >= 0) {
             const QString filename = dir.filePath(save);
@@ -611,9 +608,8 @@ QList<Chapter::SavedGame> Chapter::savedGames()
             txt::DesFile file(filename);
 
             SavedGame game;
-            game.slot = reg.cap(1).toInt();
-            game.name = file.value("name").toString();
-            game.station = file.value("station").toString();
+            game.name = reg.cap(1);
+            game.station = file.value("name").toString();
             game.time = file.value("time").toDateTime();
             saves << game;
         }

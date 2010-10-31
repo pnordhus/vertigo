@@ -39,7 +39,11 @@ class Chapter : public QObject
 public:
     struct SavedGame
     {
-        int slot;
+        bool operator < (const SavedGame& rho) const
+        {
+            return time > rho.time;
+        }
+
         QString name;
         QString station;
         QDateTime time;

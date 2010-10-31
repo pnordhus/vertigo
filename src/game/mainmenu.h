@@ -39,11 +39,13 @@ public:
     MainMenu(bool skipToTitle);
 
 signals:
-    void startGame();
+    void startGame(const QString &name);
     void loadGame(const QString &name);
     void quit();
 
 private slots:
+    void showNew();
+    void hideNew();
     void showLoad();
     void hideLoad();
     void loadGame();
@@ -53,14 +55,18 @@ private:
     void deactivate();
     void changeState(State state);
     void mousePressEvent(QMouseEvent *);
+    void keyPressEvent(QKeyEvent *);
 
 private:
     State m_state;
     ui::Label m_presents;
     ui::Label m_title;
     ui::Label *m_lblMain;
+    ui::Label *m_lblNew;
+    ui::Label *m_lblName;
     ui::Label *m_lblLoad;
     sfx::Sound m_backgroundSound;
+    QString m_name;
 };
 
 
