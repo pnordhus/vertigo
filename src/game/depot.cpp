@@ -60,6 +60,8 @@ Depot::Depot() :
 
     m_videoFlip1.open(QString("gfx:mvi/sflip/%1").arg(Chapter::get()->boat()->flipMovie1()));
     m_videoFlip2.open(QString("gfx:mvi/sflip/%1").arg(Chapter::get()->boat()->flipMovie2()));
+    m_videoFlip1.setFrameRate(20);
+    m_videoFlip2.setFrameRate(20);
     m_videoFlip2.play();
 
     Q_ASSERT(m_videoFlip1.width() == m_videoFlip2.width());

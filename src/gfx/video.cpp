@@ -57,7 +57,6 @@ void Video::open(const QString &filename)
     quint32 totalFrames;
     quint32 audioFrames;
     quint32 videoFrames;
-    quint32 framerate;
     quint32 hasAudio;
     quint32 channels;
     quint32 sampleRate;
@@ -65,7 +64,7 @@ void Video::open(const QString &filename)
     stream.skipRawData(8);
     stream >> m_width >> m_height;
     stream >> totalFrames >> audioFrames >> videoFrames;
-    stream >> framerate;
+    stream >> m_frameRate;
     stream >> hasAudio >> channels >> sampleRate;
     stream.skipRawData(4);
 
@@ -127,6 +126,12 @@ void Video::stop()
 }
 
 
+void Video::setFrameRate(int frameRate)
+{
+    m_frameRate = frameRate;
+}
+
+
 void Video::reset()
 {
     m_videoPos = 0;
@@ -151,7 +156,7 @@ Image Video::getFrame()
         }
     }
 
-    if (m_time.elapsed() < 100)
+    if (m_time.elapsed() < 1000.0f / m_frameRate)
         return QImage();
 
     m_time.restart();

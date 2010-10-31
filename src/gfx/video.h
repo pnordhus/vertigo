@@ -40,6 +40,7 @@ public:
     void playLoop();
     void stop();
     bool isPlaying() const { return m_playing; }
+    void setFrameRate(int frameRate);
     Image getFrame();
     QByteArray getAudio();
     bool atEnd() const;
@@ -79,6 +80,7 @@ private:
     quint32 m_audioPos;
     quint32 m_lastAudioPos;
     bool m_hasAudio;
+    quint32 m_frameRate;
 
     QTime m_time;
     bool m_playing;
