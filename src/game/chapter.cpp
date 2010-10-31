@@ -38,7 +38,8 @@ Chapter::Chapter() :
     m_currentStation(-1),
     m_credits(0),
     m_mission(NULL),
-    m_boat(NULL)
+    m_boat(NULL),
+    m_end(false)
 {
     Q_ASSERT(m_singleton == NULL);
     m_singleton = this;
@@ -86,11 +87,11 @@ void Chapter::loadChapter(int chapter)
             m_runningTasks.removeAll(m_tasksFile.value(key).toInt());
     }
 
-    load(QString("dat:story/ch%1.des").arg(chapter));
+    load(QString("dat:story/ch%1.des").arg(chapter), false);
 }
 
 
-void Chapter::load(const QString &filename)
+void Chapter::load(const QString &filename, bool load)
 {
     m_movies.clear();
     delete m_area;
@@ -106,6 +107,7 @@ void Chapter::load(const QString &filename)
     m_missions.clear();
     delete m_mission;
     m_mission = NULL;
+    m_save = false;
 
     txt::DesFile file(filename);
 
@@ -171,7 +173,7 @@ void Chapter::load(const QString &filename)
     // the intro has always been played
     m_playedMovies << 2;
 
-    setStation(startStationIndex);
+    setStation(startStationIndex, load);
 }
 
 
@@ -251,18 +253,16 @@ void Chapter::save(int slot, const QString &name) const
 void Chapter::load(int slot)
 {
     const QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
-    load(QString("%1/save%2.des").arg(path).arg(slot));
+    load(QString("%1/save%2.des").arg(path).arg(slot), true);
 }
 
 
-void Chapter::setStation(int stationIndex)
+void Chapter::setStation(int stationIndex, bool load)
 {
     if (m_desktop) {
         save(98, QString("AutoSave: %1").arg(m_desktop->name()));
         m_desktop->deleteLater();
     }
-
-    m_save = m_desktop;
 
     int previousStation = m_currentStation;
     m_currentStation = stationIndex;
@@ -284,7 +284,7 @@ void Chapter::setStation(int stationIndex)
     if (m_movieHarbour && previousStation >= 0)
         m_movies << QString("gfx:mvi/film/%1hf.mvi").arg("hiob");
 
-    if (!m_mission)
+    if (!m_mission && !load)
         playApproach(true);
 
     playMovies();
@@ -293,6 +293,12 @@ void Chapter::setStation(int stationIndex)
 
 void Chapter::startMission(const QString &name)
 {
+    if (m_desktop) {
+        save(98, QString("AutoSave: %1").arg(m_desktop->name()));
+        m_desktop->deleteLater();
+        m_desktop = NULL;
+    }
+
     QMutableListIterator<Mission*> it(m_missions);
     while (it.hasNext()) {
         it.next();
@@ -303,11 +309,6 @@ void Chapter::startMission(const QString &name)
         }
     }
 
-    if (m_desktop) {
-        save(98, QString("AutoSave: %1").arg(m_desktop->name()));
-        m_desktop->deleteLater();
-        m_desktop = NULL;
-    }
     m_currentStation = -1;
 
     startMission();
@@ -335,6 +336,7 @@ void Chapter::finishMission()
     m_successfulMissions.append(m_mission->shortName());
     delete m_mission;
     m_mission = NULL;
+    m_save = true;
 
     if (m_currentStation < 0) {
         //TODO: this should be selectable from within the mission
@@ -356,8 +358,11 @@ void Chapter::playApproach(bool autopilot)
     if (m_approachMovieReplacement.contains(m_currentStation)) {
         const QString movie = m_approachMovieReplacement.take(m_currentStation);
         QRegExp reg("d(\\d*)\\.mvi");
-        if (reg.indexIn(movie) >= 0)
+        if (reg.indexIn(movie) >= 0) {
             m_playedMovies << reg.cap(1).toInt();
+            if (reg.cap(1).toInt() == 36)
+                m_end = true;
+        }
         m_movies << "gfx:mvi/film/" + movie;
     } else {
         if (m_movieAutopilot && autopilot)
@@ -381,6 +386,8 @@ void Chapter::playMovies()
         sfx::SoundSystem::get()->resumeAll();
         if (m_mission) {
             startMission();
+        } else if (m_end) {
+            emit endGame();
         } else {
             if (m_save) {
                 save(98, QString("AutoSave: %1").arg(m_desktop->name()));

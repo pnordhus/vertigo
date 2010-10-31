@@ -54,7 +54,7 @@ public:
     void save(int slot, const QString &name) const;
     void load(int slot);
     void loadChapter(int chapter);
-    void setStation(int station);
+    void setStation(int station, bool load = false);
     Area* area() const { return m_area; }
     const QMap<int, Station>& stations() const { return m_stations; }
     int currentStation() const { return m_currentStation; }
@@ -77,7 +77,7 @@ public:
     const Boat* boat() const { return m_boat; }
 
 private:
-    void load(const QString &filename);
+    void load(const QString &filename, bool load);
     void playApproach(bool autopilot);
     void playMovies();
     void startMission();
@@ -129,6 +129,7 @@ private:
     txt::DesFile m_tasksFile;
     bool m_save;
     Boat *m_boat;
+    bool m_end;
 };
 
 
