@@ -17,6 +17,7 @@
 
 #include "chapter.h"
 #include "depot.h"
+#include "items.h"
 #include "gfx/colortable.h"
 #include "gfx/image.h"
 #include "ui/button.h"
@@ -26,7 +27,8 @@ namespace game {
 
 
 Depot::Depot() :
-    m_flipped(false)
+    m_state(Flipping),
+    m_side(1)
 {
     const gfx::ColorTable colorTable("gfx:pal/gui/border.pal");
     gfx::Image backgroundImage = gfx::Image::load("gfx:img/desktop/depot/depoback.img", colorTable);
@@ -60,38 +62,64 @@ Depot::Depot() :
 
     m_videoFlip1.open(QString("gfx:mvi/sflip/%1").arg(Chapter::get()->boat()->flipMovie1()));
     m_videoFlip2.open(QString("gfx:mvi/sflip/%1").arg(Chapter::get()->boat()->flipMovie2()));
-    m_videoFlip1.setFrameRate(20);
-    m_videoFlip2.setFrameRate(20);
+    m_videoFlip1.setFrameRate(25);
+    m_videoFlip2.setFrameRate(25);
     m_videoFlip2.play();
 
     Q_ASSERT(m_videoFlip1.width() == m_videoFlip2.width());
     Q_ASSERT(m_videoFlip1.height() == m_videoFlip2.height());
-    m_flip.createEmpty(m_videoFlip1.width(), m_videoFlip1.height(), gfx::Texture::RGBA);
+    m_boatTexture.createEmpty(m_videoFlip1.width(), m_videoFlip1.height(), gfx::Texture::RGBA);
 
-    label = new ui::Label(m_backgroundLabel);
-    label->setTexture(m_flip);
-    label->setPosition(16, 85);
+    m_boatLabel = new ui::Label(m_backgroundLabel);
+    m_boatLabel->setTexture(m_boatTexture);
+    m_boatLabel->setPosition(16, 75);
 
     m_btnFlip = new ui::Button(m_backgroundLabel);
     m_btnFlip->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdfliu.img", colorTable));
+    m_btnFlip->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdflid.img", colorTable));
     m_btnFlip->setPosition(304, 243);
-    m_btnFlip->setOffset(2);
     connect(m_btnFlip, SIGNAL(clicked()), SLOT(flip()));
 
-    //gdlefd.img    Arrow left disabled
-    //gdlefu.img    Arrow left active
-    //gdrigd.img    Arrow right disabled
-    //gdrigu.img    Arrow right active
-    //gdflid.img    Flip disabled
-    //gdfliu.img    Flip active
-    //gdammod.img   Repair disabled (same as active)
-    //gdammou.img   Repair active
-    //gdbuyd.img    Buy disabled (same as active)
-    //gdbuyu.img    Buy active
-    //gdtinfd.img   Info disabled
-    //gdtinfu.img   Info active
-    //gdseld.img    Sell disabled (same as active)
-    //gdselu.img    Sell active
+    m_btnRepair = new ui::Button(m_backgroundLabel);
+    m_btnRepair->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdammou.img", colorTable));
+    m_btnRepair->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdammod.img", colorTable));
+    m_btnRepair->setPosition(304, 75);
+
+    m_btnLeft1 = new ui::Button(m_backgroundLabel);
+    m_btnLeft1->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdlefu.img", colorTable));
+    m_btnLeft1->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdlefd.img", colorTable));
+    m_btnLeft1->setPosition(21, 16);
+
+    m_btnRight1 = new ui::Button(m_backgroundLabel);
+    m_btnRight1->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdrigu.img", colorTable));
+    m_btnRight1->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdrigd.img", colorTable));
+    m_btnRight1->setPosition(501, 16);
+
+    m_btnLeft2 = new ui::Button(m_backgroundLabel);
+    m_btnLeft2->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdlefu.img", colorTable));
+    m_btnLeft2->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdlefd.img", colorTable));
+    m_btnLeft2->setPosition(21, 301);
+
+    m_btnRight2 = new ui::Button(m_backgroundLabel);
+    m_btnRight2->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdrigu.img", colorTable));
+    m_btnRight2->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdrigd.img", colorTable));
+    m_btnRight2->setPosition(501, 301);
+
+    m_btnBuy = new ui::Button(m_backgroundLabel);
+    m_btnBuy->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdbuyu.img", colorTable));
+    m_btnBuy->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdbuyd.img", colorTable));
+    m_btnBuy->setPosition(507, 243);
+
+    m_btnSell = new ui::Button(m_backgroundLabel);
+    m_btnSell->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdselu.img", colorTable));
+    m_btnSell->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdseld.img", colorTable));
+    m_btnSell->setPosition(507, 75);
+
+    m_btnInfo = new ui::Button(m_backgroundLabel);
+    m_btnInfo->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdtinfu.img", colorTable));
+    m_btnInfo->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdtinfd.img", colorTable));
+    m_btnInfo->setPosition(507, 131);
+
     //chkgre.img    Check green
     //chkred.img    Check red
 }
@@ -104,28 +132,48 @@ Depot::~Depot()
 
 void Depot::flip()
 {
-    m_flipped = !m_flipped;
-    if (m_flipped)
+    if (m_state == Ready && m_side == 1)
+    {
         m_videoFlip1.play();
-    else
+        m_state = Flipping;
+        m_side = 2;
+    }
+    if (m_state == Ready && m_side == 2)
+    {
         m_videoFlip2.play();
+        m_state = Flipping;
+        m_side = 1;
+    }
 }
 
 
 void Depot::draw()
 {
-    gfx::Image frame;
-    if (m_flipped)
-        frame = m_videoFlip1.getFrame();
-    else
-        frame = m_videoFlip2.getFrame();
-    if (!frame.isNull())
+    if (m_state == Flipping)
     {
-        gfx::ColorTable colorTable = frame.colorTable();
-        colorTable[0] = qRgba(0, 0, 0, 0);
-        frame.setColorTable(colorTable);
-        m_flip.update(0, 0, frame);
+        gfx::Video *video;
+        if (m_side == 1)
+            video = &m_videoFlip2;
+        if (m_side == 2)
+            video = &m_videoFlip1;
+
+        gfx::Image frame = video->getFrame();
+        if (!frame.isNull())
+        {
+            gfx::ColorTable colorTable = frame.colorTable();
+            colorTable[0] = qRgba(0, 0, 0, 0);
+            frame.setColorTable(colorTable);
+            m_boatTexture.update(0, 0, frame);
+        }
+
+        if (video->atEnd())
+            m_state = Loading;
     }
+    if (m_state == Loading)
+    {
+        m_state = Ready;
+    }
+
 
     ui::Label::draw();
 }
