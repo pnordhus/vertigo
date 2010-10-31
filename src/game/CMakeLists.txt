@@ -66,5 +66,5 @@ set(MOC_SOURCES
 
 qt4_wrap_cpp(MOC_SOURCES ${MOC_SOURCES})
 
-add_executable(vertigo ${SOURCES} ${MOC_SOURCES})
+add_executable(vertigo WIN32 ${SOURCES} ${MOC_SOURCES})
 target_link_libraries(vertigo sfx txt ui ${QT_LIBRARIES} ${OPENGL_LIBRARY})
