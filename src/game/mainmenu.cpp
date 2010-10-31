@@ -161,7 +161,7 @@ void MainMenu::keyPressEvent(QKeyEvent *event)
 
     if (m_lblNew && m_lblNew->isVisible()) {
         if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
-            emit startGame(m_name);
+            emit startGame(m_name.trimmed());
 
         if (event->key() == Qt::Key_Backspace)
             m_name.chop(1);
