@@ -26,6 +26,7 @@
 #include "minimovie.h"
 #include "notebook.h"
 #include "room.h"
+#include "depot.h"
 #include "gfx/texture.h"
 #include "sfx/sound.h"
 #include "ui/button.h"
@@ -58,6 +59,8 @@ private slots:
     void hideEnCom();
     void showDeparture();
     void hideDeparture();
+    void showDepot();
+    void hideDepot();
 
 private:
     void activate();
@@ -88,6 +91,7 @@ private:
     MiniMovie m_miniMovie;
     bool m_first;
     QMap<int, RoomEntry> m_rooms;
+    Depot *m_depot;
 };
 
 

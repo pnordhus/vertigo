@@ -16,7 +16,7 @@
  ***************************************************************************/
 
 #include "chapter.h"
-#include "room.h"
+#include "depot.h"
 #include "gfx/colortable.h"
 #include "gfx/image.h"
 #include "ui/button.h"
@@ -25,12 +25,18 @@
 namespace game {
 
 
-Room::Room(int index, const QString &title, const QString &name) :
-    m_index(index),
-    m_miniMovie("gfx:mvi/room"),
-    m_name(name),
-    m_dockMan(NULL)
+Depot::Depot()
 {
+    const gfx::ColorTable colorTable("gfx:pal/gui/border.pal");
+    gfx::Image backgroundImage = gfx::Image::load("gfx:img/desktop/depot/depoback.img", colorTable);
+
+    setupFrame(backgroundImage.size() + QSize(18, 24), "DEPOT", true);
+
+    m_backgroundLabel = new ui::Label(this);
+    m_backgroundLabel->setPosition(9, 15);
+    m_backgroundLabel->setTexture(backgroundImage);
+
+/*
     txt::DesFile file("dat:world/" + name + ".des");
     file.setSection("Room");
 
@@ -98,20 +104,19 @@ Room::Room(int index, const QString &title, const QString &name) :
         m_dockMan = person;
         m_dockManName = file.value("Name").toString();
     }
-
+*/
     restart();
 }
 
 
-Room::~Room()
+Depot::~Depot()
 {
-    qDeleteAll(m_persons);
 }
 
 
-void Room::restart()
+void Depot::restart()
 {
-    m_dockSound.stop();
+/*    m_dockSound.stop();
     m_background.fromImage(m_backgroundImage);
     QList<Dialog*> dialogs = Chapter::get()->dialogs(m_index);
 
@@ -142,48 +147,24 @@ void Room::restart()
 
     dialogs = Chapter::get()->dialogsEnCom(true);
     if (!dialogs.isEmpty())
-        emit startEnCom(dialogs.first());
+        emit startEnCom(dialogs.first());*/
 }
 
 
-void Room::draw()
+void Depot::draw()
 {
-    m_miniMovie.update(m_background);
     ui::Label::draw();
 }
 
 
-bool Room::mousePressEvent(const QPoint &pos, Qt::MouseButton button)
+bool Depot::mousePressEvent(const QPoint &pos, Qt::MouseButton button)
 {
-    if (!m_backgroundLabel->isEnabled()) {
-        m_miniMovie.stopOneshot();
-        return true;
-    }
-
     if (button == Qt::RightButton) {
         closeFrame();
         return true;
     }
 
     return false;
-}
-
-
-void Room::showDock()
-{
-    emit hideCursor();
-    m_backgroundLabel->disable();
-    m_dockSound.play();
-    m_miniMovie.playOneshot();
-}
-
-
-void Room::startDialog(int dialogId)
-{
-    if (dialogId > 0)
-        emit startDialog(Chapter::get()->dialog(dialogId));
-    else
-        emit showDepot();
 }
 
 

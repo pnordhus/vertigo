@@ -32,6 +32,7 @@ Desktop::Desktop(const QString &name) :
     m_dialog(NULL),
     m_enCom(NULL),
     m_departure(NULL),
+    m_depot(NULL),
     m_miniMovie("gfx:mvi/desktop"),
     m_first(true)
 {
@@ -136,6 +137,7 @@ Desktop::~Desktop()
     delete m_dialog;
     delete m_departure;
     delete m_room;
+    delete m_depot;
 }
 
 
@@ -172,6 +174,8 @@ void Desktop::draw()
         m_enCom->doDraw();
     if (m_departure)
         m_departure->doDraw();
+    if (m_depot)
+        m_depot->doDraw();
     m_notebook.doDraw();
 }
 
@@ -214,6 +218,7 @@ void Desktop::showRoom(int index)
     connect(m_room, SIGNAL(startDialog(Dialog*)), SLOT(showDialog(Dialog*)));
     connect(m_room, SIGNAL(startEnCom(Dialog*)), SLOT(showEnCom(Dialog*)));
     connect(m_room, SIGNAL(showDeparture()), SLOT(showDeparture()));
+    connect(m_room, SIGNAL(showDepot()), SLOT(showDepot()));
     connect(m_room, SIGNAL(hideCursor()), SLOT(hideCursor()));
     setRootWidget(m_room);
     m_btnNotebook->hide();
@@ -315,6 +320,28 @@ void Desktop::hideDeparture()
     m_room->show();
     m_departure->deleteLater();
     m_departure = NULL;
+}
+
+
+void Desktop::showDepot()
+{
+    Q_ASSERT(m_room);
+    Q_ASSERT(!m_depot);
+    m_depot = new Depot();
+    connect(m_depot, SIGNAL(close()), SLOT(hideDepot()));
+    setRootWidget(m_depot);
+    m_depot->setPosition((640 - m_depot->width()) / 2, (480 - m_depot->height()) / 2);
+}
+
+
+void Desktop::hideDepot()
+{
+    Q_ASSERT(m_room);
+    Q_ASSERT(m_depot);
+    setRootWidget(m_room);
+    m_room->restart();
+    m_depot->deleteLater();
+    m_depot = NULL;
 }
 
 

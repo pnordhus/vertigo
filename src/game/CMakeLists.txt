@@ -7,6 +7,8 @@ set(SOURCES
     chapter.h
     departure.cpp
     departure.h
+    depot.cpp
+    depot.h
     desktop.cpp
     desktop.h
     dialog.cpp
@@ -46,6 +48,7 @@ set(MOC_SOURCES
     briefing.h
     chapter.h
     departure.h
+    depot.h
     desktop.h
     dialog.h
     encom.h
