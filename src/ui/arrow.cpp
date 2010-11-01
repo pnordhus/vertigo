@@ -25,7 +25,8 @@ namespace ui {
 
 Arrow::Arrow(const QString &dir, const QPoint &pos, bool large, Widget *parent) :
     m_position(pos),
-    m_value(0)
+    m_value(0),
+    m_large(large)
 {
     const gfx::ColorTable colorTable("gfx:pal/gui/border.pal");
 
@@ -40,11 +41,11 @@ Arrow::Arrow(const QString &dir, const QPoint &pos, bool large, Widget *parent) 
         arrowY = 'b';
 
     m_label = new Label(parent);
-    m_label->setTexture(gfx::Image::load(QString("gfx:img/desktop/gui/arr%1%2sma.img").arg(arrowY).arg(arrowX), colorTable));
+    m_label->setTexture(gfx::Image::load(QString("gfx:img/desktop/gui/arr%1%2%3.img").arg(arrowY).arg(arrowX).arg(large ? "med" : "sma"), colorTable));
     m_label->setPosition(pos);
 
     m_button = new Button(parent);
-    m_button->setFont(gfx::Font::Small);
+    m_button->setFont(m_large ? gfx::Font::Medium : gfx::Font::Small);
     m_button->setOffset(0);
     connect(m_button, SIGNAL(clicked()), SLOT(clicked()));
 }
@@ -86,17 +87,19 @@ void Arrow::setValue(int value)
 void Arrow::setText(const QString &text)
 {
     QPoint offset(9, 2);
+    if (m_large)
+        offset = QPoint(11, 3);
     QPoint offsetArrow;
-    const int width = gfx::Font(gfx::Font::Small).width(text);
-
-    if (m_left) {
-        offsetArrow.setX(-8);
-        offset.setX(-1 - width);
-    }
+    const int width = gfx::Font(m_large ? gfx::Font::Medium : gfx::Font::Small).width(text);
 
     if (m_top) {
-        offsetArrow.setY(-8);
-        offset.setY(-2);
+        offsetArrow.setY(1 - offset.x());
+        offset.setY(-offset.y());
+    }
+
+    if (m_left) {
+        offsetArrow.setX(1 - offset.x());
+        offset.setX(-1 - width);
     }
 
     m_button->setText(text);
