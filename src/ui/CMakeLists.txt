@@ -5,6 +5,8 @@ set(SOURCES
     button.h
     frame.cpp
     frame.h
+    itemlist.cpp
+    itemlist.h
     label.cpp
     label.h
     list.cpp
@@ -17,6 +19,7 @@ set(MOC_SOURCES
     arrow.h
     button.h
     frame.h
+    itemlist.h
     widget.h
 )
 
