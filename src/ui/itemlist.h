@@ -15,54 +15,67 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GAME_ITEMS_H
-#define GAME_ITEMS_H
+
+#ifndef UI_ITEMLIST_H
+#define UI_ITEMLIST_H
 
 
+#include "widget.h"
+#include "button.h"
+#include "label.h"
+#include "gfx/texture.h"
 #include "gfx/image.h"
-#include <QString>
-#include <QStringList>
-#include <QMap>
 
 
-namespace game {
+namespace ui {
 
 
-class Items
+class ItemList : public Widget
 {
-public:
-    enum Type { Torpedo, Magazine, Gun, Engine, Booster, Silator, Armor, NRSkin, Sensor, Software, Buzzer, Fixer };
+    Q_OBJECT
 
 public:
-    Items();
-    ~Items();
+    ItemList(Widget *parent);
+    ~ItemList();
 
 public:
+    void addItem(const gfx::Image &icon, bool red, bool green);
+    void selectItem(int index);
+
+signals:
+    void clicked(int);
+
+private:
     struct Item
     {
-        int model;
-        Type type;
-        int cost;
-        QString longname;
-        QString imgname;
-        QStringList text;
         gfx::Image icon;
+        bool red;
+        bool green;
     };
 
-
-public:
-    static Item* get(int model);
-    static Item* getType(Type type);
+private:
+    void draw();
+    void redraw();
 
 private:
-    void addItem(int model, Type type, const QString &name, const QString &imgname, const QString &txtname);
+    gfx::Texture m_texture;
+    gfx::Image m_chkGreen;
+    gfx::Image m_chkRed;
+    gfx::Image m_imgFrame;
 
-private:
-    QMap<int, Item*> m_items;
+    ui::Label *m_lblList;
+    ui::Button *m_btnLeft;
+    ui::Button *m_btnRight;
+    ui::Label *m_lblLeft;
+    ui::Label *m_lblRight;
+
+    QList<Item*> m_items;
+    int m_firstItem;
+    int m_selectedItem;
 };
 
 
-} // namespace game
+} // namespace ui
 
 
-#endif // GAME_ITEMS_H
+#endif // UI_ITEMLIST_H

@@ -23,6 +23,7 @@
 #include "sfx/sound.h"
 #include "ui/arrow.h"
 #include "ui/frame.h"
+#include "ui/itemlist.h"
 
 
 namespace game {
@@ -54,31 +55,32 @@ private:
     gfx::Video m_videoFlip1;
     gfx::Video m_videoFlip2;
     gfx::Texture m_boatTexture;
+
     ui::Label *m_boatLabel;
     ui::Button *m_btnFlip;
     ui::Button *m_btnRepair;
-    ui::Button *m_btnLeft1;
-    ui::Button *m_btnRight1;
-    ui::Button *m_btnLeft2;
-    ui::Button *m_btnRight2;
     ui::Button *m_btnBuy;
     ui::Button *m_btnSell;
     ui::Button *m_btnInfo;
 
     ui::Label *m_lblFlip;
-    ui::Label *m_lblLeft1;
-    ui::Label *m_lblRight1;
-    ui::Label *m_lblLeft2;
-    ui::Label *m_lblRight2;
     ui::Label *m_lblBuy;
     ui::Label *m_lblSell;
 
-	Boat *m_boat;
-	QList<ui::Arrow*> m_mountingArrows;
+    ui::ItemList *m_itemList1;
+    ui::ItemList *m_itemList2;
+
+    Boat *m_boat;
+    int m_side;
+    int m_mounting;
+    QList<ui::Arrow*> m_mountingArrows;
+    QList<int> m_list1;
+    QList<int> m_list2;
+    int m_selectedList;
+    int m_selectedItem;
 
     QTime m_time;
     State m_state;
-    int m_side;
     LoadingState m_loadingState;
     int m_loadingItem;
 };
