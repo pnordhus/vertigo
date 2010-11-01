@@ -17,6 +17,7 @@
 
 #include "items.h"
 #include "txt/desfile.h"
+#include "gfx/colortable.h"
 #include <QFile>
 
 QString trimEnd(const QString& str);
@@ -24,13 +25,6 @@ QString trimEnd(const QString& str);
 namespace game {
 
 Items *items = NULL;
-
-Items* Items::get()
-{
-    if (items == NULL)
-        items = new Items();
-    return items;
-}
 
 Items::Items()
 {
@@ -108,7 +102,7 @@ Items::Items()
     {
         QString str = file.value(QString("C%1").arg(c)).toString();
         str.truncate(str.indexOf(' '));
-        Item *item = get(str.toInt());
+        Item *item = m_items.value(str.toInt());
         if (item)
             item->cost = file.value(QString("C%1C").arg(c)).toInt();
     }
@@ -129,6 +123,15 @@ void Items::addItem(int model, Type type, const QString &name, const QString &im
     item->longname = name;
     item->imgname = imgname;
 
+    gfx::ColorTable colorTable;
+    if (type == Torpedo)
+        colorTable.loadFromFile("gfx:pal/depot/torpedo.pal");
+    else if (type == Gun)
+        colorTable.loadFromFile("gfx:pal/depot/gun.pal");
+    else
+        colorTable.loadFromFile("gfx:pal/depot/specs.pal");
+    item->icon = gfx::Image::load(QString("gfx:img/icon/%1.img").arg(imgname), colorTable);
+
     QFile file("txt:thing/" + txtname);
     if (file.open(QFile::ReadOnly))
     {
@@ -142,7 +145,9 @@ void Items::addItem(int model, Type type, const QString &name, const QString &im
 
 Items::Item* Items::get(int model)
 {
-    return m_items.value(model);
+    if (items == NULL)
+        items = new Items();
+    return items->m_items.value(model);
 }
 
 } // namespace game

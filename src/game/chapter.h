@@ -87,7 +87,7 @@ public:
     void startMission(const QString &name);
     const Mission* mission() const { return m_mission; }
     QList<Task> tasks();
-    const Boat* boat() const { return m_boat; }
+    Boat* boat() const { return m_boat; }
 
 private:
     void load(const QString &filename, bool load);

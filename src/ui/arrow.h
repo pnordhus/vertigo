@@ -54,6 +54,7 @@ private:
     bool m_top;
     QPoint m_position;
     int m_value;
+    bool m_large;
 };
 
 

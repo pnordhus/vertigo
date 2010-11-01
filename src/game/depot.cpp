@@ -17,6 +17,7 @@
 
 #include "chapter.h"
 #include "depot.h"
+#include "boat.h"
 #include "items.h"
 #include "gfx/colortable.h"
 #include "gfx/image.h"
@@ -27,6 +28,7 @@ namespace game {
 
 
 Depot::Depot() :
+    m_boat(Chapter::get()->boat()),
     m_state(Flipping),
     m_side(1)
 {
@@ -58,7 +60,7 @@ Depot::Depot() :
     label = new ui::Label(m_backgroundLabel);
     label->setFont(gfx::Font::Large);
     label->setPosition(16, 75);
-    label->setText(Chapter::get()->boat()->name());
+    label->setText(m_boat->name());
 
     m_videoFlip1.open(QString("gfx:mvi/sflip/%1").arg(Chapter::get()->boat()->flipMovie1()));
     m_videoFlip2.open(QString("gfx:mvi/sflip/%1").arg(Chapter::get()->boat()->flipMovie2()));
@@ -85,26 +87,6 @@ Depot::Depot() :
     m_btnRepair->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdammod.img", colorTable));
     m_btnRepair->setPosition(304, 75);
 
-    m_btnLeft1 = new ui::Button(m_backgroundLabel);
-    m_btnLeft1->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdlefu.img", colorTable));
-    m_btnLeft1->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdlefd.img", colorTable));
-    m_btnLeft1->setPosition(21, 16);
-
-    m_btnRight1 = new ui::Button(m_backgroundLabel);
-    m_btnRight1->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdrigu.img", colorTable));
-    m_btnRight1->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdrigd.img", colorTable));
-    m_btnRight1->setPosition(501, 16);
-
-    m_btnLeft2 = new ui::Button(m_backgroundLabel);
-    m_btnLeft2->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdlefu.img", colorTable));
-    m_btnLeft2->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdlefd.img", colorTable));
-    m_btnLeft2->setPosition(21, 301);
-
-    m_btnRight2 = new ui::Button(m_backgroundLabel);
-    m_btnRight2->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdrigu.img", colorTable));
-    m_btnRight2->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdrigd.img", colorTable));
-    m_btnRight2->setPosition(501, 301);
-
     m_btnBuy = new ui::Button(m_backgroundLabel);
     m_btnBuy->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdbuyu.img", colorTable));
     m_btnBuy->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdbuyd.img", colorTable));
@@ -120,8 +102,29 @@ Depot::Depot() :
     m_btnInfo->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdtinfd.img", colorTable));
     m_btnInfo->setPosition(507, 131);
 
-    //chkgre.img    Check green
-    //chkred.img    Check red
+    m_itemList1 = new ui::ItemList(m_backgroundLabel);
+    m_itemList1->setPosition(8, 8);
+    m_itemList1->addItem(Items::get(5121)->icon, false, true);
+    m_itemList1->addItem(Items::get(5122)->icon, true, false);
+    m_itemList1->addItem(Items::get(6145)->icon, false, true);
+    m_itemList1->addItem(Items::get(6146)->icon, false, true);
+    m_itemList1->addItem(Items::get(9217)->icon, false, true);
+
+    m_itemList2 = new ui::ItemList(m_backgroundLabel);
+    m_itemList2->setPosition(8, 293);
+    m_itemList2->addItem(Items::get(5121)->icon, false, false);
+    m_itemList2->selectItem(0);
+
+    for (int i = 0; i < m_boat->mountings().count(); i++)
+    {
+        Boat::Mounting *mounting = m_boat->mountings().at(i);
+        ui::Arrow *arrow = new ui::Arrow(mounting->dir, mounting->pos, true, m_backgroundLabel);
+        arrow->setText(mounting->name);
+        arrow->setValue(i);
+        arrow->hide();
+        //connect(arrow, SIGNAL(clicked(int)), SLOT(loadMounting(int)));
+        m_mountingArrows << arrow;
+    }
 }
 
 
@@ -144,11 +147,18 @@ void Depot::flip()
         m_state = Flipping;
         m_side = 1;
     }
+    if (m_state == Flipping)
+    {
+        foreach (ui::Arrow *arrow, m_mountingArrows)
+            arrow->hide();
+    }
 }
 
 
 void Depot::draw()
 {
+    ui::Label::draw();
+
     if (m_state == Flipping)
     {
         gfx::Video *video;
@@ -167,15 +177,68 @@ void Depot::draw()
         }
 
         if (video->atEnd())
+        {
             m_state = Loading;
+            m_loadingState = Arrows;
+            m_loadingItem = 0;
+        }
     }
+
+    switch (m_state)
+    {
+    case Flipping:
+    case Ready:
+    case Repair:
+        return;
+    case Loading:
+        if (m_time.elapsed() < 75)
+            return;
+        break;
+    }
+
+    m_time.restart();
+
     if (m_state == Loading)
     {
-        m_state = Ready;
+        if (m_loadingState == Arrows)
+        {
+            int i;
+            int j = 0;
+            for (i = 0; i < m_boat->mountings().count(); i++)
+            {
+                Boat::Mounting *mounting = m_boat->mountings().at(i);
+                if (mounting->side == m_side)
+                {
+                    if (m_loadingItem == 0)
+                        m_mounting = i;
+                    if (j == m_loadingItem)
+                    {
+                        m_mountingArrows.at(i)->show();
+                        m_loadingItem++;
+                        break;
+                    }
+                    j++;
+                }
+            }
+            if (i >= m_boat->mountings().count())
+            {
+                m_loadingState = List2;
+                m_loadingItem = 0;
+                m_list2 = m_boat->getItems(m_boat->mountings().at(m_mounting)->name);
+                m_selectedList = 2;
+                m_selectedItem = 0;
+            }
+        }
+        if (m_loadingState == List2)
+        {
+            m_loadingState = List1;
+            m_loadingItem = 0;
+        }
+        if (m_loadingState == List1)
+        {
+            m_state = Ready;
+        }
     }
-
-
-    ui::Label::draw();
 }
 
 
