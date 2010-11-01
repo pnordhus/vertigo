@@ -27,6 +27,7 @@
 
 namespace game {
 
+class Boat;
 
 class Depot : public ui::Frame
 {
@@ -71,6 +72,9 @@ private:
     ui::Label *m_lblRight2;
     ui::Label *m_lblBuy;
     ui::Label *m_lblSell;
+
+	Boat *m_boat;
+	QList<ui::Arrow*> m_mountingArrows;
 
     QTime m_time;
     State m_state;
