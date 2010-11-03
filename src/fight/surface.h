@@ -15,53 +15,48 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GAME_WINDOW_H
-#define GAME_WINDOW_H
+#ifndef FIGHT_SURFACE_H
+#define FIGHT_SURFACE_H
 
 
-#include <QGLWidget>
+#include "vector.h"
+#include "gfx/texture.h"
+#include <QVector>
+#include <QMap>
+
+namespace fight {
 
 
-namespace game {
-
-
-class Renderer;
-
-
-class Window : public QGLWidget
+class Surface
 {
-    Q_OBJECT
+public:
+    Surface(const QString &name, int mapping);
 
 public:
-    Window();
-
-public slots:
-    void setRenderer(Renderer *renderer);
-
-private slots:
-    void toggleFullScreen();
-    void centerMouse();
+    void draw();
 
 private:
-    void initializeGL();
-    void resizeGL(int w, int h);
-    void paintGL();
-    void keyPressEvent(QKeyEvent *);
-    void keyReleaseEvent(QKeyEvent *);
-    void mousePressEvent(QMouseEvent *);
-    void mouseReleaseEvent(QMouseEvent *);
-    void mouseMoveEvent(QMouseEvent *);
-    void closeEvent(QCloseEvent *);
-    void saveSettings();
-    void loadSettings();
+    struct TexCoord
+    {
+        TexCoord() {}
+        TexCoord(float s, float t) : s(s), t(t) {}
 
-private:
-    QCursor m_cursor;
-    Renderer *m_renderer;
+        float s;
+        float t;
+    };
+
+    struct Quad
+    {
+        QVector<Vector> vertices;
+        QVector<TexCoord> texCoords;
+    };
+
+    QList<gfx::Texture> m_texture;
+    QMap<int, Quad> m_quads;
 };
 
 
-} // namespace game
+} // namespace fight
 
 
-#endif // GAME_WINDOW_H
+#endif // FIGHT_SURFACE_H

@@ -15,53 +15,44 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GAME_WINDOW_H
-#define GAME_WINDOW_H
+#ifndef FIGHT_SCENARIO_H
+#define FIGHT_SCENARIO_H
 
 
-#include <QGLWidget>
+#include "game/renderer.h"
 
 
-namespace game {
+namespace fight {
 
 
-class Renderer;
+class Surface;
 
 
-class Window : public QGLWidget
+class Scenario : public game::Renderer
 {
     Q_OBJECT
 
 public:
-    Window();
+    Scenario(const QString &name);
+    ~Scenario();
 
-public slots:
-    void setRenderer(Renderer *renderer);
+signals:
+    void success();
 
-private slots:
-    void toggleFullScreen();
-    void centerMouse();
-
-private:
-    void initializeGL();
-    void resizeGL(int w, int h);
-    void paintGL();
+protected:
+    void draw();
     void keyPressEvent(QKeyEvent *);
-    void keyReleaseEvent(QKeyEvent *);
-    void mousePressEvent(QMouseEvent *);
-    void mouseReleaseEvent(QMouseEvent *);
     void mouseMoveEvent(QMouseEvent *);
-    void closeEvent(QCloseEvent *);
-    void saveSettings();
-    void loadSettings();
 
 private:
-    QCursor m_cursor;
-    Renderer *m_renderer;
+    Surface *m_surface;
+    float m_angleX;
+    float m_angleY;
+    QPoint m_mouse;
 };
 
 
-} // namespace game
+} // namespace fight
 
 
-#endif // GAME_WINDOW_H
+#endif // FIGHT_SCENARIO_H

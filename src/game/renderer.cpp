@@ -23,9 +23,16 @@ namespace game {
 
 
 Renderer::Renderer() :
-    m_cursorVisible(true)
+    m_cursorVisible(true),
+    m_window(NULL)
 {
 
+}
+
+
+void Renderer::setWindow(QWidget *window)
+{
+    m_window = window;
 }
 
 
@@ -70,6 +77,8 @@ void Renderer::setupOrthographicMatrix(float w, float h)
     }
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_LIGHTING);
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -79,6 +88,7 @@ void Renderer::setupOrthographicMatrix(float w, float h)
     m_projection.optimize();
 
     glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
 }
 
 

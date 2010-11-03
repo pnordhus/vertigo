@@ -15,53 +15,26 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GAME_WINDOW_H
-#define GAME_WINDOW_H
+#ifndef FIGHT_VECTOR_H
+#define FIGHT_VECTOR_H
 
 
-#include <QGLWidget>
+namespace fight {
 
 
-namespace game {
-
-
-class Renderer;
-
-
-class Window : public QGLWidget
+class Vector
 {
-    Q_OBJECT
+public:
+    Vector();
 
 public:
-    Window();
-
-public slots:
-    void setRenderer(Renderer *renderer);
-
-private slots:
-    void toggleFullScreen();
-    void centerMouse();
-
-private:
-    void initializeGL();
-    void resizeGL(int w, int h);
-    void paintGL();
-    void keyPressEvent(QKeyEvent *);
-    void keyReleaseEvent(QKeyEvent *);
-    void mousePressEvent(QMouseEvent *);
-    void mouseReleaseEvent(QMouseEvent *);
-    void mouseMoveEvent(QMouseEvent *);
-    void closeEvent(QCloseEvent *);
-    void saveSettings();
-    void loadSettings();
-
-private:
-    QCursor m_cursor;
-    Renderer *m_renderer;
+    float x;
+    float y;
+    float z;
 };
 
 
-} // namespace game
+} // namespace fight
 
 
-#endif // GAME_WINDOW_H
+#endif // FIGHT_VECTOR_H
