@@ -53,6 +53,9 @@ public:
     QRectF draw(float x, float y);
     QRectF draw(const QPointF &pos);
     QRectF draw(const QRectF &rect);
+    QRectF draw(float x, float y, const QRectF &srcRect);
+    QRectF draw(const QPointF &pos, const QRectF &srcRect);
+    QRectF draw(const QRectF &rect, const QRectF &srcRect);
 
 private:
     QExplicitlySharedDataPointer<TexturePrivate> d;
@@ -178,7 +181,25 @@ inline QRectF Texture::draw(const QPointF &pos)
 
 inline QRectF Texture::draw(const QRectF &destRect)
 {
-    return d->draw(destRect, QRectF(0, 0, width(), height()));
+    return draw(destRect, QRectF(0, 0, width(), height()));
+}
+
+
+inline QRectF Texture::draw(float x, float y, const QRectF &srcRect)
+{
+    return draw(QRectF(x, y, srcRect.width(), srcRect.height()), srcRect);
+}
+
+
+inline QRectF Texture::draw(const QPointF &pos, const QRectF &srcRect)
+{
+    return draw(pos.x(), pos.y(), srcRect);
+}
+
+
+inline QRectF Texture::draw(const QRectF &destRect, const QRectF &srcRect)
+{
+    return d->draw(destRect, srcRect);
 }
 
 

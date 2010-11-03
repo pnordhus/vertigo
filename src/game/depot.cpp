@@ -102,18 +102,28 @@ Depot::Depot() :
     m_btnInfo->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdtinfd.img", colorTable));
     m_btnInfo->setPosition(507, 131);
 
-    m_itemList1 = new ui::ItemList(m_backgroundLabel);
+    m_itemList1 = new ui::ItemList(m_backgroundLabel, true);
     m_itemList1->setPosition(8, 8);
+    connect(m_itemList1, SIGNAL(clicked(int)), SLOT(itemListClicked1(int)));
     m_itemList1->addItem(Items::get(5121)->icon, false, true);
     m_itemList1->addItem(Items::get(5122)->icon, true, false);
     m_itemList1->addItem(Items::get(6145)->icon, false, true);
     m_itemList1->addItem(Items::get(6146)->icon, false, true);
     m_itemList1->addItem(Items::get(9217)->icon, false, true);
+    m_itemList1->addItem(Items::get(5121)->icon, false, true);
+    m_itemList1->addItem(Items::get(5122)->icon, true, false);
+    m_itemList1->addItem(Items::get(5121)->icon, false, true);
+    m_itemList1->addItem(Items::get(5122)->icon, true, false);
+    m_itemList1->addItem(Items::get(5121)->icon, false, true);
+    m_itemList1->addItem(Items::get(5122)->icon, true, false);
 
-    m_itemList2 = new ui::ItemList(m_backgroundLabel);
+    m_itemList2 = new ui::ItemList(m_backgroundLabel, false);
     m_itemList2->setPosition(8, 293);
+    connect(m_itemList2, SIGNAL(clicked(int)), SLOT(itemListClicked2(int)));
     m_itemList2->addItem(Items::get(5121)->icon, false, false);
     m_itemList2->selectItem(0);
+    m_selectedList = 2;
+    m_selectedItem = 0;
 
     for (int i = 0; i < m_boat->mountings().count(); i++)
     {
@@ -250,6 +260,26 @@ bool Depot::mousePressEvent(const QPoint &pos, Qt::MouseButton button)
     }
 
     return false;
+}
+
+
+void Depot::itemListClicked1(int index)
+{
+    if (m_selectedList == 2)
+        m_itemList2->selectItem(-1);
+    m_selectedList = 1;
+    m_selectedItem = index;
+    m_itemList1->selectItem(index);
+}
+
+
+void Depot::itemListClicked2(int index)
+{
+    if (m_selectedList == 1)
+        m_itemList1->selectItem(-1);
+    m_selectedList = 2;
+    m_selectedItem = index;
+    m_itemList2->selectItem(index);
 }
 
 

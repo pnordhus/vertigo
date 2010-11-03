@@ -44,6 +44,8 @@ public:
 
 private slots:
     void flip();
+    void itemListClicked1(int index);
+    void itemListClicked2(int index);
 
 protected:
     void draw();
