@@ -21,7 +21,6 @@ set(SOURCES
     encom.h
     items.cpp
     items.h
-    main.cpp
     mainmenu.cpp
     mainmenu.h
     menu.cpp
@@ -68,5 +67,8 @@ set(MOC_SOURCES
 
 qt4_wrap_cpp(MOC_SOURCES ${MOC_SOURCES})
 
-add_executable(vertigo WIN32 ${SOURCES} ${MOC_SOURCES})
-target_link_libraries(vertigo sfx txt ui ${QT_LIBRARIES} ${OPENGL_LIBRARY})
+add_library(game ${SOURCES} ${MOC_SOURCES})
+target_link_libraries(game sfx txt ui ${QT_LIBRARIES} ${OPENGL_LIBRARY})
+
+add_executable(vertigo WIN32 main.cpp)
+target_link_libraries(vertigo game)
