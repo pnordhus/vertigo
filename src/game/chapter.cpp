@@ -16,6 +16,7 @@
  ***************************************************************************/
 
 #include "chapter.h"
+#include "fight/scenario.h"
 #include "sfx/soundsystem.h"
 #include "txt/desfile.h"
 #include <QDesktopServices>
@@ -38,6 +39,7 @@ Chapter::Chapter(const QString &name) :
     m_currentStation(-1),
     m_credits(0),
     m_mission(NULL),
+    m_scenario(NULL),
     m_boat(NULL),
     m_end(false),
     m_name(name)
@@ -69,6 +71,7 @@ Chapter::~Chapter()
 
     qDeleteAll(m_pendingDialogues);
     qDeleteAll(m_missions);
+    delete m_scenario;
     delete m_mission;
     delete m_boat;
     delete m_movie;
@@ -322,22 +325,38 @@ void Chapter::startMission(const QString &name)
 void Chapter::startMission()
 {
     Q_ASSERT(m_mission);
-    qDebug() << "Start mission" << m_mission->shortName();
 
     if (m_briefing)
         m_briefing->deleteLater();
     m_briefing = new Briefing();
-    connect(m_briefing, SIGNAL(startEngine()), SLOT(finishMission()));
+    connect(m_briefing, SIGNAL(startEngine()), SLOT(startScenario()));
     emit setRenderer(m_briefing);
 }
 
-void Chapter::finishMission()
+
+void Chapter::startScenario()
 {
-    if (m_briefing)
-        m_briefing->deleteLater();
+    Q_ASSERT(m_briefing);
+    m_briefing->deleteLater();
     m_briefing = NULL;
 
+    Q_ASSERT(m_mission);
+    Q_ASSERT(m_scenario == NULL);
+    m_scenario = new fight::Scenario(m_mission->scenario());
+    connect(m_scenario, SIGNAL(success()), SLOT(finishMission()));
+    emit setRenderer(m_scenario);
+}
+
+
+void Chapter::finishMission()
+{
+    Q_ASSERT(m_scenario);
+    m_scenario->deleteLater();
+    m_scenario = NULL;
+
     m_successfulMissions.append(m_mission->shortName());
+
+    Q_ASSERT(m_mission);
     delete m_mission;
     m_mission = NULL;
     m_save = true;

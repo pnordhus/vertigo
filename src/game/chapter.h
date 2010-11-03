@@ -29,6 +29,9 @@
 #include "boat.h"
 
 
+namespace fight { class Scenario; }
+
+
 namespace game {
 
 
@@ -110,6 +113,7 @@ private slots:
     void addMission(const QString &mission, int station);
     void replaceApproachMovie(int station, const QString &movie);
     void gameOver();
+    void startScenario();
     void finishMission();
 
 public:
@@ -140,6 +144,7 @@ private:
     bool m_movieApproach;
     bool m_movieHarbour;
     Mission *m_mission;
+    fight::Scenario *m_scenario;
     txt::DesFile m_tasksFile;
     bool m_save;
     Boat *m_boat;

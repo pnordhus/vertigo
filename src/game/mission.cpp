@@ -31,6 +31,9 @@ Mission::Mission(const QString &name, int station) :
     m_name = file.value("name").toString();
     m_pos = QPoint(file.value("X").toInt(), file.value("Y").toInt());
 
+    file.setSection("mission");
+    m_scenario = file.value("dramaturgy").toString();
+
     file.setSection("B");
     m_textB = file.value("{text}").toStringList();
     file.setSection("P");

@@ -68,7 +68,7 @@ set(MOC_SOURCES
 qt4_wrap_cpp(MOC_SOURCES ${MOC_SOURCES})
 
 add_library(game ${SOURCES} ${MOC_SOURCES})
-target_link_libraries(game sfx txt ui ${QT_LIBRARIES} ${OPENGL_LIBRARY})
+target_link_libraries(game fight sfx txt ui ${QT_LIBRARIES} ${OPENGL_LIBRARY})
 
 add_executable(vertigo WIN32 main.cpp)
 target_link_libraries(vertigo game)

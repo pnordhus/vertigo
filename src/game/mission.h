@@ -35,6 +35,7 @@ public:
 public:
     const QString& shortName() const { return m_shortName; }
     const QString& name() const { return m_name; }
+    const QString& scenario() const { return m_scenario; }
     int station() const { return m_station; }
     const QPoint& pos() const { return m_pos; }
     const QStringList& textB() const { return m_textB; }
@@ -44,6 +45,7 @@ public:
 private:
     QString m_shortName;
     QString m_name;
+    QString m_scenario;
     int m_station;
     QPoint m_pos;
     QStringList m_textB;
