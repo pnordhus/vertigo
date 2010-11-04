@@ -43,6 +43,7 @@ public:
     void addItem(const gfx::Image &icon);
     void addItem(const gfx::Image &icon, bool red, bool green);
     void selectItem(int index);
+    void clear();
 
 signals:
     void clicked(int);

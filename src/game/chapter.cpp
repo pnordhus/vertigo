@@ -16,6 +16,7 @@
  ***************************************************************************/
 
 #include "chapter.h"
+#include "items.h"
 #include "sfx/soundsystem.h"
 #include "txt/desfile.h"
 #include <QDesktopServices>
@@ -51,8 +52,6 @@ Chapter::Chapter() :
     s.endGroup();
 
     m_tasksFile.load("dat:story/tasks.des");
-
-    m_boat = new Boat(0);
 }
 
 
@@ -168,6 +167,43 @@ void Chapter::load(const QString &filename)
     foreach (const QString &key, file.keys().filter(QRegExp("^movie\\d*")))
         m_playedMovies << file.value(key).toInt();
 
+    file.setSection("Ship");
+    if (file.contains("type"))
+    {
+        delete m_boat;
+        m_boat = new Boat(file.value("type").toInt());
+
+        for (int i = 0; i < m_boat->mountings().count(); i++)
+        {
+            Boat::Mounting *mounting = m_boat->mountings().at(i);
+            file.setSection(QString("ShipMounting%1").arg(i));
+            QList<int> items;
+            if (file.contains("armor"))
+                items << file.value("armor").toInt();
+            if (file.contains("nrs"))
+                items << 5126;
+            if (file.contains("sensor"))
+                items << file.value("sensor").toInt();
+            if (file.contains("fixer"))
+                items << 9218;
+            for (int buzzer = 0; file.contains(QString("buzzer%1").arg(buzzer)); buzzer++)
+                items << 9217;
+            if (file.contains("engine"))
+                items << file.value("engine").toInt();
+            if (file.contains("booster"))
+                items << 4100;
+            if (file.contains("silator"))
+                items << 4101;
+            if (file.contains("model"))
+                items << file.value("model").toInt();
+            for (int torpedo = 0; file.contains(QString("torpedo%1").arg(torpedo)); torpedo++)
+                items << file.value(QString("torpedo%1").arg(torpedo)).toInt();
+            if (file.contains("software"))
+                items << file.value("software").toInt();
+            m_boat->setItems(mounting->name, items);
+        }
+    }
+
     // the intro has always been played
     m_playedMovies << 2;
 
@@ -242,6 +278,49 @@ void Chapter::save(int slot, const QString &name) const
     i = 0;
     foreach (int movie, m_playedMovies)
         file.setValue(QString("movie%1").arg(i++), movie);
+
+    file.setSection("Ship");
+    file.setValue("type", m_boat->type());
+
+    for (i = 0; i < m_boat->mountings().count(); i++)
+    {
+        Boat::Mounting *mounting = m_boat->mountings().at(i);
+        file.setSection(QString("ShipMounting%1").arg(i));
+
+        QList<int> items = m_boat->getItems(mounting->name);
+        file.setValue("side", mounting->side);
+        file.setValue("type", mounting->type);
+        int buzzer = 0;
+        int torpedo = 0;
+        foreach (int model, items)
+        {
+            Items::Item *item = Items::get(model);
+            if (item->type == Items::Armor)
+                file.setValue("armor", model);
+            if (item->type == Items::NRSkin)
+                file.setValue("nrs", 0);
+            if (item->type == Items::Sensor)
+                file.setValue("sensor", model);
+            if (item->type == Items::Fixer)
+                file.setValue("fixer", 0);
+            if (item->type == Items::Buzzer)
+                file.setValue(QString("buzzer%1").arg(buzzer++), 0);
+            if (item->type == Items::Engine)
+                file.setValue("engine", model);
+            if (item->type == Items::Booster)
+                file.setValue("booster", 0);
+            if (item->type == Items::Silator)
+                file.setValue("silator", 0);
+            if (item->type == Items::Gun)
+                file.setValue("model", model);
+            if (item->type == Items::Magazine)
+                file.setValue("model", model);
+            if (item->type == Items::Torpedo)
+                file.setValue(QString("torpedo%1").arg(torpedo++), model);
+            if (item->type == Items::Software)
+                file.setValue("software", model);
+        }
+    }
 
     const QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
     file.save(QString("%1/save%2.des").arg(path).arg(slot));

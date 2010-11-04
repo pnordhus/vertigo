@@ -120,10 +120,6 @@ Depot::Depot() :
     m_itemList2 = new ui::ItemList(m_backgroundLabel, false);
     m_itemList2->setPosition(8, 293);
     connect(m_itemList2, SIGNAL(clicked(int)), SLOT(itemListClicked2(int)));
-    m_itemList2->addItem(Items::get(5121)->icon, false, false);
-    m_itemList2->selectItem(0);
-    m_selectedList = 2;
-    m_selectedItem = 0;
 
     for (int i = 0; i < m_boat->mountings().count(); i++)
     {
@@ -132,7 +128,7 @@ Depot::Depot() :
         arrow->setText(mounting->name);
         arrow->setValue(i);
         arrow->hide();
-        //connect(arrow, SIGNAL(clicked(int)), SLOT(loadMounting(int)));
+        connect(arrow, SIGNAL(clicked(int)), SLOT(loadMounting(int)));
         m_mountingArrows << arrow;
     }
 }
@@ -161,7 +157,47 @@ void Depot::flip()
     {
         foreach (ui::Arrow *arrow, m_mountingArrows)
             arrow->hide();
+        m_itemList1->clear();
+        m_itemList2->clear();
     }
+}
+
+
+void Depot::loadMounting(int index)
+{
+    if (m_mounting != index)
+    {
+        m_mounting = index;
+        m_state = Loading;
+        m_itemList1->clear();
+        m_itemList2->clear();
+
+        m_loadingState = List2;
+        m_loadingItem = 0;
+        m_list2 = m_boat->getItems(m_boat->mountings().at(m_mounting)->name);
+        m_selectedList = 2;
+        m_selectedItem = 0;
+    }
+}
+
+
+void Depot::itemListClicked1(int index)
+{
+    if (m_selectedList == 2)
+        m_itemList2->selectItem(-1);
+    m_selectedList = 1;
+    m_selectedItem = index;
+    m_itemList1->selectItem(index);
+}
+
+
+void Depot::itemListClicked2(int index)
+{
+    if (m_selectedList == 1)
+        m_itemList1->selectItem(-1);
+    m_selectedList = 2;
+    m_selectedItem = index;
+    m_itemList2->selectItem(index);
 }
 
 
@@ -217,7 +253,7 @@ void Depot::draw()
             for (i = 0; i < m_boat->mountings().count(); i++)
             {
                 Boat::Mounting *mounting = m_boat->mountings().at(i);
-                if (mounting->side == m_side)
+                if (mounting->side + 1 == m_side)
                 {
                     if (m_loadingItem == 0)
                         m_mounting = i;
@@ -241,12 +277,28 @@ void Depot::draw()
         }
         if (m_loadingState == List2)
         {
-            m_loadingState = List1;
-            m_loadingItem = 0;
+            if (m_loadingItem < m_list2.count())
+            {
+                int model = m_list2.at(m_loadingItem);
+                m_itemList2->addItem(Items::get(model)->icon);
+                m_loadingItem++;
+            }
+            else
+            {
+                m_loadingState = List1;
+                m_loadingItem = 0;
+                m_list1.clear();
+            }
         }
         if (m_loadingState == List1)
         {
-            m_state = Ready;
+            if (m_loadingItem < m_list1.count())
+            {
+            }
+            else
+            {
+                m_state = Ready;
+            }
         }
     }
 }
@@ -260,26 +312,6 @@ bool Depot::mousePressEvent(const QPoint &pos, Qt::MouseButton button)
     }
 
     return false;
-}
-
-
-void Depot::itemListClicked1(int index)
-{
-    if (m_selectedList == 2)
-        m_itemList2->selectItem(-1);
-    m_selectedList = 1;
-    m_selectedItem = index;
-    m_itemList1->selectItem(index);
-}
-
-
-void Depot::itemListClicked2(int index)
-{
-    if (m_selectedList == 1)
-        m_itemList1->selectItem(-1);
-    m_selectedList = 2;
-    m_selectedItem = index;
-    m_itemList2->selectItem(index);
 }
 
 

@@ -124,7 +124,7 @@ void Items::addItem(int model, Type type, const QString &name, const QString &im
     item->imgname = imgname;
 
     gfx::ColorTable colorTable;
-    if (type == Torpedo)
+    if (type == Torpedo || type == Magazine)
         colorTable.loadFromFile("gfx:pal/depot/torpedo.pal");
     else if (type == Gun)
         colorTable.loadFromFile("gfx:pal/depot/gun.pal");

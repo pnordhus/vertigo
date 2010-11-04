@@ -44,6 +44,7 @@ public:
 
 private slots:
     void flip();
+    void loadMounting(int index);
     void itemListClicked1(int index);
     void itemListClicked2(int index);
 
