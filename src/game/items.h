@@ -19,6 +19,7 @@
 #define GAME_ITEMS_H
 
 
+#include "station.h"
 #include "gfx/image.h"
 #include <QString>
 #include <QStringList>
@@ -52,10 +53,12 @@ public:
 
 public:
     static Item* get(int model);
-    static Item* getType(Type type);
+    static QList<int> getDepotItems(const QString &mounting);
+    static int getDepotPrice(int model);
 
 private:
     void addItem(int model, Type type, const QString &name, const QString &imgname, const QString &txtname);
+    static void insertType(Type type, QList<int> &list);
 
 private:
     QMap<int, Item*> m_items;

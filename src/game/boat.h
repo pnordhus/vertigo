@@ -30,7 +30,7 @@ namespace game {
 class Boat
 {
 public:
-    Boat(int id);
+    Boat(int type);
     ~Boat();
 
 public:
@@ -38,11 +38,13 @@ public:
     {
         QString name;
         int side;
+        int type;
         QPoint pos;
         QString dir;
     };
 
 public:
+    int type() const { return m_type; }
     const QString& name() const { return m_name; }
     const QString& cockpit() const { return m_cockpit; }
     const QString& flipMovie1() const { return m_flipMovie1; }
@@ -75,10 +77,11 @@ public:
     int fixer() const { return m_fixer; }
 
 private:
-    void addMounting(const QString &name, int side, int x, int y, const QString &dir);
+    void addMounting(const QString &name, int side, int type, int x, int y, const QString &dir);
     int getCapacity(int magazine);
 
 private:
+    int m_type;
     QString m_name;
     QString m_cockpit;
     QString m_flipMovie1;

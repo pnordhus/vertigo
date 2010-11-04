@@ -22,6 +22,7 @@
 #include "gfx/colortable.h"
 #include "gfx/image.h"
 #include "ui/button.h"
+#include "txt/stringtable.h"
 
 
 namespace game {
@@ -57,10 +58,40 @@ Depot::Depot() :
     label->setTexture(gfx::Image::load("gfx:img/desktop/gui/verline.img", colorTable));
     label->setPosition(352, 75);
 
-    label = new ui::Label(m_backgroundLabel);
-    label->setFont(gfx::Font::Large);
-    label->setPosition(16, 75);
-    label->setText(m_boat->name());
+    m_boatName = new ui::Label(m_backgroundLabel);
+    m_boatName->setFont(gfx::Font::Large);
+    m_boatName->setPosition(16, 75);
+    m_boatName->setText(m_boat->name());
+
+    m_credits = new ui::Label(m_backgroundLabel);
+    m_credits->setFont(gfx::Font::Large);
+    m_credits->setPosition(16, 263);
+    updateCredits();
+
+    m_lblInfo = new ui::Label(m_backgroundLabel);
+    m_lblInfo->hide();
+
+    m_lblItemName = new ui::Label(m_lblInfo);
+    m_lblItemName->setFont(gfx::Font::Medium);
+    m_lblItemName->setPosition(371, 75);
+    m_lblItemName->setSize(128, 16);
+    m_lblItemName->setAlignment(Label::AlignHCenter);
+
+    m_lblItemPrice = new ui::Label(m_lblInfo);
+    m_lblItemPrice->setFont(gfx::Font::Medium);
+    m_lblItemPrice->setPosition(371, 87);
+    m_lblItemPrice->setSize(128, 16);
+    m_lblItemPrice->setAlignment(Label::AlignHCenter);
+
+    m_lblItemVideo = new ui::Label(m_lblInfo);
+    m_lblItemVideo->setPosition(371, 75);
+    m_lblItemVideo->setTexture(m_itemTexture);
+
+    m_lblItemText = new ui::List(m_lblInfo);
+    m_lblItemText->setFont(gfx::Font::Small);
+    m_lblItemText->setPosition(371, 105);
+    m_lblItemText->setSize(160, 192);
+    m_lblItemText->setAlignCenter(false);
 
     m_videoFlip1.open(QString("gfx:mvi/sflip/%1").arg(Chapter::get()->boat()->flipMovie1()));
     m_videoFlip2.open(QString("gfx:mvi/sflip/%1").arg(Chapter::get()->boat()->flipMovie2()));
@@ -91,29 +122,27 @@ Depot::Depot() :
     m_btnBuy->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdbuyu.img", colorTable));
     m_btnBuy->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdbuyd.img", colorTable));
     m_btnBuy->setPosition(507, 243);
+    connect(m_btnBuy, SIGNAL(clicked()), SLOT(buy()));
 
     m_btnSell = new ui::Button(m_backgroundLabel);
     m_btnSell->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdselu.img", colorTable));
     m_btnSell->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdseld.img", colorTable));
     m_btnSell->setPosition(507, 75);
+    connect(m_btnSell, SIGNAL(clicked()), SLOT(sell()));
 
     m_btnInfo = new ui::Button(m_backgroundLabel);
     m_btnInfo->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdtinfu.img", colorTable));
     m_btnInfo->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdtinfd.img", colorTable));
     m_btnInfo->setPosition(507, 131);
+    connect(m_btnInfo, SIGNAL(clicked()), SLOT(toggleInfo()));
 
-    m_itemList1 = new ui::ItemList(m_backgroundLabel);
+    m_itemList1 = new ui::ItemList(m_backgroundLabel, true);
     m_itemList1->setPosition(8, 8);
-    m_itemList1->addItem(Items::get(5121)->icon, false, true);
-    m_itemList1->addItem(Items::get(5122)->icon, true, false);
-    m_itemList1->addItem(Items::get(6145)->icon, false, true);
-    m_itemList1->addItem(Items::get(6146)->icon, false, true);
-    m_itemList1->addItem(Items::get(9217)->icon, false, true);
+    connect(m_itemList1, SIGNAL(clicked(int)), SLOT(itemListClicked1(int)));
 
-    m_itemList2 = new ui::ItemList(m_backgroundLabel);
+    m_itemList2 = new ui::ItemList(m_backgroundLabel, false);
     m_itemList2->setPosition(8, 293);
-    m_itemList2->addItem(Items::get(5121)->icon, false, false);
-    m_itemList2->selectItem(0);
+    connect(m_itemList2, SIGNAL(clicked(int)), SLOT(itemListClicked2(int)));
 
     for (int i = 0; i < m_boat->mountings().count(); i++)
     {
@@ -122,7 +151,7 @@ Depot::Depot() :
         arrow->setText(mounting->name);
         arrow->setValue(i);
         arrow->hide();
-        //connect(arrow, SIGNAL(clicked(int)), SLOT(loadMounting(int)));
+        connect(arrow, SIGNAL(clicked(int)), SLOT(loadMounting(int)));
         m_mountingArrows << arrow;
     }
 }
@@ -151,7 +180,170 @@ void Depot::flip()
     {
         foreach (ui::Arrow *arrow, m_mountingArrows)
             arrow->hide();
+        m_itemList1->clear();
+        m_itemList2->clear();
+        m_lblInfo->hide();
     }
+}
+
+
+void Depot::loadMounting(int index)
+{
+    if (m_mounting != index)
+    {
+        m_mounting = index;
+        m_state = Loading;
+        m_itemList1->clear();
+        m_itemList2->clear();
+        m_lblInfo->hide();
+
+        m_loadingState = List2;
+        m_loadingItem = 0;
+        m_list2 = m_boat->getItems(m_boat->mountings().at(m_mounting)->name);
+        m_selectedList = 2;
+        m_selectedItem = 0;
+    }
+}
+
+
+void Depot::itemListClicked1(int index)
+{
+    if (m_selectedList == 2)
+        m_itemList2->selectItem(-1);
+    m_selectedList = 1;
+    m_selectedItem = index;
+    m_itemList1->selectItem(index);
+    updateInfo();
+}
+
+
+void Depot::itemListClicked2(int index)
+{
+    if (m_selectedList == 1)
+        m_itemList1->selectItem(-1);
+    m_selectedList = 2;
+    m_selectedItem = index;
+    m_itemList2->selectItem(index);
+    updateInfo();
+}
+
+
+void Depot::toggleInfo()
+{
+    if (m_lblItemText->isVisible())
+        m_lblItemText->hide();
+    else
+        m_lblItemText->show();
+}
+
+
+void Depot::updateInfo()
+{
+    Items::Item *item = NULL;
+    if (m_selectedList == 1)
+        item = Items::get(m_list1.at(m_selectedItem));
+    if (m_selectedList == 2 && m_selectedItem >= 0)
+        item = Items::get(m_list2.at(m_selectedItem));
+    if (item == NULL)
+        return;
+
+    m_lblItemName->setText(item->longname);
+    m_lblItemText->setText(item->text);
+
+    m_videoItem.open(QString("gfx:mvi/thing/%1.mvi").arg(item->imgname));
+    m_videoItem.setFrameRate(13);
+    m_videoItem.playLoop();
+    m_itemTexture.createEmpty(m_videoItem.width(), m_videoItem.height(), gfx::Texture::RGBA);
+
+    int price = Items::getDepotPrice(item->model);
+    if (m_selectedList == 2)
+        if (m_boat->canSell(item->model, m_boat->mountings().at(m_mounting)->name))
+            m_lblItemPrice->setText(txt::StringTable::get(txt::Depot_Bid) + QString("%1").arg(price));
+        else
+            m_lblItemPrice->setText(txt::StringTable::get(txt::Depot_Value) + QString("%1").arg(price));
+    if (m_selectedList == 1)
+    {
+        int oldModel;
+        m_boat->canBuy(item->model, m_boat->mountings().at(m_mounting)->name, &oldModel);
+        if (oldModel > 0)
+        {
+            int oldPrice = Items::getDepotPrice(oldModel);
+            if (oldPrice < price)
+                m_lblItemPrice->setText(txt::StringTable::get(txt::Depot_Upgrade) + QString("%1").arg(price - oldPrice));
+            else
+                m_lblItemPrice->setText(txt::StringTable::get(txt::Depot_Degrade) + QString("%1").arg(price - oldPrice));
+        }
+        else
+            m_lblItemPrice->setText(txt::StringTable::get(txt::Depot_Cost) + QString("%1").arg(price));
+    }
+
+    m_lblInfo->show();
+}
+
+
+void Depot::updateCredits()
+{
+    m_credits->setText(QString("CREDITS: $%1").arg(Chapter::get()->credits()));
+}
+
+
+void Depot::buy()
+{
+    const QString &mounting = m_boat->mountings().at(m_mounting)->name;
+    if (m_selectedList != 1)
+        return;
+    Items::Item *item = Items::get(m_list1.at(m_selectedItem));
+    if (!m_boat->isCompatible(item->model))
+        return;
+    int oldModel;
+    if (!m_boat->canBuy(item->model, mounting, &oldModel))
+    {
+        return;
+    }
+    int price = Items::getDepotPrice(item->model);
+    if (oldModel > 0)
+        price -= Items::getDepotPrice(oldModel);
+    if (price > Chapter::get()->credits())
+    {
+        return;
+    }
+    Chapter::get()->addCredit(-price);
+    m_boat->buy(item->model, mounting);
+
+    m_list2 = m_boat->getItems(mounting);
+    m_itemList2->clear();
+    foreach (int model, m_list2)
+        m_itemList2->addItem(Items::get(model)->icon);
+    updateCredits();
+}
+
+
+void Depot::sell()
+{
+    const QString &mounting = m_boat->mountings().at(m_mounting)->name;
+    if (m_selectedList != 2 || m_selectedItem >= m_list2.count())
+        return;
+    Items::Item *item = Items::get(m_list2.at(m_selectedItem));
+    if (!m_boat->canSell(item->model, mounting))
+        return;
+    int price = Items::getDepotPrice(item->model);
+
+    int index = 0;
+    for (int i = 0; i < m_selectedItem; i++)
+        if (Items::get(m_list2.at(i))->type == item->type)
+            index++;
+    m_boat->sell(item->model, index, mounting);
+    Chapter::get()->addCredit(price);
+
+    m_list2 = m_boat->getItems(mounting);
+    m_itemList2->clear();
+    foreach (int model, m_list2)
+        m_itemList2->addItem(Items::get(model)->icon);
+    if (m_selectedItem >= m_list2.count())
+        m_selectedItem = m_list2.count() - 1;
+    m_itemList2->selectItem(m_selectedItem);
+    updateInfo();
+    updateCredits();
 }
 
 
@@ -159,6 +351,20 @@ void Depot::draw()
 {
     ui::Label::draw();
 
+    if (m_state == Ready)
+    {
+        if (m_lblInfo->isVisible())
+        {
+            gfx::Image frame = m_videoItem.getFrame();
+            if (!frame.isNull())
+            {
+                gfx::ColorTable colorTable = frame.colorTable();
+                colorTable[0] = qRgba(0, 0, 0, 0);
+                frame.setColorTable(colorTable);
+                m_itemTexture.update(0, 0, frame);
+            }
+        }
+    }
     if (m_state == Flipping)
     {
         gfx::Video *video;
@@ -191,7 +397,9 @@ void Depot::draw()
     case Repair:
         return;
     case Loading:
-        if (m_time.elapsed() < 75)
+        if (m_loadingState == Arrows && m_time.elapsed() < 95)
+            return;
+        if (m_loadingState != Arrows && m_time.elapsed() < 35)
             return;
         break;
     }
@@ -207,7 +415,7 @@ void Depot::draw()
             for (i = 0; i < m_boat->mountings().count(); i++)
             {
                 Boat::Mounting *mounting = m_boat->mountings().at(i);
-                if (mounting->side == m_side)
+                if (mounting->side + 1 == m_side)
                 {
                     if (m_loadingItem == 0)
                         m_mounting = i;
@@ -226,17 +434,43 @@ void Depot::draw()
                 m_loadingItem = 0;
                 m_list2 = m_boat->getItems(m_boat->mountings().at(m_mounting)->name);
                 m_selectedList = 2;
-                m_selectedItem = 0;
+                m_selectedItem = -1;
             }
         }
         if (m_loadingState == List2)
         {
-            m_loadingState = List1;
-            m_loadingItem = 0;
+            if (m_loadingItem < m_list2.count())
+            {
+                int model = m_list2.at(m_loadingItem);
+                m_itemList2->addItem(Items::get(model)->icon);
+                if (m_selectedItem < 0)
+                {
+                    m_selectedItem = m_loadingItem;
+                    m_itemList2->selectItem(m_selectedItem);
+                }
+                m_loadingItem++;
+            }
+            else
+            {
+                m_loadingState = List1;
+                m_loadingItem = 0;
+                m_list1 = Items::getDepotItems(m_boat->mountings().at(m_mounting)->name);
+            }
         }
         if (m_loadingState == List1)
         {
-            m_state = Ready;
+            if (m_loadingItem < m_list1.count())
+            {
+                int model = m_list1.at(m_loadingItem);
+                bool compatible = m_boat->isCompatible(model);
+                m_itemList1->addItem(Items::get(model)->icon, !compatible, compatible);
+                m_loadingItem++;
+            }
+            else
+            {
+                updateInfo();
+                m_state = Ready;
+            }
         }
     }
 }

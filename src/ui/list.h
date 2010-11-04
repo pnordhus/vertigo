@@ -35,6 +35,7 @@ public:
 public:
     void setText(const QStringList &text);
     void setFont(const gfx::Font &font);
+    void setAlignCenter(bool alignCenter);
 
 protected:
     void draw();
@@ -42,6 +43,7 @@ protected:
 private:
     QStringList m_text;
     gfx::Font m_font;
+    bool m_alignCenter;
 };
 
 

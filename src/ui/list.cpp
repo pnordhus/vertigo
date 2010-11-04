@@ -23,7 +23,8 @@ namespace ui {
 
 
 List::List(Widget *parent) :
-    Widget(parent)
+    Widget(parent),
+    m_alignCenter(true)
 {
 
 }
@@ -41,11 +42,17 @@ void List::setFont(const gfx::Font &font)
 }
 
 
+void List::setAlignCenter(bool alignCenter)
+{
+    m_alignCenter = alignCenter;
+}
+
+
 void List::draw()
 {
     int y = 0;
     foreach (const QString &line, m_text) {
-        QRect rect = m_font.draw(line, QPoint(0, y), QSize(width(), -1), true, false);
+        QRect rect = m_font.draw(line, QPoint(0, y), QSize(width(), -1), m_alignCenter, false);
         y += rect.height();
     }
 }

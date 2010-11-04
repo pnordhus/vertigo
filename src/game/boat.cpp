@@ -23,20 +23,29 @@
 namespace game {
 
 
-Boat::Boat(int id)
+Boat::Boat(int type) : 
+    m_type(type),
+    m_nrskin(0),
+    m_fixer(0),
+    m_booster(0),
+    m_silator(0),
+    m_tur1(0),
+    m_tur1soft(0),
+    m_tur2(0),
+    m_tur2soft(0)
 {
     txt::DesFile file;
 
-    if (id == 0)
+    if (type == 2049)
     {
         file.load("vfx:sobjects/hiob.des");
         m_flipMovie1 = "hiob1.mvi";
         m_flipMovie2 = "hiob2.mvi";
 
-        addMounting("DEFE", 1, 280, 173, "TopLeft");
-        addMounting("GENE", 1, 80, 132, "BottomRight");
-        addMounting("GUN", 2, 324, 188, "BottomLeft");
-        addMounting("TORP", 2, 276, 129, "TopLeft");
+        addMounting("DEFE", 0, 3, 280, 173, "TopLeft");
+        addMounting("GENE", 0, 4, 80, 132, "BottomRight");
+        addMounting("GUN", 1, 1, 324, 188, "BottomLeft");
+        addMounting("TORP", 1, 0, 276, 129, "TopLeft");
     }
 
     file.setSection("Ship");
@@ -60,11 +69,12 @@ Boat::~Boat()
     qDeleteAll(m_mountings);
 }
 
-void Boat::addMounting(const QString &name, int side, int x, int y, const QString &dir)
+void Boat::addMounting(const QString &name, int side, int type, int x, int y, const QString &dir)
 {
     Mounting *mounting = new Mounting();
     mounting->name = name;
     mounting->side = side;
+    mounting->type = type;
     mounting->pos = QPoint(x, y);
     mounting->dir = dir;
     m_mountings << mounting;
@@ -101,10 +111,10 @@ QList<int> Boat::getItems(const QString& mounting)
         if (m_nrskin)
             list << m_nrskin;
         list << m_sensor;
-        foreach (int buzz, m_buzzers)
-            list << buzz;
         if (m_fixer)
             list << m_fixer;
+        foreach (int buzz, m_buzzers)
+            list << buzz;
     }
     if (mounting == "GENE")
     {
@@ -144,6 +154,8 @@ QList<int> Boat::getItems(const QString& mounting)
 
 void Boat::setItems(const QString& mounting, const QList<int> &items)
 {
+    foreach (int model, items)
+        buy(model, mounting);
 }
 
 
@@ -267,11 +279,100 @@ bool Boat::isCompatible(int model)
 
 void Boat::buy(int model, const QString& mounting)
 {
+    Items::Item *item = Items::get(model);
+
+    if (mounting == "DEFE")
+    {
+        if (item->type == Items::Armor)
+            m_armor = model;
+        if (item->type == Items::NRSkin)
+            m_nrskin = model;
+        if (item->type == Items::Sensor)
+            m_sensor = model;
+        if (item->type == Items::Buzzer)
+            m_buzzers << model;
+        if (item->type == Items::Fixer)
+            m_fixer = model;
+    }
+    if (mounting == "GENE")
+    {
+        if (item->type == Items::Engine)
+            m_engine = model;
+        if (item->type == Items::Booster)
+            m_booster = model;
+        if (item->type == Items::Silator)
+            m_silator = model;
+    }
+    if (mounting == "GUN")
+    {
+        if (item->type == Items::Gun)
+            m_gun = model;
+    }
+    if (mounting == "TORP")
+    {
+        if (item->type == Items::Magazine)
+            m_magazine = model;
+        if (item->type == Items::Torpedo)
+            m_torpedoes << model;
+    }
+    if (mounting == "TUR1")
+    {
+        if (item->type == Items::Gun)
+            m_tur1 = model;
+        if (item->type == Items::Software)
+            m_tur1soft = model;
+    }
+    if (mounting == "TUR2")
+    {
+        if (item->type == Items::Gun)
+            m_tur2 = model;
+        if (item->type == Items::Software)
+            m_tur2soft = model;
+    }
 }
 
 
 void Boat::sell(int model, int index, const QString& mounting)
 {
+    Items::Item *item = Items::get(model);
+    if (mounting == "DEFE")
+    {
+        if (item->type == Items::NRSkin)
+            m_nrskin = 0;
+        if (item->type == Items::Buzzer)
+            m_buzzers.removeAt(index);
+        if (item->type == Items::Fixer)
+            m_fixer = 0;
+    }
+    if (mounting == "GENE")
+    {
+        if (item->type == Items::Booster)
+            m_booster = 0;
+        if (item->type == Items::Silator)
+            m_silator = 0;
+    }
+    if (mounting == "GUN")
+    {
+    }
+    if (mounting == "TORP")
+    {
+        if (item->type == Items::Torpedo)
+            m_torpedoes.removeAt(index);
+    }
+    if (mounting == "TUR1")
+    {
+        if (item->type == Items::Gun)
+            m_tur1 = 0;
+        if (item->type == Items::Software)
+            m_tur1soft = 0;
+    }
+    if (mounting == "TUR2")
+    {
+        if (item->type == Items::Gun)
+            m_tur2 = 0;
+        if (item->type == Items::Software)
+            m_tur2soft = 0;
+    }
 }
 
 

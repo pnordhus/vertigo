@@ -65,6 +65,7 @@ public slots:
     void toggleMovieAutopilot();
     void toggleMovieApproach();
     void toggleMovieHarbour();
+    void addCredit(int credit);
 
 public:
     void save() const;
@@ -91,6 +92,7 @@ public:
     const Mission* mission() const { return m_mission; }
     QList<Task> tasks();
     Boat* boat() const { return m_boat; }
+    int credits() const { return m_credits; }
 
 private:
     void load(const QString &filename, bool load);
@@ -107,7 +109,6 @@ private slots:
     void changeChapter(int chapter);
     void addDialog(int dialogId);
     void removeDialog(int dialogId);
-    void addCredit(int credit);
     void enableStation(int station);
     void disableStation(int station);
     void addMission(const QString &mission, int station);

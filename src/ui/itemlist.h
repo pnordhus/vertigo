@@ -25,6 +25,7 @@
 #include "label.h"
 #include "gfx/texture.h"
 #include "gfx/image.h"
+#include <QTime>
 
 
 namespace ui {
@@ -35,12 +36,14 @@ class ItemList : public Widget
     Q_OBJECT
 
 public:
-    ItemList(Widget *parent);
+    ItemList(Widget *parent, bool showChecks, int maxItems = 31);
     ~ItemList();
 
 public:
+    void addItem(const gfx::Image &icon);
     void addItem(const gfx::Image &icon, bool red, bool green);
     void selectItem(int index);
+    void clear();
 
 signals:
     void clicked(int);
@@ -55,13 +58,18 @@ private:
 
 private:
     void draw();
-    void redraw();
+    bool mousePressEvent(const QPoint &pos, Qt::MouseButton button);
+
+private slots:
+    void scrollLeft();
+    void scrollRight();
 
 private:
     gfx::Texture m_texture;
+    gfx::Texture m_textureChecks;
+    gfx::Texture m_textureFrame;
     gfx::Image m_chkGreen;
     gfx::Image m_chkRed;
-    gfx::Image m_imgFrame;
 
     ui::Label *m_lblList;
     ui::Button *m_btnLeft;
@@ -72,6 +80,8 @@ private:
     QList<Item*> m_items;
     int m_firstItem;
     int m_selectedItem;
+    int m_offset;
+    QTime m_time;
 };
 
 

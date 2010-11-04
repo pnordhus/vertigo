@@ -23,6 +23,7 @@
 #include "sfx/sound.h"
 #include "ui/arrow.h"
 #include "ui/frame.h"
+#include "ui/list.h"
 #include "ui/itemlist.h"
 
 
@@ -44,6 +45,16 @@ public:
 
 private slots:
     void flip();
+    void loadMounting(int index);
+    void itemListClicked1(int index);
+    void itemListClicked2(int index);
+    void toggleInfo();
+    void buy();
+    void sell();
+
+private:
+    void updateInfo();
+    void updateCredits();
 
 protected:
     void draw();
@@ -57,6 +68,8 @@ private:
     gfx::Texture m_boatTexture;
 
     ui::Label *m_boatLabel;
+    ui::Label *m_boatName;
+    ui::Label *m_credits;
     ui::Button *m_btnFlip;
     ui::Button *m_btnRepair;
     ui::Button *m_btnBuy;
@@ -66,6 +79,14 @@ private:
     ui::Label *m_lblFlip;
     ui::Label *m_lblBuy;
     ui::Label *m_lblSell;
+
+    ui::Label *m_lblInfo;
+    ui::Label *m_lblItemName;
+    ui::Label *m_lblItemPrice;
+    ui::List *m_lblItemText;
+    ui::Label *m_lblItemVideo;
+    gfx::Video m_videoItem;
+    gfx::Texture m_itemTexture;
 
     ui::ItemList *m_itemList1;
     ui::ItemList *m_itemList2;
