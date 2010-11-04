@@ -16,6 +16,7 @@
  ***************************************************************************/
 
 #include "items.h"
+#include "chapter.h"
 #include "txt/desfile.h"
 #include "gfx/colortable.h"
 #include <QFile>
@@ -149,5 +150,61 @@ Items::Item* Items::get(int model)
         items = new Items();
     return items->m_items.value(model);
 }
+
+
+void Items::insertType(Type type, QList<int> &list)
+{
+    Station station = Chapter::get()->stations().value(Chapter::get()->currentStation());
+    foreach (Item *item, items->m_items.values())
+        if (item->type == type && station.depotPrices().contains(item->model))
+            list << item->model;
+}
+
+
+QList<int> Items::getDepotItems(const QString &mounting)
+{
+    if (items == NULL)
+        items = new Items();
+    QList<int> list;
+    if (mounting == "DEFE")
+    {
+        insertType(Armor, list);
+        insertType(NRSkin, list);
+        insertType(Sensor, list);
+        insertType(Buzzer, list);
+        insertType(Fixer, list);
+    }
+    if (mounting == "GENE")
+    {
+        insertType(Engine, list);
+        insertType(Booster, list);
+        insertType(Silator, list);
+    }
+    if (mounting == "TORP")
+    {
+        insertType(Magazine, list);
+        insertType(Torpedo, list);
+    }
+    if (mounting == "GUN")
+    {
+        insertType(Gun, list);
+    }
+    if (mounting == "TUR1" || mounting == "TUR2")
+    {
+        insertType(Gun, list);
+        insertType(Software, list);
+    }
+    return list;
+}
+
+
+int Items::getDepotPrice(int model)
+{
+    if (items == NULL)
+        items = new Items();
+    Station station = Chapter::get()->stations().value(Chapter::get()->currentStation());
+    return (int)(items->m_items.value(model)->cost*station.depotPrices().value(model));
+}
+
 
 } // namespace game

@@ -105,17 +105,6 @@ Depot::Depot() :
     m_itemList1 = new ui::ItemList(m_backgroundLabel, true);
     m_itemList1->setPosition(8, 8);
     connect(m_itemList1, SIGNAL(clicked(int)), SLOT(itemListClicked1(int)));
-    m_itemList1->addItem(Items::get(5121)->icon, false, true);
-    m_itemList1->addItem(Items::get(5122)->icon, true, false);
-    m_itemList1->addItem(Items::get(6145)->icon, false, true);
-    m_itemList1->addItem(Items::get(6146)->icon, false, true);
-    m_itemList1->addItem(Items::get(9217)->icon, false, true);
-    m_itemList1->addItem(Items::get(5121)->icon, false, true);
-    m_itemList1->addItem(Items::get(5122)->icon, true, false);
-    m_itemList1->addItem(Items::get(5121)->icon, false, true);
-    m_itemList1->addItem(Items::get(5122)->icon, true, false);
-    m_itemList1->addItem(Items::get(5121)->icon, false, true);
-    m_itemList1->addItem(Items::get(5122)->icon, true, false);
 
     m_itemList2 = new ui::ItemList(m_backgroundLabel, false);
     m_itemList2->setPosition(8, 293);
@@ -237,7 +226,9 @@ void Depot::draw()
     case Repair:
         return;
     case Loading:
-        if (m_time.elapsed() < 75)
+        if (m_loadingState == Arrows && m_time.elapsed() < 95)
+            return;
+        if (m_loadingState != Arrows && m_time.elapsed() < 35)
             return;
         break;
     }
@@ -281,19 +272,25 @@ void Depot::draw()
             {
                 int model = m_list2.at(m_loadingItem);
                 m_itemList2->addItem(Items::get(model)->icon);
+                if (m_loadingItem == m_selectedItem)
+                    m_itemList2->selectItem(m_selectedItem);
                 m_loadingItem++;
             }
             else
             {
                 m_loadingState = List1;
                 m_loadingItem = 0;
-                m_list1.clear();
+                m_list1 = Items::getDepotItems(m_boat->mountings().at(m_mounting)->name);
             }
         }
         if (m_loadingState == List1)
         {
             if (m_loadingItem < m_list1.count())
             {
+                int model = m_list1.at(m_loadingItem);
+                bool compatible = m_boat->isCompatible(model);
+                m_itemList1->addItem(Items::get(model)->icon, !compatible, compatible);
+                m_loadingItem++;
             }
             else
             {
