@@ -74,8 +74,8 @@ Surface::Surface(const QString &name, int mapping)
         for (int x = 12; x < heightMap.width() - 1; x++) {
             const int x1 = y * heightMap.width() + x - 12;
 
-            const uint8_t m = map[x1];
-            const uint8_t d = dir[x1];
+            const quint8 m = map[x1];
+            const quint8 d = dir[x1];
 
             int texture = (m >> 2);
 
