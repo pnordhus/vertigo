@@ -90,6 +90,12 @@ void ItemList::addItem(const gfx::Image &icon, bool red, bool green)
 void ItemList::selectItem(int index)
 {
     m_selectedItem = index;
+    if (m_firstItem + 8 <= m_selectedItem)
+    {
+        m_firstItem = m_selectedItem - 7;
+        m_offset = -54;
+        m_time.restart();
+    }
 }
 
 
@@ -155,7 +161,7 @@ bool ItemList::mousePressEvent(const QPoint &pos, Qt::MouseButton button)
     QRect rect = mapToGlobal(QRect(54, 0, 435, 48));
     if (button == Qt::LeftButton && rect.contains(pos))
     {
-        int index = m_firstItem + (pos.x() - rect.x() - 1)/54;
+        int index = m_firstItem + (pos.x() - rect.x())/54;
         if (index >= 0 && index < m_items.count())
         {
             emit clicked(index);

@@ -66,7 +66,7 @@ Depot::Depot() :
     m_credits = new ui::Label(m_backgroundLabel);
     m_credits->setFont(gfx::Font::Large);
     m_credits->setPosition(16, 263);
-    m_credits->setText(QString("CREDITS: $%1").arg(Chapter::get()->credits()));
+    updateCredits();
 
     m_lblInfo = new ui::Label(m_backgroundLabel);
     m_lblInfo->hide();
@@ -122,11 +122,13 @@ Depot::Depot() :
     m_btnBuy->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdbuyu.img", colorTable));
     m_btnBuy->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdbuyd.img", colorTable));
     m_btnBuy->setPosition(507, 243);
+    connect(m_btnBuy, SIGNAL(clicked()), SLOT(buy()));
 
     m_btnSell = new ui::Button(m_backgroundLabel);
     m_btnSell->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdselu.img", colorTable));
     m_btnSell->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdseld.img", colorTable));
     m_btnSell->setPosition(507, 75);
+    connect(m_btnSell, SIGNAL(clicked()), SLOT(sell()));
 
     m_btnInfo = new ui::Button(m_backgroundLabel);
     m_btnInfo->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdtinfu.img", colorTable));
@@ -240,7 +242,7 @@ void Depot::updateInfo()
     Items::Item *item = NULL;
     if (m_selectedList == 1)
         item = Items::get(m_list1.at(m_selectedItem));
-    if (m_selectedList == 2 && m_selectedItem < m_list2.count())
+    if (m_selectedList == 2 && m_selectedItem >= 0)
         item = Items::get(m_list2.at(m_selectedItem));
     if (item == NULL)
         return;
@@ -276,6 +278,72 @@ void Depot::updateInfo()
     }
 
     m_lblInfo->show();
+}
+
+
+void Depot::updateCredits()
+{
+    m_credits->setText(QString("CREDITS: $%1").arg(Chapter::get()->credits()));
+}
+
+
+void Depot::buy()
+{
+    const QString &mounting = m_boat->mountings().at(m_mounting)->name;
+    if (m_selectedList != 1)
+        return;
+    Items::Item *item = Items::get(m_list1.at(m_selectedItem));
+    if (!m_boat->isCompatible(item->model))
+        return;
+    int oldModel;
+    if (!m_boat->canBuy(item->model, mounting, &oldModel))
+    {
+        return;
+    }
+    int price = Items::getDepotPrice(item->model);
+    if (oldModel > 0)
+        price -= Items::getDepotPrice(oldModel);
+    if (price > Chapter::get()->credits())
+    {
+        return;
+    }
+    Chapter::get()->addCredit(-price);
+    m_boat->buy(item->model, mounting);
+
+    m_list2 = m_boat->getItems(mounting);
+    m_itemList2->clear();
+    foreach (int model, m_list2)
+        m_itemList2->addItem(Items::get(model)->icon);
+    updateCredits();
+}
+
+
+void Depot::sell()
+{
+    const QString &mounting = m_boat->mountings().at(m_mounting)->name;
+    if (m_selectedList != 2 || m_selectedItem >= m_list2.count())
+        return;
+    Items::Item *item = Items::get(m_list2.at(m_selectedItem));
+    if (!m_boat->canSell(item->model, mounting))
+        return;
+    int price = Items::getDepotPrice(item->model);
+
+    int index = 0;
+    for (int i = 0; i < m_selectedItem; i++)
+        if (Items::get(m_list2.at(i))->type == item->type)
+            index++;
+    m_boat->sell(item->model, index, mounting);
+    Chapter::get()->addCredit(price);
+
+    m_list2 = m_boat->getItems(mounting);
+    m_itemList2->clear();
+    foreach (int model, m_list2)
+        m_itemList2->addItem(Items::get(model)->icon);
+    if (m_selectedItem >= m_list2.count())
+        m_selectedItem = m_list2.count() - 1;
+    m_itemList2->selectItem(m_selectedItem);
+    updateInfo();
+    updateCredits();
 }
 
 
@@ -366,7 +434,7 @@ void Depot::draw()
                 m_loadingItem = 0;
                 m_list2 = m_boat->getItems(m_boat->mountings().at(m_mounting)->name);
                 m_selectedList = 2;
-                m_selectedItem = 0;
+                m_selectedItem = -1;
             }
         }
         if (m_loadingState == List2)
@@ -375,8 +443,11 @@ void Depot::draw()
             {
                 int model = m_list2.at(m_loadingItem);
                 m_itemList2->addItem(Items::get(model)->icon);
-                if (m_loadingItem == m_selectedItem)
+                if (m_selectedItem < 0)
+                {
+                    m_selectedItem = m_loadingItem;
                     m_itemList2->selectItem(m_selectedItem);
+                }
                 m_loadingItem++;
             }
             else

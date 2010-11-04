@@ -49,9 +49,12 @@ private slots:
     void itemListClicked1(int index);
     void itemListClicked2(int index);
     void toggleInfo();
+    void buy();
+    void sell();
 
 private:
     void updateInfo();
+    void updateCredits();
 
 protected:
     void draw();

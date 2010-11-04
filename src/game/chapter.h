@@ -49,6 +49,7 @@ public slots:
     void toggleMovieAutopilot();
     void toggleMovieApproach();
     void toggleMovieHarbour();
+    void addCredit(int credit);
 
 public:
     void save(int slot, const QString &name) const;
@@ -92,7 +93,6 @@ private slots:
     void changeChapter(int chapter);
     void addDialog(int dialogId);
     void removeDialog(int dialogId);
-    void addCredit(int credit);
     void enableStation(int station);
     void disableStation(int station);
     void addMission(const QString &mission, int station);

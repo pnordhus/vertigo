@@ -111,10 +111,10 @@ QList<int> Boat::getItems(const QString& mounting)
         if (m_nrskin)
             list << m_nrskin;
         list << m_sensor;
-        foreach (int buzz, m_buzzers)
-            list << buzz;
         if (m_fixer)
             list << m_fixer;
+        foreach (int buzz, m_buzzers)
+            list << buzz;
     }
     if (mounting == "GENE")
     {
@@ -155,58 +155,7 @@ QList<int> Boat::getItems(const QString& mounting)
 void Boat::setItems(const QString& mounting, const QList<int> &items)
 {
     foreach (int model, items)
-    {
-        Items::Item *item = Items::get(model);
-
-        if (mounting == "DEFE")
-        {
-            if (item->type == Items::Armor)
-                m_armor = model;
-            if (item->type == Items::NRSkin)
-                m_nrskin = model;
-            if (item->type == Items::Sensor)
-                m_sensor = model;
-            if (item->type == Items::Buzzer)
-                m_buzzers << model;
-            if (item->type == Items::Fixer)
-                m_fixer = model;
-        }
-        if (mounting == "GENE")
-        {
-            if (item->type == Items::Engine)
-                m_engine = model;
-            if (item->type == Items::Booster)
-                m_booster = model;
-            if (item->type == Items::Silator)
-                m_silator = model;
-        }
-        if (mounting == "GUN")
-        {
-            if (item->type == Items::Gun)
-                m_gun = model;
-        }
-        if (mounting == "TORP")
-        {
-            if (item->type == Items::Magazine)
-                m_magazine = model;
-            if (item->type == Items::Torpedo)
-                m_torpedoes << model;
-        }
-        if (mounting == "TUR1")
-        {
-            if (item->type == Items::Gun)
-                m_tur1 = model;
-            if (item->type == Items::Software)
-                m_tur1soft = model;
-        }
-        if (mounting == "TUR2")
-        {
-            if (item->type == Items::Gun)
-                m_tur2 = model;
-            if (item->type == Items::Software)
-                m_tur2soft = model;
-        }
-    }
+        buy(model, mounting);
 }
 
 
@@ -330,11 +279,100 @@ bool Boat::isCompatible(int model)
 
 void Boat::buy(int model, const QString& mounting)
 {
+    Items::Item *item = Items::get(model);
+
+    if (mounting == "DEFE")
+    {
+        if (item->type == Items::Armor)
+            m_armor = model;
+        if (item->type == Items::NRSkin)
+            m_nrskin = model;
+        if (item->type == Items::Sensor)
+            m_sensor = model;
+        if (item->type == Items::Buzzer)
+            m_buzzers << model;
+        if (item->type == Items::Fixer)
+            m_fixer = model;
+    }
+    if (mounting == "GENE")
+    {
+        if (item->type == Items::Engine)
+            m_engine = model;
+        if (item->type == Items::Booster)
+            m_booster = model;
+        if (item->type == Items::Silator)
+            m_silator = model;
+    }
+    if (mounting == "GUN")
+    {
+        if (item->type == Items::Gun)
+            m_gun = model;
+    }
+    if (mounting == "TORP")
+    {
+        if (item->type == Items::Magazine)
+            m_magazine = model;
+        if (item->type == Items::Torpedo)
+            m_torpedoes << model;
+    }
+    if (mounting == "TUR1")
+    {
+        if (item->type == Items::Gun)
+            m_tur1 = model;
+        if (item->type == Items::Software)
+            m_tur1soft = model;
+    }
+    if (mounting == "TUR2")
+    {
+        if (item->type == Items::Gun)
+            m_tur2 = model;
+        if (item->type == Items::Software)
+            m_tur2soft = model;
+    }
 }
 
 
 void Boat::sell(int model, int index, const QString& mounting)
 {
+    Items::Item *item = Items::get(model);
+    if (mounting == "DEFE")
+    {
+        if (item->type == Items::NRSkin)
+            m_nrskin = 0;
+        if (item->type == Items::Buzzer)
+            m_buzzers.removeAt(index);
+        if (item->type == Items::Fixer)
+            m_fixer = 0;
+    }
+    if (mounting == "GENE")
+    {
+        if (item->type == Items::Booster)
+            m_booster = 0;
+        if (item->type == Items::Silator)
+            m_silator = 0;
+    }
+    if (mounting == "GUN")
+    {
+    }
+    if (mounting == "TORP")
+    {
+        if (item->type == Items::Torpedo)
+            m_torpedoes.removeAt(index);
+    }
+    if (mounting == "TUR1")
+    {
+        if (item->type == Items::Gun)
+            m_tur1 = 0;
+        if (item->type == Items::Software)
+            m_tur1soft = 0;
+    }
+    if (mounting == "TUR2")
+    {
+        if (item->type == Items::Gun)
+            m_tur2 = 0;
+        if (item->type == Items::Software)
+            m_tur2soft = 0;
+    }
 }
 
 
