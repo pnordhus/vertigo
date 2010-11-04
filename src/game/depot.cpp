@@ -22,6 +22,7 @@
 #include "gfx/colortable.h"
 #include "gfx/image.h"
 #include "ui/button.h"
+#include "txt/stringtable.h"
 
 
 namespace game {
@@ -57,10 +58,40 @@ Depot::Depot() :
     label->setTexture(gfx::Image::load("gfx:img/desktop/gui/verline.img", colorTable));
     label->setPosition(352, 75);
 
-    label = new ui::Label(m_backgroundLabel);
-    label->setFont(gfx::Font::Large);
-    label->setPosition(16, 75);
-    label->setText(m_boat->name());
+    m_boatName = new ui::Label(m_backgroundLabel);
+    m_boatName->setFont(gfx::Font::Large);
+    m_boatName->setPosition(16, 75);
+    m_boatName->setText(m_boat->name());
+
+    m_credits = new ui::Label(m_backgroundLabel);
+    m_credits->setFont(gfx::Font::Large);
+    m_credits->setPosition(16, 263);
+    m_credits->setText(QString("CREDITS: $%1").arg(Chapter::get()->credits()));
+
+    m_lblInfo = new ui::Label(m_backgroundLabel);
+    m_lblInfo->hide();
+
+    m_lblItemName = new ui::Label(m_lblInfo);
+    m_lblItemName->setFont(gfx::Font::Medium);
+    m_lblItemName->setPosition(371, 75);
+    m_lblItemName->setSize(128, 16);
+    m_lblItemName->setAlignment(Label::AlignHCenter);
+
+    m_lblItemPrice = new ui::Label(m_lblInfo);
+    m_lblItemPrice->setFont(gfx::Font::Medium);
+    m_lblItemPrice->setPosition(371, 87);
+    m_lblItemPrice->setSize(128, 16);
+    m_lblItemPrice->setAlignment(Label::AlignHCenter);
+
+    m_lblItemVideo = new ui::Label(m_lblInfo);
+    m_lblItemVideo->setPosition(371, 75);
+    m_lblItemVideo->setTexture(m_itemTexture);
+
+    m_lblItemText = new ui::List(m_lblInfo);
+    m_lblItemText->setFont(gfx::Font::Small);
+    m_lblItemText->setPosition(371, 105);
+    m_lblItemText->setSize(160, 192);
+    m_lblItemText->setAlignCenter(false);
 
     m_videoFlip1.open(QString("gfx:mvi/sflip/%1").arg(Chapter::get()->boat()->flipMovie1()));
     m_videoFlip2.open(QString("gfx:mvi/sflip/%1").arg(Chapter::get()->boat()->flipMovie2()));
@@ -101,6 +132,7 @@ Depot::Depot() :
     m_btnInfo->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdtinfu.img", colorTable));
     m_btnInfo->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdtinfd.img", colorTable));
     m_btnInfo->setPosition(507, 131);
+    connect(m_btnInfo, SIGNAL(clicked()), SLOT(toggleInfo()));
 
     m_itemList1 = new ui::ItemList(m_backgroundLabel, true);
     m_itemList1->setPosition(8, 8);
@@ -148,6 +180,7 @@ void Depot::flip()
             arrow->hide();
         m_itemList1->clear();
         m_itemList2->clear();
+        m_lblInfo->hide();
     }
 }
 
@@ -160,6 +193,7 @@ void Depot::loadMounting(int index)
         m_state = Loading;
         m_itemList1->clear();
         m_itemList2->clear();
+        m_lblInfo->hide();
 
         m_loadingState = List2;
         m_loadingItem = 0;
@@ -177,6 +211,7 @@ void Depot::itemListClicked1(int index)
     m_selectedList = 1;
     m_selectedItem = index;
     m_itemList1->selectItem(index);
+    updateInfo();
 }
 
 
@@ -187,6 +222,60 @@ void Depot::itemListClicked2(int index)
     m_selectedList = 2;
     m_selectedItem = index;
     m_itemList2->selectItem(index);
+    updateInfo();
+}
+
+
+void Depot::toggleInfo()
+{
+    if (m_lblItemText->isVisible())
+        m_lblItemText->hide();
+    else
+        m_lblItemText->show();
+}
+
+
+void Depot::updateInfo()
+{
+    Items::Item *item = NULL;
+    if (m_selectedList == 1)
+        item = Items::get(m_list1.at(m_selectedItem));
+    if (m_selectedList == 2 && m_selectedItem < m_list2.count())
+        item = Items::get(m_list2.at(m_selectedItem));
+    if (item == NULL)
+        return;
+
+    m_lblItemName->setText(item->longname);
+    m_lblItemText->setText(item->text);
+
+    m_videoItem.open(QString("gfx:mvi/thing/%1.mvi").arg(item->imgname));
+    m_videoItem.setFrameRate(13);
+    m_videoItem.playLoop();
+    m_itemTexture.createEmpty(m_videoItem.width(), m_videoItem.height(), gfx::Texture::RGBA);
+
+    int price = Items::getDepotPrice(item->model);
+    if (m_selectedList == 2)
+        if (m_boat->canSell(item->model, m_boat->mountings().at(m_mounting)->name))
+            m_lblItemPrice->setText(txt::StringTable::get(txt::Depot_Bid) + QString("%1").arg(price));
+        else
+            m_lblItemPrice->setText(txt::StringTable::get(txt::Depot_Value) + QString("%1").arg(price));
+    if (m_selectedList == 1)
+    {
+        int oldModel;
+        m_boat->canBuy(item->model, m_boat->mountings().at(m_mounting)->name, &oldModel);
+        if (oldModel > 0)
+        {
+            int oldPrice = Items::getDepotPrice(oldModel);
+            if (oldPrice < price)
+                m_lblItemPrice->setText(txt::StringTable::get(txt::Depot_Upgrade) + QString("%1").arg(price - oldPrice));
+            else
+                m_lblItemPrice->setText(txt::StringTable::get(txt::Depot_Degrade) + QString("%1").arg(price - oldPrice));
+        }
+        else
+            m_lblItemPrice->setText(txt::StringTable::get(txt::Depot_Cost) + QString("%1").arg(price));
+    }
+
+    m_lblInfo->show();
 }
 
 
@@ -194,6 +283,20 @@ void Depot::draw()
 {
     ui::Label::draw();
 
+    if (m_state == Ready)
+    {
+        if (m_lblInfo->isVisible())
+        {
+            gfx::Image frame = m_videoItem.getFrame();
+            if (!frame.isNull())
+            {
+                gfx::ColorTable colorTable = frame.colorTable();
+                colorTable[0] = qRgba(0, 0, 0, 0);
+                frame.setColorTable(colorTable);
+                m_itemTexture.update(0, 0, frame);
+            }
+        }
+    }
     if (m_state == Flipping)
     {
         gfx::Video *video;
@@ -294,6 +397,7 @@ void Depot::draw()
             }
             else
             {
+                updateInfo();
                 m_state = Ready;
             }
         }

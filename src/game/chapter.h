@@ -75,6 +75,7 @@ public:
     const Mission* mission() const { return m_mission; }
     QList<Task> tasks();
     Boat* boat() const { return m_boat; }
+    int credits() const { return m_credits; }
 
 private:
     void load(const QString &filename);

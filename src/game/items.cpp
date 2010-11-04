@@ -203,7 +203,7 @@ int Items::getDepotPrice(int model)
     if (items == NULL)
         items = new Items();
     Station station = Chapter::get()->stations().value(Chapter::get()->currentStation());
-    return (int)(items->m_items.value(model)->cost*station.depotPrices().value(model));
+    return (int)(0.9*items->m_items.value(model)->cost*station.depotPrices().value(model));
 }
 
 
