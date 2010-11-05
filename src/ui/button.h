@@ -38,6 +38,7 @@ signals:
 public:
     void setOffset(int offset);
     void setPressedTexture(const gfx::Texture &texture);
+    void setDisabledTexture(const gfx::Texture &texture);
 
 protected:
     void draw();
@@ -48,6 +49,7 @@ private:
     bool m_pressed;
     int m_offset;
     gfx::Texture m_pressedTexture;
+    gfx::Texture m_disabledTexture;
 };
 
 

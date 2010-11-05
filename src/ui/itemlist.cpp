@@ -25,6 +25,7 @@ namespace ui {
 
 ItemList::ItemList(Widget *parent, bool showChecks, int maxItems) :
     Widget(parent),
+    m_items(0),
     m_firstItem(0),
     m_selectedItem(-1),
     m_offset(0)
@@ -36,17 +37,24 @@ ItemList::ItemList(Widget *parent, bool showChecks, int maxItems) :
         m_textureChecks.createEmpty(54*maxItems + 3, 48, gfx::Texture::RGBA);
 
     const gfx::ColorTable colorTable("gfx:pal/gui/border.pal");
+    gfx::ColorTable colorTableDisabled;
+    for (int i = 0; i < 256; i++)
+        colorTableDisabled << qRgba(qRed(colorTable[i]), qGreen(colorTable[i]), qBlue(colorTable[i]), 128);
 
     m_btnLeft = new ui::Button(this);
     m_btnLeft->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdlefu.img", colorTable));
     m_btnLeft->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdlefd.img", colorTable));
+    m_btnLeft->setDisabledTexture(gfx::Image::load("gfx:img/desktop/depot/gdlefu.img", colorTableDisabled));
     m_btnLeft->setPosition(13, 8);
+    m_btnLeft->disable();
     connect(m_btnLeft, SIGNAL(clicked()), SLOT(scrollLeft()));
 
     m_btnRight = new ui::Button(this);
     m_btnRight->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdrigu.img", colorTable));
     m_btnRight->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdrigd.img", colorTable));
+    m_btnRight->setDisabledTexture(gfx::Image::load("gfx:img/desktop/depot/gdrigu.img", colorTableDisabled));
     m_btnRight->setPosition(493, 8);
+    m_btnRight->disable();
     connect(m_btnRight, SIGNAL(clicked()), SLOT(scrollRight()));
 
     m_chkGreen = gfx::Image::load("gfx:img/desktop/depot/chkgre.img", colorTable);
@@ -57,7 +65,6 @@ ItemList::ItemList(Widget *parent, bool showChecks, int maxItems) :
 
 ItemList::~ItemList()
 {
-    qDeleteAll(m_items);
 }
 
 
@@ -69,21 +76,17 @@ void ItemList::addItem(const gfx::Image &icon)
 
 void ItemList::addItem(const gfx::Image &icon, bool red, bool green)
 {
-    Item *item = new Item();
-    item->icon = icon;
-    item->red = red;
-    item->green = green;
-    m_items << item;
-
-    int x = 54*(m_items.count() - 1);
-    m_texture.update(x, 0, item->icon);
+    int x = 54*m_items;
+    m_texture.update(x, 0, icon);
     if (m_textureChecks.isValid())
     {
-        if (item->green)
+        if (green)
             m_textureChecks.update(x + 4, 4, m_chkGreen);
-        if (item->red)
+        if (red)
             m_textureChecks.update(x + 4, 4, m_chkRed);
     }
+    m_items++;
+    updateButtons();
 }
 
 
@@ -95,6 +98,7 @@ void ItemList::selectItem(int index)
         m_firstItem = m_selectedItem - 7;
         m_offset = -54;
         m_time.restart();
+        updateButtons();
     }
 }
 
@@ -104,10 +108,11 @@ void ItemList::clear()
     m_texture.createEmpty(m_texture.width(), m_texture.height(), gfx::Texture::RGBA);
     if (m_textureChecks.isValid())
         m_textureChecks.createEmpty(m_textureChecks.width(), m_textureChecks.height(), gfx::Texture::RGBA);
-    m_items.clear();
+    m_items = 0;
     m_firstItem = 0;
     m_selectedItem = -1;
     m_offset = 0;
+    updateButtons();
 }
 
 
@@ -142,17 +147,19 @@ void ItemList::scrollLeft()
         m_offset = 54;
         m_time.restart();
     }
+    updateButtons();
 }
 
 
 void ItemList::scrollRight()
 {
-    if (m_firstItem + 8 < m_items.count())
+    if (m_firstItem + 8 < m_items)
     {
         m_firstItem++;
         m_offset = -54;
         m_time.restart();
     }
+    updateButtons();
 }
 
 
@@ -162,7 +169,7 @@ bool ItemList::mousePressEvent(const QPoint &pos, Qt::MouseButton button)
     if (button == Qt::LeftButton && rect.contains(pos))
     {
         int index = m_firstItem + (pos.x() - rect.x())/54;
-        if (index >= 0 && index < m_items.count())
+        if (index >= 0 && index < m_items)
         {
             emit clicked(index);
             return true;
@@ -170,6 +177,13 @@ bool ItemList::mousePressEvent(const QPoint &pos, Qt::MouseButton button)
     }
 
     return false;
+}
+
+
+void ItemList::updateButtons()
+{
+    m_btnLeft->setEnabled(m_firstItem > 0);
+    m_btnRight->setEnabled(m_firstItem + 8 < m_items);
 }
 
 

@@ -36,7 +36,7 @@ class Depot : public ui::Frame
     Q_OBJECT
 
 private:
-    enum State { Flipping, Loading, Ready, Scrolling, Repair };
+    enum State { Flipping, Loading, Ready, Repair };
     enum LoadingState { Arrows, List1, List2 };
 
 public:
@@ -55,6 +55,7 @@ private slots:
 private:
     void updateInfo();
     void updateCredits();
+    void updateButtons();
 
 protected:
     void draw();
@@ -75,10 +76,6 @@ private:
     ui::Button *m_btnBuy;
     ui::Button *m_btnSell;
     ui::Button *m_btnInfo;
-
-    ui::Label *m_lblFlip;
-    ui::Label *m_lblBuy;
-    ui::Label *m_lblSell;
 
     ui::Label *m_lblInfo;
     ui::Label *m_lblItemName;

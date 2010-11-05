@@ -89,6 +89,7 @@ private:
 
     QList<Mounting*> m_mountings;
     QList<int> m_compatibility;
+    int m_maxBuzzers;
 
     QList<int> m_torpedoes;
     int m_magazine;

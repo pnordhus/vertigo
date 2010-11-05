@@ -34,8 +34,11 @@ Depot::Depot() :
     m_side(1)
 {
     const gfx::ColorTable colorTable("gfx:pal/gui/border.pal");
-    gfx::Image backgroundImage = gfx::Image::load("gfx:img/desktop/depot/depoback.img", colorTable);
+    gfx::ColorTable colorTableDisabled;
+    for (int i = 0; i < 256; i++)
+        colorTableDisabled << qRgba(qRed(colorTable[i]), qGreen(colorTable[i]), qBlue(colorTable[i]), 128);
 
+    gfx::Image backgroundImage = gfx::Image::load("gfx:img/desktop/depot/depoback.img", colorTable);
     setupFrame(backgroundImage.size() + QSize(18, 24), "DEPOT", true);
 
     m_backgroundLabel = new ui::Label(this);
@@ -93,6 +96,7 @@ Depot::Depot() :
     m_lblItemText->setSize(160, 192);
     m_lblItemText->setAlignCenter(false);
 
+
     m_videoFlip1.open(QString("gfx:mvi/sflip/%1").arg(Chapter::get()->boat()->flipMovie1()));
     m_videoFlip2.open(QString("gfx:mvi/sflip/%1").arg(Chapter::get()->boat()->flipMovie2()));
     m_videoFlip1.setFrameRate(25);
@@ -107,9 +111,11 @@ Depot::Depot() :
     m_boatLabel->setTexture(m_boatTexture);
     m_boatLabel->setPosition(16, 75);
 
+
     m_btnFlip = new ui::Button(m_backgroundLabel);
     m_btnFlip->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdfliu.img", colorTable));
     m_btnFlip->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdflid.img", colorTable));
+    m_btnFlip->setDisabledTexture(gfx::Image::load("gfx:img/desktop/depot/gdfliu.img", colorTableDisabled));
     m_btnFlip->setPosition(304, 243);
     connect(m_btnFlip, SIGNAL(clicked()), SLOT(flip()));
 
@@ -121,20 +127,26 @@ Depot::Depot() :
     m_btnBuy = new ui::Button(m_backgroundLabel);
     m_btnBuy->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdbuyu.img", colorTable));
     m_btnBuy->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdbuyd.img", colorTable));
+    m_btnBuy->setDisabledTexture(gfx::Image::load("gfx:img/desktop/depot/gdbuyu.img", colorTableDisabled));
     m_btnBuy->setPosition(507, 243);
     connect(m_btnBuy, SIGNAL(clicked()), SLOT(buy()));
 
     m_btnSell = new ui::Button(m_backgroundLabel);
     m_btnSell->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdselu.img", colorTable));
     m_btnSell->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdseld.img", colorTable));
+    m_btnSell->setDisabledTexture(gfx::Image::load("gfx:img/desktop/depot/gdselu.img", colorTableDisabled));
     m_btnSell->setPosition(507, 75);
     connect(m_btnSell, SIGNAL(clicked()), SLOT(sell()));
 
     m_btnInfo = new ui::Button(m_backgroundLabel);
     m_btnInfo->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdtinfu.img", colorTable));
     m_btnInfo->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdtinfd.img", colorTable));
+    m_btnInfo->setDisabledTexture(gfx::Image::load("gfx:img/desktop/depot/gdtinfu.img", colorTableDisabled));
     m_btnInfo->setPosition(507, 131);
     connect(m_btnInfo, SIGNAL(clicked()), SLOT(toggleInfo()));
+
+    updateButtons();
+
 
     m_itemList1 = new ui::ItemList(m_backgroundLabel, true);
     m_itemList1->setPosition(8, 8);
@@ -183,6 +195,7 @@ void Depot::flip()
         m_itemList1->clear();
         m_itemList2->clear();
         m_lblInfo->hide();
+        updateButtons();
     }
 }
 
@@ -196,12 +209,13 @@ void Depot::loadMounting(int index)
         m_itemList1->clear();
         m_itemList2->clear();
         m_lblInfo->hide();
+        updateButtons();
 
         m_loadingState = List2;
         m_loadingItem = 0;
         m_list2 = m_boat->getItems(m_boat->mountings().at(m_mounting)->name);
         m_selectedList = 2;
-        m_selectedItem = 0;
+        m_selectedItem = -1;
     }
 }
 
@@ -213,7 +227,9 @@ void Depot::itemListClicked1(int index)
     m_selectedList = 1;
     m_selectedItem = index;
     m_itemList1->selectItem(index);
+
     updateInfo();
+    updateButtons();
 }
 
 
@@ -224,7 +240,9 @@ void Depot::itemListClicked2(int index)
     m_selectedList = 2;
     m_selectedItem = index;
     m_itemList2->selectItem(index);
+
     updateInfo();
+    updateButtons();
 }
 
 
@@ -245,7 +263,10 @@ void Depot::updateInfo()
     if (m_selectedList == 2 && m_selectedItem >= 0)
         item = Items::get(m_list2.at(m_selectedItem));
     if (item == NULL)
+    {
+        m_lblInfo->hide();
         return;
+    }
 
     m_lblItemName->setText(item->longname);
     m_lblItemText->setText(item->text);
@@ -287,6 +308,37 @@ void Depot::updateCredits()
 }
 
 
+void Depot::updateButtons()
+{
+    if (m_state == Flipping)
+        m_btnFlip->disable();
+    if (m_state == Ready)
+        m_btnFlip->enable();
+
+    if (m_state == Flipping || m_state == Loading || (m_state == Ready && m_selectedItem < 0))
+    {
+        m_btnBuy->disable();
+        m_btnInfo->disable();
+        m_btnSell->disable();
+    }
+
+    if (m_state == Ready && m_selectedItem >= 0)
+    {
+        m_btnInfo->enable();
+
+        if (m_selectedList == 1 && m_boat->isCompatible(m_list1.at(m_selectedItem)))
+            m_btnBuy->enable();
+        else
+            m_btnBuy->disable();
+
+        if (m_selectedList == 2 && m_boat->canSell(m_list2.at(m_selectedItem), m_boat->mountings().at(m_mounting)->name))
+            m_btnSell->enable();
+        else
+            m_btnSell->disable();
+    }
+}
+
+
 void Depot::buy()
 {
     const QString &mounting = m_boat->mountings().at(m_mounting)->name;
@@ -314,6 +366,7 @@ void Depot::buy()
     m_itemList2->clear();
     foreach (int model, m_list2)
         m_itemList2->addItem(Items::get(model)->icon);
+ 
     updateCredits();
 }
 
@@ -342,7 +395,9 @@ void Depot::sell()
     if (m_selectedItem >= m_list2.count())
         m_selectedItem = m_list2.count() - 1;
     m_itemList2->selectItem(m_selectedItem);
+
     updateInfo();
+    updateButtons();
     updateCredits();
 }
 
@@ -468,8 +523,9 @@ void Depot::draw()
             }
             else
             {
-                updateInfo();
                 m_state = Ready;
+                updateInfo();
+                updateButtons();
             }
         }
     }

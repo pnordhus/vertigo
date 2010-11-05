@@ -42,10 +42,18 @@ void Button::setPressedTexture(const gfx::Texture &texture)
 }
 
 
+void Button::setDisabledTexture(const gfx::Texture &texture)
+{
+    m_disabledTexture = texture;
+}
+
+
 void Button::draw()
 {
     if (m_text.isEmpty()) {
-        if (m_pressed && m_pressedTexture.isValid())
+        if (!isEnabled() && m_disabledTexture.isValid())
+            m_drawRect = m_disabledTexture.draw().toRect();
+        else if (m_pressed && m_pressedTexture.isValid())
             m_drawRect = m_pressedTexture.draw().toRect();
         else
             m_drawRect = m_texture.draw().toRect();

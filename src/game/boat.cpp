@@ -41,6 +41,7 @@ Boat::Boat(int type) :
         file.load("vfx:sobjects/hiob.des");
         m_flipMovie1 = "hiob1.mvi";
         m_flipMovie2 = "hiob2.mvi";
+        m_maxBuzzers = 2;
 
         addMounting("DEFE", 0, 3, 280, 173, "TopLeft");
         addMounting("GENE", 0, 4, 80, 132, "BottomRight");
@@ -171,7 +172,7 @@ bool Boat::canBuy(int model, const QString& mounting, int *oldModel)
             *oldModel = m_nrskin;
         if (item->type == Items::Sensor)
             *oldModel = m_sensor;
-        if (item->type == Items::Buzzer && m_buzzers.count() < 8)
+        if (item->type == Items::Buzzer && m_buzzers.count() < m_maxBuzzers)
             return true;
         if (item->type == Items::Fixer)
             *oldModel = m_fixer;

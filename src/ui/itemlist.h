@@ -49,16 +49,9 @@ signals:
     void clicked(int);
 
 private:
-    struct Item
-    {
-        gfx::Image icon;
-        bool red;
-        bool green;
-    };
-
-private:
     void draw();
     bool mousePressEvent(const QPoint &pos, Qt::MouseButton button);
+    void updateButtons();
 
 private slots:
     void scrollLeft();
@@ -74,10 +67,8 @@ private:
     ui::Label *m_lblList;
     ui::Button *m_btnLeft;
     ui::Button *m_btnRight;
-    ui::Label *m_lblLeft;
-    ui::Label *m_lblRight;
 
-    QList<Item*> m_items;
+    int m_items;
     int m_firstItem;
     int m_selectedItem;
     int m_offset;
