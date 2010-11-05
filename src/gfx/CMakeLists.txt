@@ -11,6 +11,8 @@ set(SOURCES
 	rle.h
     texture.cpp
     texture.h
+    texturemanager.cpp
+    texturemanager.h
     video.cpp
     video.h
 )
