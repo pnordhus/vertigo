@@ -109,11 +109,12 @@ Surface::Surface(const QString &name, int mapping)
                     rotate++;
             }
 
+            const float margin = 0.002f;
             QList<TexCoord> texCoords;
-            texCoords << TexCoord(0.5f + subTextureX, 0.0f + subTextureY);
-            texCoords << TexCoord(0.0f + subTextureX, 0.0f + subTextureY);
-            texCoords << TexCoord(0.0f + subTextureX, 0.5f + subTextureY);
-            texCoords << TexCoord(0.5f + subTextureX, 0.5f + subTextureY);
+            texCoords << TexCoord(0.5f + subTextureX - margin, 0.0f + subTextureY + margin);
+            texCoords << TexCoord(0.0f + subTextureX + margin, 0.0f + subTextureY + margin);
+            texCoords << TexCoord(0.0f + subTextureX + margin, 0.5f + subTextureY - margin);
+            texCoords << TexCoord(0.5f + subTextureX - margin, 0.5f + subTextureY - margin);
 
             if (flip) {
                 qSwap(texCoords[0], texCoords[1]);
