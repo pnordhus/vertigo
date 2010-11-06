@@ -24,6 +24,7 @@
 #include <QFileDialog>
 #include <QSettings>
 #include <QTimer>
+#include "fight/scenario.h"
 
 
 namespace game {
@@ -52,7 +53,7 @@ Vertigo::~Vertigo()
 }
 
 
-bool Vertigo::start()
+bool Vertigo::start(const QString &scenario)
 {
     QDir::addSearchPath("dat", "data:dat");
     QDir::addSearchPath("gfx", "data:gfx");
@@ -75,11 +76,16 @@ bool Vertigo::start()
     m_window = new Window;
     m_fontManager = new gfx::FontManager;
 
-    createMainMenu(false);
-
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), SLOT(update()));
     timer->start(20);
+
+    if (scenario.isEmpty()) {
+        createMainMenu(false);
+    } else {
+        fight::Scenario *s = new fight::Scenario(scenario);
+        m_window->setRenderer(s);
+    }
 
     m_window->show();
     return true;

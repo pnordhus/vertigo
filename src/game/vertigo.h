@@ -42,7 +42,7 @@ public:
     ~Vertigo();
 
 public:
-    bool start();
+    bool start(const QString &scenario);
 
 private slots:
     void update();

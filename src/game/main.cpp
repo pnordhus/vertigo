@@ -28,8 +28,12 @@ int main(int argc, char *argv[])
     app.setOrganizationName("Vertigo");
     app.setApplicationName("Vertigo");
 
+    QString scenario;
+    if (argc > 1)
+        scenario = argv[1];
+
     game::Vertigo vertigo;
-    if (!vertigo.start())
+    if (!vertigo.start(scenario))
         return 1;
 
     return app.exec();
