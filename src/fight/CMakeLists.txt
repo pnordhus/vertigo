@@ -1,4 +1,10 @@
 set(SOURCES
+    module.cpp
+    module.h
+    modulemanager.cpp
+    modulemanager.h
+    object.cpp
+    object.h
     scenario.cpp
     scenario.h
     surface.cpp

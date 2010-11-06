@@ -15,70 +15,32 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef FIGHT_SCENARIO_H
-#define FIGHT_SCENARIO_H
+#ifndef FIGHT_MODULEMANAGER_H
+#define FIGHT_MODULEMANAGER_H
 
 
-#include "object.h"
-#include "game/renderer.h"
-#include "txt/desfile.h"
+#include "module.h"
+#include "gfx/texturemanager.h"
 
 
 namespace fight {
 
 
-class Surface;
-
-
-class Scenario : public game::Renderer
+class ModuleManager
 {
-    Q_OBJECT
+public:
+    ModuleManager(gfx::TextureManager &texMan);
 
 public:
-    Scenario(const QString &name);
-    ~Scenario();
-
-signals:
-    void success();
-
-protected:
-    void draw();
-    void keyPressEvent(QKeyEvent *);
-    void keyReleaseEvent(QKeyEvent *);
+    Module get(const QString &name);
 
 private:
-    QVector3D getPosition() const;
-
-private:
-    enum Type
-    {
-        TypeBoat        = 2049,
-        TypeBomber      = 2050,
-        TypeTank        = 2051,
-        TypeTower       = 2052,
-        TypeCrawler     = 2053,
-        TypePlayer      = 2057,
-    };
-
-    Surface *m_surface;
-    QVector3D m_position;
-    txt::DesFile m_file;
-    gfx::TextureManager m_textureManager;
-    ModuleManager m_moduleManager;
-    QList<Object*> m_objects;
-
-    float m_left;
-    float m_right;
-    float m_up;
-    float m_down;
-    float m_forwards;
-    float m_backwards;
-
-    QMatrix4x4 m_cameraMatrix;
+    gfx::TextureManager &m_textureManager;
+    QMap<QString, Module> m_modules;
 };
 
 
 } // namespace fight
 
 
-#endif // FIGHT_SCENARIO_H
+#endif // FIGHT_MODULEMANAGER_H

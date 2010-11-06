@@ -15,70 +15,79 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef FIGHT_SCENARIO_H
-#define FIGHT_SCENARIO_H
+#ifndef FIGHT_MODULE_H
+#define FIGHT_MODULE_H
 
 
-#include "object.h"
-#include "game/renderer.h"
-#include "txt/desfile.h"
+#include "vector.h"
+#include "gfx/texturemanager.h"
 
 
 namespace fight {
 
 
-class Surface;
-
-
-class Scenario : public game::Renderer
+class ModulePrivate : public QSharedData
 {
-    Q_OBJECT
-
 public:
-    Scenario(const QString &name);
-    ~Scenario();
-
-signals:
-    void success();
-
-protected:
+    void load(gfx::TextureManager &texMan, const QString &name);
     void draw();
-    void keyPressEvent(QKeyEvent *);
-    void keyReleaseEvent(QKeyEvent *);
 
 private:
-    QVector3D getPosition() const;
-
-private:
-    enum Type
+    struct TexCoord
     {
-        TypeBoat        = 2049,
-        TypeBomber      = 2050,
-        TypeTank        = 2051,
-        TypeTower       = 2052,
-        TypeCrawler     = 2053,
-        TypePlayer      = 2057,
+        TexCoord() {}
+        TexCoord(float s, float t) : s(s), t(t) {}
+
+        float s;
+        float t;
     };
 
-    Surface *m_surface;
-    QVector3D m_position;
-    txt::DesFile m_file;
-    gfx::TextureManager m_textureManager;
-    ModuleManager m_moduleManager;
-    QList<Object*> m_objects;
+    struct Face
+    {
+        gfx::Texture texture;
+        QVector<Vector> vertices;
+        QVector<TexCoord> texCoords;
+    };
 
-    float m_left;
-    float m_right;
-    float m_up;
-    float m_down;
-    float m_forwards;
-    float m_backwards;
-
-    QMatrix4x4 m_cameraMatrix;
+    QList<Face> m_faces;
 };
+
+
+class Module
+{
+public:
+    Module();
+    Module(gfx::TextureManager &texMan, const QString &name);
+
+public:
+    void draw();
+
+private:
+    QExplicitlySharedDataPointer<ModulePrivate> d;
+};
+
+
+inline Module::Module() :
+    d(new ModulePrivate)
+{
+
+}
+
+
+inline Module::Module(gfx::TextureManager &texMan, const QString &name) :
+    d(new ModulePrivate)
+{
+    d->load(texMan, name);
+}
+
+
+inline void Module::draw()
+{
+    d->draw();
+}
 
 
 } // namespace fight
 
 
-#endif // FIGHT_SCENARIO_H
+#endif // FIGHT_MODULE_H

@@ -15,70 +15,39 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef FIGHT_SCENARIO_H
-#define FIGHT_SCENARIO_H
-
-
 #include "object.h"
-#include "game/renderer.h"
 #include "txt/desfile.h"
+#include <QGLContext>
 
 
 namespace fight {
 
 
-class Surface;
-
-
-class Scenario : public game::Renderer
+Object::Object(ModuleManager &modMan, const QString &name)
 {
-    Q_OBJECT
+    txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
+    file.setSection("cluster");
+    m_base = modMan.get(file.value("base").toString());
 
-public:
-    Scenario(const QString &name);
-    ~Scenario();
+    file.setSection("size");
+    m_scale = file.value("scale").toFloat() / 16;
+}
 
-signals:
-    void success();
 
-protected:
-    void draw();
-    void keyPressEvent(QKeyEvent *);
-    void keyReleaseEvent(QKeyEvent *);
+void Object::setPosition(const QVector3D &pos)
+{
+    m_position = pos;
+}
 
-private:
-    QVector3D getPosition() const;
 
-private:
-    enum Type
-    {
-        TypeBoat        = 2049,
-        TypeBomber      = 2050,
-        TypeTank        = 2051,
-        TypeTower       = 2052,
-        TypeCrawler     = 2053,
-        TypePlayer      = 2057,
-    };
-
-    Surface *m_surface;
-    QVector3D m_position;
-    txt::DesFile m_file;
-    gfx::TextureManager m_textureManager;
-    ModuleManager m_moduleManager;
-    QList<Object*> m_objects;
-
-    float m_left;
-    float m_right;
-    float m_up;
-    float m_down;
-    float m_forwards;
-    float m_backwards;
-
-    QMatrix4x4 m_cameraMatrix;
-};
+void Object::draw()
+{
+    glPushMatrix();
+    glTranslatef(m_position.x(), m_position.y(), m_position.z());
+    glScalef(m_scale, m_scale, m_scale);
+    m_base.draw();
+    glPopMatrix();
+}
 
 
 } // namespace fight
-
-
-#endif // FIGHT_SCENARIO_H

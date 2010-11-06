@@ -24,6 +24,7 @@
 #include <QVector>
 #include <QMap>
 
+
 namespace fight {
 
 
@@ -34,6 +35,7 @@ public:
 
 public:
     void draw();
+    float heightAt(float x, float y) const;
 
 private:
     struct TexCoord
@@ -53,6 +55,8 @@ private:
 
     QList<gfx::Texture> m_texture;
     QMap<int, Quad> m_quads;
+    QImage m_heightMap;
+    Vector m_scale;
 };
 
 

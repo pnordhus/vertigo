@@ -79,6 +79,8 @@ void Renderer::setupOrthographicMatrix(float w, float h)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_LIGHTING);
+    glDisable(GL_CULL_FACE);
+    glFrontFace(GL_CCW);
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();

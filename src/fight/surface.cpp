@@ -30,24 +30,24 @@ Surface::Surface(const QString &name, int mapping)
 {
     txt::DesFile file(QString("vfx:surface/%1.des").arg(name));
     file.setSection("height");
-    const QImage heightMap = gfx::Image::loadPCX(QString("vfx:surface/%2").arg(file.value("name").toString().replace("\\", "/")));
+    m_heightMap = gfx::Image::loadPCX(QString("vfx:surface/%2").arg(file.value("name").toString().replace("\\", "/")));
 
-    float scaleX = 1;
-    float scaleY = 1;
-    float scaleZ = 1;
+    m_scale.x = 1;
+    m_scale.y = 1;
+    m_scale.z = 1;
 
     {
         file.setSection("map");
         QFile scaleFile(QString("vfx:surface/%1").arg(file.value("scale").toString().replace("\\", "/")));
         scaleFile.open(QFile::ReadOnly);
 
-        int x,y,z;
         QDataStream stream(&scaleFile);
         stream.setByteOrder(QDataStream::LittleEndian);
-        stream >> x >> y >> z;
-        scaleX = *(float*) &x;
-        scaleY = *(float*) &y;
-        scaleZ = *(float*) &z;
+        stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+        stream >> m_scale.x >> m_scale.y >> m_scale.z;
+        m_scale.x /= 32.0f;
+        m_scale.y /= 32.0f;
+        m_scale.z /= 32.0f;
     }
 
     QByteArray map;
@@ -70,9 +70,9 @@ Surface::Surface(const QString &name, int mapping)
         dir = scaleFile.readAll();
     }
 
-    for (int y = 0; y < heightMap.height() - 13; y++) {
-        for (int x = 12; x < heightMap.width() - 1; x++) {
-            const int x1 = y * heightMap.width() + x - 12;
+    for (int y = 0; y < m_heightMap.height() - 13; y++) {
+        for (int x = 12; x < m_heightMap.width() - 1; x++) {
+            const int x1 = y * m_heightMap.width() + x - 12;
 
             const quint8 m = map[x1];
             const quint8 d = dir[x1];
@@ -129,24 +129,24 @@ Surface::Surface(const QString &name, int mapping)
             foreach (const TexCoord &coord, texCoords)
                 quad.texCoords << coord;
 
-            v.x = (x + 0) * scaleX;
-            v.y = (y + 0) * scaleY;
-            v.z = qGray(heightMap.pixel(x + 0, y + 0)) * scaleZ;
+            v.x = (x + 0) * m_scale.x;
+            v.y = (y + 0) * m_scale.y;
+            v.z = qGray(m_heightMap.pixel(x + 0, y + 0)) * m_scale.z;
             quad.vertices << v;
 
-            v.x = (x + 0) * scaleX;
-            v.y = (y + 1) * scaleY;
-            v.z = qGray(heightMap.pixel(x + 0, y + 1)) * scaleZ;
+            v.x = (x + 0) * m_scale.x;
+            v.y = (y + 1) * m_scale.y;
+            v.z = qGray(m_heightMap.pixel(x + 0, y + 1)) * m_scale.z;
             quad.vertices << v;
 
-            v.x = (x + 1) * scaleX;
-            v.y = (y + 1) * scaleY;
-            v.z = qGray(heightMap.pixel(x + 1, y + 1)) * scaleZ;
+            v.x = (x + 1) * m_scale.x;
+            v.y = (y + 1) * m_scale.y;
+            v.z = qGray(m_heightMap.pixel(x + 1, y + 1)) * m_scale.z;
             quad.vertices << v;
 
-            v.x = (x + 1) * scaleX;
-            v.y = (y + 0) * scaleY;
-            v.z = qGray(heightMap.pixel(x + 1, y + 0)) * scaleZ;
+            v.x = (x + 1) * m_scale.x;
+            v.y = (y + 0) * m_scale.y;
+            v.z = qGray(m_heightMap.pixel(x + 1, y + 0)) * m_scale.z;
             quad.vertices << v;
         }
     }
@@ -157,6 +157,15 @@ Surface::Surface(const QString &name, int mapping)
         gfx::ColorTable colorTable(QString("vfx:texture/%1_%2.s16").arg(sName).arg(i, 3, 10, QChar('0')));
         m_texture << gfx::Image::load(QString("vfx:texture/%1_%2.imb").arg(tName).arg(i, 3, 10, QChar('0')), colorTable);
     }
+}
+
+
+float Surface::heightAt(float x, float y) const
+{
+    const int dx = x / 16;
+    const int dy = y / 16;
+
+    return qGray(m_heightMap.pixel(dx, dy)) * m_scale.z;
 }
 
 

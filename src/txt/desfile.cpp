@@ -67,7 +67,7 @@ bool DesFile::load(const QString &filename)
 
         if (regKey.indexIn(line) >= 0) {
             const QString key = regKey.cap(1).trimmed().toLower();
-            if (!key.startsWith(";"))
+            if (!key.startsWith(";") && !key.startsWith("/"))
                 setValue(key, regKey.cap(2).trimmed());
         }
 
