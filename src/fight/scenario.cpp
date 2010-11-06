@@ -138,7 +138,7 @@ void Scenario::draw()
     glFrontFace(GL_CW);
 
     m_cameraMatrix.rotate(angleX, m_cameraMatrix.row(0).toVector3D());
-    m_cameraMatrix.rotate(angleY, m_cameraMatrix.row(1).toVector3D());
+    m_cameraMatrix.rotate(angleY, QVector3D(0, 0, 1));
     m_position += m_cameraMatrix.row(2).toVector3D() * (m_backwards - m_forwards) * 5.0f;
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -184,6 +184,10 @@ void Scenario::keyPressEvent(QKeyEvent *e)
         m_forwards = 1.0f;
     if (e->key() == Qt::Key_Z || e->key() == Qt::Key_Y)
         m_backwards = 1.0f;
+    if (e->key() == Qt::Key_S)
+        m_forwards = 0.2f;
+    if (e->key() == Qt::Key_X)
+        m_backwards = 0.2f;
 }
 
 
@@ -200,6 +204,10 @@ void Scenario::keyReleaseEvent(QKeyEvent *e)
     if (e->key() == Qt::Key_A)
         m_forwards = 0.0f;
     if (e->key() == Qt::Key_Z || e->key() == Qt::Key_Y)
+        m_backwards = 0.0f;
+    if (e->key() == Qt::Key_S)
+        m_forwards = 0.0f;
+    if (e->key() == Qt::Key_X)
         m_backwards = 0.0f;
 }
 
