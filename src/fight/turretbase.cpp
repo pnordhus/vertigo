@@ -16,6 +16,7 @@
  ***************************************************************************/
 
 #include "turret.h"
+#include "turretbase.h"
 #include "txt/desfile.h"
 #include <QGLContext>
 
@@ -23,42 +24,34 @@
 namespace fight {
 
 
-Turret::Turret(ModuleManager &modMan, const QString &name)
+TurretBase::TurretBase(ModuleManager &modMan, const QString &name) :
+    Object(modMan, name)
 {
     txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
-    file.setSection("cluster");
-    m_body = modMan.get(file.value("body").toString());
+    file.setSection("gunturret");
+    m_turret = new Turret(modMan, file.value("name").toString());
 
-    m_armLeft = modMan.get(file.value("arml").toString());
-    m_armLeftPosition.setX(file.value("ArmLOffsetX").toFloat());
-    m_armLeftPosition.setY(file.value("ArmLOffsetY").toFloat());
-    m_armLeftPosition.setZ(file.value("ArmLOffsetZ").toFloat());
-
-    m_armRight = modMan.get(file.value("armr").toString());
-    m_armRightPosition.setX(file.value("ArmROffsetX").toFloat());
-    m_armRightPosition.setY(file.value("ArmROffsetY").toFloat());
-    m_armRightPosition.setZ(file.value("ArmROffsetZ").toFloat());
-
-    file.setSection("size");
-    m_scale = file.value("scale").toFloat() / 16;
+    m_turretPosition.setX(file.value("RelativePositionX").toFloat());
+    m_turretPosition.setY(file.value("RelativePositionY").toFloat());
+    m_turretPosition.setZ(file.value("RelativePositionZ").toFloat());
 }
 
 
-void Turret::draw()
+TurretBase::~TurretBase()
+{
+    delete m_turret;
+}
+
+
+void TurretBase::draw()
 {
     glPushMatrix();
-    m_body.draw();
+    glTranslatef(m_position.x(), m_position.y(), m_position.z());
+    glScalef(m_scale, m_scale, m_scale);
+    m_base.draw();
 
-    glPushMatrix();
-    glTranslatef(m_armLeftPosition.x(), m_armLeftPosition.y(), m_armLeftPosition.z());
-    m_armLeft.draw();
-    glPopMatrix();
-
-    glPushMatrix();
-    glTranslatef(m_armRightPosition.x(), m_armRightPosition.y(), m_armRightPosition.z());
-    m_armRight.draw();
-    glPopMatrix();
-
+    glTranslatef(m_turretPosition.x(), m_turretPosition.y(), m_turretPosition.z());
+    m_turret->draw();
     glPopMatrix();
 }
 

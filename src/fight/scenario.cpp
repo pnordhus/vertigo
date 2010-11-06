@@ -18,7 +18,7 @@
 #include "module.h"
 #include "scenario.h"
 #include "surface.h"
-#include "turret.h"
+#include "turretbase.h"
 #include <QGLContext>
 #include <QKeyEvent>
 
@@ -97,7 +97,7 @@ Scenario::Scenario(const QString &name) :
                     continue;
                 }
 
-                Object *object = new Turret(m_moduleManager, types.value(dType));
+                Object *object = new TurretBase(m_moduleManager, types.value(dType));
                 object->setPosition(getPosition());
                 m_objects << object;
             }

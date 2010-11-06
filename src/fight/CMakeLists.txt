@@ -11,6 +11,8 @@ set(SOURCES
     surface.h
     turret.cpp
     turret.h
+    turretbase.cpp
+    turretbase.h
     vector.cpp
     vector.h
 )

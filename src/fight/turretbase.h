@@ -15,36 +15,35 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef FIGHT_TURRET_H
-#define FIGHT_TURRET_H
+#ifndef FIGHT_TURRETBASE_H
+#define FIGHT_TURRETBASE_H
 
 
-#include "modulemanager.h"
-#include <QVector3D>
+#include "object.h"
 
 
 namespace fight {
 
 
-class Turret
+class Turret;
+
+
+class TurretBase : public Object
 {
 public:
-    Turret(ModuleManager &modMan, const QString &name);
+    TurretBase(ModuleManager &modMan, const QString &name);
+    ~TurretBase();
 
 public:
     void draw();
 
 private:
-    Module m_body;
-    Module m_armLeft;
-    Module m_armRight;
-    QVector3D m_armLeftPosition;
-    QVector3D m_armRightPosition;
-    float m_scale;
+    QVector3D m_turretPosition;
+    Turret *m_turret;
 };
 
 
 } // namespace fight
 
 
-#endif // FIGHT_TURRET_H
+#endif // FIGHT_TURRETBASE_H
