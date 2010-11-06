@@ -25,6 +25,7 @@
 #include "label.h"
 #include "gfx/texture.h"
 #include "gfx/image.h"
+#include "sfx/sound.h"
 #include <QTime>
 
 
@@ -67,6 +68,7 @@ private:
     ui::Label *m_lblList;
     ui::Button *m_btnLeft;
     ui::Button *m_btnRight;
+    sfx::Sound m_sndButton;
 
     int m_items;
     int m_firstItem;

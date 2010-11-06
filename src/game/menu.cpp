@@ -24,7 +24,8 @@ namespace game {
 
 
 Menu::Menu() :
-    m_rootWidget(NULL)
+    m_rootWidget(NULL),
+    m_click(true)
 {
 
 }
@@ -39,6 +40,12 @@ void Menu::draw()
 }
 
 
+void Menu::setClick(bool enabled)
+{
+    m_click = enabled;
+}
+
+
 void Menu::setRootWidget(ui::Widget *widget)
 {
     m_rootWidget = widget;
@@ -48,7 +55,7 @@ void Menu::setRootWidget(ui::Widget *widget)
 void Menu::mousePressEvent(QMouseEvent *event)
 {
     if (m_rootWidget)
-        if (m_rootWidget->doMousePressEvent(screenToImage(event->pos()).toPoint(), event->button()))
+        if (m_rootWidget->doMousePressEvent(screenToImage(event->pos()).toPoint(), event->button()) && m_click)
             sfx::SoundSystem::get()->sound(sfx::Click)->play();
 }
 

@@ -60,6 +60,8 @@ ItemList::ItemList(Widget *parent, bool showChecks, int maxItems) :
     m_chkGreen = gfx::Image::load("gfx:img/desktop/depot/chkgre.img", colorTable);
     m_chkRed = gfx::Image::load("gfx:img/desktop/depot/chkred.img", colorTable);
     m_textureFrame.fromImage(gfx::Image::load("gfx:img/desktop/depot/iframe.img", colorTable));
+
+    m_sndButton.load("sfx:snd/desktop/button.pcm");
 }
 
 
@@ -146,6 +148,7 @@ void ItemList::scrollLeft()
         m_firstItem--;
         m_offset = 54;
         m_time.restart();
+        m_sndButton.play();
     }
     updateButtons();
 }
@@ -158,6 +161,7 @@ void ItemList::scrollRight()
         m_firstItem++;
         m_offset = -54;
         m_time.restart();
+        m_sndButton.play();
     }
     updateButtons();
 }

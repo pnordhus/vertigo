@@ -51,6 +51,7 @@ private slots:
     void toggleInfo();
     void buy();
     void sell();
+    void repair();
 
 private:
     void updateInfo();
@@ -101,6 +102,13 @@ private:
     State m_state;
     LoadingState m_loadingState;
     int m_loadingItem;
+
+    sfx::Sound m_sndFlip;
+    sfx::Sound m_sndWeapon;
+    sfx::Sound m_sndError;
+    sfx::Sound m_sndButton;
+    sfx::Sound m_sndSelect;
+    sfx::Sound m_sndNoop;
 };
 
 

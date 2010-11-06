@@ -332,6 +332,7 @@ void Desktop::showDepot()
     connect(m_depot, SIGNAL(close()), SLOT(hideDepot()));
     setRootWidget(m_depot);
     m_depot->setPosition((640 - m_depot->width()) / 2, (480 - m_depot->height()) / 2);
+    setClick(false);
 }
 
 
@@ -343,6 +344,7 @@ void Desktop::hideDepot()
     m_room->restart();
     m_depot->deleteLater();
     m_depot = NULL;
+    setClick(true);
 }
 
 

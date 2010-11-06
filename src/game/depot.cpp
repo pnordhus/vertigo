@@ -123,6 +123,7 @@ Depot::Depot() :
     m_btnRepair->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdammou.img", colorTable));
     m_btnRepair->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdammod.img", colorTable));
     m_btnRepair->setPosition(304, 75);
+    connect(m_btnRepair, SIGNAL(clicked()), SLOT(repair()));
 
     m_btnBuy = new ui::Button(m_backgroundLabel);
     m_btnBuy->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdbuyu.img", colorTable));
@@ -166,6 +167,15 @@ Depot::Depot() :
         connect(arrow, SIGNAL(clicked(int)), SLOT(loadMounting(int)));
         m_mountingArrows << arrow;
     }
+
+    m_sndFlip.load("sfx:snd/desktop/shipdreh.pcm");
+    m_sndWeapon.load("sfx:snd/desktop/weapchng.pcm");
+    m_sndError.load("sfx:snd/desktop/error.pcm");
+    m_sndButton.load("sfx:snd/desktop/button.pcm");
+    m_sndNoop.load("sfx:snd/desktop/cursor1.pcm");
+    m_sndSelect.load("sfx:snd/desktop/cursor2.pcm");
+    m_sndButton.play();
+    m_sndFlip.play();
 }
 
 
@@ -176,6 +186,7 @@ Depot::~Depot()
 
 void Depot::flip()
 {
+    m_sndButton.play();
     if (m_state == Ready && m_side == 1)
     {
         m_videoFlip1.play();
@@ -196,6 +207,7 @@ void Depot::flip()
         m_itemList2->clear();
         m_lblInfo->hide();
         updateButtons();
+        m_sndFlip.play();
     }
 }
 
@@ -217,6 +229,8 @@ void Depot::loadMounting(int index)
         m_selectedList = 2;
         m_selectedItem = -1;
     }
+    else
+        m_sndNoop.play();
 }
 
 
@@ -230,6 +244,7 @@ void Depot::itemListClicked1(int index)
 
     updateInfo();
     updateButtons();
+    m_sndSelect.play();
 }
 
 
@@ -243,15 +258,23 @@ void Depot::itemListClicked2(int index)
 
     updateInfo();
     updateButtons();
+    m_sndSelect.play();
 }
 
 
 void Depot::toggleInfo()
 {
+    m_sndButton.play();
     if (m_lblItemText->isVisible())
         m_lblItemText->hide();
     else
         m_lblItemText->show();
+}
+
+
+void Depot::repair()
+{
+    m_sndButton.play();
 }
 
 
@@ -350,6 +373,7 @@ void Depot::buy()
     int oldModel;
     if (!m_boat->canBuy(item->model, mounting, &oldModel))
     {
+        m_sndError.play();
         return;
     }
     int price = Items::getDepotPrice(item->model);
@@ -357,6 +381,7 @@ void Depot::buy()
         price -= Items::getDepotPrice(oldModel);
     if (price > Chapter::get()->credits())
     {
+        m_sndError.play();
         return;
     }
     Chapter::get()->addCredit(-price);
@@ -368,6 +393,7 @@ void Depot::buy()
         m_itemList2->addItem(Items::get(model)->icon);
  
     updateCredits();
+    m_sndWeapon.play();
 }
 
 
@@ -399,6 +425,7 @@ void Depot::sell()
     updateInfo();
     updateButtons();
     updateCredits();
+    m_sndWeapon.play();
 }
 
 
@@ -504,22 +531,31 @@ void Depot::draw()
                     m_itemList2->selectItem(m_selectedItem);
                 }
                 m_loadingItem++;
+                m_sndSelect.play();
             }
             else
             {
                 m_loadingState = List1;
-                m_loadingItem = 0;
+                m_loadingItem = -1;
                 m_list1 = Items::getDepotItems(m_boat->mountings().at(m_mounting)->name);
             }
         }
         if (m_loadingState == List1)
         {
-            if (m_loadingItem < m_list1.count())
-            {
-                int model = m_list1.at(m_loadingItem);
-                bool compatible = m_boat->isCompatible(model);
-                m_itemList1->addItem(Items::get(model)->icon, !compatible, compatible);
+            if (m_loadingItem < 0)
                 m_loadingItem++;
+            else if (m_loadingItem < m_list1.count())
+            {
+                while (m_loadingItem < m_list1.count())
+                {
+                    int model = m_list1.at(m_loadingItem);
+                    bool compatible = m_boat->isCompatible(model);
+                    m_itemList1->addItem(Items::get(model)->icon, !compatible, compatible);
+                    m_loadingItem++;
+                    if (m_loadingItem <= 8)
+                        break;
+                }
+                m_sndSelect.play();
             }
             else
             {

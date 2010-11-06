@@ -33,6 +33,7 @@ public:
 
 public:
     void draw();
+    void setClick(bool);
 
 protected:
     void setRootWidget(ui::Widget *widget);
@@ -42,6 +43,7 @@ protected:
 
 private:
     ui::Widget *m_rootWidget;
+    bool m_click;
 };
 
 
