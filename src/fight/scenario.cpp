@@ -50,13 +50,17 @@ Scenario::Scenario(const QString &name) :
                 const int dType = m_file.value("dtyp").toInt();
                 QString name;
                 switch (dType) {
+                case 1:
+                    name = "anscout2";
+                    break;
+
                 case 8:
                     name = "bioscout";
                     break;
 
-//                case 10:
-//                    name = "russcout";
-//                    break;
+                case 10:
+                    name = "russcout";
+                    break;
 
                 case 12:
                     name = "atscout";
@@ -64,6 +68,10 @@ Scenario::Scenario(const QString &name) :
 
                 case 39:
                     name = "anscout1";
+                    break;
+
+                case 67:
+                    name = "entrobot";
                     break;
                 }
 
@@ -82,6 +90,10 @@ Scenario::Scenario(const QString &name) :
                 const int dType = m_file.value("dtyp").toInt();
                 QString name;
                 switch (dType) {
+                case 16:
+                    name = "anbombr1";
+                    break;
+
                 case 41:
                     name = "atbomber";
                     break;
