@@ -15,6 +15,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
+#include "mine.h"
 #include "module.h"
 #include "scenario.h"
 #include "surface.h"
@@ -48,6 +49,7 @@ Scenario::Scenario(const QString &name) :
     types.insert(16, "anbombr1");
     types.insert(10, "russcout");
     types.insert(12, "atscout");
+    types.insert(27, "mine0");
     types.insert(39, "anscout1");
     types.insert(41, "atbomber");
     types.insert(67, "entrobot");
@@ -98,6 +100,20 @@ Scenario::Scenario(const QString &name) :
                 }
 
                 Object *object = new TurretBase(m_moduleManager, types.value(dType));
+                object->setPosition(getPosition());
+                m_objects << object;
+            }
+            break;
+
+        case TypeMine:
+            {
+                const int dType = m_file.value("dtyp").toInt();
+                if (!types.contains(dType)) {
+                    qDebug() << "Unhandled dtype" << dType;
+                    continue;
+                }
+
+                Object *object = new Mine(m_moduleManager, types.value(dType));
                 object->setPosition(getPosition());
                 m_objects << object;
             }
@@ -212,9 +228,7 @@ QVector3D Scenario::getPosition() const
     QVector3D pos;
     pos.setX(m_file.value("px").toInt() * 16 + 8);
     pos.setY(m_file.value("py").toInt() * 16 + 8);
-    pos.setZ(m_file.value("pz").toInt() * 16);
-    if (pos.z() == 0)
-        pos.setZ(m_surface->heightAt(pos.x(), pos.y()));
+    pos.setZ(m_surface->heightAt(pos.x(), pos.y()) + m_file.value("pz").toInt() * 16 + m_file.value("hei").toInt());
     return pos;
 }
 

@@ -15,71 +15,24 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef FIGHT_SCENARIO_H
-#define FIGHT_SCENARIO_H
+#ifndef FIGHT_MINE_H
+#define FIGHT_MINE_H
 
 
 #include "object.h"
-#include "game/renderer.h"
-#include "txt/desfile.h"
 
 
 namespace fight {
 
 
-class Surface;
-
-
-class Scenario : public game::Renderer
+class Mine : public Object
 {
-    Q_OBJECT
-
 public:
-    Scenario(const QString &name);
-    ~Scenario();
-
-signals:
-    void success();
-
-protected:
-    void draw();
-    void keyPressEvent(QKeyEvent *);
-    void keyReleaseEvent(QKeyEvent *);
-
-private:
-    QVector3D getPosition() const;
-
-private:
-    enum Type
-    {
-        TypeBoat        = 2049,
-        TypeBomber      = 2050,
-        TypeTank        = 2051,
-        TypeTower       = 2052,
-        TypeCrawler     = 2053,
-        TypePlayer      = 2057,
-        TypeMine        = 2058,
-    };
-
-    Surface *m_surface;
-    QVector3D m_position;
-    txt::DesFile m_file;
-    gfx::TextureManager m_textureManager;
-    ModuleManager m_moduleManager;
-    QList<Object*> m_objects;
-
-    float m_left;
-    float m_right;
-    float m_up;
-    float m_down;
-    float m_forwards;
-    float m_backwards;
-
-    QMatrix4x4 m_cameraMatrix;
+    Mine(ModuleManager &modMan, const QString &name);
 };
 
 
 } // namespace fight
 
 
-#endif // FIGHT_SCENARIO_H
+#endif // FIGHT_MINE_H

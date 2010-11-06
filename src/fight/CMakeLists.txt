@@ -1,4 +1,6 @@
 set(SOURCES
+    mine.cpp
+    mine.h
     module.cpp
     module.h
     modulemanager.cpp
