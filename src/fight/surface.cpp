@@ -110,14 +110,14 @@ Surface::Surface(const QString &name, int mapping)
             }
 
             QList<TexCoord> texCoords;
+            texCoords << TexCoord(0.5f + subTextureX, 0.0f + subTextureY);
             texCoords << TexCoord(0.0f + subTextureX, 0.0f + subTextureY);
             texCoords << TexCoord(0.0f + subTextureX, 0.5f + subTextureY);
             texCoords << TexCoord(0.5f + subTextureX, 0.5f + subTextureY);
-            texCoords << TexCoord(0.5f + subTextureX, 0.0f + subTextureY);
 
             if (flip) {
-                qSwap(texCoords[0], texCoords[3]);
-                qSwap(texCoords[1], texCoords[2]);
+                qSwap(texCoords[0], texCoords[1]);
+                qSwap(texCoords[2], texCoords[3]);
             }
 
             for (; rotate > 0; rotate--)
@@ -128,6 +128,11 @@ Surface::Surface(const QString &name, int mapping)
 
             foreach (const TexCoord &coord, texCoords)
                 quad.texCoords << coord;
+
+            v.x = (x + 1) * m_scale.x;
+            v.y = (y + 0) * m_scale.y;
+            v.z = qGray(m_heightMap.pixel(x + 1, y + 0)) * m_scale.z;
+            quad.vertices << v;
 
             v.x = (x + 0) * m_scale.x;
             v.y = (y + 0) * m_scale.y;
@@ -142,11 +147,6 @@ Surface::Surface(const QString &name, int mapping)
             v.x = (x + 1) * m_scale.x;
             v.y = (y + 1) * m_scale.y;
             v.z = qGray(m_heightMap.pixel(x + 1, y + 1)) * m_scale.z;
-            quad.vertices << v;
-
-            v.x = (x + 1) * m_scale.x;
-            v.y = (y + 0) * m_scale.y;
-            v.z = qGray(m_heightMap.pixel(x + 1, y + 0)) * m_scale.z;
             quad.vertices << v;
         }
     }
