@@ -54,9 +54,9 @@ Scenario::Scenario(const QString &name) :
                     name = "bioscout";
                     break;
 
-//                case 10:
-//                    name = "russcout";
-//                    break;
+                case 10:
+                    name = "russcout";
+                    break;
 
                 case 12:
                     name = "atscout";

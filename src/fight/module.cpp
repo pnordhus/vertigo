@@ -55,60 +55,59 @@ void ModulePrivate::load(gfx::TextureManager &texMan, const QString &name)
 
     for (unsigned int i = 0; i < numFaces; i++) {
         quint32 faceNumber;
-        quint32 unknown;
+        quint32 type;
         quint32 numVertices;
         quint32 numVertices2;
-        quint32 someNumber;
 
         stream >> faceNumber;
-        stream >> unknown;
+        stream >> type;
         stream.skipRawData(2);
         stream >> numVertices;
-        stream.skipRawData(8);
-        stream >> someNumber;
-        stream.skipRawData(12);
 
-        if (unknown == 0)
-            continue;
+        if (type == 0) {
+            stream.skipRawData(8);
+            stream.skipRawData(numVertices * 12);
+            stream.skipRawData(4);
+        } else if (type == 1) {
+            stream.skipRawData(32);
+            stream >> numVertices2;
+            stream.skipRawData(4);
 
-        stream.skipRawData(8);
-        stream >> numVertices2;
-        stream.skipRawData(4);
+            QVector<TexCoord> texCoords;
+            texCoords.reserve(numVertices2 * 2);
 
-        QVector<TexCoord> texCoords;
-        texCoords.reserve(numVertices2 * 2);
-        for (unsigned int i = 0; i < numVertices2; i++) {
-            quint32 s;
-            quint32 t;
+            for (unsigned int i = 0; i < numVertices2; i++) {
+                quint32 s;
+                quint32 t;
 
-            stream >> s;
-            stream >> t;
+                stream >> s;
+                stream >> t;
 
-            texCoords << TexCoord(s / 65535.0 / 255, t / 65535.0f / 255);
+                texCoords << TexCoord(s / 65535.0 / 255, t / 65535.0f / 255);
+            }
+            quint32 nameLength;
+            stream >> nameLength;
+            stream.skipRawData(4);
+
+            const QString textureName = file.read(nameLength);
+
+            QVector<quint32> indices;
+            indices.reserve(3 * numVertices2);
+            for (unsigned int i = 0; i < 3 * numVertices2; i++) {
+                quint32 index;
+                stream >> index;
+                indices << index;
+            }
+
+            Face face;
+            face.texture = texMan.getModule(textureName);
+            for (unsigned int j = 0; j < numVertices2; j++) {
+                face.vertices << vertices[indices[3 * j]];
+                face.texCoords << texCoords[j];
+            }
+
+            m_faces << face;
         }
-
-        quint32 nameLength;
-        stream >> nameLength;
-        stream.skipRawData(4);
-
-        const QString textureName = file.read(nameLength);
-
-        QVector<quint32> indices;
-        indices.reserve(3 * numVertices2);
-        for (unsigned int i = 0; i < 3 * numVertices2; i++) {
-            quint32 index;
-            stream >> index;
-            indices << index;
-        }
-
-        Face face;
-        face.texture = texMan.getModule(textureName);
-        for (unsigned int j = 0; j < numVertices2; j++) {
-            face.vertices << vertices[indices[3 * j]];
-            face.texCoords << texCoords[j];
-        }
-
-        m_faces << face;
     }
 }
 
