@@ -15,53 +15,70 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GAME_WINDOW_H
-#define GAME_WINDOW_H
+#ifndef FIGHT_SCENARIO_H
+#define FIGHT_SCENARIO_H
 
 
-#include <QGLWidget>
+#include "object.h"
+#include "game/renderer.h"
+#include "txt/desfile.h"
 
 
-namespace game {
+namespace fight {
 
 
-class Renderer;
+class Surface;
 
 
-class Window : public QGLWidget
+class Scenario : public game::Renderer
 {
     Q_OBJECT
 
 public:
-    Window();
+    Scenario(const QString &name);
+    ~Scenario();
 
-public slots:
-    void setRenderer(Renderer *renderer);
+signals:
+    void success();
 
-private slots:
-    void toggleFullScreen();
-    void centerMouse();
-
-private:
-    void initializeGL();
-    void resizeGL(int w, int h);
-    void paintGL();
+protected:
+    void draw();
     void keyPressEvent(QKeyEvent *);
     void keyReleaseEvent(QKeyEvent *);
-    void mousePressEvent(QMouseEvent *);
-    void mouseReleaseEvent(QMouseEvent *);
-    void mouseMoveEvent(QMouseEvent *);
-    void closeEvent(QCloseEvent *);
-    void saveSettings();
-    void loadSettings();
 
 private:
-    QCursor m_cursor;
-    Renderer *m_renderer;
+    QVector3D getPosition() const;
+
+private:
+    enum Type
+    {
+        TypeBoat        = 2049,
+        TypeBomber      = 2050,
+        TypeTank        = 2051,
+        TypeTower       = 2052,
+        TypeCrawler     = 2053,
+        TypePlayer      = 2057,
+    };
+
+    Surface *m_surface;
+    QVector3D m_position;
+    txt::DesFile m_file;
+    gfx::TextureManager m_textureManager;
+    ModuleManager m_moduleManager;
+    QList<Object*> m_objects;
+
+    float m_left;
+    float m_right;
+    float m_up;
+    float m_down;
+    float m_forwards;
+    float m_backwards;
+
+    QMatrix4x4 m_cameraMatrix;
 };
 
 
-} // namespace game
+} // namespace fight
 
 
-#endif // GAME_WINDOW_H
+#endif // FIGHT_SCENARIO_H

@@ -1,6 +1,8 @@
+set(QT_USE_QTMAIN true)
 set(QT_USE_QTOPENGL true)
 include(${QT_USE_FILE})
 
+add_subdirectory(fight)
 add_subdirectory(game)
 add_subdirectory(gfx)
 add_subdirectory(sfx)

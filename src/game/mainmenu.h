@@ -23,6 +23,7 @@
 #include "gfx/texture.h"
 #include "sfx/sound.h"
 #include "ui/label.h"
+#include <QTime>
 
 
 namespace game {
@@ -39,28 +40,36 @@ public:
     MainMenu(bool skipToTitle);
 
 signals:
-    void startGame();
-    void loadGame(int);
+    void startGame(const QString &name);
+    void loadGame(const QString &name);
     void quit();
 
 private slots:
+    void showNew();
+    void hideNew();
     void showLoad();
     void hideLoad();
     void loadGame();
 
 private:
+    void draw();
     void activate();
     void deactivate();
     void changeState(State state);
     void mousePressEvent(QMouseEvent *);
+    void keyPressEvent(QKeyEvent *);
 
 private:
     State m_state;
     ui::Label m_presents;
     ui::Label m_title;
     ui::Label *m_lblMain;
+    ui::Label *m_lblNew;
     ui::Label *m_lblLoad;
     sfx::Sound m_backgroundSound;
+    QString m_name;
+    bool m_cursor;
+    QTime m_time;
 };
 
 

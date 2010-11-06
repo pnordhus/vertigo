@@ -15,53 +15,39 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GAME_WINDOW_H
-#define GAME_WINDOW_H
+#include "object.h"
+#include "txt/desfile.h"
+#include <QGLContext>
 
 
-#include <QGLWidget>
+namespace fight {
 
 
-namespace game {
-
-
-class Renderer;
-
-
-class Window : public QGLWidget
+Object::Object(ModuleManager &modMan, const QString &name)
 {
-    Q_OBJECT
+    txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
+    file.setSection("cluster");
+    m_base = modMan.get(file.value("base").toString());
 
-public:
-    Window();
-
-public slots:
-    void setRenderer(Renderer *renderer);
-
-private slots:
-    void toggleFullScreen();
-    void centerMouse();
-
-private:
-    void initializeGL();
-    void resizeGL(int w, int h);
-    void paintGL();
-    void keyPressEvent(QKeyEvent *);
-    void keyReleaseEvent(QKeyEvent *);
-    void mousePressEvent(QMouseEvent *);
-    void mouseReleaseEvent(QMouseEvent *);
-    void mouseMoveEvent(QMouseEvent *);
-    void closeEvent(QCloseEvent *);
-    void saveSettings();
-    void loadSettings();
-
-private:
-    QCursor m_cursor;
-    Renderer *m_renderer;
-};
+    file.setSection("size");
+    m_scale = file.value("scale").toFloat() / 16;
+}
 
 
-} // namespace game
+void Object::setPosition(const QVector3D &pos)
+{
+    m_position = pos;
+}
 
 
-#endif // GAME_WINDOW_H
+void Object::draw()
+{
+    glPushMatrix();
+    glTranslatef(m_position.x(), m_position.y(), m_position.z());
+    glScalef(m_scale, m_scale, m_scale);
+    m_base.draw();
+    glPopMatrix();
+}
+
+
+} // namespace fight

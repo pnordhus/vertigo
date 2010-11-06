@@ -27,15 +27,16 @@
 namespace game {
 
 
-Dialog::Dialog(int id, ui::Widget *parent) :
+Dialog::Dialog(int chapter, int id, ui::Widget *parent) :
     ui::Widget(parent),
     m_id(id),
     m_option(NULL),
     m_finished(false),
     m_remove(false),
-    m_changeChapter(-1)
+    m_changeChapter(-1),
+    m_gameOver(false)
 {
-    const QString baseName = QString("txt:dia/%1/%2").arg(id / 1000, 3, 10, QChar('0')).arg(id, 6, 10, QChar('0'));
+    const QString baseName = QString("txt:dia/%1/%2").arg(chapter, 3, 10, QChar('0')).arg(id, 6, 10, QChar('0'));
 
     txt::DesFile file(baseName + ".des");
 
@@ -95,6 +96,8 @@ Dialog::Dialog(int id, ui::Widget *parent) :
             message.type = Message::ReplaceApproachMovie;
             message.value = file.value("Station").toInt();
             message.name = file.value("Name").toString();
+        } else if (type == "endgame") {
+            message.type = Message::GameOver;
         }
 
         m_messages.insertMulti(id, message);
@@ -180,14 +183,21 @@ void Dialog::select()
                 case Message::ReplaceApproachMovie:
                     emit replaceApproachMovie(message.value, message.name + ".mvi");
                     break;
+
+                case Message::GameOver:
+                    m_gameOver = true;
+                    break;
                 }
             }
         }
-        switch (m_option->next) {
-        case RemoveDialog:
-            m_remove = true;
-            emit remove(m_id);
-            break;
+
+        if (!m_gameOver) {
+            switch (m_option->next) {
+            case RemoveDialog:
+                m_remove = true;
+                emit remove(m_id);
+                break;
+            }
         }
 
         if (m_option->next > 0) {
@@ -199,7 +209,10 @@ void Dialog::select()
     if (m_finished) {
         if (m_changeChapter != -1)
             emit changeChapter(m_changeChapter);
-        emit close();
+        if (m_gameOver)
+            emit gameOver();
+        else
+            emit close();
     }
 
     if (!m_option || m_finished) {

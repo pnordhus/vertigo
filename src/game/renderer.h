@@ -37,10 +37,13 @@ class Renderer : public QObject
 public:
     Renderer();
 
+signals:
+    void centerMouse();
+
 public:
     virtual void draw() = 0;
-    virtual void activate() = 0;
-    virtual void deactivate() = 0;
+    virtual void activate() {}
+    virtual void deactivate() {}
 
 public slots:
     void setCursorVisible(bool visible);
@@ -48,6 +51,7 @@ public slots:
     void hideCursor();
 
 public:
+    void setWindow(QWidget *window);
     virtual bool isCursorVisible() const { return m_cursorVisible; }
     void setRect(const QRect &rect);
     QRect rect() const { return m_rect; }
@@ -59,17 +63,19 @@ public:
 public:
     virtual void keyPressEvent(QKeyEvent *) {}
     virtual void keyReleaseEvent(QKeyEvent *) {}
-    virtual void mousePressEvent(QMouseEvent *) = 0;
+    virtual void mousePressEvent(QMouseEvent *) {}
     virtual void mouseReleaseEvent(QMouseEvent *) {}
     virtual void mouseMoveEvent(QMouseEvent *) {}
 
 protected:
     void setupOrthographicMatrix(float w, float h);
+    QWidget* window() const { return m_window; }
 
 private:
     bool m_cursorVisible;
     QRect m_rect;
     QMatrix4x4 m_projection;
+    QWidget *m_window;
 };
 
 

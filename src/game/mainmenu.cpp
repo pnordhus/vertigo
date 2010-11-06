@@ -30,7 +30,9 @@ namespace game {
 
 MainMenu::MainMenu(bool skipToTitle) :
     m_state(Invalid),
-    m_lblLoad(NULL)
+    m_lblNew(NULL),
+    m_lblLoad(NULL),
+    m_cursor(false)
 {
     const gfx::ColorTable colorTable("gfx:pal/gui/border.pal");
 
@@ -52,11 +54,6 @@ MainMenu::MainMenu(bool skipToTitle) :
     label->setText("Vertigo 0.1");
 
     label = new ui::Label(&m_title);
-    label->setFont(fontMedium);
-    label->setPosition(145, 256 - fontMedium.height() - 2);
-    label->setText(txt::StringTable::get(txt::MainMenu));
-
-    label = new ui::Label(&m_title);
     label->setTexture(texBar);
     label->setPosition(140, 256);
 
@@ -67,6 +64,11 @@ MainMenu::MainMenu(bool skipToTitle) :
     {
         m_lblMain = new ui::Label(&m_title);
 
+        label = new ui::Label(m_lblMain);
+        label->setFont(fontMedium);
+        label->setPosition(145, 256 - fontMedium.height() - 2);
+        label->setText(txt::StringTable::get(txt::MainMenu));
+
         ui::Button *button;
         button = new ui::Button(m_lblMain);
         button->setFont(fontLarge);
@@ -74,7 +76,7 @@ MainMenu::MainMenu(bool skipToTitle) :
         button->setWidth(640);
         button->setAlignment(ui::Label::AlignHCenter);
         button->setText(txt::StringTable::get(txt::MainMenu_NewGame));
-        connect(button, SIGNAL(clicked()), SIGNAL(startGame()));
+        connect(button, SIGNAL(clicked()), SLOT(showNew()));
 
         button = new ui::Button(m_lblMain);
         button->setFont(fontLarge);
@@ -97,6 +99,23 @@ MainMenu::MainMenu(bool skipToTitle) :
         changeState(Title);
     else
         changeState(Presents);
+}
+
+
+void MainMenu::draw()
+{
+    Menu::draw();
+
+    if (m_lblNew) {
+        if (m_time.elapsed() > 300) {
+            m_time.start();
+            m_cursor = !m_cursor;
+        }
+
+        QRect rect = gfx::Font(gfx::Font::Large).draw(m_name, QPoint(0, 328), QSize(640, -1), true, false);
+        if (m_cursor)
+            gfx::Font(gfx::Font::Large).draw("_", rect.topRight() + QPoint(0, 2));
+    }
 }
 
 
@@ -145,9 +164,65 @@ void MainMenu::mousePressEvent(QMouseEvent *event)
     }
 
     if (event->button() == Qt::RightButton) {
+        if (m_lblNew && m_lblNew->isVisible())
+            hideNew();
         if (m_lblLoad && m_lblLoad->isVisible())
             hideLoad();
     }
+}
+
+
+void MainMenu::keyPressEvent(QKeyEvent *event)
+{
+    Menu::keyPressEvent(event);
+
+    if (m_lblNew && m_lblNew->isVisible()) {
+        if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
+            emit startGame(m_name.trimmed());
+
+        if (event->key() == Qt::Key_Backspace)
+            m_name.chop(1);
+
+        QString text = event->text().toLower().toAscii();
+        text.remove(QRegExp("[^a-z\\-0-9 ]*"));
+        if (!text.isEmpty())
+            m_name += text;
+
+        if (m_name.length() > 20)
+            m_name.chop(m_name.length() - 20);
+    }
+}
+
+
+void MainMenu::showNew()
+{
+    m_lblMain->hide();
+
+    Q_ASSERT(!m_lblNew);
+    m_lblNew = new ui::Label(&m_title);
+    m_name = "dead-eye";
+
+    ui::Label *label = new ui::Label(m_lblNew);
+    label->setFont(gfx::Font::Medium);
+    label->setPosition(145, 256 - gfx::Font(gfx::Font::Medium).height() - 2);
+    label->setText(txt::StringTable::get(txt::MainMenu_NewGame));
+
+    ui::Button *button = new ui::Button(m_lblNew);
+    button->setPosition(0, 428);
+    button->setWidth(640);
+    button->setAlignment(ui::Button::AlignHCenter);
+    button->setFont(gfx::Font::Large);
+    button->setText(txt::StringTable::get(txt::MainMenu));
+    connect(button, SIGNAL(clicked()), SLOT(hideNew()));
+}
+
+
+void MainMenu::hideNew()
+{
+    Q_ASSERT(m_lblNew);
+    m_lblNew->deleteLater();
+    m_lblNew = NULL;
+    m_lblMain->show();
 }
 
 
@@ -158,19 +233,34 @@ void MainMenu::showLoad()
     Q_ASSERT(!m_lblLoad);
     m_lblLoad = new ui::Label(&m_title);
 
-    int y = 282;
-    QMapIterator<int, QString> it(Chapter::savedGames());
-    while (it.hasNext()) {
-        it.next();
+    ui::Label *label = new ui::Label(m_lblLoad);
+    label->setFont(gfx::Font::Medium);
+    label->setPosition(145, 256 - gfx::Font(gfx::Font::Medium).height() - 2);
+    label->setText(txt::StringTable::get(txt::MainMenu_Load));
 
+    int y = 282;
+
+    QList<Chapter::SavedGame> games = Chapter::savedGames();
+    qSort(games);
+    foreach (const Chapter::SavedGame &game, games) {
         ui::Button *button = new ui::Button(m_lblLoad);
         button->setPosition(0, y);
         button->setWidth(640);
         button->setAlignment(ui::Button::AlignHCenter);
         button->setFont(gfx::Font::Large);
-        button->setText(it.value());
-        button->setProperty("id", it.key());
+        button->setText(QString("%1: %2").arg(game.name, game.station));
+        button->setProperty("name", game.name);
         connect(button, SIGNAL(clicked()), SLOT(loadGame()));
+
+        y += 13;
+
+        ui::Label *label = new ui::Label(m_lblLoad);
+        label->setPosition(0, y);
+        label->setWidth(640);
+        label->setAlignment(ui::Button::AlignHCenter);
+        label->setFont(gfx::Font::Small);
+        label->setText(game.time.toString(Qt::DefaultLocaleShortDate));
+
         y += 20;
     }
 
@@ -195,7 +285,7 @@ void MainMenu::hideLoad()
 
 void MainMenu::loadGame()
 {
-    emit loadGame(sender()->property("id").toInt());
+    emit loadGame(sender()->property("name").toString());
 }
 
 

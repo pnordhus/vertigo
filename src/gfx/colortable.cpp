@@ -46,8 +46,15 @@ bool ColorTable::loadFromFile(const QString &filename)
     QFile file(filename);
     if (!file.open(QFile::ReadOnly))
         return false;
-    file.seek(4);
-    load(file.readAll());
+
+    quint16 type;
+    QDataStream stream(&file);
+    stream >> type;
+    if (type == 0x0208)
+        stream.skipRawData(12);
+    else
+        stream.skipRawData(2);
+    load(file.read(256 * 3));
     return true;
 }
 

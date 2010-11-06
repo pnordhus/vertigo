@@ -15,53 +15,34 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GAME_WINDOW_H
-#define GAME_WINDOW_H
+#ifndef FIGHT_OBJECT_H
+#define FIGHT_OBJECT_H
 
 
-#include <QGLWidget>
+#include "modulemanager.h"
+#include <QVector3D>
 
 
-namespace game {
+namespace fight {
 
 
-class Renderer;
-
-
-class Window : public QGLWidget
+class Object
 {
-    Q_OBJECT
+public:
+    Object(ModuleManager &modMan, const QString &name);
 
 public:
-    Window();
-
-public slots:
-    void setRenderer(Renderer *renderer);
-
-private slots:
-    void toggleFullScreen();
-    void centerMouse();
+    void draw();
+    void setPosition(const QVector3D &pos);
 
 private:
-    void initializeGL();
-    void resizeGL(int w, int h);
-    void paintGL();
-    void keyPressEvent(QKeyEvent *);
-    void keyReleaseEvent(QKeyEvent *);
-    void mousePressEvent(QMouseEvent *);
-    void mouseReleaseEvent(QMouseEvent *);
-    void mouseMoveEvent(QMouseEvent *);
-    void closeEvent(QCloseEvent *);
-    void saveSettings();
-    void loadSettings();
-
-private:
-    QCursor m_cursor;
-    Renderer *m_renderer;
+    Module m_base;
+    float m_scale;
+    QVector3D m_position;
 };
 
 
-} // namespace game
+} // namespace fight
 
 
-#endif // GAME_WINDOW_H
+#endif // FIGHT_OBJECT_H

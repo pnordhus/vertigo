@@ -15,53 +15,28 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GAME_WINDOW_H
-#define GAME_WINDOW_H
+#include "modulemanager.h"
 
 
-#include <QGLWidget>
+namespace fight {
 
 
-namespace game {
-
-
-class Renderer;
-
-
-class Window : public QGLWidget
+ModuleManager::ModuleManager(gfx::TextureManager &texMan) :
+    m_textureManager(texMan)
 {
-    Q_OBJECT
 
-public:
-    Window();
-
-public slots:
-    void setRenderer(Renderer *renderer);
-
-private slots:
-    void toggleFullScreen();
-    void centerMouse();
-
-private:
-    void initializeGL();
-    void resizeGL(int w, int h);
-    void paintGL();
-    void keyPressEvent(QKeyEvent *);
-    void keyReleaseEvent(QKeyEvent *);
-    void mousePressEvent(QMouseEvent *);
-    void mouseReleaseEvent(QMouseEvent *);
-    void mouseMoveEvent(QMouseEvent *);
-    void closeEvent(QCloseEvent *);
-    void saveSettings();
-    void loadSettings();
-
-private:
-    QCursor m_cursor;
-    Renderer *m_renderer;
-};
+}
 
 
-} // namespace game
+Module ModuleManager::get(const QString &name)
+{
+    if (m_modules.contains(name))
+        return m_modules.value(name);
+
+    Module module(m_textureManager, "vfx:module/" + name);
+    m_modules.insert(name, module);
+    return module;
+}
 
 
-#endif // GAME_WINDOW_H
+} // namespace fight

@@ -143,8 +143,10 @@ QRect FontPrivate::draw(const QString &text, int x, int y, int w, int h, bool al
     int totalHeight = m_height;
     int totalWidth = 0.0f;
     int lineWidth = 0.0f;
+    int current = 0;
     foreach (QString word, strings) {
-        word += " ";
+        if (++current < strings.size())
+            word += " ";
         const int wordWidth = width(word);
         if (w > 0 && lineWidth + wordWidth > w) {
             glTranslatef(-lineWidth, m_height + 1, 0);

@@ -29,6 +29,9 @@
 #include "boat.h"
 
 
+namespace fight { class Scenario; }
+
+
 namespace game {
 
 
@@ -37,7 +40,20 @@ class Chapter : public QObject
     Q_OBJECT
 
 public:
-    Chapter();
+    struct SavedGame
+    {
+        bool operator < (const SavedGame& rho) const
+        {
+            return time > rho.time;
+        }
+
+        QString name;
+        QString station;
+        QDateTime time;
+    };
+
+public:
+    Chapter(const QString &name);
     ~Chapter();
 
 signals:
@@ -52,10 +68,10 @@ public slots:
     void addCredit(int credit);
 
 public:
-    void save(int slot, const QString &name) const;
-    void load(int slot);
+    void save() const;
+    void load(const QString &name);
     void loadChapter(int chapter);
-    void setStation(int station);
+    void setStation(int station, bool load = false);
     Area* area() const { return m_area; }
     const QMap<int, Station>& stations() const { return m_stations; }
     int currentStation() const { return m_currentStation; }
@@ -79,7 +95,7 @@ public:
     int credits() const { return m_credits; }
 
 private:
-    void load(const QString &filename);
+    void load(const QString &filename, bool load);
     void playApproach(bool autopilot);
     void playMovies();
     void startMission();
@@ -97,11 +113,13 @@ private slots:
     void disableStation(int station);
     void addMission(const QString &mission, int station);
     void replaceApproachMovie(int station, const QString &movie);
+    void gameOver();
+    void startScenario();
     void finishMission();
 
 public:
     static Chapter* get() { Q_ASSERT(m_singleton); return m_singleton; }
-    static QMap<int, QString> savedGames();
+    static QList<SavedGame> savedGames();
 
 private:
     int m_code;
@@ -127,9 +145,12 @@ private:
     bool m_movieApproach;
     bool m_movieHarbour;
     Mission *m_mission;
+    fight::Scenario *m_scenario;
     txt::DesFile m_tasksFile;
     bool m_save;
     Boat *m_boat;
+    bool m_end;
+    QString m_name;
 };
 
 

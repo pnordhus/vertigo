@@ -15,53 +15,31 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GAME_WINDOW_H
-#define GAME_WINDOW_H
+#include "colortable.h"
+#include "image.h"
+#include "texturemanager.h"
 
 
-#include <QGLWidget>
+namespace gfx {
 
 
-namespace game {
-
-
-class Renderer;
-
-
-class Window : public QGLWidget
+TextureManager::TextureManager()
 {
-    Q_OBJECT
 
-public:
-    Window();
-
-public slots:
-    void setRenderer(Renderer *renderer);
-
-private slots:
-    void toggleFullScreen();
-    void centerMouse();
-
-private:
-    void initializeGL();
-    void resizeGL(int w, int h);
-    void paintGL();
-    void keyPressEvent(QKeyEvent *);
-    void keyReleaseEvent(QKeyEvent *);
-    void mousePressEvent(QMouseEvent *);
-    void mouseReleaseEvent(QMouseEvent *);
-    void mouseMoveEvent(QMouseEvent *);
-    void closeEvent(QCloseEvent *);
-    void saveSettings();
-    void loadSettings();
-
-private:
-    QCursor m_cursor;
-    Renderer *m_renderer;
-};
+}
 
 
-} // namespace game
+Texture TextureManager::getModule(const QString &filename)
+{
+    QString basename = QString("vfx:texture/%1").arg(filename);
+    if (m_textures.contains(basename))
+        return m_textures.value(basename);
+
+    const ColorTable colorTable(basename + ".pal");
+    Texture texture = Image::load(basename + ".imb", colorTable);
+    m_textures.insert(basename, texture);
+    return texture;
+}
 
 
-#endif // GAME_WINDOW_H
+} // namespace gfx

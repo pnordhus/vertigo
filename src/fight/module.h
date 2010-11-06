@@ -15,53 +15,79 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GAME_WINDOW_H
-#define GAME_WINDOW_H
+#ifndef FIGHT_MODULE_H
+#define FIGHT_MODULE_H
 
 
-#include <QGLWidget>
+#include "vector.h"
+#include "gfx/texturemanager.h"
 
 
-namespace game {
+namespace fight {
 
 
-class Renderer;
-
-
-class Window : public QGLWidget
+class ModulePrivate : public QSharedData
 {
-    Q_OBJECT
-
 public:
-    Window();
-
-public slots:
-    void setRenderer(Renderer *renderer);
-
-private slots:
-    void toggleFullScreen();
-    void centerMouse();
+    void load(gfx::TextureManager &texMan, const QString &name);
+    void draw();
 
 private:
-    void initializeGL();
-    void resizeGL(int w, int h);
-    void paintGL();
-    void keyPressEvent(QKeyEvent *);
-    void keyReleaseEvent(QKeyEvent *);
-    void mousePressEvent(QMouseEvent *);
-    void mouseReleaseEvent(QMouseEvent *);
-    void mouseMoveEvent(QMouseEvent *);
-    void closeEvent(QCloseEvent *);
-    void saveSettings();
-    void loadSettings();
+    struct TexCoord
+    {
+        TexCoord() {}
+        TexCoord(float s, float t) : s(s), t(t) {}
 
-private:
-    QCursor m_cursor;
-    Renderer *m_renderer;
+        float s;
+        float t;
+    };
+
+    struct Face
+    {
+        gfx::Texture texture;
+        QVector<Vector> vertices;
+        QVector<TexCoord> texCoords;
+    };
+
+    QList<Face> m_faces;
 };
 
 
-} // namespace game
+class Module
+{
+public:
+    Module();
+    Module(gfx::TextureManager &texMan, const QString &name);
+
+public:
+    void draw();
+
+private:
+    QExplicitlySharedDataPointer<ModulePrivate> d;
+};
 
 
-#endif // GAME_WINDOW_H
+inline Module::Module() :
+    d(new ModulePrivate)
+{
+
+}
+
+
+inline Module::Module(gfx::TextureManager &texMan, const QString &name) :
+    d(new ModulePrivate)
+{
+    d->load(texMan, name);
+}
+
+
+inline void Module::draw()
+{
+    d->draw();
+}
+
+
+} // namespace fight
+
+
+#endif // FIGHT_MODULE_H

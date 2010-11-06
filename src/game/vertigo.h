@@ -46,8 +46,8 @@ public:
 
 private slots:
     void update();
-    void startGame();
-    void loadGame(int);
+    void startGame(const QString &name);
+    void loadGame(const QString &name);
     void endGame();
     void introFinished();
 
@@ -62,6 +62,7 @@ private:
     Chapter *m_chapter;
     sfx::SoundSystem *m_soundSystem;
     gfx::FontManager *m_fontManager;
+    QString m_name;
 };
 
 

@@ -15,53 +15,31 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GAME_WINDOW_H
-#define GAME_WINDOW_H
+#ifndef GFX_TEXTUREMANAGER_H
+#define GFX_TEXTUREMANAGER_H
 
 
-#include <QGLWidget>
+#include "texture.h"
+#include <QMap>
 
 
-namespace game {
+namespace gfx {
 
 
-class Renderer;
-
-
-class Window : public QGLWidget
+class TextureManager
 {
-    Q_OBJECT
+public:
+    TextureManager();
 
 public:
-    Window();
-
-public slots:
-    void setRenderer(Renderer *renderer);
-
-private slots:
-    void toggleFullScreen();
-    void centerMouse();
+    Texture getModule(const QString &filename);
 
 private:
-    void initializeGL();
-    void resizeGL(int w, int h);
-    void paintGL();
-    void keyPressEvent(QKeyEvent *);
-    void keyReleaseEvent(QKeyEvent *);
-    void mousePressEvent(QMouseEvent *);
-    void mouseReleaseEvent(QMouseEvent *);
-    void mouseMoveEvent(QMouseEvent *);
-    void closeEvent(QCloseEvent *);
-    void saveSettings();
-    void loadSettings();
-
-private:
-    QCursor m_cursor;
-    Renderer *m_renderer;
+    QMap<QString, Texture> m_textures;
 };
 
 
-} // namespace game
+} // namespace gfx
 
 
-#endif // GAME_WINDOW_H
+#endif // GFX_TEXTUREMANAGER_H
