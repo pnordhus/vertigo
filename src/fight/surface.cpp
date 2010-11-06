@@ -100,14 +100,10 @@ Surface::Surface(const QString &name, int mapping)
 
             const float subTextureX = (m & 0x01) ? 0.5f : 0.0f;
             const float subTextureY = (m & 0x02) ? 0.5f : 0.0f;
-            int rotate = d & 0x03;
-            const bool flip = d & 0x04;
-            if ((m & 3) >= 2) {
-                if (flip)
-                    rotate += 3;
-                else
-                    rotate++;
-            }
+            int rotate = -2 + (d & 0x03);
+            if (rotate < 0)
+                rotate += 4;
+            const bool flip = !(d & 0x04);
 
             const float margin = 0.002f;
             QList<TexCoord> texCoords;
