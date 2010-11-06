@@ -9,6 +9,8 @@ set(SOURCES
     scenario.h
     surface.cpp
     surface.h
+    turret.cpp
+    turret.h
     vector.cpp
     vector.h
 )

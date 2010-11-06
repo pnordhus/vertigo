@@ -15,35 +15,19 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef FIGHT_OBJECT_H
-#define FIGHT_OBJECT_H
-
-
-#include "modulemanager.h"
-#include <QVector3D>
+#include "turret.h"
+#include "txt/desfile.h"
+#include <QGLContext>
 
 
 namespace fight {
 
 
-class Object
+Turret::Turret(ModuleManager &modMan, const QString &name) :
+    Object(modMan, name)
 {
-public:
-    Object(ModuleManager &modMan, const QString &name);
-    virtual ~Object() {}
 
-public:
-    virtual void draw();
-    void setPosition(const QVector3D &pos);
-
-protected:
-    Module m_base;
-    float m_scale;
-    QVector3D m_position;
-};
+}
 
 
 } // namespace fight
-
-
-#endif // FIGHT_OBJECT_H
