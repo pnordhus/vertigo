@@ -38,7 +38,7 @@ Scenario::Scenario(const QString &name) :
     m_file.load(QString("vfx:scenario/%1.des").arg(name));
 
     m_file.setSection("surface");
-    m_surface = new Surface(m_file.value("name").toString().toLower(), m_file.value("patchcomb").toInt());
+    m_surface = new Surface(m_file.value("name").toString().toLower(), m_file.value("maxheightscale").toInt(), m_file.value("patchcomb").toInt());
 
     foreach (const QString &section, m_file.sections().filter(QRegExp("^movable\\d*"))) {
         m_file.setSection(section);

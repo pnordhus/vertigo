@@ -26,7 +26,7 @@
 namespace fight {
 
 
-Surface::Surface(const QString &name, int mapping)
+Surface::Surface(const QString &name, int maxheightscale, int mapping)
 {
     txt::DesFile file(QString("vfx:surface/%1.des").arg(name));
     file.setSection("height");
@@ -47,7 +47,7 @@ Surface::Surface(const QString &name, int mapping)
         stream >> m_scale.x >> m_scale.y >> m_scale.z;
         m_scale.x /= 32.0f;
         m_scale.y /= 32.0f;
-        m_scale.z /= 32.0f;
+        m_scale.z = maxheightscale / m_scale.z;
     }
 
     QByteArray map;

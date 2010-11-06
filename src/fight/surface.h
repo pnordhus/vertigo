@@ -31,7 +31,7 @@ namespace fight {
 class Surface
 {
 public:
-    Surface(const QString &name, int mapping);
+    Surface(const QString &name, int maxheightscale, int mapping);
 
 public:
     void draw();
