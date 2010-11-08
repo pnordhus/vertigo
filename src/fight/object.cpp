@@ -30,7 +30,7 @@ Object::Object(ModuleManager &modMan, const QString &name)
     m_base = modMan.get(file.value("base").toString());
 
     file.setSection("size");
-    m_scale = file.value("scale").toFloat() / 16;
+    m_scale = file.value("scale").toFloat() / 32;
 }
 
 
