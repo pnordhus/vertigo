@@ -15,35 +15,23 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef FIGHT_OBJECT_H
-#define FIGHT_OBJECT_H
-
-
-#include "modulemanager.h"
-#include <QVector3D>
+#include "mine.h"
+#include "txt/desfile.h"
 
 
 namespace fight {
 
 
-class Object
+Mine::Mine(ModuleManager &modMan, const QString &name) :
+    Object(modMan, name)
 {
-public:
-    Object(ModuleManager &modMan, const QString &name);
-    virtual ~Object() {}
+    txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
+    file.setSection("cluster");
+    m_base = modMan.get(file.value("name").toString());
 
-public:
-    virtual void draw();
-    void setPosition(const QVector3D &pos);
-
-protected:
-    Module m_base;
-    float m_scale;
-    QVector3D m_position;
-};
+    file.setSection("size");
+    m_scale = file.value("scale").toFloat() / 16;
+}
 
 
 } // namespace fight
-
-
-#endif // FIGHT_OBJECT_H

@@ -15,35 +15,45 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef FIGHT_OBJECT_H
-#define FIGHT_OBJECT_H
-
-
-#include "modulemanager.h"
-#include <QVector3D>
+#include "turret.h"
+#include "turretbase.h"
+#include "txt/desfile.h"
+#include <QGLContext>
 
 
 namespace fight {
 
 
-class Object
+TurretBase::TurretBase(ModuleManager &modMan, const QString &name) :
+    Object(modMan, name)
 {
-public:
-    Object(ModuleManager &modMan, const QString &name);
-    virtual ~Object() {}
+    txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
+    file.setSection("gunturret");
+    m_turret = new Turret(modMan, file.value("name").toString());
 
-public:
-    virtual void draw();
-    void setPosition(const QVector3D &pos);
+    m_turretPosition.setX(file.value("RelativePositionX").toFloat());
+    m_turretPosition.setY(file.value("RelativePositionY").toFloat());
+    m_turretPosition.setZ(file.value("RelativePositionZ").toFloat());
+}
 
-protected:
-    Module m_base;
-    float m_scale;
-    QVector3D m_position;
-};
+
+TurretBase::~TurretBase()
+{
+    delete m_turret;
+}
+
+
+void TurretBase::draw()
+{
+    glPushMatrix();
+    glTranslatef(m_position.x(), m_position.y(), m_position.z());
+    glScalef(m_scale, m_scale, m_scale);
+    m_base.draw();
+
+    glTranslatef(m_turretPosition.x(), m_turretPosition.y(), m_turretPosition.z());
+    m_turret->draw();
+    glPopMatrix();
+}
 
 
 } // namespace fight
-
-
-#endif // FIGHT_OBJECT_H

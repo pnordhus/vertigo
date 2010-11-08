@@ -1,4 +1,6 @@
 set(SOURCES
+    mine.cpp
+    mine.h
     module.cpp
     module.h
     modulemanager.cpp
@@ -9,6 +11,10 @@ set(SOURCES
     scenario.h
     surface.cpp
     surface.h
+    turret.cpp
+    turret.h
+    turretbase.cpp
+    turretbase.h
     vector.cpp
     vector.h
 )

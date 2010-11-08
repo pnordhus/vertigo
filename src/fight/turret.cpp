@@ -15,71 +15,52 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef FIGHT_SCENARIO_H
-#define FIGHT_SCENARIO_H
-
-
-#include "object.h"
-#include "game/renderer.h"
+#include "turret.h"
 #include "txt/desfile.h"
+#include <QGLContext>
 
 
 namespace fight {
 
 
-class Surface;
-
-
-class Scenario : public game::Renderer
+Turret::Turret(ModuleManager &modMan, const QString &name)
 {
-    Q_OBJECT
+    txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
+    file.setSection("cluster");
+    m_body = modMan.get(file.value("body").toString());
 
-public:
-    Scenario(const QString &name);
-    ~Scenario();
+    m_armLeft = modMan.get(file.value("arml").toString());
+    m_armLeftPosition.setX(file.value("ArmLOffsetX").toFloat());
+    m_armLeftPosition.setY(file.value("ArmLOffsetY").toFloat());
+    m_armLeftPosition.setZ(file.value("ArmLOffsetZ").toFloat());
 
-signals:
-    void success();
+    m_armRight = modMan.get(file.value("armr").toString());
+    m_armRightPosition.setX(file.value("ArmROffsetX").toFloat());
+    m_armRightPosition.setY(file.value("ArmROffsetY").toFloat());
+    m_armRightPosition.setZ(file.value("ArmROffsetZ").toFloat());
 
-protected:
-    void draw();
-    void keyPressEvent(QKeyEvent *);
-    void keyReleaseEvent(QKeyEvent *);
+    file.setSection("size");
+    m_scale = file.value("scale").toFloat() / 16;
+}
 
-private:
-    QVector3D getPosition() const;
 
-private:
-    enum Type
-    {
-        TypeBoat        = 2049,
-        TypeBomber      = 2050,
-        TypeTank        = 2051,
-        TypeTower       = 2052,
-        TypeCrawler     = 2053,
-        TypePlayer      = 2057,
-        TypeMine        = 2058,
-    };
+void Turret::draw()
+{
+    glPushMatrix();
+    m_body.draw();
 
-    Surface *m_surface;
-    QVector3D m_position;
-    txt::DesFile m_file;
-    gfx::TextureManager m_textureManager;
-    ModuleManager m_moduleManager;
-    QList<Object*> m_objects;
+    glPushMatrix();
+    glTranslatef(m_armLeftPosition.x(), m_armLeftPosition.y(), m_armLeftPosition.z());
+    m_armLeft.draw();
+    glPopMatrix();
 
-    float m_left;
-    float m_right;
-    float m_up;
-    float m_down;
-    float m_forwards;
-    float m_backwards;
+    glPushMatrix();
+    glTranslatef(m_armRightPosition.x(), m_armRightPosition.y(), m_armRightPosition.z());
+    m_armRight.draw();
+    glPopMatrix();
 
-    QMatrix4x4 m_cameraMatrix;
-};
+    glPopMatrix();
+}
 
 
 } // namespace fight
-
-
-#endif // FIGHT_SCENARIO_H

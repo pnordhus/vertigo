@@ -15,11 +15,13 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
+#include "mine.h"
 #include "module.h"
 #include "scenario.h"
 #include "surface.h"
+#include "turretbase.h"
 #include <QGLContext>
-#include <QMouseEvent>
+#include <QKeyEvent>
 
 
 namespace fight {
@@ -40,6 +42,18 @@ Scenario::Scenario(const QString &name) :
     m_file.setSection("surface");
     m_surface = new Surface(m_file.value("name").toString().toLower(), m_file.value("maxheightscale").toInt(), m_file.value("patchcomb").toInt());
 
+    QMap<int, QString> types;
+    types.insert( 1, "anscout2");
+    types.insert( 5, "guntow0");
+    types.insert( 8, "bioscout");
+    types.insert(16, "anbombr1");
+    types.insert(10, "russcout");
+    types.insert(12, "atscout");
+    types.insert(27, "mine0");
+    types.insert(39, "anscout1");
+    types.insert(41, "atbomber");
+    types.insert(67, "entrobot");
+
     foreach (const QString &section, m_file.sections().filter(QRegExp("^movable\\d*"))) {
         m_file.setSection(section);
 
@@ -48,39 +62,15 @@ Scenario::Scenario(const QString &name) :
         case TypeBoat:
             {
                 const int dType = m_file.value("dtyp").toInt();
-                QString name;
-                switch (dType) {
-                case 1:
-                    name = "anscout2";
-                    break;
-
-                case 8:
-                    name = "bioscout";
-                    break;
-
-                case 10:
-                    name = "russcout";
-                    break;
-
-                case 12:
-                    name = "atscout";
-                    break;
-
-                case 39:
-                    name = "anscout1";
-                    break;
-
-                case 67:
-                    name = "entrobot";
-                    break;
-                }
-
-                if (name.isEmpty()) {
+                if (!types.contains(dType)) {
                     qDebug() << "Unhandled dtype" << dType;
                     continue;
                 }
-                Object *object = new Object(m_moduleManager, name);
-                object->setPosition(getPosition());
+
+                Object *object = new Object(m_moduleManager, types.value(dType));
+                QVector3D pos = getPosition();
+                pos.setZ(pos.z() + 20.0f);
+                object->setPosition(pos);
                 m_objects << object;
             }
             break;
@@ -88,22 +78,42 @@ Scenario::Scenario(const QString &name) :
         case TypeBomber:
             {
                 const int dType = m_file.value("dtyp").toInt();
-                QString name;
-                switch (dType) {
-                case 16:
-                    name = "anbombr1";
-                    break;
-
-                case 41:
-                    name = "atbomber";
-                    break;
-                }
-
-                if (name.isEmpty()) {
+                if (!types.contains(dType)) {
                     qDebug() << "Unhandled dtype" << dType;
                     continue;
                 }
-                Object *object = new Object(m_moduleManager, name);
+
+                Object *object = new Object(m_moduleManager, types.value(dType));
+                QVector3D pos = getPosition();
+                pos.setZ(pos.z() + 20.0f);
+                object->setPosition(pos);
+                m_objects << object;
+            }
+            break;
+
+        case TypeTower:
+            {
+                const int dType = m_file.value("dtyp").toInt();
+                if (!types.contains(dType)) {
+                    qDebug() << "Unhandled dtype" << dType;
+                    continue;
+                }
+
+                Object *object = new TurretBase(m_moduleManager, types.value(dType));
+                object->setPosition(getPosition());
+                m_objects << object;
+            }
+            break;
+
+        case TypeMine:
+            {
+                const int dType = m_file.value("dtyp").toInt();
+                if (!types.contains(dType)) {
+                    qDebug() << "Unhandled dtype" << dType;
+                    continue;
+                }
+
+                Object *object = new Mine(m_moduleManager, types.value(dType));
                 object->setPosition(getPosition());
                 m_objects << object;
             }
@@ -111,10 +121,11 @@ Scenario::Scenario(const QString &name) :
 
         case TypePlayer:
             m_position = getPosition();
+            m_position.setZ(m_position.z() + 20.0f);
             break;
 
         default:
-            qDebug() << "Unhandled movable" << type;
+            qDebug() << "Unhandled movable" << type << m_file.value("dtyp").toInt();;
         }
     }
 
@@ -215,11 +226,9 @@ void Scenario::keyReleaseEvent(QKeyEvent *e)
 QVector3D Scenario::getPosition() const
 {
     QVector3D pos;
-    pos.setX(m_file.value("px").toInt() * 16);
-    pos.setY(m_file.value("py").toInt() * 16);
-    pos.setZ(m_file.value("pz").toInt() * 16);
-    if (pos.z() == 0)
-        pos.setZ(m_surface->heightAt(pos.x(), pos.y()) + 10);
+    pos.setX(m_file.value("px").toInt() * 16 + 8);
+    pos.setY(m_file.value("py").toInt() * 16 + 8);
+    pos.setZ(m_surface->heightAt(pos.x(), pos.y()) + m_file.value("pz").toInt() * 16 + m_file.value("hei").toInt());
     return pos;
 }
 
