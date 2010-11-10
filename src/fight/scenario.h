@@ -22,6 +22,7 @@
 #include "object.h"
 #include "game/renderer.h"
 #include "txt/desfile.h"
+#include <QTime>
 
 
 namespace fight {
@@ -57,6 +58,7 @@ private:
         TypeTank        = 2051,
         TypeTower       = 2052,
         TypeCrawler     = 2053,
+        TypeBuilding    = 2056,
         TypePlayer      = 2057,
         TypeMine        = 2058,
     };
@@ -67,6 +69,9 @@ private:
     gfx::TextureManager m_textureManager;
     ModuleManager m_moduleManager;
     QList<Object*> m_objects;
+    QList<Object*> m_lightSources;
+
+    QTime m_time;
 
     float m_left;
     float m_right;

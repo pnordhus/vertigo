@@ -28,7 +28,7 @@ namespace fight {
 
 Surface::Surface(const QString &name, int maxheightscale, int mapping)
 {
-    m_level = 2; // Set it to 3 for even smoother surface.
+    m_level = 3; // Set it to 3 for even smoother surface.
     m_spline = new BetaSpline(m_level, 1, 0);
     InitIndices();
 
@@ -284,7 +284,7 @@ float Surface::heightAt(float x, float y) const
 void Surface::draw()
 {
     //glEnable(GL_TEXTURE_2D);
-    glDisable(GL_TEXTURE_2D);
+    //glDisable(GL_TEXTURE_2D);
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
@@ -302,17 +302,6 @@ void Surface::draw()
 
     glEnableClientState(GL_NORMAL_ARRAY);
     glFrontFace(GL_CCW);
-    glEnable(GL_LIGHTING);
-
-    GLfloat light_ambient[] = { 3.0, 3.0, 3.0, 1.0 };
-    GLfloat light_diffuse[] = { 0.5, 0.5, 0.5, 1.0 };
-    GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-    GLfloat light_position[] = { 0.0, 0.0, 1.0, 0.0 };
-    glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-    glEnable(GL_LIGHT0);
 
     QMapIterator<int, ElementSubset> it(m_element);
     while (it.hasNext()) {
@@ -327,7 +316,6 @@ void Surface::draw()
         glDrawArrays(GL_TRIANGLES, 0, subset.vertices.size());
     }
 
-    glDisable(GL_LIGHTING);
     glFrontFace(GL_CW);
 }
 
@@ -433,7 +421,7 @@ void BetaSpline::InitFrame(const QImage &Map, short x, short y)
 {
 	for (short k = 0; k < 4; k++) 
 		for (short l = 0; l < 4; l++) 
-            frame[k][l] = QVector3D(l - 1, k - 1, qGray(Map.pixel((short)(x + l - 1), (short)(y + k - 1))));
+            frame[k][l] = QVector3D(l - 1, k - 1, qGray(Map.pixel((x + l - 1 + Map.width())%Map.width(), (y + k - 1 + Map.height())%Map.height())));
 }
 
 

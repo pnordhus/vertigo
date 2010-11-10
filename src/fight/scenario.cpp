@@ -22,6 +22,7 @@
 #include "turretbase.h"
 #include <QGLContext>
 #include <QKeyEvent>
+#include "math.h"
 
 
 namespace fight {
@@ -72,6 +73,7 @@ Scenario::Scenario(const QString &name) :
                 pos.setZ(pos.z() + 20.0f);
                 object->setPosition(pos);
                 m_objects << object;
+                m_lightSources << object;
             }
             break;
 
@@ -121,7 +123,7 @@ Scenario::Scenario(const QString &name) :
 
         case TypePlayer:
             m_position = getPosition();
-            m_position.setZ(m_position.z() + 20.0f);
+            //m_position.setZ(m_position.z() + 20.0f);
             break;
 
         default:
@@ -131,6 +133,8 @@ Scenario::Scenario(const QString &name) :
 
     m_cameraMatrix.rotate( 90, 0, 1, 0);
     m_cameraMatrix.rotate(-90, 1, 0, 0);
+
+    m_time.restart();
 }
 
 
@@ -152,6 +156,7 @@ void Scenario::draw()
     m_cameraMatrix.rotate(angleY, QVector3D(0, 0, 1));
     m_position += m_cameraMatrix.row(2).toVector3D() * (m_backwards - m_forwards) * 5.0f;
 
+    glClearColor(0.0, 0.0, 0.15, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glEnable(GL_DEPTH_TEST);
@@ -164,12 +169,60 @@ void Scenario::draw()
     glLoadMatrixd(m_cameraMatrix.data());
     glTranslatef(-m_position.x(), -m_position.y(), -m_position.z());
 
-    static float lightPos[] = {100, 100, 200, 0 };
-    static float lightColor[] = { 1, 1, 1, 1 };
-   // glEnable(GL_LIGHTING);
+    GLfloat global_ambient[] = { 0.5f, 0.5f, 1.0f, 1.0f };
+    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, global_ambient);
+
+    glEnable(GL_LIGHTING);
+
+    GLfloat light_ambient[] = { 6.0, 6.0, 6.0, 1.0 };
+    GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
+    glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+    
+    GLfloat light_position[] = { 0.0, 0.0, 0.0, 1.0 };
+    GLfloat spot_direction[] = { 0.0, 0.0, -1.0 };
+
+    glPushMatrix();
+    glLoadIdentity();
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+    glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, spot_direction);
+    glPopMatrix();
+
+    glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 90.0);
+    glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, 0.1);
+    glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.0002);
+    glLightf(GL_LIGHT0, GL_SPOT_EXPONENT, 4.0);
+
     glEnable(GL_LIGHT0);
-    glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
-    glLightfv(GL_LIGHT0, GL_AMBIENT_AND_DIFFUSE, lightColor);
+
+    if (m_lightSources.count() > 0)
+    {
+        Object *object = m_lightSources[0];
+
+        glLightfv(GL_LIGHT1, GL_AMBIENT, light_ambient);
+        glLightfv(GL_LIGHT1, GL_DIFFUSE, light_diffuse);
+        
+        GLfloat light_position[] = { object->position().x(), object->position().y(), object->position().z(), 1.0 };
+        GLfloat spot_direction[] = { cos(0.005*m_time.elapsed()), sin(0.005*m_time.elapsed()), 0.0 };
+
+        glLightfv(GL_LIGHT1, GL_POSITION, light_position);
+        glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, spot_direction);
+
+        glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 90.0);
+        glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, 0.1);
+        glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.0002);
+        glLightf(GL_LIGHT1, GL_SPOT_EXPONENT, 4.0);
+
+        glEnable(GL_LIGHT1);
+    }
+
+    glEnable(GL_FOG);
+    GLfloat fogColor[4] = {0.0, 0.0, 0.15, 1.0};
+    glFogi(GL_FOG_MODE, GL_LINEAR);
+    glFogfv(GL_FOG_COLOR, fogColor);
+    glHint(GL_FOG_HINT, GL_FASTEST);
+    glFogf(GL_FOG_START, 100.0);
+    glFogf(GL_FOG_END, 200.0);
 
     m_surface->draw();
 

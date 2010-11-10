@@ -35,6 +35,7 @@ public:
 public:
     virtual void draw();
     void setPosition(const QVector3D &pos);
+    QVector3D position() const { return m_position; }
 
 protected:
     Module m_base;
