@@ -15,6 +15,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
+#include "building.h"
 #include "mine.h"
 #include "module.h"
 #include "scenario.h"
@@ -44,6 +45,7 @@ Scenario::Scenario(const QString &name) :
     m_surface = new Surface(m_file.value("name").toString().toLower(), m_file.value("maxheightscale").toInt(), m_file.value("patchcomb").toInt());
 
     QMap<int, QString> types;
+    types.insert( 0, "anscout2");
     types.insert( 1, "anscout2");
     types.insert( 5, "guntow0");
     types.insert( 8, "bioscout");
@@ -51,10 +53,12 @@ Scenario::Scenario(const QString &name) :
     types.insert(10, "russcout");
     types.insert(12, "atscout");
     types.insert(27, "mine0");
+    types.insert(36, "atscout");
     types.insert(39, "anscout1");
     types.insert(41, "atbomber");
     types.insert(67, "entrobot");
 
+    float initialDir = 0.0f;
     foreach (const QString &section, m_file.sections().filter(QRegExp("^movable\\d*"))) {
         m_file.setSection(section);
 
@@ -107,6 +111,14 @@ Scenario::Scenario(const QString &name) :
             }
             break;
 
+        case TypeBuilding:
+            {
+                Object *object = new Building(m_moduleManager, QString("gp%1x%1_%2").arg(m_file.value("siz").toInt() + 1).arg(m_file.value("buityp").toInt()), m_file.value("siz").toInt(), m_file.value("card", 0).toInt() * 45.0f);
+                object->setPosition(getPosition());
+                m_objects << object;
+            }
+            break;
+
         case TypeMine:
             {
                 const int dType = m_file.value("dtyp").toInt();
@@ -123,6 +135,7 @@ Scenario::Scenario(const QString &name) :
 
         case TypePlayer:
             m_position = getPosition();
+            initialDir = 45.0f * m_file.value("card").toInt();
             //m_position.setZ(m_position.z() + 20.0f);
             break;
 
@@ -131,7 +144,7 @@ Scenario::Scenario(const QString &name) :
         }
     }
 
-    m_cameraMatrix.rotate( 90, 0, 1, 0);
+    m_cameraMatrix.rotate(initialDir, 0, 1, 0);
     m_cameraMatrix.rotate(-90, 1, 0, 0);
 
     m_time.restart();
@@ -278,10 +291,20 @@ void Scenario::keyReleaseEvent(QKeyEvent *e)
 
 QVector3D Scenario::getPosition() const
 {
+    int x = m_file.value("px").toInt();
+    int y = m_file.value("py").toInt();
+
     QVector3D pos;
-    pos.setX(m_file.value("px").toInt() * 16 + 8);
-    pos.setY(m_file.value("py").toInt() * 16 + 8);
-    pos.setZ(m_surface->heightAt(pos.x(), pos.y()) + m_file.value("pz").toInt() * 16 + m_file.value("hei").toInt());
+    pos.setX(x * 16 + 8);
+    pos.setY(y * 16 + 8);
+
+    if (m_file.contains("refx"))
+        x = m_file.value("refx").toInt();
+    if (m_file.contains("refy"))
+        y = m_file.value("refy").toInt();
+
+    pos.setZ(m_surface->heightAt(x, y) + m_file.value("pz").toInt() * 16 + m_file.value("hei").toInt());
+    pos.setZ(pos.z() + m_file.value("pz").toInt() * 16 + m_file.value("hei").toInt());
     return pos;
 }
 

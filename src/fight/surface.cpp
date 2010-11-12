@@ -274,10 +274,7 @@ float Surface::PrepareElementSubset(int Level, short x, short y, QVector3D trans
 
 float Surface::heightAt(float x, float y) const
 {
-    const int dx = x / 16;
-    const int dy = y / 16;
-
-    return qGray(m_heightMap.pixel(dx, dy)) * m_scale.z;
+    return qGray(m_heightMap.pixel(x, y)) * m_scale.z;
 }
 
 
