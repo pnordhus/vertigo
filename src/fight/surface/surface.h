@@ -19,7 +19,7 @@
 #define FIGHT_SURFACE_H
 
 
-#include "vector.h"
+#include "../vector.h"
 #include "gfx/texture.h"
 #include <QVector>
 #include <QMap>
@@ -30,34 +30,8 @@
 namespace fight {
 
 
-class BetaSpline
-{
-public:
-    BetaSpline(int Level, float defaultBeta1, float defaultBeta2);
-    ~BetaSpline();
-
-public:
-    void InitFrame(const QImage &Map, short x, short y);
-    QVector3D Beta_3_3(int u, int v);
-    QVector3D Beta_norm(int u, int v);
-    void Beta_TB(int u, int v, QVector3D *tangent, QVector3D *binormal);
-
-private:
-    float b(int i, float t);
-    float bs(int i, float t);
-
-private:
-    int Level;
-
-	float beta1, beta2;
-	float b12, b13, b22, b23;
-	float delta, d;
-
-	float* B[4];
-	float* BS[4];
-
-	QVector3D frame[4][4];
-};
+class Tesselator;
+class Element;
 
 
 class Surface
@@ -67,49 +41,27 @@ public:
     ~Surface();
 
 public:
-    void draw();
+    void draw(QVector3D position, QVector3D direction);
     float heightAt(float x, float y) const;
+    QVector3D scale() const { return m_scale; }
+    float height(int x, int y) const;
+    void bindTexture(int textureId);
 
 private:
-    struct TexCoord
-    {
-        TexCoord() {}
-        TexCoord(float s, float t) : s(s), t(t) {}
+    Element* getElement(QPoint pos);
 
-        float s;
-        float t;
-    };
-
-    struct Quad
-    {
-        QVector<Vector> vertices;
-        QVector<TexCoord> texCoords;
-    };
-
-    QList<gfx::Texture> m_texture;
-    QMap<int, Quad> m_quads;
+private:
+    QList<gfx::Texture> m_textures;
     QImage m_heightMap;
-    Vector m_scale;
+    QByteArray m_textureMap;
+    QByteArray m_textureDir;
+    QVector3D m_scale;
+    int m_mapping;
 
 private:
-    struct ElementSubset
-    {
-        QVector<QVector3D> vertices;
-        QVector<QVector3D> normals;
-        QVector<QVector2D> texCoords;
-    };
-
-    void InitIndices();
-    float PrepareElementSubset(int Level, short x, short y, QVector3D trans, QVector2D t0, QVector2D tu, QVector2D tv, ElementSubset &subset);
-
-private:
-    static const int MaxLevel = 3;
-
-    int m_level;
-    BetaSpline *m_spline;
-    short *indices;
-
-    QMap<int, ElementSubset> m_element;
+    static const int Level = 3;
+    Tesselator *m_tesselator;
+    QMap<int, Element*> m_elements;
 };
 
 

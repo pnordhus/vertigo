@@ -18,7 +18,7 @@
 #include "mine.h"
 #include "module.h"
 #include "scenario.h"
-#include "surface.h"
+#include "surface/surface.h"
 #include "turretbase.h"
 #include <QGLContext>
 #include <QKeyEvent>
@@ -224,7 +224,7 @@ void Scenario::draw()
     glFogf(GL_FOG_START, 100.0);
     glFogf(GL_FOG_END, 200.0);
 
-    m_surface->draw();
+    m_surface->draw(m_position, -m_cameraMatrix.row(2).toVector3D());
 
     foreach (Object *object, m_objects)
         object->draw();
@@ -279,9 +279,11 @@ void Scenario::keyReleaseEvent(QKeyEvent *e)
 QVector3D Scenario::getPosition() const
 {
     QVector3D pos;
-    pos.setX(m_file.value("px").toInt() * 16 + 8);
-    pos.setY(m_file.value("py").toInt() * 16 + 8);
-    pos.setZ(m_surface->heightAt(pos.x(), pos.y()) + m_file.value("pz").toInt() * 16 + m_file.value("hei").toInt());
+    pos.setX(m_file.value("px").toInt() + 0.5f);
+    pos.setY(m_file.value("py").toInt() + 0.5f);
+    pos.setZ(m_file.value("pz").toInt() + m_file.value("hei").toInt());
+    pos *= m_surface->scale();
+    pos += QVector3D(0, 0, m_surface->heightAt(pos.x(), pos.y()));
     return pos;
 }
 
