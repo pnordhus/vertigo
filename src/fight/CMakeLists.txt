@@ -1,3 +1,5 @@
+add_subdirectory(surface)
+
 set(SOURCES
     mine.cpp
     mine.h
@@ -9,8 +11,6 @@ set(SOURCES
     object.h
     scenario.cpp
     scenario.h
-    surface.cpp
-    surface.h
     turret.cpp
     turret.h
     turretbase.cpp
@@ -26,4 +26,4 @@ set(MOC_SOURCES
 qt4_wrap_cpp(MOC_SOURCES ${MOC_SOURCES})
 
 add_library(fight ${SOURCES} ${MOC_SOURCES})
-target_link_libraries(fight game)
+target_link_libraries(fight surface game)
