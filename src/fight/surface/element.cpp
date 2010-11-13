@@ -88,6 +88,8 @@ void Element::draw()
         glTexCoordPointer(2, GL_FLOAT, 0, subset.texCoords.data());
         glDrawElements(GL_TRIANGLES, subset.indices.count(), GL_UNSIGNED_SHORT, subset.indices.data());
     }
+
+    glDisableClientState(GL_NORMAL_ARRAY);
 }
 
 

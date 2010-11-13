@@ -80,6 +80,7 @@ Surface::Surface(const QString &name, int maxheightscale, int mapping) :
 
 Surface::~Surface()
 {
+    qDeleteAll(m_elements.values());
 }
 
 
