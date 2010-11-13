@@ -77,13 +77,15 @@ void ModulePrivate::load(gfx::TextureManager &texMan, const QString &name)
             texCoords.reserve(numVertices2 * 2);
 
             for (unsigned int i = 0; i < numVertices2; i++) {
-                quint32 s;
-                quint32 t;
+                quint16 s;
+                quint16 t;
 
+                stream.skipRawData(2);
                 stream >> s;
+                stream.skipRawData(2);
                 stream >> t;
 
-                texCoords << TexCoord(s / 65535.0 / 255, t / 65535.0f / 255);
+                texCoords << TexCoord(s / 255.0f, t / 255.0f);
             }
             quint32 nameLength;
             stream >> nameLength;

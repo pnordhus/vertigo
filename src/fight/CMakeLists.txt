@@ -1,6 +1,8 @@
 add_subdirectory(surface)
 
 set(SOURCES
+    building.cpp
+    building.h
     mine.cpp
     mine.h
     module.cpp
