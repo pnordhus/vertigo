@@ -113,8 +113,8 @@ Scenario::Scenario(const QString &name) :
 
         case TypeBuilding:
             {
-                Object *object = new Building(m_moduleManager, QString("gp%1x%1_%2").arg(m_file.value("siz").toInt() + 1).arg(m_file.value("buityp").toInt()), m_file.value("siz").toInt(), m_file.value("card", 0).toInt() * 45.0f);
-                object->setPosition(getPosition(m_file.value("siz").toInt() + 1));
+                Object *object = new Building(m_moduleManager, QString("gp%1x%1_%2").arg(m_file.value("siz").toInt() + 1).arg(m_file.value("buityp").toInt()), m_file.value("siz").toInt(), m_file.value("card", 0).toInt() * 45.0f, m_surface, m_file.value("px").toInt(), m_file.value("py").toInt(), m_file.value("refx").toInt(), m_file.value("refy").toInt());
+                object->setPosition(getPosition());
                 m_objects << object;
             }
             break;
@@ -289,29 +289,15 @@ void Scenario::keyReleaseEvent(QKeyEvent *e)
 }
 
 
-QVector3D Scenario::getPosition(int size) const
+QVector3D Scenario::getPosition() const
 {
-    float x = m_file.value("px").toInt() + 0.5f;
-    float y = m_file.value("py").toInt() + 0.5f;
-    int refx = x;
-    int refy = y;
-
     QVector3D pos;
-    pos.setX(x);
-    pos.setY(y);
+    pos.setX(m_file.value("px").toInt() + 0.5f);
+    pos.setY(m_file.value("py").toInt() + 0.5f);
     pos.setZ(m_file.value("pz").toInt() + m_file.value("hei").toInt());
 
-    if (m_file.contains("refx"))
-        refx = m_file.value("refx").toInt();
-    if (m_file.contains("refy"))
-        refy=  m_file.value("refy").toInt();
-
-    pos += QVector3D(0, 0, m_surface->height(refx, refy));
     pos *= m_surface->scale();
-
-    if (m_file.contains("refx")) {
-        m_surface->setHeight(x, y, refx, refy, size);
-    }
+    pos += QVector3D(0, 0, m_surface->heightAt(pos.x(), pos.y()));
 
     return pos;
 }
