@@ -48,7 +48,7 @@ protected:
     void keyReleaseEvent(QKeyEvent *);
 
 private:
-    QVector3D getPosition() const;
+    QVector3D getPosition(int size = 0) const;
 
 private:
     enum Type

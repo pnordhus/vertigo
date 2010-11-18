@@ -96,6 +96,18 @@ float Surface::height(int x, int y) const
 }
 
 
+void Surface::setHeight(int x, int y, int refx, int refy, int size)
+{
+    int i = m_heightMap.pixelIndex(refx, refy);
+
+    for (int dy = 0; dy < size; dy++) {
+        for (int dx = 0; dx < size; dx++) {
+            m_heightMap.setPixel(x + dx, y - dy, i);
+        }
+    }
+}
+
+
 void Surface::bindTexture(int textureId)
 {
     m_textures[textureId].bind();

@@ -46,6 +46,7 @@ public:
     QVector3D scale() const { return m_scale; }
     float height(int x, int y) const;
     void bindTexture(int textureId);
+    void setHeight(int x, int y, int refx, int refy, int size);
 
 private:
     Element* getElement(QPoint pos);
