@@ -29,6 +29,8 @@ TurretBase::TurretBase(ModuleManager &modMan, const QString &name) :
 {
     txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
     file.setSection("gunturret");
+    if (!file.contains("name"))
+        file.setSection("torpedoturret");
     m_turret = new Turret(modMan, file.value("name").toString());
 
     m_turretPosition.setX(file.value("RelativePositionX").toFloat());

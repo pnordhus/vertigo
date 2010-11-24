@@ -15,31 +15,43 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "colortable.h"
-#include "image.h"
-#include "texturemanager.h"
+#include "navpoint.h"
 
 
-namespace gfx {
+namespace fight {
 
 
-TextureManager::TextureManager()
+NavPoint::NavPoint(ModuleManager &modMan, int num) :
+    m_num(num)
 {
+    m_state0 = modMan.get("thumper2.mod");
+    m_state1 = modMan.get("thumper1.mod");
+    m_scale = 0.03;
 
+    m_base = m_state0;
+    m_state = 0;
+    m_time.restart();
 }
 
 
-Texture TextureManager::getModule(const QString &filename)
+void NavPoint::draw()
 {
-    QString basename = QString("vfx:texture/%1").arg(filename);
-    if (m_textures.contains(basename))
-        return m_textures.value(basename);
-
-    const ColorTable colorTable(basename + ".s16");
-    Texture texture = Image::load(basename + ".imb", colorTable);
-    m_textures.insert(basename, texture);
-    return texture;
+    if (m_time.elapsed() > 500)
+    {
+        if (m_state == 0)
+        {
+            m_state = 1;
+            m_base = m_state1;
+        }
+        else
+        {
+            m_state = 0;
+            m_base = m_state0;
+        }
+        m_time.restart();
+    }
+    Object::draw();
 }
 
 
-} // namespace gfx
+} // namespace fight

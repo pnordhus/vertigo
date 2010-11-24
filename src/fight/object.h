@@ -29,13 +29,15 @@ namespace fight {
 class Object
 {
 public:
-    Object(ModuleManager &modMan, const QString &name);
+    Object();
+    Object(ModuleManager &modMan, const QString &name, float scale = 1/32.0f);
     virtual ~Object() {}
 
 public:
     virtual void draw();
     void setPosition(const QVector3D &pos);
     QVector3D position() const { return m_position; }
+
 
 protected:
     Module m_base;

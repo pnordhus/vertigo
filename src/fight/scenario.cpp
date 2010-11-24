@@ -21,6 +21,7 @@
 #include "scenario.h"
 #include "surface/surface.h"
 #include "turretbase.h"
+#include "navpoint.h"
 #include <QGLContext>
 #include <QKeyEvent>
 #include "math.h"
@@ -48,14 +49,18 @@ Scenario::Scenario(const QString &name) :
     types.insert( 0, "anscout2");
     types.insert( 1, "anscout2");
     types.insert( 5, "guntow0");
+    types.insert( 7, "guntow2");
     types.insert( 8, "bioscout");
     types.insert(16, "anbombr1");
     types.insert(10, "russcout");
     types.insert(12, "atscout");
     types.insert(27, "mine0");
-    types.insert(36, "atscout");
+    types.insert(36, "tortow0");
     types.insert(39, "anscout1");
     types.insert(41, "atbomber");
+    types.insert(47, "build2");
+    types.insert(48, "build3");
+    types.insert(50, "build5");
     types.insert(67, "entrobot");
 
     float initialDir = 0.0f;
@@ -98,6 +103,7 @@ Scenario::Scenario(const QString &name) :
             break;
 
         case TypeTower:
+        case TypeTorpedoTower:
             {
                 const int dType = m_file.value("dtyp").toInt();
                 if (!types.contains(dType)) {
@@ -137,6 +143,36 @@ Scenario::Scenario(const QString &name) :
             m_position = getPosition();
             initialDir = 45.0f * m_file.value("card").toInt();
             //m_position.setZ(m_position.z() + 20.0f);
+            break;
+
+        case TypeCrawler:
+            {
+                Object *object = new Object(m_moduleManager, "gvehicle");
+                object->setPosition(getPosition());
+                m_objects << object;
+            }
+            break;
+
+        case TypeNavPoint:
+            {
+                Object *object = new NavPoint(m_moduleManager, m_file.value("dtyp").toInt());
+                object->setPosition(getPosition() + QVector3D(-0.5f*m_surface->scale().x(), -0.5f*m_surface->scale().y(), 12));
+                m_objects << object;
+            }
+            break;
+
+        case TypeActiveBuilding:
+            {
+                const int dType = m_file.value("dtyp").toInt();
+                if (!types.contains(dType)) {
+                    qDebug() << "Unhandled dtype" << dType;
+                    continue;
+                }
+
+                Object *object = new Object(m_moduleManager, types.value(dType), 16);
+                object->setPosition(getPosition());
+                m_objects << object;
+            }
             break;
 
         default:

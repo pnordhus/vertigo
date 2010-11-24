@@ -23,14 +23,19 @@
 namespace fight {
 
 
-Object::Object(ModuleManager &modMan, const QString &name)
+Object::Object()
+{
+}
+
+
+Object::Object(ModuleManager &modMan, const QString &name, float scale)
 {
     txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
     file.setSection("cluster");
     m_base = modMan.get(file.value("base").toString());
 
     file.setSection("size");
-    m_scale = file.value("scale").toFloat() / 32;
+    m_scale = file.value("scale").toFloat() * scale;
 }
 
 

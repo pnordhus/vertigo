@@ -15,31 +15,35 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "colortable.h"
-#include "image.h"
-#include "texturemanager.h"
+#ifndef FIGHT_NAVPOINT_H
+#define FIGHT_NAVPOINT_H
 
 
-namespace gfx {
+#include "object.h"
+#include <QTime>
 
 
-TextureManager::TextureManager()
+namespace fight {
+
+
+class NavPoint : public Object
 {
+public:
+    NavPoint(ModuleManager &modMan, int num);
 
-}
+public:
+    void draw();
 
-
-Texture TextureManager::getModule(const QString &filename)
-{
-    QString basename = QString("vfx:texture/%1").arg(filename);
-    if (m_textures.contains(basename))
-        return m_textures.value(basename);
-
-    const ColorTable colorTable(basename + ".s16");
-    Texture texture = Image::load(basename + ".imb", colorTable);
-    m_textures.insert(basename, texture);
-    return texture;
-}
+private:
+    int m_num;
+    Module m_state0;
+    Module m_state1;
+    int m_state;
+    QTime m_time;
+};
 
 
-} // namespace gfx
+} // namespace fight
+
+
+#endif // FIGHT_NAVPOINT_H
