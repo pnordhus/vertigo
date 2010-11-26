@@ -21,6 +21,7 @@
 
 #include "modulemanager.h"
 #include <QVector3D>
+#include <QMatrix4x4>
 
 
 namespace fight {
@@ -38,11 +39,17 @@ public:
     void setPosition(const QVector3D &pos);
     QVector3D position() const { return m_position; }
 
+public:
+    static void setCamera(const QMatrix4x4 &cameraMatrix);
 
 protected:
     Module m_base;
     float m_scale;
     QVector3D m_position;
+
+protected:
+    static QMatrix4x4 m_cameraMatrix;
+    static QMatrix4x4 m_cameraMatrixInverted;
 };
 
 

@@ -23,6 +23,10 @@
 namespace fight {
 
 
+QMatrix4x4 Object::m_cameraMatrix;
+QMatrix4x4 Object::m_cameraMatrixInverted;
+
+
 Object::Object()
 {
 }
@@ -52,6 +56,13 @@ void Object::draw()
     glScalef(m_scale, m_scale, m_scale);
     m_base.draw();
     glPopMatrix();
+}
+
+
+void Object::setCamera(const QMatrix4x4 &cameraMatrix)
+{
+    m_cameraMatrix = cameraMatrix;
+    m_cameraMatrixInverted = cameraMatrix.inverted();
 }
 
 

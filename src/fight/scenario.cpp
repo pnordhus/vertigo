@@ -22,6 +22,7 @@
 #include "surface/surface.h"
 #include "turretbase.h"
 #include "navpoint.h"
+#include "billboard.h"
 #include <QGLContext>
 #include <QKeyEvent>
 #include "math.h"
@@ -143,6 +144,40 @@ Scenario::Scenario(const QString &name) :
             m_position = getPosition();
             initialDir = 45.0f * m_file.value("card").toInt();
             //m_position.setZ(m_position.z() + 20.0f);
+
+            qDebug("DesFile constructor is too slow!");
+            {
+                for (int i = 0; i < 27; i++)
+                {
+                    Object *object = new Billboard(m_textureManager, "explosio", i);
+                    object->setPosition(m_position + QVector3D(i*5, 0, 0));
+                    m_objects << object;
+                }
+                for (int i = 0; i < 9; i++)
+                {
+                    Object *object = new Billboard(m_textureManager, "shoot", i);
+                    object->setPosition(m_position + QVector3D(i*5, -10, 0));
+                    m_objects << object;
+                }
+                for (int i = 0; i < 23; i++)
+                {
+                    Object *object = new Billboard(m_textureManager, "debris", i);
+                    object->setPosition(m_position + QVector3D(i*5, -20, 0));
+                    m_objects << object;
+                }
+                for (int i = 0; i < 5; i++)
+                {
+                    Object *object = new Billboard(m_textureManager, "trash", i);
+                    object->setPosition(m_position + QVector3D(i*5, -30, 0));
+                    m_objects << object;
+                }
+                for (int i = 0; i < 3; i++)
+                {
+                    Object *object = new Billboard(m_textureManager, "bubble", i);
+                    object->setPosition(m_position + QVector3D(i*5, -40, 0));
+                    m_objects << object;
+                }
+            }
             break;
 
         case TypeCrawler:
@@ -175,6 +210,16 @@ Scenario::Scenario(const QString &name) :
             }
             break;
 
+        case TypeTrash:
+            {
+                //Object *object = new Billboard(m_textureManager, "debris", 18);
+                //Object *object = new Billboard(m_textureManager, "explosio", 14);
+                /*Object *object = new Billboard(m_textureManager, "trash", 0);
+                object->setPosition(getPosition());
+                m_objects << object;*/
+            }
+            break;
+
         default:
             qDebug() << "Unhandled movable" << type << m_file.value("dtyp").toInt();;
         }
@@ -203,6 +248,7 @@ void Scenario::draw()
 
     m_cameraMatrix.rotate(angleX, m_cameraMatrix.row(0).toVector3D());
     m_cameraMatrix.rotate(angleY, QVector3D(0, 0, 1));
+    Object::setCamera(m_cameraMatrix);
     m_position += m_cameraMatrix.row(2).toVector3D() * (m_backwards - m_forwards) * 5.0f;
 
     glClearColor(0.0, 0.0, 0.15, 1.0);

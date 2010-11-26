@@ -15,31 +15,45 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GFX_TEXTUREMANAGER_H
-#define GFX_TEXTUREMANAGER_H
+#ifndef FIGHT_BILLBOARD_H
+#define FIGHT_BILLBOARD_H
 
 
-#include "texture.h"
-#include <QMap>
+#include "object.h"
+#include "gfx/texturemanager.h"
+#include <QVector2D>
+#include <QTime>
 
 
-namespace gfx {
+namespace fight {
 
 
-class TextureManager
+class Billboard : public Object
 {
 public:
-    TextureManager();
+    Billboard(gfx::TextureManager &texMan, const QString &name, int index);
 
 public:
-    Texture getModule(const QString &filename, bool colorKey = false);
+    void draw();
 
 private:
-    QMap<QString, Texture> m_textures;
+    struct Stage
+    {
+        gfx::Texture texture;
+        QVector2D texCoords[4];
+        QVector2D scale;
+        QVector2D offset;
+    };
+
+    float m_angle;
+    float m_displayTime;
+    QList<Stage> m_stages;
+    int m_currentStage;
+    QTime m_time;
 };
 
 
-} // namespace gfx
+} // namespace fight
 
 
-#endif // GFX_TEXTUREMANAGER_H
+#endif // FIGHT_BILLBOARD_H
