@@ -1,3 +1,4 @@
+add_subdirectory(effects)
 add_subdirectory(surface)
 
 set(SOURCES
@@ -9,6 +10,8 @@ set(SOURCES
     module.h
     modulemanager.cpp
     modulemanager.h
+    navpoint.cpp
+    navpoint.h
     object.cpp
     object.h
     scenario.cpp
@@ -28,4 +31,4 @@ set(MOC_SOURCES
 qt4_wrap_cpp(MOC_SOURCES ${MOC_SOURCES})
 
 add_library(fight ${SOURCES} ${MOC_SOURCES})
-target_link_libraries(fight surface game)
+target_link_libraries(fight effects surface game)
