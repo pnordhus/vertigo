@@ -15,47 +15,37 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "turret.h"
-#include "turretbase.h"
-#include "txt/desfile.h"
-#include <QGLContext>
+#ifndef FIGHT_EFFECT_H
+#define FIGHT_EFFECT_H
+
+
+#include "../object.h"
+#include <QTime>
 
 
 namespace fight {
 
 
-TurretBase::TurretBase(ModuleManager &modMan, const QString &name) :
-    Object(modMan, name)
+class Billboard;
+
+
+class Effect : public Object
 {
-    txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
-    file.setSection("gunturret");
-    if (!file.contains("name"))
-        file.setSection("torpedoturret");
-    m_turret = new Turret(modMan, file.value("name").toString());
+public:
+    Effect(Billboard *billboard, float angle);
 
-    m_turretPosition.setX(file.value("RelativePositionX").toFloat());
-    m_turretPosition.setY(file.value("RelativePositionY").toFloat());
-    m_turretPosition.setZ(file.value("RelativePositionZ").toFloat());
-}
+public:
+    void draw();
+    virtual bool atEnd();
 
-
-TurretBase::~TurretBase()
-{
-    delete m_turret;
-}
-
-
-void TurretBase::draw()
-{
-    glPushMatrix();
-    glTranslatef(m_position.x(), m_position.y(), m_position.z());
-    glScalef(m_scale, m_scale, m_scale);
-    m_base.draw();
-
-    glTranslatef(m_turretPosition.x(), m_turretPosition.y(), m_turretPosition.z());
-    m_turret->draw();
-    glPopMatrix();
-}
+protected:
+    Billboard *m_billboard;
+    float m_angle;
+    QTime m_time;
+};
 
 
 } // namespace fight
+
+
+#endif // FIGHT_EFFECT_H

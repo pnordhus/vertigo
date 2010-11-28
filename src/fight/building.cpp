@@ -16,6 +16,7 @@
  ***************************************************************************/
 
 #include "building.h"
+#include "surface/surface.h"
 #include "txt/desfile.h"
 #include <QGLContext>
 
@@ -23,7 +24,7 @@
 namespace fight {
 
 
-Building::Building(ModuleManager &modMan, const QString &name, int size, float angle) :
+Building::Building(ModuleManager &modMan, const QString &name, int size, float angle, Surface *surface, int x, int y, int refx, int refy) :
     Object(modMan, name),
     m_size(size),
     m_angle(angle)
@@ -42,14 +43,31 @@ Building::Building(ModuleManager &modMan, const QString &name, int size, float a
         cluster.scale = file.value("scale").toFloat() * 16;
 
         file.setSection(QString("position%1").arg(i));
-        cluster.offset.setX(file.value("OffsetX").toFloat() * 16);
-        cluster.offset.setY(file.value("OffsetY").toFloat() * 16);
+        int offsetX = file.value("OffsetX").toInt();
+        int offsetY = file.value("OffsetY").toInt();
+        cluster.offset.setX(offsetX);
+        cluster.offset.setY(offsetY);
+        cluster.offset *= surface->scale();
 
-        float height = file.value("HeightReference").toFloat();
-        if (height >= 1000.0f) {
-            height -= 1000.0f;
-            height += 4;
-            cluster.offset.setZ(64 * height * cluster.scale);
+        int clusterX = x + offsetX;
+        int clusterY = y + offsetY - size;
+
+        int heightRef = file.value("HeightReference").toInt();
+        if (heightRef >= 1000)
+            cluster.offset.setZ(m_clusters[heightRef - 1000].offset.z() + 256*cluster.scale); // TODO: test moar
+        else
+        {
+            if (file.value("SurfaceLifting").toString() == "p")
+            {
+                if (heightRef == 0)
+                    surface->setHeight(clusterX, clusterY, refx, refy, 0);
+                else
+                {
+                    qDebug("Untested: HeightReference = -1");
+                    surface->setHeight(clusterX, clusterY, clusterX, clusterY, -4); // TODO: test
+                }
+            }
+            cluster.offset.setZ(surface->heightAt((clusterX + 0.5f)*surface->scale().x(), (clusterY + 0.5f)*surface->scale().y()));
         }
 
         switch (file.value("cardinal").toString().toAscii()[0]) {
@@ -76,7 +94,7 @@ Building::Building(ModuleManager &modMan, const QString &name, int size, float a
 void Building::draw()
 {
     glPushMatrix();
-    glTranslatef(m_position.x(), m_position.y() - m_size * 16.0f, m_position.z());
+    glTranslatef(m_position.x(), m_position.y() - m_size * 16.0f, 0);
     glRotatef(m_angle, 0, 0, 1);
 
     QMutableListIterator<Cluster> it(m_clusters);

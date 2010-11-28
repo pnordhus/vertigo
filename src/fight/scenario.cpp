@@ -21,6 +21,7 @@
 #include "scenario.h"
 #include "surface/surface.h"
 #include "turretbase.h"
+#include "navpoint.h"
 #include <QGLContext>
 #include <QKeyEvent>
 #include "math.h"
@@ -31,6 +32,7 @@ namespace fight {
 
 Scenario::Scenario(const QString &name) :
     m_moduleManager(m_textureManager),
+    m_effectManager(m_textureManager),
     m_left(0.0f),
     m_right(0.0f),
     m_up(0.0f),
@@ -48,14 +50,18 @@ Scenario::Scenario(const QString &name) :
     types.insert( 0, "anscout2");
     types.insert( 1, "anscout2");
     types.insert( 5, "guntow0");
+    types.insert( 7, "guntow2");
     types.insert( 8, "bioscout");
     types.insert(16, "anbombr1");
     types.insert(10, "russcout");
     types.insert(12, "atscout");
     types.insert(27, "mine0");
-    types.insert(36, "atscout");
+    types.insert(36, "tortow0");
     types.insert(39, "anscout1");
     types.insert(41, "atbomber");
+    types.insert(47, "build2");
+    types.insert(48, "build3");
+    types.insert(50, "build5");
     types.insert(67, "entrobot");
 
     float initialDir = 0.0f;
@@ -98,6 +104,7 @@ Scenario::Scenario(const QString &name) :
             break;
 
         case TypeTower:
+        case TypeTorpedoTower:
             {
                 const int dType = m_file.value("dtyp").toInt();
                 if (!types.contains(dType)) {
@@ -113,8 +120,8 @@ Scenario::Scenario(const QString &name) :
 
         case TypeBuilding:
             {
-                Object *object = new Building(m_moduleManager, QString("gp%1x%1_%2").arg(m_file.value("siz").toInt() + 1).arg(m_file.value("buityp").toInt()), m_file.value("siz").toInt(), m_file.value("card", 0).toInt() * 45.0f);
-                object->setPosition(getPosition(m_file.value("siz").toInt() + 1));
+                Object *object = new Building(m_moduleManager, QString("gp%1x%1_%2").arg(m_file.value("siz").toInt() + 1).arg(m_file.value("buityp").toInt()), m_file.value("siz").toInt(), m_file.value("card", 0).toInt() * 45.0f, m_surface, m_file.value("px").toInt(), m_file.value("py").toInt(), m_file.value("refx").toInt(), m_file.value("refy").toInt());
+                object->setPosition(getPosition());
                 m_objects << object;
             }
             break;
@@ -137,6 +144,79 @@ Scenario::Scenario(const QString &name) :
             m_position = getPosition();
             initialDir = 45.0f * m_file.value("card").toInt();
             //m_position.setZ(m_position.z() + 20.0f);
+
+            {
+                for (int i = 0; i < 27; i++)
+                {
+                    Object *object = m_effectManager.create((Effects)(Explosion_0 + i));
+                    object->setPosition(m_position + QVector3D(i*5, 0, 0));
+                    m_objects << object;
+                }
+                for (int i = 0; i < 9; i++)
+                {
+                    Object *object = m_effectManager.create((Effects)(Shoot_0 + i));
+                    object->setPosition(m_position + QVector3D(i*5, -10, 0));
+                    m_objects << object;
+                }
+                for (int i = 0; i < 23; i++)
+                {
+                    Object *object = m_effectManager.create((Effects)(Debris_0 + i));
+                    object->setPosition(m_position + QVector3D(i*5, -20, 0));
+                    m_objects << object;
+                }
+                for (int i = 0; i < 5; i++)
+                {
+                    Object *object = m_effectManager.create((Effects)(Trash_0 + i));
+                    object->setPosition(m_position + QVector3D(i*5, -30, 0));
+                    m_objects << object;
+                }
+                for (int i = 0; i < 3; i++)
+                {
+                    Object *object = m_effectManager.create((Effects)(Bubble_0 + i));
+                    object->setPosition(m_position + QVector3D(i*5, -40, 0));
+                    m_objects << object;
+                }
+            }
+            break;
+
+        case TypeCrawler:
+            {
+                Object *object = new Object(m_moduleManager, "gvehicle");
+                object->setPosition(getPosition());
+                m_objects << object;
+            }
+            break;
+
+        case TypeNavPoint:
+            {
+                Object *object = new NavPoint(m_moduleManager, m_file.value("dtyp").toInt());
+                object->setPosition(getPosition() + QVector3D(-0.5f*m_surface->scale().x(), -0.5f*m_surface->scale().y(), 12));
+                m_objects << object;
+            }
+            break;
+
+        case TypeActiveBuilding:
+            {
+                const int dType = m_file.value("dtyp").toInt();
+                if (!types.contains(dType)) {
+                    qDebug() << "Unhandled dtype" << dType;
+                    continue;
+                }
+
+                Object *object = new Object(m_moduleManager, types.value(dType), 16);
+                object->setPosition(getPosition());
+                m_objects << object;
+            }
+            break;
+
+        case TypeTrash:
+            {
+                //Object *object = new Billboard(m_textureManager, "debris", 18);
+                //Object *object = new Billboard(m_textureManager, "explosio", 14);
+                /*Object *object = new Billboard(m_textureManager, "trash", 0);
+                object->setPosition(getPosition());
+                m_objects << object;*/
+            }
             break;
 
         default:
@@ -167,6 +247,7 @@ void Scenario::draw()
 
     m_cameraMatrix.rotate(angleX, m_cameraMatrix.row(0).toVector3D());
     m_cameraMatrix.rotate(angleY, QVector3D(0, 0, 1));
+    Object::setCamera(m_cameraMatrix);
     m_position += m_cameraMatrix.row(2).toVector3D() * (m_backwards - m_forwards) * 5.0f;
 
     glClearColor(0.0, 0.0, 0.15, 1.0);
@@ -241,6 +322,8 @@ void Scenario::draw()
 
     foreach (Object *object, m_objects)
         object->draw();
+
+    m_effectManager.draw();
 }
 
 
@@ -265,6 +348,9 @@ void Scenario::keyPressEvent(QKeyEvent *e)
         m_forwards = 0.2f;
     if (e->key() == Qt::Key_X)
         m_backwards = 0.2f;
+
+    if (e->key() == Qt::Key_Space)
+        m_effectManager.addProjectile(Shoot_Vendetta, m_position, -m_cameraMatrix.row(2).toVector3D());
 }
 
 
@@ -289,29 +375,15 @@ void Scenario::keyReleaseEvent(QKeyEvent *e)
 }
 
 
-QVector3D Scenario::getPosition(int size) const
+QVector3D Scenario::getPosition() const
 {
-    float x = m_file.value("px").toInt() + 0.5f;
-    float y = m_file.value("py").toInt() + 0.5f;
-    int refx = x;
-    int refy = y;
-
     QVector3D pos;
-    pos.setX(x);
-    pos.setY(y);
+    pos.setX(m_file.value("px").toInt() + 0.5f);
+    pos.setY(m_file.value("py").toInt() + 0.5f);
     pos.setZ(m_file.value("pz").toInt() + m_file.value("hei").toInt());
 
-    if (m_file.contains("refx"))
-        refx = m_file.value("refx").toInt();
-    if (m_file.contains("refy"))
-        refy=  m_file.value("refy").toInt();
-
-    pos += QVector3D(0, 0, m_surface->height(refx, refy));
     pos *= m_surface->scale();
-
-    if (m_file.contains("refx")) {
-        m_surface->setHeight(x, y, refx, refy, size);
-    }
+    pos += QVector3D(0, 0, m_surface->heightAt(pos.x(), pos.y()));
 
     return pos;
 }

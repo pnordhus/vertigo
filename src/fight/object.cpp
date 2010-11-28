@@ -23,14 +23,23 @@
 namespace fight {
 
 
-Object::Object(ModuleManager &modMan, const QString &name)
+QMatrix4x4 Object::m_cameraMatrix;
+QMatrix4x4 Object::m_cameraMatrixInverted;
+
+
+Object::Object()
+{
+}
+
+
+Object::Object(ModuleManager &modMan, const QString &name, float scale)
 {
     txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
     file.setSection("cluster");
     m_base = modMan.get(file.value("base").toString());
 
     file.setSection("size");
-    m_scale = file.value("scale").toFloat() / 32;
+    m_scale = file.value("scale").toFloat() * scale;
 }
 
 
@@ -47,6 +56,13 @@ void Object::draw()
     glScalef(m_scale, m_scale, m_scale);
     m_base.draw();
     glPopMatrix();
+}
+
+
+void Object::setCamera(const QMatrix4x4 &cameraMatrix)
+{
+    m_cameraMatrix = cameraMatrix;
+    m_cameraMatrixInverted = cameraMatrix.inverted();
 }
 
 

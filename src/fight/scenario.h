@@ -20,6 +20,7 @@
 
 
 #include "object.h"
+#include "effects/effectmanager.h"
 #include "game/renderer.h"
 #include "txt/desfile.h"
 #include <QTime>
@@ -48,19 +49,24 @@ protected:
     void keyReleaseEvent(QKeyEvent *);
 
 private:
-    QVector3D getPosition(int size = 0) const;
+    QVector3D getPosition() const;
 
 private:
     enum Type
     {
-        TypeBoat        = 2049,
-        TypeBomber      = 2050,
-        TypeTank        = 2051,
-        TypeTower       = 2052,
-        TypeCrawler     = 2053,
-        TypeBuilding    = 2056,
-        TypePlayer      = 2057,
-        TypeMine        = 2058,
+        TypeBoat           = 2049,
+        TypeBomber         = 2050,
+        TypeTank           = 2051,
+        TypeTower          = 2052,
+        TypeCrawler        = 2053,
+        TypeTrash          = 2054,
+        TypeBuilding       = 2056,
+        TypePlayer         = 2057,
+        TypeMine           = 2058,
+        TypeTorpedoTower   = 2059,
+        TypeSpace          = 2060,
+        TypeNavPoint       = 2061,
+        TypeActiveBuilding = 2062,
     };
 
     Surface *m_surface;
@@ -68,6 +74,7 @@ private:
     txt::DesFile m_file;
     gfx::TextureManager m_textureManager;
     ModuleManager m_moduleManager;
+    EffectManager m_effectManager;
     QList<Object*> m_objects;
     QList<Object*> m_lightSources;
 

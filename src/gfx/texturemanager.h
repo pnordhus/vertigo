@@ -32,7 +32,7 @@ public:
     TextureManager();
 
 public:
-    Texture getModule(const QString &filename);
+    Texture getModule(const QString &filename, bool colorKey = false);
 
 private:
     QMap<QString, Texture> m_textures;

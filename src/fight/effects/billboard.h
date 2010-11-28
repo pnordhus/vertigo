@@ -15,47 +15,56 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "turret.h"
-#include "turretbase.h"
+#ifndef FIGHT_BILLBOARD_H
+#define FIGHT_BILLBOARD_H
+
+
+#include "gfx/texturemanager.h"
 #include "txt/desfile.h"
-#include <QGLContext>
+#include <QVector2D>
+#include <QMatrix4x4>
 
 
 namespace fight {
 
 
-TurretBase::TurretBase(ModuleManager &modMan, const QString &name) :
-    Object(modMan, name)
+class Billboard
 {
-    txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
-    file.setSection("gunturret");
-    if (!file.contains("name"))
-        file.setSection("torpedoturret");
-    m_turret = new Turret(modMan, file.value("name").toString());
+public:
+    Billboard(gfx::TextureManager &texMan, txt::DesFile &name, int index);
 
-    m_turretPosition.setX(file.value("RelativePositionX").toFloat());
-    m_turretPosition.setY(file.value("RelativePositionY").toFloat());
-    m_turretPosition.setZ(file.value("RelativePositionZ").toFloat());
-}
+public:
+    void draw(QVector3D position, float angle, float scale, int time, const QMatrix4x4 &cameraMatrixInverted);
+    
+    int duration() const { return m_stages.count()*m_displayTime; }
+    float range() const { return m_range; }
+    float velocity() const { return m_velocity; }
+    float collisionRadius() const { return m_collisionRadius; }
+    int kineticStrength() const { return m_kineticStrength; }
+    int shockStrength() const { return m_shockStrength; }
 
+private:
+    struct Stage
+    {
+        gfx::Texture texture;
+        QVector2D texCoords[4];
+        QVector2D scale;
+        QVector2D offset;
+    };
 
-TurretBase::~TurretBase()
-{
-    delete m_turret;
-}
+    int m_displayTime;
+    QList<Stage> m_stages;
+    float m_scale;
 
-
-void TurretBase::draw()
-{
-    glPushMatrix();
-    glTranslatef(m_position.x(), m_position.y(), m_position.z());
-    glScalef(m_scale, m_scale, m_scale);
-    m_base.draw();
-
-    glTranslatef(m_turretPosition.x(), m_turretPosition.y(), m_turretPosition.z());
-    m_turret->draw();
-    glPopMatrix();
-}
+    float m_range;
+    float m_velocity;
+    float m_collisionRadius;
+    int m_kineticStrength;
+    int m_shockStrength;
+};
 
 
 } // namespace fight
+
+
+#endif // FIGHT_BILLBOARD_H

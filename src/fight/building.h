@@ -25,10 +25,13 @@
 namespace fight {
 
 
+class Surface;
+
+
 class Building : public Object
 {
 public:
-    Building(ModuleManager &modMan, const QString &name, int size, float angle);
+    Building(ModuleManager &modMan, const QString &name, int size, float angle, Surface *surface, int x, int y, int refx, int refy);
 
 public:
     void draw();

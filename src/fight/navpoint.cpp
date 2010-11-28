@@ -15,46 +15,42 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "turret.h"
-#include "turretbase.h"
-#include "txt/desfile.h"
-#include <QGLContext>
+#include "navpoint.h"
 
 
 namespace fight {
 
 
-TurretBase::TurretBase(ModuleManager &modMan, const QString &name) :
-    Object(modMan, name)
+NavPoint::NavPoint(ModuleManager &modMan, int num) :
+    m_num(num)
 {
-    txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
-    file.setSection("gunturret");
-    if (!file.contains("name"))
-        file.setSection("torpedoturret");
-    m_turret = new Turret(modMan, file.value("name").toString());
+    m_state0 = modMan.get("thumper2.mod");
+    m_state1 = modMan.get("thumper1.mod");
+    m_scale = 0.03;
 
-    m_turretPosition.setX(file.value("RelativePositionX").toFloat());
-    m_turretPosition.setY(file.value("RelativePositionY").toFloat());
-    m_turretPosition.setZ(file.value("RelativePositionZ").toFloat());
+    m_base = m_state0;
+    m_state = 0;
+    m_time.restart();
 }
 
 
-TurretBase::~TurretBase()
+void NavPoint::draw()
 {
-    delete m_turret;
-}
-
-
-void TurretBase::draw()
-{
-    glPushMatrix();
-    glTranslatef(m_position.x(), m_position.y(), m_position.z());
-    glScalef(m_scale, m_scale, m_scale);
-    m_base.draw();
-
-    glTranslatef(m_turretPosition.x(), m_turretPosition.y(), m_turretPosition.z());
-    m_turret->draw();
-    glPopMatrix();
+    if (m_time.elapsed() > 500)
+    {
+        if (m_state == 0)
+        {
+            m_state = 1;
+            m_base = m_state1;
+        }
+        else
+        {
+            m_state = 0;
+            m_base = m_state0;
+        }
+        m_time.restart();
+    }
+    Object::draw();
 }
 
 
