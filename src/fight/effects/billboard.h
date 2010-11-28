@@ -19,10 +19,7 @@
 #define FIGHT_BILLBOARD_H
 
 
-#include "gfx/texturemanager.h"
-#include "txt/desfile.h"
-#include <QVector2D>
-#include <QMatrix4x4>
+#include "../object.h"
 
 
 namespace fight {

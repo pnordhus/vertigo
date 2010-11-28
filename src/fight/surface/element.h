@@ -48,6 +48,7 @@ public:
     float maxZ() const { return m_maxZ; }
     float minZ() const { return m_minZ; }
     QVector3D center() const;
+    bool testCollision(const QVector3D &center, float radius);
 
 private:
     struct ElementSubset
@@ -63,6 +64,7 @@ private:
     QRect m_rect;
     float m_maxZ;
     float m_minZ;
+    float *m_heights;
 
     QMap<int, ElementSubset> m_subsets;
 };

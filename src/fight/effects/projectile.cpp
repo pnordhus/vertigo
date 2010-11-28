@@ -17,16 +17,23 @@
 
 #include "projectile.h"
 #include "billboard.h"
+#include "../surface/surface.h"
 
 
 namespace fight {
 
 
-Projectile::Projectile(Billboard *billboard) : 
-    Effect(billboard, 0)
+Projectile::Projectile(Scenario *scenario, Billboard *billboard) : 
+    Effect(scenario, billboard, 0)
 {
 }
 
+
+void Projectile::setPosition(const QVector3D &pos)
+{
+    m_originPos = pos;
+    Object::setPosition(pos);
+}
 
 void Projectile::setDirection(const QVector3D &direction)
 {
@@ -34,15 +41,26 @@ void Projectile::setDirection(const QVector3D &direction)
 }
 
 
-void Projectile::draw()
+void Projectile::update()
 {
-    m_billboard->draw(m_position + m_direction*m_time.elapsed()*m_billboard->velocity()/1000, m_angle, 2, m_time.elapsed(), m_cameraMatrixInverted);
+    QVector3D prevPos = m_position;
+    m_position = m_originPos + m_direction*m_time.elapsed()*m_billboard->velocity()/1000;
+
+    QVector3D pos, normal;
+    if (m_scenario->surface()->testCollision(prevPos, m_position, m_billboard->collisionRadius(), pos, normal))
+    {
+        m_scenario->effectManager().addEffect(Explosion_12, pos);
+        disable();
+    }
+
+    if (m_time.elapsed()*m_billboard->velocity()/1000 > m_billboard->range())
+        disable();
 }
 
 
-bool Projectile::atEnd()
+void Projectile::draw()
 {
-    return m_time.elapsed()*m_billboard->velocity()/1000 > m_billboard->range();
+    m_billboard->draw(m_position, m_angle, 2, m_time.elapsed(), m_scenario->cameraMatrixInverted());
 }
 
 

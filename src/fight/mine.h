@@ -28,7 +28,7 @@ namespace fight {
 class Mine : public Object
 {
 public:
-    Mine(ModuleManager &modMan, const QString &name);
+    Mine(Scenario *scenario, const QString &name);
 };
 
 

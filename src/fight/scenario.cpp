@@ -20,6 +20,7 @@
 #include "module.h"
 #include "scenario.h"
 #include "surface/surface.h"
+#include "effects/effect.h"
 #include "turretbase.h"
 #include "navpoint.h"
 #include <QGLContext>
@@ -32,7 +33,7 @@ namespace fight {
 
 Scenario::Scenario(const QString &name) :
     m_moduleManager(m_textureManager),
-    m_effectManager(m_textureManager),
+    m_effectManager(this),
     m_left(0.0f),
     m_right(0.0f),
     m_up(0.0f),
@@ -78,7 +79,7 @@ Scenario::Scenario(const QString &name) :
                     continue;
                 }
 
-                Object *object = new Object(m_moduleManager, types.value(dType));
+                Object *object = new Object(this, types.value(dType));
                 QVector3D pos = getPosition();
                 pos.setZ(pos.z() + 20.0f);
                 object->setPosition(pos);
@@ -95,7 +96,7 @@ Scenario::Scenario(const QString &name) :
                     continue;
                 }
 
-                Object *object = new Object(m_moduleManager, types.value(dType));
+                Object *object = new Object(this, types.value(dType));
                 QVector3D pos = getPosition();
                 pos.setZ(pos.z() + 20.0f);
                 object->setPosition(pos);
@@ -112,7 +113,7 @@ Scenario::Scenario(const QString &name) :
                     continue;
                 }
 
-                Object *object = new TurretBase(m_moduleManager, types.value(dType));
+                Object *object = new TurretBase(this, types.value(dType));
                 object->setPosition(getPosition());
                 m_objects << object;
             }
@@ -120,7 +121,7 @@ Scenario::Scenario(const QString &name) :
 
         case TypeBuilding:
             {
-                Object *object = new Building(m_moduleManager, QString("gp%1x%1_%2").arg(m_file.value("siz").toInt() + 1).arg(m_file.value("buityp").toInt()), m_file.value("siz").toInt(), m_file.value("card", 0).toInt() * 45.0f, m_surface, m_file.value("px").toInt(), m_file.value("py").toInt(), m_file.value("refx").toInt(), m_file.value("refy").toInt());
+                Object *object = new Building(this, QString("gp%1x%1_%2").arg(m_file.value("siz").toInt() + 1).arg(m_file.value("buityp").toInt()), m_file.value("siz").toInt(), m_file.value("card", 0).toInt() * 45.0f, m_file.value("px").toInt(), m_file.value("py").toInt(), m_file.value("refx").toInt(), m_file.value("refy").toInt());
                 object->setPosition(getPosition());
                 m_objects << object;
             }
@@ -134,7 +135,7 @@ Scenario::Scenario(const QString &name) :
                     continue;
                 }
 
-                Object *object = new Mine(m_moduleManager, types.value(dType));
+                Object *object = new Mine(this, types.value(dType));
                 object->setPosition(getPosition());
                 m_objects << object;
             }
@@ -148,32 +149,37 @@ Scenario::Scenario(const QString &name) :
             {
                 for (int i = 0; i < 27; i++)
                 {
-                    Object *object = m_effectManager.create((Effects)(Explosion_0 + i));
+                    Effect *object = m_effectManager.create((Effects)(Explosion_0 + i));
                     object->setPosition(m_position + QVector3D(i*5, 0, 0));
+                    object->setPermanent(true);
                     m_objects << object;
                 }
                 for (int i = 0; i < 9; i++)
                 {
-                    Object *object = m_effectManager.create((Effects)(Shoot_0 + i));
+                    Effect *object = m_effectManager.create((Effects)(Shoot_0 + i));
                     object->setPosition(m_position + QVector3D(i*5, -10, 0));
+                    object->setPermanent(true);
                     m_objects << object;
                 }
                 for (int i = 0; i < 23; i++)
                 {
-                    Object *object = m_effectManager.create((Effects)(Debris_0 + i));
+                    Effect *object = m_effectManager.create((Effects)(Debris_0 + i));
                     object->setPosition(m_position + QVector3D(i*5, -20, 0));
+                    object->setPermanent(true);
                     m_objects << object;
                 }
                 for (int i = 0; i < 5; i++)
                 {
-                    Object *object = m_effectManager.create((Effects)(Trash_0 + i));
+                    Effect *object = m_effectManager.create((Effects)(Trash_0 + i));
                     object->setPosition(m_position + QVector3D(i*5, -30, 0));
+                    object->setPermanent(true);
                     m_objects << object;
                 }
                 for (int i = 0; i < 3; i++)
                 {
-                    Object *object = m_effectManager.create((Effects)(Bubble_0 + i));
+                    Effect *object = m_effectManager.create((Effects)(Bubble_0 + i));
                     object->setPosition(m_position + QVector3D(i*5, -40, 0));
+                    object->setPermanent(true);
                     m_objects << object;
                 }
             }
@@ -181,7 +187,7 @@ Scenario::Scenario(const QString &name) :
 
         case TypeCrawler:
             {
-                Object *object = new Object(m_moduleManager, "gvehicle");
+                Object *object = new Object(this, "gvehicle");
                 object->setPosition(getPosition());
                 m_objects << object;
             }
@@ -189,7 +195,7 @@ Scenario::Scenario(const QString &name) :
 
         case TypeNavPoint:
             {
-                Object *object = new NavPoint(m_moduleManager, m_file.value("dtyp").toInt());
+                Object *object = new NavPoint(this, m_file.value("dtyp").toInt());
                 object->setPosition(getPosition() + QVector3D(-0.5f*m_surface->scale().x(), -0.5f*m_surface->scale().y(), 12));
                 m_objects << object;
             }
@@ -203,7 +209,7 @@ Scenario::Scenario(const QString &name) :
                     continue;
                 }
 
-                Object *object = new Object(m_moduleManager, types.value(dType), 16);
+                Object *object = new Object(this, types.value(dType), 16);
                 object->setPosition(getPosition());
                 m_objects << object;
             }
@@ -242,13 +248,26 @@ void Scenario::draw()
     const float angleY = (m_right - m_left) * 2.0f;
     const float angleX = (m_up - m_down) * 2.0f;
 
-    glEnable(GL_CULL_FACE);
-    glFrontFace(GL_CW);
-
     m_cameraMatrix.rotate(angleX, m_cameraMatrix.row(0).toVector3D());
     m_cameraMatrix.rotate(angleY, QVector3D(0, 0, 1));
-    Object::setCamera(m_cameraMatrix);
+    m_cameraMatrixInverted = m_cameraMatrix.inverted();
+
+    QVector3D prevPos = m_position;
     m_position += m_cameraMatrix.row(2).toVector3D() * (m_backwards - m_forwards) * 5.0f;
+
+    QVector3D pos, normal;
+    if (m_surface->testCollision(prevPos, m_position, 1.5f, pos, normal))
+        m_position = pos;
+
+    foreach (Object *object, m_objects)
+        if (object->isEnabled())
+            object->update();
+
+    m_effectManager.update();
+
+
+    glEnable(GL_CULL_FACE);
+    glFrontFace(GL_CW);
 
     glClearColor(0.0, 0.0, 0.15, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -273,7 +292,7 @@ void Scenario::draw()
     glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
     
-    GLfloat light_position[] = { 0.0, 0.0, 0.0, 1.0 };
+    GLfloat light_position[] = { 0.0, 0.0, 4.0, 1.0 };
     GLfloat spot_direction[] = { 0.0, 0.0, -1.0 };
 
     glPushMatrix();
@@ -321,7 +340,8 @@ void Scenario::draw()
     m_surface->draw(m_position, -m_cameraMatrix.row(2).toVector3D());
 
     foreach (Object *object, m_objects)
-        object->draw();
+        if (object->isEnabled())
+            object->draw();
 
     m_effectManager.draw();
 }

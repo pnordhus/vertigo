@@ -21,11 +21,12 @@
 namespace fight {
 
 
-NavPoint::NavPoint(ModuleManager &modMan, int num) :
+NavPoint::NavPoint(Scenario *scenario, int num) :
+    Object(scenario),
     m_num(num)
 {
-    m_state0 = modMan.get("thumper2.mod");
-    m_state1 = modMan.get("thumper1.mod");
+    m_state0 = scenario->moduleManager().get("thumper2.mod");
+    m_state1 = scenario->moduleManager().get("thumper1.mod");
     m_scale = 0.03;
 
     m_base = m_state0;

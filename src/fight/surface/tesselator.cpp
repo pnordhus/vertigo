@@ -152,6 +152,83 @@ float Tesselator::heightAt(QVector2D pos) const
 }
 
 
+float Tesselator::heightAt(QVector2D pos, QVector3D &normal) const
+{
+    const int x = pos.x();
+    const int y = pos.y();
+    const float dx = pos.x() - x;
+    const float dy = pos.y() - y;
+
+    BetaSpline *spline = m_splines[2];
+	spline->InitFrame(&height, x, y);
+
+    normal = spline->Beta_norm(dx, dy);
+    return spline->Beta_3_3(dx, dy).z();
+}
+
+
+bool Tesselator::intersect(const QVector3D &start, const QVector3D &end, float radius, QVector3D &position, QVector3D &normal)
+{
+    BetaSpline *spline = m_splines[2];
+
+    int x = start.x();
+    int y = start.y();
+	spline->InitFrame(&height, x, y);
+    float dx = start.x() - x;
+    float dy = start.y() - y;
+
+    float z = spline->Beta_3_3(dx, dy).z();
+    position = QVector3D(start.x(), start.y(), z + radius + 1e-5);
+    if (z > start.z() - radius)
+    {
+        normal = spline->Beta_norm(dx, dy);
+        return true;
+    }
+
+    if (x != (int)end.x() || y != (int)end.y())
+    {
+        x = end.x();
+        y = end.y();
+    	spline->InitFrame(&height, x, y);
+    }
+    dx = end.x() - x;
+    dy = end.y() - y;
+
+    z = spline->Beta_3_3(dx, dy).z();
+    if (z <= end.z() - radius)
+        return false;
+
+    QVector3D l = start;
+    QVector3D r = end;
+    QVector3D m;
+    while ((l - r).lengthSquared() > 0.01f)
+    {
+        m = (l + r)/2;
+
+        if (x != (int)m.x() || y != (int)m.y())
+        {
+            x = m.x();
+            y = m.y();
+    	    spline->InitFrame(&height, x, y);
+        }
+        dx = m.x() - x;
+        dy = m.y() - y;
+
+        z = spline->Beta_3_3(dx, dy).z();
+        if (z > m.z() - radius)
+            r = m;
+        else
+        {
+            l = m;
+            position = QVector3D(m.x(), m.y(), z + radius + 1e-5);
+        }
+    }
+
+    normal = spline->Beta_norm(dx, dy);
+    return true;
+}
+
+
 float Tesselator::height(int x, int y)
 {
     return defaultTesselator.m_surface->height(x, y);

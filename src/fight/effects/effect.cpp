@@ -22,23 +22,32 @@
 namespace fight {
 
 
-Effect::Effect(Billboard *billboard, float angle) : 
+Effect::Effect(Scenario *scenario, Billboard *billboard, float angle) : 
+    Object(scenario),
     m_billboard(billboard),
-    m_angle(angle)
+    m_angle(angle),
+    m_permanent(false)
 {
     m_time.restart();
 }
 
 
-void Effect::draw()
+void Effect::update()
 {
-    m_billboard->draw(m_position, m_angle, 1, m_time.elapsed(), m_cameraMatrixInverted);
+    if (!m_permanent && m_time.elapsed() >= m_billboard->duration())
+        disable();
 }
 
 
-bool Effect::atEnd()
+void Effect::draw()
 {
-    return m_time.elapsed() >= m_billboard->duration();
+    m_billboard->draw(m_position, m_angle, 1, m_time.elapsed(), m_scenario->cameraMatrixInverted());
+}
+
+
+void Effect::setPermanent(bool permanent)
+{
+    m_permanent = permanent;
 }
 
 

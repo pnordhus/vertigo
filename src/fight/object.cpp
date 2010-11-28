@@ -16,36 +16,55 @@
  ***************************************************************************/
 
 #include "object.h"
-#include "txt/desfile.h"
-#include <QGLContext>
 
 
 namespace fight {
 
 
-QMatrix4x4 Object::m_cameraMatrix;
-QMatrix4x4 Object::m_cameraMatrixInverted;
-
-
-Object::Object()
+Object::Object(Scenario *scenario) :
+    m_scenario(scenario)
 {
 }
 
 
-Object::Object(ModuleManager &modMan, const QString &name, float scale)
+Object::Object(Scenario *scenario, const QString &name, float scale) :
+    m_scenario(scenario)
 {
     txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
     file.setSection("cluster");
-    m_base = modMan.get(file.value("base").toString());
+    m_base = scenario->moduleManager().get(file.value("base").toString());
 
     file.setSection("size");
     m_scale = file.value("scale").toFloat() * scale;
 }
 
 
+void Object::setEnabled(bool enabled)
+{
+    m_enabled = enabled;
+}
+
+
+void Object::enable()
+{
+    m_enabled = true;
+}
+
+
+void Object::disable()
+{
+    m_enabled = false;
+}
+
+
 void Object::setPosition(const QVector3D &pos)
 {
     m_position = pos;
+}
+
+
+void Object::update()
+{
 }
 
 
@@ -56,13 +75,6 @@ void Object::draw()
     glScalef(m_scale, m_scale, m_scale);
     m_base.draw();
     glPopMatrix();
-}
-
-
-void Object::setCamera(const QMatrix4x4 &cameraMatrix)
-{
-    m_cameraMatrix = cameraMatrix;
-    m_cameraMatrixInverted = cameraMatrix.inverted();
 }
 
 

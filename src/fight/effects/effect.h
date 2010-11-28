@@ -20,7 +20,6 @@
 
 
 #include "../object.h"
-#include <QTime>
 
 
 namespace fight {
@@ -32,16 +31,18 @@ class Billboard;
 class Effect : public Object
 {
 public:
-    Effect(Billboard *billboard, float angle);
+    Effect(Scenario *scenario, Billboard *billboard, float angle);
 
 public:
+    void update();
     void draw();
-    virtual bool atEnd();
+    void setPermanent(bool permanent);
 
 protected:
     Billboard *m_billboard;
     float m_angle;
     QTime m_time;
+    bool m_permanent;
 };
 
 

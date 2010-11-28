@@ -16,18 +16,17 @@
  ***************************************************************************/
 
 #include "mine.h"
-#include "txt/desfile.h"
 
 
 namespace fight {
 
 
-Mine::Mine(ModuleManager &modMan, const QString &name) :
-    Object(modMan, name)
+Mine::Mine(Scenario *scenario, const QString &name) :
+    Object(scenario, name)
 {
     txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
     file.setSection("cluster");
-    m_base = modMan.get(file.value("name").toString());
+    m_base = scenario->moduleManager().get(file.value("name").toString());
 
     file.setSection("size");
     m_scale = file.value("scale").toFloat() / 16;

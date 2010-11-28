@@ -90,6 +90,12 @@ float Surface::heightAt(float x, float y) const
 }
 
 
+float Surface::heightAt(float x, float y, QVector3D &normal) const
+{
+    return m_tesselator->heightAt(QVector2D(x / m_scale.x(), y / m_scale.y()), normal) * m_scale.z();
+}
+
+
 float Surface::height(int x, int y) const
 {
     return qGray(m_heightMap.pixel(x & 0xff, y & 0xff));
@@ -105,6 +111,23 @@ void Surface::setHeight(int x, int y, int refx, int refy, int offset)
             m_heightMap.setPixel(x + dx, y + dy, i + offset);
         }
     }
+}
+
+
+bool Surface::testCollision(const QVector3D &start, const QVector3D &end, float radius, QVector3D &position, QVector3D &normal)
+{
+    int x0 = end.x() / m_scale.x() / 8;
+    int y0 = end.y() / m_scale.y() / 8;
+    Element *element = getElement(QPoint(x0*8, y0*8));
+    if (element->testCollision(end, radius))
+    {
+        if (m_tesselator->intersect(QVector3D(start.x()/m_scale.x(), start.y()/m_scale.y(), start.z()/m_scale.z()), QVector3D(end.x()/m_scale.x(), end.y()/m_scale.y(), end.z()/m_scale.z()), radius/m_scale.z(), position, normal))
+        {
+            position *= m_scale;
+            return true;
+        }
+    }
+    return false;
 }
 
 

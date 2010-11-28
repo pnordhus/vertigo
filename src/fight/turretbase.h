@@ -31,7 +31,7 @@ class Turret;
 class TurretBase : public Object
 {
 public:
-    TurretBase(ModuleManager &modMan, const QString &name);
+    TurretBase(Scenario *scenario, const QString &name);
     ~TurretBase();
 
 public:

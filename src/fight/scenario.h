@@ -19,16 +19,17 @@
 #define FIGHT_SCENARIO_H
 
 
+#include <QTime>
+#include "txt/desfile.h"
+#include "game/renderer.h"
 #include "object.h"
 #include "effects/effectmanager.h"
-#include "game/renderer.h"
-#include "txt/desfile.h"
-#include <QTime>
 
 
 namespace fight {
 
 
+class Object;
 class Surface;
 
 
@@ -42,6 +43,14 @@ public:
 
 signals:
     void success();
+
+public:
+    const QVector3D& position() const { return m_position; }
+    const QMatrix4x4& cameraMatrixInverted() const { return m_cameraMatrixInverted; }
+    Surface *surface() const { return m_surface; }
+    gfx::TextureManager& textureManager() { return m_textureManager; }
+    ModuleManager& moduleManager() { return m_moduleManager; }
+    EffectManager& effectManager() { return m_effectManager; }
 
 protected:
     void draw();
@@ -88,6 +97,7 @@ private:
     float m_backwards;
 
     QMatrix4x4 m_cameraMatrix;
+    QMatrix4x4 m_cameraMatrixInverted;
 };
 
 

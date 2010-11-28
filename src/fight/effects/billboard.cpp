@@ -16,8 +16,6 @@
  ***************************************************************************/
 
 #include "billboard.h"
-#include "txt/desfile.h"
-#include <QGLContext>
 
 
 namespace fight {
@@ -135,11 +133,11 @@ void Billboard::draw(QVector3D position, float angle, float scale, int time, con
 
     glPushMatrix();
     glTranslatef(position.x(), position.y(), position.z());
-    glScalef(m_scale*scale, m_scale*scale, m_scale*scale);
     glMultMatrixd(cameraMatrixInverted.data());
+    glScalef(m_scale*scale, m_scale*scale, 1);
     glRotatef(angle, 0, 0, 1);
-    glScalef(m_stages[currentStage].scale.x(), m_stages[currentStage].scale.y(), 0);
-    glTranslatef(m_stages[currentStage].offset.x(), m_stages[currentStage].offset.y(), 0);
+    glScalef(m_stages[currentStage].scale.x(), m_stages[currentStage].scale.y(), 1);
+    glTranslatef(m_stages[currentStage].offset.x(), m_stages[currentStage].offset.y(), 2);
 
     m_stages[currentStage].texture.bind();
     glVertexPointer(3, GL_FLOAT, 0, square);

@@ -43,10 +43,12 @@ public:
 public:
     void draw(QVector3D position, QVector3D direction);
     float heightAt(float x, float y) const;
+    float heightAt(float x, float y, QVector3D &normal) const;
     QVector3D scale() const { return m_scale; }
     float height(int x, int y) const;
     void bindTexture(int textureId);
     void setHeight(int x, int y, int refx, int refy, int offset);
+    bool testCollision(const QVector3D &start, const QVector3D &end, float radius, QVector3D &position, QVector3D &normal);
 
 private:
     Element* getElement(QPoint pos);

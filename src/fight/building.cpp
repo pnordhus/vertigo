@@ -17,27 +17,26 @@
 
 #include "building.h"
 #include "surface/surface.h"
-#include "txt/desfile.h"
-#include <QGLContext>
 
 
 namespace fight {
 
 
-Building::Building(ModuleManager &modMan, const QString &name, int size, float angle, Surface *surface, int x, int y, int refx, int refy) :
-    Object(modMan, name),
+Building::Building(Scenario *scenario, const QString &name, int size, float angle, int x, int y, int refx, int refy) :
+    Object(scenario, name),
     m_size(size),
     m_angle(angle)
 {
     txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
 
     int i = 0;
+    QVector3D scale = scenario->surface()->scale();
 
     while (file.sections().contains(QString("cluster%1").arg(i))) {
         file.setSection(QString("cluster%1").arg(i));
 
         Cluster cluster;
-        cluster.module = modMan.get(file.value("base").toString());
+        cluster.module = scenario->moduleManager().get(file.value("base").toString());
 
         file.setSection(QString("size%1").arg(i));
         cluster.scale = file.value("scale").toFloat() * 16;
@@ -47,7 +46,7 @@ Building::Building(ModuleManager &modMan, const QString &name, int size, float a
         int offsetY = file.value("OffsetY").toInt();
         cluster.offset.setX(offsetX);
         cluster.offset.setY(offsetY);
-        cluster.offset *= surface->scale();
+        cluster.offset *= scale;
 
         int clusterX = x + offsetX;
         int clusterY = y + offsetY - size;
@@ -60,14 +59,14 @@ Building::Building(ModuleManager &modMan, const QString &name, int size, float a
             if (file.value("SurfaceLifting").toString() == "p")
             {
                 if (heightRef == 0)
-                    surface->setHeight(clusterX, clusterY, refx, refy, 0);
+                    scenario->surface()->setHeight(clusterX, clusterY, refx, refy, 0);
                 else
                 {
                     qDebug("Untested: HeightReference = -1");
-                    surface->setHeight(clusterX, clusterY, clusterX, clusterY, -4); // TODO: test
+                    scenario->surface()->setHeight(clusterX, clusterY, clusterX, clusterY, -4); // TODO: test
                 }
             }
-            cluster.offset.setZ(surface->heightAt((clusterX + 0.5f)*surface->scale().x(), (clusterY + 0.5f)*surface->scale().y()));
+            cluster.offset.setZ(scenario->surface()->heightAt((clusterX + 0.5f)*scale.x(), (clusterY + 0.5f)*scale.y()));
         }
 
         switch (file.value("cardinal").toString().toAscii()[0]) {

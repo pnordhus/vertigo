@@ -19,37 +19,45 @@
 #define FIGHT_OBJECT_H
 
 
-#include "modulemanager.h"
 #include <QVector3D>
+#include <QVector2D>
 #include <QMatrix4x4>
+#include <QGLContext>
+#include "modulemanager.h"
+#include "scenario.h"
 
 
 namespace fight {
 
 
+class Scenario;
+
+
 class Object
 {
 public:
-    Object();
-    Object(ModuleManager &modMan, const QString &name, float scale = 1/32.0f);
+    Object(Scenario *scenario);
+    Object(Scenario *scenario, const QString &name, float scale = 1/32.0f);
     virtual ~Object() {}
 
 public:
-    virtual void draw();
-    void setPosition(const QVector3D &pos);
+    void setEnabled(bool);
+    void enable();
+    void disable();
+    bool isEnabled() const { return m_enabled; }
+    virtual void setPosition(const QVector3D &pos);
     QVector3D position() const { return m_position; }
 
 public:
-    static void setCamera(const QMatrix4x4 &cameraMatrix);
+    virtual void update();
+    virtual void draw();
 
 protected:
+    Scenario *m_scenario;
+    bool m_enabled;
     Module m_base;
     float m_scale;
     QVector3D m_position;
-
-protected:
-    static QMatrix4x4 m_cameraMatrix;
-    static QMatrix4x4 m_cameraMatrixInverted;
 };
 
 
