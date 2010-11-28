@@ -20,6 +20,7 @@
 
 
 #include "object.h"
+#include "effects/effectmanager.h"
 #include "game/renderer.h"
 #include "txt/desfile.h"
 #include <QTime>
@@ -73,6 +74,7 @@ private:
     txt::DesFile m_file;
     gfx::TextureManager m_textureManager;
     ModuleManager m_moduleManager;
+    EffectManager m_effectManager;
     QList<Object*> m_objects;
     QList<Object*> m_lightSources;
 

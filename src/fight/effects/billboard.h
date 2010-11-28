@@ -19,22 +19,29 @@
 #define FIGHT_BILLBOARD_H
 
 
-#include "object.h"
 #include "gfx/texturemanager.h"
+#include "txt/desfile.h"
 #include <QVector2D>
-#include <QTime>
+#include <QMatrix4x4>
 
 
 namespace fight {
 
 
-class Billboard : public Object
+class Billboard
 {
 public:
-    Billboard(gfx::TextureManager &texMan, const QString &name, int index);
+    Billboard(gfx::TextureManager &texMan, txt::DesFile &name, int index);
 
 public:
-    void draw();
+    void draw(QVector3D position, float angle, float scale, int time, const QMatrix4x4 &cameraMatrixInverted);
+    
+    int duration() const { return m_stages.count()*m_displayTime; }
+    float range() const { return m_range; }
+    float velocity() const { return m_velocity; }
+    float collisionRadius() const { return m_collisionRadius; }
+    int kineticStrength() const { return m_kineticStrength; }
+    int shockStrength() const { return m_shockStrength; }
 
 private:
     struct Stage
@@ -45,11 +52,15 @@ private:
         QVector2D offset;
     };
 
-    float m_angle;
-    float m_displayTime;
+    int m_displayTime;
     QList<Stage> m_stages;
-    int m_currentStage;
-    QTime m_time;
+    float m_scale;
+
+    float m_range;
+    float m_velocity;
+    float m_collisionRadius;
+    int m_kineticStrength;
+    int m_shockStrength;
 };
 
 

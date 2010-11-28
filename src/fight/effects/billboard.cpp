@@ -26,18 +26,30 @@ namespace fight {
 QVector3D square[4] = {QVector3D(-1, 1, 0), QVector3D(1, 1, 0), QVector3D(1, -1, 0), QVector3D(-1, -1, 0)};
 
 
-Billboard::Billboard(gfx::TextureManager &texMan, const QString &name, int index) :
-    m_angle(0)
+Billboard::Billboard(gfx::TextureManager &texMan, txt::DesFile &file, int index)
 {
-    txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
-
     file.setSection(QString("size%1").arg(index));
     m_scale = file.value("scale").toFloat();
+
+    file.setSection(QString("collision%1").arg(index));
+    m_collisionRadius = file.value("radiusscale").toFloat();
+
+    file.setSection(QString("offense%1").arg(index));
+    m_kineticStrength = file.value("kineticstrength").toInt();
+    m_shockStrength = file.value("shockstrength").toInt();
+
+    file.setSection(QString("kinematics%1").arg(index));
+    if (file.contains("range"))
+    {
+        m_range = file.value("range").toInt() / 32.0f;
+        m_velocity = file.value("velocity").toInt() / 32.0f;
+    }
+
 
     file.setSection(QString("anim%1").arg(index));
     float scale = file.value("scale").toFloat();
 
-    m_displayTime = file.value("displaytime").toFloat();
+    m_displayTime = (int)(file.value("displaytime").toFloat()*1000) + 20;
     int numOfStages = file.value("numofstages").toInt();
     int numInX = 0;
 
@@ -106,20 +118,13 @@ Billboard::Billboard(gfx::TextureManager &texMan, const QString &name, int index
             m_stages << stage;
         }
     }
-
-    m_currentStage = 0;
-    m_time.restart();
 }
 
 
 
-void Billboard::draw()
+void Billboard::draw(QVector3D position, float angle, float scale, int time, const QMatrix4x4 &cameraMatrixInverted)
 {
-    if (m_time.elapsed() > m_displayTime*1000 + 20)
-    {
-        m_currentStage = (m_currentStage + 1)%m_stages.count();
-        m_time.restart();
-    }
+    int currentStage = time/m_displayTime%m_stages.count();
 
     glEnable(GL_TEXTURE_2D);
     glEnableClientState(GL_VERTEX_ARRAY);
@@ -129,16 +134,16 @@ void Billboard::draw()
     glAlphaFunc(GL_NOTEQUAL, 0.0);
 
     glPushMatrix();
-    glTranslatef(m_position.x(), m_position.y(), m_position.z());
-    glScalef(m_scale, m_scale, m_scale);
-    glMultMatrixd(m_cameraMatrixInverted.data());
-    glRotatef(m_angle, 0, 0, 1);
-    glScalef(m_stages[m_currentStage].scale.x(), m_stages[m_currentStage].scale.y(), 0);
-    glTranslatef(m_stages[m_currentStage].offset.x(), m_stages[m_currentStage].offset.y(), 0);
+    glTranslatef(position.x(), position.y(), position.z());
+    glScalef(m_scale*scale, m_scale*scale, m_scale*scale);
+    glMultMatrixd(cameraMatrixInverted.data());
+    glRotatef(angle, 0, 0, 1);
+    glScalef(m_stages[currentStage].scale.x(), m_stages[currentStage].scale.y(), 0);
+    glTranslatef(m_stages[currentStage].offset.x(), m_stages[currentStage].offset.y(), 0);
 
-    m_stages[m_currentStage].texture.bind();
+    m_stages[currentStage].texture.bind();
     glVertexPointer(3, GL_FLOAT, 0, square);
-    glTexCoordPointer(2, GL_FLOAT, 0, m_stages[m_currentStage].texCoords);
+    glTexCoordPointer(2, GL_FLOAT, 0, m_stages[currentStage].texCoords);
     glDrawArrays(GL_QUADS, 0, 4);
 
     glPopMatrix();

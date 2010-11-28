@@ -22,7 +22,6 @@
 #include "surface/surface.h"
 #include "turretbase.h"
 #include "navpoint.h"
-#include "billboard.h"
 #include <QGLContext>
 #include <QKeyEvent>
 #include "math.h"
@@ -33,6 +32,7 @@ namespace fight {
 
 Scenario::Scenario(const QString &name) :
     m_moduleManager(m_textureManager),
+    m_effectManager(m_textureManager),
     m_left(0.0f),
     m_right(0.0f),
     m_up(0.0f),
@@ -145,35 +145,34 @@ Scenario::Scenario(const QString &name) :
             initialDir = 45.0f * m_file.value("card").toInt();
             //m_position.setZ(m_position.z() + 20.0f);
 
-            qDebug("DesFile constructor is too slow!");
             {
                 for (int i = 0; i < 27; i++)
                 {
-                    Object *object = new Billboard(m_textureManager, "explosio", i);
+                    Object *object = m_effectManager.create((Effects)(Explosion_0 + i));
                     object->setPosition(m_position + QVector3D(i*5, 0, 0));
                     m_objects << object;
                 }
                 for (int i = 0; i < 9; i++)
                 {
-                    Object *object = new Billboard(m_textureManager, "shoot", i);
+                    Object *object = m_effectManager.create((Effects)(Shoot_0 + i));
                     object->setPosition(m_position + QVector3D(i*5, -10, 0));
                     m_objects << object;
                 }
                 for (int i = 0; i < 23; i++)
                 {
-                    Object *object = new Billboard(m_textureManager, "debris", i);
+                    Object *object = m_effectManager.create((Effects)(Debris_0 + i));
                     object->setPosition(m_position + QVector3D(i*5, -20, 0));
                     m_objects << object;
                 }
                 for (int i = 0; i < 5; i++)
                 {
-                    Object *object = new Billboard(m_textureManager, "trash", i);
+                    Object *object = m_effectManager.create((Effects)(Trash_0 + i));
                     object->setPosition(m_position + QVector3D(i*5, -30, 0));
                     m_objects << object;
                 }
                 for (int i = 0; i < 3; i++)
                 {
-                    Object *object = new Billboard(m_textureManager, "bubble", i);
+                    Object *object = m_effectManager.create((Effects)(Bubble_0 + i));
                     object->setPosition(m_position + QVector3D(i*5, -40, 0));
                     m_objects << object;
                 }
@@ -323,6 +322,8 @@ void Scenario::draw()
 
     foreach (Object *object, m_objects)
         object->draw();
+
+    m_effectManager.draw();
 }
 
 
@@ -347,6 +348,9 @@ void Scenario::keyPressEvent(QKeyEvent *e)
         m_forwards = 0.2f;
     if (e->key() == Qt::Key_X)
         m_backwards = 0.2f;
+
+    if (e->key() == Qt::Key_Space)
+        m_effectManager.addProjectile(Shoot_Vendetta, m_position, -m_cameraMatrix.row(2).toVector3D());
 }
 
 
