@@ -72,3 +72,4 @@ target_link_libraries(game fight sfx txt ui ${QT_LIBRARIES} ${OPENGL_LIBRARY})
 
 add_executable(vertigo WIN32 main.cpp)
 target_link_libraries(vertigo game)
+install(TARGETS vertigo DESTINATION bin)
