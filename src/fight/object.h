@@ -25,12 +25,14 @@
 #include <QGLContext>
 #include "modulemanager.h"
 #include "scenario.h"
+#include "boundingbox.h"
 
 
 namespace fight {
 
 
 class Scenario;
+class CollisionCache;
 
 
 class Object
@@ -38,7 +40,7 @@ class Object
 public:
     Object(Scenario *scenario);
     Object(Scenario *scenario, const QString &name, float scale = 1/32.0f);
-    virtual ~Object() {}
+    ~Object();
 
 public:
     void setEnabled(bool);
@@ -48,9 +50,15 @@ public:
     virtual void setPosition(const QVector3D &pos);
     QVector3D position() const { return m_position; }
 
+    const BoundingBox& box() const { return m_box; }
+    bool isStatic() const { return m_static; }
+    CollisionCache *collisionCache() const { return m_collisionCache; }
+    void setCollisionCache(CollisionCache *cache);
+
 public:
     virtual void update();
     virtual void draw();
+    virtual bool intersect(const QVector3D &start, const QVector3D &dir, float radius, float &distance, QVector3D &normal);
 
 protected:
     Scenario *m_scenario;
@@ -58,6 +66,10 @@ protected:
     Module m_base;
     float m_scale;
     QVector3D m_position;
+
+    BoundingBox m_box;
+    bool m_static;
+    CollisionCache *m_collisionCache;
 };
 
 

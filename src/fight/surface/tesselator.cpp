@@ -56,7 +56,7 @@ void Tesselator::InitIndices(int MaxLevel)
 	int i, j, k, l, t;
 	int Level;
 
-	indices = new short[4*(MaxLevel - 1)*(MaxLevel - 1)*3];
+	indices = new quint16[4*(MaxLevel - 1)*(MaxLevel - 1)*3];
 
 	k = 0;
 	i = 0;
@@ -70,19 +70,19 @@ void Tesselator::InitIndices(int MaxLevel)
 		{
 			for (l = 0; l < Level - 2; l++)
 			{
-				indices[k++] = (short)i;
-				indices[k++] = (short)j;
-				indices[k++] = (short)(j + 1);
+				indices[k++] = (quint16)i;
+				indices[k++] = (quint16)j;
+				indices[k++] = (quint16)(j + 1);
 
-				indices[k++] = (short)i;
+				indices[k++] = (quint16)i;
 				j++;
-				indices[k++] = (short)j;
+				indices[k++] = (quint16)j;
 				i = (i - i0 + 1)%(4*Level - 8) + i0;
-				indices[k++] = (short)i;
+				indices[k++] = (quint16)i;
 			}
-			indices[k++] = (short)i;
-			indices[k++] = (short)j;
-			indices[k++] = (short)((j - j0 + 1)%(4*Level - 4) + j0);
+			indices[k++] = (quint16)i;
+			indices[k++] = (quint16)j;
+			indices[k++] = (quint16)((j - j0 + 1)%(4*Level - 4) + j0);
 			j++;
 		}
 		i = j0;
@@ -218,12 +218,10 @@ bool Tesselator::intersect(const QVector3D &start, const QVector3D &end, float r
         if (z > m.z() - radius)
             r = m;
         else
-        {
             l = m;
-            position = QVector3D(m.x(), m.y(), z + radius + 1e-5);
-        }
     }
 
+    position = l;
     normal = spline->Beta_norm(dx, dy);
     return true;
 }

@@ -42,7 +42,7 @@ public:
 public:
     int numVertices(int textureId);
     void addVertex(int textureId, QVector3D position, QVector3D normal, QVector2D texCoords);
-    void addTriangle(int textureId, short a, short b, short c);
+    void addTriangle(int textureId, quint16 a, quint16 b, quint16 c);
 
     void draw();
     float maxZ() const { return m_maxZ; }
@@ -56,7 +56,7 @@ private:
         QVector<QVector3D> vertices;
         QVector<QVector3D> normals;
         QVector<QVector2D> texCoords;
-        QVector<short> indices;
+        QVector<quint16> indices;
     };
 
 private:

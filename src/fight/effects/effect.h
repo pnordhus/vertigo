@@ -42,6 +42,7 @@ protected:
     Billboard *m_billboard;
     float m_angle;
     QTime m_time;
+    int m_elapsedTime;
     bool m_permanent;
 };
 

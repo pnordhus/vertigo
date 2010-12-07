@@ -54,7 +54,7 @@ private:
 
 private:
     QList<BetaSpline*> m_splines;
-    short *indices;
+    quint16 *indices;
 
     Surface *m_surface;
 };

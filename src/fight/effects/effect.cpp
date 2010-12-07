@@ -26,6 +26,7 @@ Effect::Effect(Scenario *scenario, Billboard *billboard, float angle) :
     Object(scenario),
     m_billboard(billboard),
     m_angle(angle),
+    m_elapsedTime(0),
     m_permanent(false)
 {
     m_time.restart();
@@ -34,14 +35,15 @@ Effect::Effect(Scenario *scenario, Billboard *billboard, float angle) :
 
 void Effect::update()
 {
-    if (!m_permanent && m_time.elapsed() >= m_billboard->duration())
+    m_elapsedTime = m_time.elapsed();
+    if (!m_permanent && m_elapsedTime >= m_billboard->duration())
         disable();
 }
 
 
 void Effect::draw()
 {
-    m_billboard->draw(m_position, m_angle, 1, m_time.elapsed(), m_scenario->cameraMatrixInverted());
+    m_billboard->draw(m_position, m_angle, 1, m_elapsedTime, m_scenario->cameraMatrixInverted());
 }
 
 

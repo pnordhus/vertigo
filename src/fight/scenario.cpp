@@ -21,6 +21,8 @@
 #include "scenario.h"
 #include "surface/surface.h"
 #include "effects/effect.h"
+#include "effects/effectmanager.h"
+#include "collisionmanager.h"
 #include "turretbase.h"
 #include "navpoint.h"
 #include <QGLContext>
@@ -33,7 +35,6 @@ namespace fight {
 
 Scenario::Scenario(const QString &name) :
     m_moduleManager(m_textureManager),
-    m_effectManager(this),
     m_left(0.0f),
     m_right(0.0f),
     m_up(0.0f),
@@ -41,6 +42,9 @@ Scenario::Scenario(const QString &name) :
     m_forwards(0.0f),
     m_backwards(0.0f)
 {
+    m_effectManager = new EffectManager(this);
+    m_collisionManager = new CollisionManager();
+
     hideCursor();
     m_file.load(QString("vfx:scenario/%1.des").arg(name));
 
@@ -149,35 +153,35 @@ Scenario::Scenario(const QString &name) :
             {
                 for (int i = 0; i < 27; i++)
                 {
-                    Effect *object = m_effectManager.create((Effects)(Explosion_0 + i));
+                    Effect *object = m_effectManager->create((Effects)(Explosion_0 + i));
                     object->setPosition(m_position + QVector3D(i*5, 0, 0));
                     object->setPermanent(true);
                     m_objects << object;
                 }
                 for (int i = 0; i < 9; i++)
                 {
-                    Effect *object = m_effectManager.create((Effects)(Shoot_0 + i));
+                    Effect *object = m_effectManager->create((Effects)(Shoot_0 + i));
                     object->setPosition(m_position + QVector3D(i*5, -10, 0));
                     object->setPermanent(true);
                     m_objects << object;
                 }
                 for (int i = 0; i < 23; i++)
                 {
-                    Effect *object = m_effectManager.create((Effects)(Debris_0 + i));
+                    Effect *object = m_effectManager->create((Effects)(Debris_0 + i));
                     object->setPosition(m_position + QVector3D(i*5, -20, 0));
                     object->setPermanent(true);
                     m_objects << object;
                 }
                 for (int i = 0; i < 5; i++)
                 {
-                    Effect *object = m_effectManager.create((Effects)(Trash_0 + i));
+                    Effect *object = m_effectManager->create((Effects)(Trash_0 + i));
                     object->setPosition(m_position + QVector3D(i*5, -30, 0));
                     object->setPermanent(true);
                     m_objects << object;
                 }
                 for (int i = 0; i < 3; i++)
                 {
-                    Effect *object = m_effectManager.create((Effects)(Bubble_0 + i));
+                    Effect *object = m_effectManager->create((Effects)(Bubble_0 + i));
                     object->setPosition(m_position + QVector3D(i*5, -40, 0));
                     object->setPermanent(true);
                     m_objects << object;
@@ -240,6 +244,8 @@ Scenario::Scenario(const QString &name) :
 Scenario::~Scenario()
 {
     delete m_surface;
+    delete m_collisionManager;
+    delete m_effectManager;
 }
 
 
@@ -255,15 +261,20 @@ void Scenario::draw()
     QVector3D prevPos = m_position;
     m_position += m_cameraMatrix.row(2).toVector3D() * (m_backwards - m_forwards) * 5.0f;
 
-    QVector3D pos, normal;
-    if (m_surface->testCollision(prevPos, m_position, 1.5f, pos, normal))
-        m_position = pos;
+    if (m_position != prevPos)
+    {
+        QVector3D pos, normal;
+        if (m_surface->testCollision(prevPos, m_position, 1.5f, pos, normal))
+            m_position = pos;
+        if (m_collisionManager->testCollision(prevPos, m_position, 1.5f, pos, normal))
+            m_position = pos;
+    }
 
     foreach (Object *object, m_objects)
         if (object->isEnabled())
             object->update();
 
-    m_effectManager.update();
+    m_effectManager->update();
 
 
     glEnable(GL_CULL_FACE);
@@ -343,7 +354,7 @@ void Scenario::draw()
         if (object->isEnabled())
             object->draw();
 
-    m_effectManager.draw();
+    m_effectManager->draw();
 }
 
 
@@ -370,7 +381,7 @@ void Scenario::keyPressEvent(QKeyEvent *e)
         m_backwards = 0.2f;
 
     if (e->key() == Qt::Key_Space)
-        m_effectManager.addProjectile(Shoot_Vendetta, m_position, -m_cameraMatrix.row(2).toVector3D());
+        m_effectManager->addProjectile(Shoot_Vendetta, m_position, -m_cameraMatrix.row(2).toVector3D());
 }
 
 

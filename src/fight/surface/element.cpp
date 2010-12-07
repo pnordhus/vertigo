@@ -79,7 +79,7 @@ void Element::addVertex(int textureId, QVector3D position, QVector3D normal, QVe
 }
 
 
-void Element::addTriangle(int textureId, short a, short b, short c)
+void Element::addTriangle(int textureId, quint16 a, quint16 b, quint16 c)
 {
     m_subsets[textureId].indices << a << b << c;
 }

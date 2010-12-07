@@ -23,7 +23,6 @@
 #include "txt/desfile.h"
 #include "game/renderer.h"
 #include "object.h"
-#include "effects/effectmanager.h"
 
 
 namespace fight {
@@ -31,6 +30,8 @@ namespace fight {
 
 class Object;
 class Surface;
+class EffectManager;
+class CollisionManager;
 
 
 class Scenario : public game::Renderer
@@ -50,7 +51,8 @@ public:
     Surface *surface() const { return m_surface; }
     gfx::TextureManager& textureManager() { return m_textureManager; }
     ModuleManager& moduleManager() { return m_moduleManager; }
-    EffectManager& effectManager() { return m_effectManager; }
+    EffectManager* effectManager() { return m_effectManager; }
+    CollisionManager* collisionManager() { return m_collisionManager; }
 
 protected:
     void draw();
@@ -83,7 +85,8 @@ private:
     txt::DesFile m_file;
     gfx::TextureManager m_textureManager;
     ModuleManager m_moduleManager;
-    EffectManager m_effectManager;
+    EffectManager *m_effectManager;
+    CollisionManager *m_collisionManager;
     QList<Object*> m_objects;
     QList<Object*> m_lightSources;
 

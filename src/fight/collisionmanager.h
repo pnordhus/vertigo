@@ -15,46 +15,72 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef FIGHT_BUILDING_H
-#define FIGHT_BUILDING_H
+#ifndef FIGHT_COLLISIONMANAGER_H
+#define FIGHT_COLLISIONMANAGER_H
 
 
-#include "object.h"
+#include "boundingbox.h"
 
 
 namespace fight {
 
 
-class Surface;
+enum ObjectType
+{
+    NoObject,
+    BuildingObject,
+};
 
 
-class Building : public Object
+class Object;
+
+
+class CollisionCache
 {
 public:
-    Building(Scenario *scenario, const QString &name, int size, float angle, int x, int y, int refx, int refy);
+    CollisionCache();
 
 public:
-    void draw();
-    bool intersect(const QVector3D &start, const QVector3D &dir, float radius, float &distance, QVector3D &normal);
+    void addObject(Object *object, bool collision, const QVector3D &position, const QVector3D &normal);
+    bool testObject(Object *object, bool &collision, QVector3D &position, QVector3D &normal);
 
 private:
-    struct Cluster
+    struct CacheEntry
     {
-        Module module;
-        QVector3D offset;
-        float scale;
-        float angle;
-        QMatrix4x4 transform;
-        QMatrix4x4 invTransform;
+        Object *object;
+        bool collision;
+        QVector3D position;
+        QVector3D normal;
     };
 
-    QList<Cluster> m_clusters;
-    int m_size;
-    float m_angle;
+private:
+    QList<CacheEntry> m_entries;
+};
+
+
+class CollisionManager
+{
+public:
+    CollisionManager();
+
+public:
+    void addObject(ObjectType type, Object *object);
+    ObjectType testCollision(const QVector3D &start, const QVector3D &end, float radius, QVector3D &position, QVector3D &normal);
+    ObjectType testCollision(Object *object, const QVector3D &end, float radius, QVector3D &position, QVector3D &normal);
+
+private:
+    struct ObjectEntry
+    {
+        ObjectType type;
+        Object *object;
+    };
+
+private:
+    QList<ObjectEntry> m_entries;
 };
 
 
 } // namespace fight
 
 
-#endif // FIGHT_BUILDING_H
+#endif // FIGHT_COLLISIONMANAGER_H

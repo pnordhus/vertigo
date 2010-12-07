@@ -36,6 +36,7 @@ void ModulePrivate::load(gfx::TextureManager &texMan, const QString &name)
 
     quint32 numFaces;
     quint32 numVertices;
+    QMap<QString, int> textures;
 
     stream.skipRawData(2);
     stream >> numFaces;
@@ -43,14 +44,15 @@ void ModulePrivate::load(gfx::TextureManager &texMan, const QString &name)
     stream >> numVertices;
     stream.skipRawData(4);
 
-    QVector<Vector> vertices;
+    QVector<QVector3D> vertices;
     vertices.reserve(numVertices);
 
     for (unsigned int i = 0; i < numVertices; i++) {
         quint32 index;
-        Vector v;
-        stream >> index >> v.x >> v.y >> v.z;
+        QVector3D v;
+        stream >> index >> v;
         vertices << v;
+        m_box.add(v);
     }
 
     for (unsigned int i = 0; i < numFaces; i++) {
@@ -73,7 +75,7 @@ void ModulePrivate::load(gfx::TextureManager &texMan, const QString &name)
             stream >> numVertices2;
             stream.skipRawData(4);
 
-            QVector<TexCoord> texCoords;
+            QVector<QVector2D> texCoords;
             texCoords.reserve(numVertices2 * 2);
 
             for (unsigned int i = 0; i < numVertices2; i++) {
@@ -85,7 +87,7 @@ void ModulePrivate::load(gfx::TextureManager &texMan, const QString &name)
                 stream.skipRawData(2);
                 stream >> t;
 
-                texCoords << TexCoord(s / 255.0f, t / 255.0f);
+                texCoords << QVector2D(s / 255.0f, t / 255.0f);
             }
             quint32 nameLength;
             stream >> nameLength;
@@ -101,16 +103,32 @@ void ModulePrivate::load(gfx::TextureManager &texMan, const QString &name)
                 indices << index;
             }
 
-            Face face;
-            face.texture = texMan.getModule(textureName);
-            for (unsigned int j = 0; j < numVertices2; j++) {
-                face.vertices << vertices[indices[3 * j]];
-                face.texCoords << texCoords[j];
+            int textureId;
+            if (textures.contains(textureName))
+                textureId = textures[textureName];
+            else
+            {
+                textureId = m_textures.count();
+                textures.insert(textureName, textureId);
+                m_textures << texMan.getModule(textureName);
+                m_meshes << Mesh();
             }
 
-            m_faces << face;
+            Mesh &mesh = m_meshes[textureId];
+            int i0 = mesh.vertices.count();
+
+            for (unsigned int j = 0; j < numVertices2; j++)
+            {
+                mesh.vertices << vertices[indices[3 * j]];
+                mesh.texCoords << texCoords[j];
+                if (j > 1)
+                    mesh.indices << i0 << i0 + j - 1 << i0 + j;
+            }
         }
     }
+
+    foreach (const Mesh &mesh, m_meshes)
+        m_collisionMesh.addTriangles(mesh.vertices, mesh.indices);
 }
 
 
@@ -119,15 +137,22 @@ void ModulePrivate::draw()
     glEnable(GL_TEXTURE_2D);
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    //glEnableClientState(GL_NORMAL_ARRAY);
 
-    QMutableListIterator<Face> it(m_faces);
-    while (it.hasNext()) {
-        Face &face = it.next();
-        face.texture.bind();
-        glVertexPointer(3, GL_FLOAT, sizeof(Vector), face.vertices.data());
-        glTexCoordPointer(2, GL_FLOAT, 0, face.texCoords.data());
-        glDrawArrays(GL_TRIANGLE_FAN, 0, face.vertices.size());
+    for (int i = 0; i < m_textures.count(); i++)
+    {
+        m_textures[i].bind();
+        glVertexPointer(3, GL_FLOAT, 0, m_meshes[i].vertices.data());
+        //glNormalPointer(GL_FLOAT, 0, m_meshes[i].normals.data());
+        glTexCoordPointer(2, GL_FLOAT, 0, m_meshes[i].texCoords.data());
+        glDrawElements(GL_TRIANGLES, m_meshes[i].indices.count(), GL_UNSIGNED_SHORT, m_meshes[i].indices.data());
     }
+}
+
+
+bool ModulePrivate::intersect(const QVector3D &start, const QVector3D &dir, float radius, float &distance, QVector3D &normal)
+{
+    return m_collisionMesh.intersect(start, dir, radius, distance, normal);
 }
 
 

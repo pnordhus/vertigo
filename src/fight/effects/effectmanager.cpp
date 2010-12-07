@@ -70,7 +70,7 @@ EffectManager::~EffectManager()
 
 Effect* EffectManager::create(Effects effect)
 {
-    return new Effect(m_scenario, getBillboard(effect), 0);
+    return new Effect(m_scenario, getBillboard(effect), qrand()%360);
 }
 
 

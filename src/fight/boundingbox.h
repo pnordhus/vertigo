@@ -15,46 +15,41 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef FIGHT_BUILDING_H
-#define FIGHT_BUILDING_H
+#ifndef FIGHT_BOUNDINGBOX_H
+#define FIGHT_BOUNDINGBOX_H
 
 
-#include "object.h"
+#include <QVector3D>
+#include <QMatrix4x4>
 
 
 namespace fight {
 
 
-class Surface;
-
-
-class Building : public Object
+class BoundingBox
 {
 public:
-    Building(Scenario *scenario, const QString &name, int size, float angle, int x, int y, int refx, int refy);
+    BoundingBox();
+    BoundingBox(const BoundingBox &box);
+    BoundingBox(const QVector3D &min, const QVector3D &max);
 
 public:
-    void draw();
-    bool intersect(const QVector3D &start, const QVector3D &dir, float radius, float &distance, QVector3D &normal);
+    const QVector3D& minPoint() const { return m_min; }
+    const QVector3D& maxPoint() const { return m_max; }
+    QVector3D dim() const { return m_max - m_min; }
+    BoundingBox transform(QMatrix4x4 m);
 
-private:
-    struct Cluster
-    {
-        Module module;
-        QVector3D offset;
-        float scale;
-        float angle;
-        QMatrix4x4 transform;
-        QMatrix4x4 invTransform;
-    };
+    void add(const QVector3D &point);
+    void add(const BoundingBox &box);
+    bool test(const QVector3D &center, float radius) const;
 
-    QList<Cluster> m_clusters;
-    int m_size;
-    float m_angle;
+public:
+    QVector3D m_min;
+    QVector3D m_max;
 };
 
 
 } // namespace fight
 
 
-#endif // FIGHT_BUILDING_H
+#endif // FIGHT_BOUNDINGBOX_H

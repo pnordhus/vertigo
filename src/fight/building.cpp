@@ -17,6 +17,7 @@
 
 #include "building.h"
 #include "surface/surface.h"
+#include "collisionmanager.h"
 
 
 namespace fight {
@@ -87,6 +88,25 @@ Building::Building(Scenario *scenario, const QString &name, int size, float angl
         m_clusters << cluster;
         i++;
     }
+
+    QMutableListIterator<Cluster> it(m_clusters);
+    while (it.hasNext()) 
+    {
+        Cluster &cluster = it.next();
+
+        QMatrix4x4 m;
+        m.translate((x + 0.5f)*scale.x(), (y + 0.5f - size)*scale.y(), 0);
+        m.rotate(m_angle, 0, 0, 1);
+        m.translate(cluster.offset.x(), cluster.offset.y(), cluster.offset.z());
+        m.scale(cluster.scale);
+        m.rotate(cluster.angle, 0, 0, 1);
+        m_box.add(cluster.module.box().transform(m));
+        
+        cluster.transform = m;
+        cluster.invTransform = m.inverted();
+    }
+
+    scenario->collisionManager()->addObject(BuildingObject, this);
 }
 
 
@@ -108,6 +128,30 @@ void Building::draw()
         glPopMatrix();
     }
     glPopMatrix();
+}
+
+
+bool Building::intersect(const QVector3D &start, const QVector3D &dir, float radius, float &distance, QVector3D &normal)
+{
+    bool collision = false;
+    QMutableListIterator<Cluster> it(m_clusters);
+    while (it.hasNext()) 
+    {
+        Cluster &cluster = it.next();
+        float d;
+        QVector3D norm;
+        if (cluster.module.intersect(cluster.invTransform * start, (cluster.invTransform * QVector4D(dir, 0)).toVector3D()*cluster.scale, radius/cluster.scale, d, norm))
+        {
+            d *= cluster.scale;
+            if (!collision || distance > d)
+            {
+                distance = d;
+                normal = (cluster.transform * QVector4D(normal, 0)).toVector3D()/cluster.scale;
+                collision = true;
+            }
+        }
+    }
+    return collision;
 }
 
 

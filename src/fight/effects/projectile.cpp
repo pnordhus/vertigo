@@ -17,7 +17,9 @@
 
 #include "projectile.h"
 #include "billboard.h"
+#include "effectmanager.h"
 #include "../surface/surface.h"
+#include "../collisionmanager.h"
 
 
 namespace fight {
@@ -43,24 +45,36 @@ void Projectile::setDirection(const QVector3D &direction)
 
 void Projectile::update()
 {
-    QVector3D prevPos = m_position;
-    m_position = m_originPos + m_direction*m_time.elapsed()*m_billboard->velocity()/1000;
+    m_elapsedTime = m_time.elapsed();
+    if (m_elapsedTime == 0)
+        return;
+    if (m_elapsedTime*m_billboard->velocity()/1000 > m_billboard->range())
+    {
+        disable();
+        return;
+    }
+
+    QVector3D newPos = m_originPos + m_direction*m_elapsedTime*m_billboard->velocity()/1000;
 
     QVector3D pos, normal;
-    if (m_scenario->surface()->testCollision(prevPos, m_position, m_billboard->collisionRadius(), pos, normal))
+    if (m_scenario->surface()->testCollision(m_position, newPos, m_billboard->collisionRadius(), pos, normal))
     {
-        m_scenario->effectManager().addEffect(Explosion_12, pos);
+        m_scenario->effectManager()->addEffect(Explosion_12, pos);
+        disable();
+    }
+    if (m_scenario->collisionManager()->testCollision(this, newPos, m_billboard->collisionRadius(), pos, normal))
+    {
+        m_scenario->effectManager()->addEffect(Explosion_11, pos);
         disable();
     }
 
-    if (m_time.elapsed()*m_billboard->velocity()/1000 > m_billboard->range())
-        disable();
+    m_position = newPos;
 }
 
 
 void Projectile::draw()
 {
-    m_billboard->draw(m_position, m_angle, 2, m_time.elapsed(), m_scenario->cameraMatrixInverted());
+    m_billboard->draw(m_position, m_angle, 2, m_elapsedTime, m_scenario->cameraMatrixInverted());
 }
 
 

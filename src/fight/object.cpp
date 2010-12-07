@@ -22,13 +22,19 @@ namespace fight {
 
 
 Object::Object(Scenario *scenario) :
-    m_scenario(scenario)
+    m_scenario(scenario),
+    m_enabled(true),
+    m_static(true),
+    m_collisionCache(NULL)
 {
 }
 
 
 Object::Object(Scenario *scenario, const QString &name, float scale) :
-    m_scenario(scenario)
+    m_scenario(scenario),
+    m_enabled(true),
+    m_static(true),
+    m_collisionCache(NULL)
 {
     txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
     file.setSection("cluster");
@@ -36,6 +42,12 @@ Object::Object(Scenario *scenario, const QString &name, float scale) :
 
     file.setSection("size");
     m_scale = file.value("scale").toFloat() * scale;
+}
+
+
+Object::~Object()
+{
+    delete m_collisionCache;
 }
 
 
@@ -57,6 +69,12 @@ void Object::disable()
 }
 
 
+void Object::setCollisionCache(CollisionCache *cache)
+{
+    m_collisionCache = cache;
+}
+
+
 void Object::setPosition(const QVector3D &pos)
 {
     m_position = pos;
@@ -75,6 +93,12 @@ void Object::draw()
     glScalef(m_scale, m_scale, m_scale);
     m_base.draw();
     glPopMatrix();
+}
+
+
+bool Object::intersect(const QVector3D &start, const QVector3D &dir, float radius, float &distance, QVector3D &normal)
+{
+    return false;
 }
 
 

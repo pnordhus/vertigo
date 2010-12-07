@@ -15,46 +15,47 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef FIGHT_BUILDING_H
-#define FIGHT_BUILDING_H
+#ifndef FIGHT_COLLISIONMESH_H
+#define FIGHT_COLLISIONMESH_H
 
 
-#include "object.h"
+#include <QVector>
+#include <QVector3D>
+#include <QVector4D>
 
 
 namespace fight {
 
 
-class Surface;
-
-
-class Building : public Object
+class CollisionMesh
 {
 public:
-    Building(Scenario *scenario, const QString &name, int size, float angle, int x, int y, int refx, int refy);
+    CollisionMesh();
 
 public:
-    void draw();
+    void addTriangles(const QVector<QVector3D> &vertices, const QVector<quint16> &indices);
     bool intersect(const QVector3D &start, const QVector3D &dir, float radius, float &distance, QVector3D &normal);
 
 private:
-    struct Cluster
+    struct Triangle
     {
-        Module module;
-        QVector3D offset;
-        float scale;
-        float angle;
-        QMatrix4x4 transform;
-        QMatrix4x4 invTransform;
+        QVector3D vertices[3];
+        QVector3D u;
+        QVector3D v;
+        QVector4D plane;
+        float uu, uv, vv, invD;
+        QVector3D lineDir[3];
     };
 
-    QList<Cluster> m_clusters;
-    int m_size;
-    float m_angle;
+    bool isPointInsideTriangle(const Triangle &tri, const QVector3D &point);
+    bool intersectSphereLine(const QVector3D &point, const QVector3D &dir, float radiusSquared, float &t);
+
+private:
+    QList<Triangle> m_triangles;
 };
 
 
 } // namespace fight
 
 
-#endif // FIGHT_BUILDING_H
+#endif // FIGHT_COLLISIONMESH_H
