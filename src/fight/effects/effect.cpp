@@ -22,10 +22,11 @@
 namespace fight {
 
 
-Effect::Effect(Scenario *scenario, Billboard *billboard, float angle) : 
+Effect::Effect(Scenario *scenario, Billboard *billboard, float angle, float scale) : 
     Object(scenario),
     m_billboard(billboard),
     m_angle(angle),
+    m_scale(scale),
     m_elapsedTime(0),
     m_permanent(false)
 {
@@ -43,7 +44,7 @@ void Effect::update()
 
 void Effect::draw()
 {
-    m_billboard->draw(m_position, m_angle, 1, m_elapsedTime, m_scenario->cameraMatrixInverted());
+    m_billboard->draw(m_position, m_angle, m_scale, m_elapsedTime, m_scenario->cameraMatrixInverted());
 }
 
 

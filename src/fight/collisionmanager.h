@@ -25,13 +25,6 @@
 namespace fight {
 
 
-enum ObjectType
-{
-    NoObject,
-    BuildingObject,
-};
-
-
 class Object;
 
 
@@ -64,19 +57,14 @@ public:
     CollisionManager();
 
 public:
-    void addObject(ObjectType type, Object *object);
-    ObjectType testCollision(const QVector3D &start, const QVector3D &end, float radius, QVector3D &position, QVector3D &normal);
-    ObjectType testCollision(Object *object, const QVector3D &end, float radius, QVector3D &position, QVector3D &normal);
+    void addObject(Object *object);
+    Object* testCollision(const QVector3D &start, const QVector3D &end, float radius, QVector3D &position, QVector3D &normal);
+    Object* testCollision(Object *cacheObject, const QVector3D &end, float radius, QVector3D &position, QVector3D &normal);
 
 private:
-    struct ObjectEntry
-    {
-        ObjectType type;
-        Object *object;
-    };
 
 private:
-    QList<ObjectEntry> m_entries;
+    QList<Object*> m_objects;
 };
 
 

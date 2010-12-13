@@ -16,6 +16,7 @@
  ***************************************************************************/
 
 #include "billboard.h"
+#include "../collisionmesh.h"
 
 
 namespace fight {
@@ -146,6 +147,19 @@ void Billboard::draw(QVector3D position, float angle, float scale, int time, con
 
     glPopMatrix();
     glDisable(GL_ALPHA_TEST);
+}
+
+
+BoundingBox Billboard::box()
+{
+    float scale = m_scale*m_stages[0].scale.length();
+    return BoundingBox(QVector3D(-1, -1, -1)*scale, QVector3D(1, 1, 1)*scale);
+}
+
+
+bool Billboard::intersect(const QVector3D &start, const QVector3D &dir, float &distance)
+{
+    return CollisionMesh::intersectSphereLine(start, dir, m_scale*m_scale*m_stages[0].scale.lengthSquared(), distance);
 }
 
 

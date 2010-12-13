@@ -34,7 +34,6 @@ public:
     void setPosition(const QVector3D &pos);
     void setDirection(const QVector3D &direction);
     void update();
-    void draw();
 
 private:
     QVector3D m_originPos;

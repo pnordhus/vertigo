@@ -59,82 +59,83 @@ CollisionManager::CollisionManager()
 }
 
 
-void CollisionManager::addObject(ObjectType type, Object *object)
+void CollisionManager::addObject(Object *object)
 {
-    ObjectEntry entry;
-    entry.type = type;
-    entry.object = object;
-    m_entries << entry;
+    m_objects << object;
 }
 
 
-ObjectType CollisionManager::testCollision(const QVector3D &start, const QVector3D &end, float radius, QVector3D &position, QVector3D &normal)
+Object* CollisionManager::testCollision(const QVector3D &start, const QVector3D &end, float radius, QVector3D &position, QVector3D &normal)
 {
     QVector3D dir = end - start;
     float distance = dir.length();
     dir /= distance;
 
-    ObjectType collisionType = NoObject;
-    foreach (const ObjectEntry &entry, m_entries)
-        if (entry.object->isEnabled() && entry.object->box().test(end, radius))
+    Object *collisionObject = NULL;
+    foreach (Object *object, m_objects)
+        if (object->isEnabled() && object->box().test(end, radius))
         {
             bool collision = false;
             float d;
             QVector3D norm;
 
-            collision = entry.object->intersect(start, dir, radius, d, norm);
+            collision = object->intersect(start, dir, radius, d, norm);
 
             if (collision && distance > d)
             {
                 distance = d;
-                position = start + dir*distance;
+                position = start;
+                if (distance > 0)
+                    position += dir*distance;
                 normal = norm;
-                collisionType = entry.type;
+                collisionObject = object;
             }
         }
-    return collisionType;
+    return collisionObject;
 }
 
 
-ObjectType CollisionManager::testCollision(Object *object, const QVector3D &end, float radius, QVector3D &position, QVector3D &normal)
+Object* CollisionManager::testCollision(Object *cacheObject, const QVector3D &end, float radius, QVector3D &position, QVector3D &normal)
 {
-    QVector3D start = object->position();
+    QVector3D start = cacheObject->position();
     QVector3D dir = end - start;
     float distance = dir.length();
     dir /= distance;
 
-    ObjectType collisionType = NoObject;
-    foreach (const ObjectEntry &entry, m_entries)
-        if (entry.object->isEnabled() && entry.object->box().test(end, radius))
+    Object *collisionObject = NULL;
+    foreach (Object *object, m_objects)
+        if (object->isEnabled() && object->box().test(end, radius))
         {
             bool collision = false;
             float d;
             QVector3D pos, norm;
 
-            if (entry.object->isStatic() && object->isStatic())
+            if (object->isStatic() && cacheObject->isStatic())
             {
-                if (object->collisionCache() == NULL)
-                    object->setCollisionCache(new CollisionCache());
-                if (object->collisionCache()->testObject(entry.object, collision, pos, norm))
+                if (cacheObject->collisionCache() == NULL)
+                    cacheObject->setCollisionCache(new CollisionCache());
+                if (cacheObject->collisionCache()->testObject(object, collision, pos, norm))
                     d = QVector3D::dotProduct(pos - start, dir);
                 else
                 {
-                    collision = entry.object->intersect(start, dir, radius, d, norm);
-                    object->collisionCache()->addObject(entry.object, collision, start + dir*d, norm);
+                    collision = object->intersect(start, dir, radius, d, norm);
+                    cacheObject->collisionCache()->addObject(object, collision, start + dir*d, norm);
                 }
             }
             else
-                collision = entry.object->intersect(start, dir, radius, d, norm);
+                collision = object->intersect(start, dir, radius, d, norm);
 
             if (collision && distance > d)
             {
                 distance = d;
-                position = start + dir*distance;
+                position = start;
+                if (distance > 0)
+                    position += dir*distance;
                 normal = norm;
-                collisionType = entry.type;
+                collisionObject = object;
             }
         }
-    return collisionType;
+    return collisionObject;
 }
 
 

@@ -36,6 +36,8 @@ public:
     void addTriangles(const QVector<QVector3D> &vertices, const QVector<quint16> &indices);
     bool intersect(const QVector3D &start, const QVector3D &dir, float radius, float &distance, QVector3D &normal);
 
+    static bool intersectSphereLine(const QVector3D &point, const QVector3D &dir, float radiusSquared, float &t);
+
 private:
     struct Triangle
     {
@@ -48,7 +50,6 @@ private:
     };
 
     bool isPointInsideTriangle(const Triangle &tri, const QVector3D &point);
-    bool intersectSphereLine(const QVector3D &point, const QVector3D &dir, float radiusSquared, float &t);
 
 private:
     QList<Triangle> m_triangles;

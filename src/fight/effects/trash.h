@@ -15,40 +15,31 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef FIGHT_EFFECT_H
-#define FIGHT_EFFECT_H
+#ifndef FIGHT_TRASH_H
+#define FIGHT_TRASH_H
 
 
-#include "../object.h"
+#include "effect.h"
 
 
 namespace fight {
 
 
-class Billboard;
-
-
-class Effect : public Object
+class Trash : public Effect
 {
 public:
-    Effect(Scenario *scenario, Billboard *billboard, float angle, float scale);
+    Trash(Scenario *scenario, Billboard *billboard, float angle);
 
 public:
-    void update();
-    void draw();
-    void setPermanent(bool permanent);
+    void setPosition(const QVector3D &pos);
+    bool intersect(const QVector3D &start, const QVector3D &dir, float radius, float &distance, QVector3D &normal);
+    void destroy();
 
-protected:
-    Billboard *m_billboard;
-    float m_angle;
-    float m_scale;
-    QTime m_time;
-    int m_elapsedTime;
-    bool m_permanent;
+private:
 };
 
 
 } // namespace fight
 
 
-#endif // FIGHT_EFFECT_H
+#endif // FIGHT_TRASH_H

@@ -26,7 +26,7 @@ namespace fight {
 
 
 Projectile::Projectile(Scenario *scenario, Billboard *billboard) : 
-    Effect(scenario, billboard, 0)
+    Effect(scenario, billboard, 0, 2)
 {
 }
 
@@ -62,19 +62,17 @@ void Projectile::update()
         m_scenario->effectManager()->addEffect(Explosion_12, pos);
         disable();
     }
-    if (m_scenario->collisionManager()->testCollision(this, newPos, m_billboard->collisionRadius(), pos, normal))
+    Object *collision = m_scenario->collisionManager()->testCollision(this, newPos, m_billboard->collisionRadius(), pos, normal);
+    if (collision)
     {
-        m_scenario->effectManager()->addEffect(Explosion_11, pos);
+        if (collision->type() == TrashObject)
+            collision->destroy();
+        else
+            m_scenario->effectManager()->addEffect(Explosion_11, pos, qrand()%360);
         disable();
     }
 
     m_position = newPos;
-}
-
-
-void Projectile::draw()
-{
-    m_billboard->draw(m_position, m_angle, 2, m_elapsedTime, m_scenario->cameraMatrixInverted());
 }
 
 

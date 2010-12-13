@@ -35,6 +35,14 @@ class Scenario;
 class CollisionCache;
 
 
+enum ObjectType
+{
+    UnknownObject,
+    BuildingObject,
+    TrashObject,
+};
+
+
 class Object
 {
 public:
@@ -50,6 +58,7 @@ public:
     virtual void setPosition(const QVector3D &pos);
     QVector3D position() const { return m_position; }
 
+    ObjectType type() const { return m_type; }
     const BoundingBox& box() const { return m_box; }
     bool isStatic() const { return m_static; }
     CollisionCache *collisionCache() const { return m_collisionCache; }
@@ -59,14 +68,17 @@ public:
     virtual void update();
     virtual void draw();
     virtual bool intersect(const QVector3D &start, const QVector3D &dir, float radius, float &distance, QVector3D &normal);
+    virtual void destroy();
 
 protected:
     Scenario *m_scenario;
+
     bool m_enabled;
     Module m_base;
     float m_scale;
     QVector3D m_position;
 
+    ObjectType m_type;
     BoundingBox m_box;
     bool m_static;
     CollisionCache *m_collisionCache;

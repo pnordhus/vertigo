@@ -22,6 +22,7 @@
 #include "surface/surface.h"
 #include "effects/effect.h"
 #include "effects/effectmanager.h"
+#include "effects/trash.h"
 #include "collisionmanager.h"
 #include "turretbase.h"
 #include "navpoint.h"
@@ -44,6 +45,8 @@ Scenario::Scenario(const QString &name) :
 {
     m_effectManager = new EffectManager(this);
     m_collisionManager = new CollisionManager();
+
+    qsrand(name.right(4).toInt());
 
     hideCursor();
     m_file.load(QString("vfx:scenario/%1.des").arg(name));
@@ -221,11 +224,16 @@ Scenario::Scenario(const QString &name) :
 
         case TypeTrash:
             {
-                //Object *object = new Billboard(m_textureManager, "debris", 18);
-                //Object *object = new Billboard(m_textureManager, "explosio", 14);
-                /*Object *object = new Billboard(m_textureManager, "trash", 0);
-                object->setPosition(getPosition());
-                m_objects << object;*/
+                QVector3D pos = getPosition();
+                m_objects << m_effectManager->createTrash(Trash_0, pos);
+                m_objects << m_effectManager->createTrash(Trash_0, pos);
+                m_objects << m_effectManager->createTrash(Trash_1, pos);
+                m_objects << m_effectManager->createTrash(Trash_1, pos);
+                m_objects << m_effectManager->createTrash(Trash_2, pos);
+                m_objects << m_effectManager->createTrash(Trash_2, pos);
+                m_objects << m_effectManager->createTrash(Trash_3, pos);
+                m_objects << m_effectManager->createTrash(Trash_3, pos);
+                m_objects << m_effectManager->createTrash(Trash_4, pos);
             }
             break;
 
@@ -238,6 +246,7 @@ Scenario::Scenario(const QString &name) :
     m_cameraMatrix.rotate(-90, 1, 0, 0);
 
     m_time.restart();
+    qsrand(QTime::currentTime().second() * 1000 + QTime::currentTime().msec());
 }
 
 
@@ -266,8 +275,13 @@ void Scenario::draw()
         QVector3D pos, normal;
         if (m_surface->testCollision(prevPos, m_position, 1.5f, pos, normal))
             m_position = pos;
-        if (m_collisionManager->testCollision(prevPos, m_position, 1.5f, pos, normal))
+        Object *collision = m_collisionManager->testCollision(prevPos, m_position, 1.5f, pos, normal);
+        if (collision)
+        {
+            if (collision->type() == TrashObject)
+                collision->destroy();
             m_position = pos;
+        }
     }
 
     foreach (Object *object, m_objects)

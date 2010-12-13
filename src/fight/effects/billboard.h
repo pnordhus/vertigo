@@ -32,6 +32,9 @@ public:
 
 public:
     void draw(QVector3D position, float angle, float scale, int time, const QMatrix4x4 &cameraMatrixInverted);
+
+    BoundingBox box();
+    bool intersect(const QVector3D &start, const QVector3D &dir, float &distance);
     
     int duration() const { return m_stages.count()*m_displayTime; }
     float range() const { return m_range; }

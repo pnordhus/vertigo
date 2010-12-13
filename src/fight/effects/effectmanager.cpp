@@ -18,6 +18,9 @@
 #include "effectmanager.h"
 #include "billboard.h"
 #include "projectile.h"
+#include "trash.h"
+#include "../surface/surface.h"
+#include "../collisionmanager.h"
 
 
 namespace fight {
@@ -68,15 +71,15 @@ EffectManager::~EffectManager()
 }
 
 
-Effect* EffectManager::create(Effects effect)
+Effect* EffectManager::create(Effects effect, float angle, float scale)
 {
-    return new Effect(m_scenario, getBillboard(effect), qrand()%360);
+    return new Effect(m_scenario, getBillboard(effect), angle, scale);
 }
 
 
-void EffectManager::addEffect(Effects effect, const QVector3D &position)
+void EffectManager::addEffect(Effects effect, const QVector3D &position, float angle, float scale)
 {
-    Effect *object = create(effect);
+    Effect *object = create(effect, angle, scale);
     object->setPosition(position);
     m_effects << object;
 }
@@ -88,6 +91,22 @@ void EffectManager::addProjectile(Effects effect, const QVector3D &position, con
     object->setPosition(position);
     object->setDirection(direction);
     m_effects << object;
+}
+
+
+Trash *EffectManager::createTrash(Effects trash, const QVector3D &position)
+{
+    Trash *object = new Trash(m_scenario, getBillboard(trash), qrand()%360);
+    
+    QVector3D pos = position + QVector3D(qrand()%50 - 25, qrand()%50 - 25, qrand()%25 - 25);
+    float height = m_scenario->surface()->heightAt(pos.x(), pos.y()) + 2;
+    if (pos.z() < height)
+        pos.setZ(height);
+    object->setPosition(pos);
+
+    m_scenario->collisionManager()->addObject(object);
+
+    return object;
 }
 
 

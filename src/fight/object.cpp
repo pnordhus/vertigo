@@ -24,6 +24,7 @@ namespace fight {
 Object::Object(Scenario *scenario) :
     m_scenario(scenario),
     m_enabled(true),
+    m_type(UnknownObject),
     m_static(true),
     m_collisionCache(NULL)
 {
@@ -33,6 +34,7 @@ Object::Object(Scenario *scenario) :
 Object::Object(Scenario *scenario, const QString &name, float scale) :
     m_scenario(scenario),
     m_enabled(true),
+    m_type(UnknownObject),
     m_static(true),
     m_collisionCache(NULL)
 {
@@ -99,6 +101,12 @@ void Object::draw()
 bool Object::intersect(const QVector3D &start, const QVector3D &dir, float radius, float &distance, QVector3D &normal)
 {
     return false;
+}
+
+
+void Object::destroy()
+{
+    disable();
 }
 
 

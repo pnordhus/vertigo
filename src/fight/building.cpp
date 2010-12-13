@@ -106,7 +106,8 @@ Building::Building(Scenario *scenario, const QString &name, int size, float angl
         cluster.invTransform = m.inverted();
     }
 
-    scenario->collisionManager()->addObject(BuildingObject, this);
+    m_type = BuildingObject;
+    scenario->collisionManager()->addObject(this);
 }
 
 
