@@ -26,7 +26,8 @@ Object::Object(Scenario *scenario) :
     m_enabled(true),
     m_type(UnknownObject),
     m_static(true),
-    m_collisionCache(NULL)
+    m_collisionCache(NULL),
+    m_condEnable(this)
 {
 }
 
@@ -36,7 +37,8 @@ Object::Object(Scenario *scenario, const QString &name, float scale) :
     m_enabled(true),
     m_type(UnknownObject),
     m_static(true),
-    m_collisionCache(NULL)
+    m_collisionCache(NULL),
+    m_condEnable(this)
 {
     txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
     file.setSection("cluster");
@@ -107,6 +109,7 @@ bool Object::intersect(const QVector3D &start, const QVector3D &dir, float radiu
 void Object::destroy()
 {
     disable();
+    m_eventDestroy.complete();
 }
 
 

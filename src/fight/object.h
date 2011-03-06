@@ -26,6 +26,7 @@
 #include "modulemanager.h"
 #include "scenario.h"
 #include "boundingbox.h"
+#include "condition.h"
 
 
 namespace fight {
@@ -64,6 +65,14 @@ public:
     CollisionCache *collisionCache() const { return m_collisionCache; }
     void setCollisionCache(CollisionCache *cache);
 
+    Condition* condEnable() { return &m_condEnable; }
+    ConditionEvent* eventDestroy() { return &m_eventDestroy; }
+    ConditionEvent* eventAttack() { return &m_eventAttack; }
+    ConditionEvent* eventIdentify() { return &m_eventIdentify; }
+    ConditionEvent* eventParalyze() { return &m_eventParalyze; }
+    ConditionEvent* eventFinish() { return &m_eventFinish; }
+    ConditionEvent* eventBoard() { return &m_eventBoard; }
+
 public:
     virtual void update();
     virtual void draw();
@@ -82,6 +91,14 @@ protected:
     BoundingBox m_box;
     bool m_static;
     CollisionCache *m_collisionCache;
+
+    ConditionEnable m_condEnable;
+    ConditionEvent m_eventDestroy;
+    ConditionEvent m_eventAttack;
+    ConditionEvent m_eventIdentify;
+    ConditionEvent m_eventParalyze;
+    ConditionEvent m_eventFinish;
+    ConditionEvent m_eventBoard;
 };
 
 

@@ -20,6 +20,7 @@
 
 
 #include "effect.h"
+#include "effectmanager.h"
 
 
 namespace fight {
@@ -34,6 +35,9 @@ public:
     void setPosition(const QVector3D &pos);
     bool intersect(const QVector3D &start, const QVector3D &dir, float radius, float &distance, QVector3D &normal);
     void destroy();
+
+public:
+    static Effects trashCollection[9];
 
 private:
 };

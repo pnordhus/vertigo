@@ -15,39 +15,32 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "trash.h"
-#include "billboard.h"
+#include "conditionmanager.h"
 
 
 namespace fight {
 
-Effects Trash::trashCollection[9] = {Trash_0, Trash_0, Trash_1, Trash_1, Trash_2, Trash_2, Trash_3, Trash_3, Trash_4};
 
-Trash::Trash(Scenario *scenario, Billboard *billboard, float angle) : 
-    Effect(scenario, billboard, angle, 1)
+QList<ConditionManager::DelayCompleteEntry> ConditionManager::m_entries;
+
+void ConditionManager::delayComplete(Condition *cond, int delay)
 {
-    m_type = TrashObject;
+    m_entries.append(DelayCompleteEntry());
+    m_entries.last().cond = cond;
+    m_entries.last().completeTime = QTime::currentTime().addSecs(delay);
 }
 
 
-void Trash::setPosition(const QVector3D &pos)
+void ConditionManager::update()
 {
-    Object::setPosition(pos);
-    BoundingBox box = m_billboard->box();
-    m_box = BoundingBox(pos + box.minPoint(), pos + box.maxPoint());
-}
-
-
-bool Trash::intersect(const QVector3D &start, const QVector3D &dir, float radius, float &distance, QVector3D &normal)
-{
-    return m_billboard->intersect(start - m_position, dir, distance);
-}
-
-
-void Trash::destroy()
-{
-    m_scenario->effectManager()->addEffect(Explosion_5, m_position, 0, m_box.dim().lengthSquared() > 15 ? 2 : 1);
-    Object::destroy();
+    QTime time = QTime::currentTime();
+    for (int i = 0; i < m_entries.count(); i++)
+        if (m_entries[i].completeTime <= time)
+        {
+            m_entries[i].cond->complete();
+            m_entries.removeAt(i);
+            i--;
+        }
 }
 
 

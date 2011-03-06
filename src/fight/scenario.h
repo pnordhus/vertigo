@@ -23,6 +23,7 @@
 #include "txt/desfile.h"
 #include "game/renderer.h"
 #include "object.h"
+#include "condition.h"
 
 
 namespace fight {
@@ -101,6 +102,32 @@ private:
 
     QMatrix4x4 m_cameraMatrix;
     QMatrix4x4 m_cameraMatrixInverted;
+
+    struct ConditionEntry
+    {
+        Condition *condTrigger;
+        int cond1;
+        int dep1;
+        int ref1;
+        int op;
+        int cond2;
+        int dep2;
+        int ref2;
+        int del;
+        ConditionEvent *condSignal;
+        ConditionEvent *condAttacked;
+        ConditionEvent *condIdentified;
+        ConditionEvent *condParalyzed;
+        ConditionEvent *condFinished;
+        ConditionEvent *condBoarded;
+    };
+    ConditionAutopilot m_condAutopilot;
+    ConditionFailure m_condFailure;
+    QMap<int, Condition> m_condObjectives;
+    QList<ConditionSpace *> m_condSpaces;
+
+private:
+    void initCondition(const QMap<int, ConditionEntry> &entries, int cond, int dep, int ref, Condition *condDepend);
 };
 
 
