@@ -28,14 +28,15 @@ namespace fight {
 class Projectile : public Effect
 {
 public:
-    Projectile(Billboard *billboard);
+    Projectile(Scenario *scenario, Billboard *billboard);
 
 public:
+    void setPosition(const QVector3D &pos);
     void setDirection(const QVector3D &direction);
-    void draw();
-    bool atEnd();
+    void update();
 
 private:
+    QVector3D m_originPos;
     QVector3D m_direction;
 };
 

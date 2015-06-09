@@ -19,8 +19,10 @@
 #define FIGHT_MODULE_H
 
 
-#include "vector.h"
 #include "gfx/texturemanager.h"
+#include "boundingbox.h"
+#include "collisionmesh.h"
+#include <QVector2D>
 
 
 namespace fight {
@@ -31,25 +33,22 @@ class ModulePrivate : public QSharedData
 public:
     void load(gfx::TextureManager &texMan, const QString &name);
     void draw();
+    BoundingBox box() const { return m_box; }
+    bool intersect(const QVector3D &start, const QVector3D &dir, float radius, float &distance, QVector3D &normal);
 
 private:
-    struct TexCoord
+    struct Mesh
     {
-        TexCoord() {}
-        TexCoord(float s, float t) : s(s), t(t) {}
-
-        float s;
-        float t;
+        QVector<QVector3D> vertices;
+        //QVector<QVector3D> normals;
+        QVector<QVector2D> texCoords;
+        QVector<quint16> indices;
     };
 
-    struct Face
-    {
-        gfx::Texture texture;
-        QVector<Vector> vertices;
-        QVector<TexCoord> texCoords;
-    };
-
-    QList<Face> m_faces;
+    BoundingBox m_box;
+    QList<gfx::Texture> m_textures;
+    QList<Mesh> m_meshes;
+    CollisionMesh m_collisionMesh;
 };
 
 
@@ -61,6 +60,8 @@ public:
 
 public:
     void draw();
+    BoundingBox box() const { return d->box(); }
+    bool intersect(const QVector3D &start, const QVector3D &dir, float radius, float &distance, QVector3D &normal);
 
 private:
     QExplicitlySharedDataPointer<ModulePrivate> d;
@@ -84,6 +85,12 @@ inline Module::Module(gfx::TextureManager &texMan, const QString &name) :
 inline void Module::draw()
 {
     d->draw();
+}
+
+
+inline bool Module::intersect(const QVector3D &start, const QVector3D &dir, float radius, float &distance, QVector3D &normal)
+{
+    return d->intersect(start, dir, radius, distance, normal);
 }
 
 

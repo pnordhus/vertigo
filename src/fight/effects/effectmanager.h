@@ -19,8 +19,8 @@
 #define FIGHT_EFFECTMANAGER_H
 
 
-#include "gfx/texturemanager.h"
-#include "effect.h"
+#include <QVector3D>
+#include <QMap>
 
 
 namespace fight {
@@ -98,24 +98,31 @@ enum Effects
 };
 
 
+class Scenario;
 class Billboard;
+class Effect;
+class Trash;
 
 
 class EffectManager
 {
 public:
-    EffectManager(gfx::TextureManager &texMan);
+    EffectManager(Scenario *scenario);
     ~EffectManager();
 
 public:
     Billboard* getBillboard(Effects effect) const { return m_billboards[effect]; }
-    Effect* create(Effects effect);
+    Effect* create(Effects effect, float angle = 0, float scale = 1);
+    Trash *createTrash(Effects trash, const QVector3D &position);
 
-    void addEffect(Effects effect, const QVector3D &position);
+    void addEffect(Effects effect, const QVector3D &position, float angle = 0, float scale = 1);
     void addProjectile(Effects effect, const QVector3D &position, const QVector3D &direction);
+
+    void update();
     void draw();
 
 private:
+    Scenario *m_scenario;
     QMap<Effects, Billboard*> m_billboards;
     QList<Effect *> m_effects;
 };

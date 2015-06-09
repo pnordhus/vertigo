@@ -15,22 +15,60 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "mine.h"
+#ifndef FIGHT_COLLISIONMANAGER_H
+#define FIGHT_COLLISIONMANAGER_H
+
+
+#include "boundingbox.h"
 
 
 namespace fight {
 
 
-Mine::Mine(Scenario *scenario, const QString &name) :
-    Object(scenario, name)
-{
-    txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
-    file.setSection("cluster");
-    m_base = scenario->moduleManager().get(file.value("name").toString());
+class Object;
 
-    file.setSection("size");
-    m_scale = file.value("scale").toFloat() / 16;
-}
+
+class CollisionCache
+{
+public:
+    CollisionCache();
+
+public:
+    void addObject(Object *object, bool collision, const QVector3D &position, const QVector3D &normal);
+    bool testObject(Object *object, bool &collision, QVector3D &position, QVector3D &normal);
+
+private:
+    struct CacheEntry
+    {
+        Object *object;
+        bool collision;
+        QVector3D position;
+        QVector3D normal;
+    };
+
+private:
+    QList<CacheEntry> m_entries;
+};
+
+
+class CollisionManager
+{
+public:
+    CollisionManager();
+
+public:
+    void addObject(Object *object);
+    Object* testCollision(const QVector3D &start, const QVector3D &end, float radius, QVector3D &position, QVector3D &normal);
+    Object* testCollision(Object *cacheObject, const QVector3D &end, float radius, QVector3D &position, QVector3D &normal);
+
+private:
+
+private:
+    QList<Object*> m_objects;
+};
 
 
 } // namespace fight
+
+
+#endif // FIGHT_COLLISIONMANAGER_H

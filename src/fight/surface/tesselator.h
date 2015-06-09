@@ -43,7 +43,9 @@ public:
 
 public:
     float heightAt(QVector2D pos) const;
+    float heightAt(QVector2D pos, QVector3D &normal) const;
     Element* tesselate(QRect rect, int level, QVector3D scale, QByteArray &textureMap, QByteArray &textureDir, int mapping);
+    bool intersect(const QVector3D &start, const QVector3D &end, float radius, QVector3D &position, QVector3D &normal);
 
 private:
     void InitIndices(int MaxLevel);
@@ -52,7 +54,7 @@ private:
 
 private:
     QList<BetaSpline*> m_splines;
-    short *indices;
+    quint16 *indices;
 
     Surface *m_surface;
 };

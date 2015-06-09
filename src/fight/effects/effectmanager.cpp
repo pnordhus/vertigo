@@ -18,45 +18,47 @@
 #include "effectmanager.h"
 #include "billboard.h"
 #include "projectile.h"
-#include "txt/desfile.h"
-#include <QGLContext>
+#include "trash.h"
+#include "../surface/surface.h"
+#include "../collisionmanager.h"
 
 
 namespace fight {
 
 
-EffectManager::EffectManager(gfx::TextureManager &texMan)
+EffectManager::EffectManager(Scenario *scenario) :
+    m_scenario(scenario)
 {
     txt::DesFile file;
     
     file.load("vfx:sobjects/explosio.des");
     for (int i = 0; i < 27; i++)
     {
-        Billboard *billboard = new Billboard(texMan, file, i);
+        Billboard *billboard = new Billboard(m_scenario->textureManager(), file, i);
         m_billboards.insert((Effects)(Explosion_0 + i), billboard);
     }
     file.load("vfx:sobjects/shoot.des");
     for (int i = 0; i < 9; i++)
     {
-        Billboard *billboard = new Billboard(texMan, file, i);
+        Billboard *billboard = new Billboard(m_scenario->textureManager(), file, i);
         m_billboards.insert((Effects)(Shoot_0 + i), billboard);
     }
     file.load("vfx:sobjects/debris.des");
     for (int i = 0; i < 23; i++)
     {
-        Billboard *billboard = new Billboard(texMan, file, i);
+        Billboard *billboard = new Billboard(m_scenario->textureManager(), file, i);
         m_billboards.insert((Effects)(Debris_0 + i), billboard);
     }
     file.load("vfx:sobjects/trash.des");
     for (int i = 0; i < 5; i++)
     {
-        Billboard *billboard = new Billboard(texMan, file, i);
+        Billboard *billboard = new Billboard(m_scenario->textureManager(), file, i);
         m_billboards.insert((Effects)(Trash_0 + i), billboard);
     }
     file.load("vfx:sobjects/bubble.des");
     for (int i = 0; i < 3; i++)
     {
-        Billboard *billboard = new Billboard(texMan, file, i);
+        Billboard *billboard = new Billboard(m_scenario->textureManager(), file, i);
         m_billboards.insert((Effects)(Bubble_0 + i), billboard);
     }
 }
@@ -69,15 +71,15 @@ EffectManager::~EffectManager()
 }
 
 
-Effect* EffectManager::create(Effects effect)
+Effect* EffectManager::create(Effects effect, float angle, float scale)
 {
-    return new Effect(getBillboard(effect), 0);
+    return new Effect(m_scenario, getBillboard(effect), angle, scale);
 }
 
 
-void EffectManager::addEffect(Effects effect, const QVector3D &position)
+void EffectManager::addEffect(Effects effect, const QVector3D &position, float angle, float scale)
 {
-    Effect *object = create(effect);
+    Effect *object = create(effect, angle, scale);
     object->setPosition(position);
     m_effects << object;
 }
@@ -85,26 +87,48 @@ void EffectManager::addEffect(Effects effect, const QVector3D &position)
 
 void EffectManager::addProjectile(Effects effect, const QVector3D &position, const QVector3D &direction)
 {
-    Projectile *object = new Projectile(getBillboard(effect));
+    Projectile *object = new Projectile(m_scenario, getBillboard(effect));
     object->setPosition(position);
     object->setDirection(direction);
     m_effects << object;
 }
 
 
-void EffectManager::draw()
+Trash *EffectManager::createTrash(Effects trash, const QVector3D &position)
 {
+    Trash *object = new Trash(m_scenario, getBillboard(trash), qrand()%360);
+    
+    QVector3D pos = position + QVector3D(qrand()%50 - 25, qrand()%50 - 25, qrand()%25 - 25);
+    float height = m_scenario->surface()->heightAt(pos.x(), pos.y()) + 2;
+    if (pos.z() < height)
+        pos.setZ(height);
+    object->setPosition(pos);
+
+    m_scenario->collisionManager()->addObject(object);
+
+    return object;
+}
+
+
+void EffectManager::update()
+{
+    foreach (Effect *effect, m_effects)
+        effect->update();
     for (int i = 0; i < m_effects.count(); i++)
-    {
-        if (m_effects[i]->atEnd())
+        if (!m_effects[i]->isEnabled())
         {
             delete m_effects[i];
             m_effects.removeAt(i);
             i--;
             continue;
         }
-        m_effects[i]->draw();
-    }
+}
+
+
+void EffectManager::draw()
+{
+    foreach (Effect *effect, m_effects)
+        effect->draw();
 }
 
 

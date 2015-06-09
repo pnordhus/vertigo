@@ -15,22 +15,35 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "mine.h"
+#ifndef FIGHT_TRASH_H
+#define FIGHT_TRASH_H
+
+
+#include "effect.h"
+#include "effectmanager.h"
 
 
 namespace fight {
 
 
-Mine::Mine(Scenario *scenario, const QString &name) :
-    Object(scenario, name)
+class Trash : public Effect
 {
-    txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
-    file.setSection("cluster");
-    m_base = scenario->moduleManager().get(file.value("name").toString());
+public:
+    Trash(Scenario *scenario, Billboard *billboard, float angle);
 
-    file.setSection("size");
-    m_scale = file.value("scale").toFloat() / 16;
-}
+public:
+    void setPosition(const QVector3D &pos);
+    bool intersect(const QVector3D &start, const QVector3D &dir, float radius, float &distance, QVector3D &normal);
+    void destroy();
+
+public:
+    static Effects trashCollection[9];
+
+private:
+};
 
 
 } // namespace fight
+
+
+#endif // FIGHT_TRASH_H

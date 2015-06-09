@@ -15,22 +15,48 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "mine.h"
+#ifndef FIGHT_COLLISIONMESH_H
+#define FIGHT_COLLISIONMESH_H
+
+
+#include <QVector>
+#include <QVector3D>
+#include <QVector4D>
 
 
 namespace fight {
 
 
-Mine::Mine(Scenario *scenario, const QString &name) :
-    Object(scenario, name)
+class CollisionMesh
 {
-    txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
-    file.setSection("cluster");
-    m_base = scenario->moduleManager().get(file.value("name").toString());
+public:
+    CollisionMesh();
 
-    file.setSection("size");
-    m_scale = file.value("scale").toFloat() / 16;
-}
+public:
+    void addTriangles(const QVector<QVector3D> &vertices, const QVector<quint16> &indices);
+    bool intersect(const QVector3D &start, const QVector3D &dir, float radius, float &distance, QVector3D &normal);
+
+    static bool intersectSphereLine(const QVector3D &point, const QVector3D &dir, float radiusSquared, float &t);
+
+private:
+    struct Triangle
+    {
+        QVector3D vertices[3];
+        QVector3D u;
+        QVector3D v;
+        QVector4D plane;
+        float uu, uv, vv, invD;
+        QVector3D lineDir[3];
+    };
+
+    bool isPointInsideTriangle(const Triangle &tri, const QVector3D &point);
+
+private:
+    QList<Triangle> m_triangles;
+};
 
 
 } // namespace fight
+
+
+#endif // FIGHT_COLLISIONMESH_H

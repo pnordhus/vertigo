@@ -15,22 +15,34 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "mine.h"
+#ifndef CONDITIONMANAGER_H
+#define CONDITIONMANAGER_H
+
+
+#include "object.h"
 
 
 namespace fight {
 
 
-Mine::Mine(Scenario *scenario, const QString &name) :
-    Object(scenario, name)
+class ConditionManager
 {
-    txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
-    file.setSection("cluster");
-    m_base = scenario->moduleManager().get(file.value("name").toString());
+public:
+    static void delayComplete(Condition *cond, int delay);
+    static void update();
 
-    file.setSection("size");
-    m_scale = file.value("scale").toFloat() / 16;
+private:
+    struct DelayCompleteEntry
+    {
+        Condition *cond;
+        QTime completeTime;
+    };
+
+    static QList<DelayCompleteEntry> m_entries;
+};
+
+
 }
 
 
-} // namespace fight
+#endif // CONDITIONMANAGER_H

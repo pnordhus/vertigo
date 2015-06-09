@@ -31,10 +31,11 @@ class Surface;
 class Building : public Object
 {
 public:
-    Building(ModuleManager &modMan, const QString &name, int size, float angle, Surface *surface, int x, int y, int refx, int refy);
+    Building(Scenario *scenario, const QString &name, int size, float angle, int x, int y, int refx, int refy);
 
 public:
     void draw();
+    bool intersect(const QVector3D &start, const QVector3D &dir, float radius, float &distance, QVector3D &normal);
 
 private:
     struct Cluster
@@ -43,6 +44,8 @@ private:
         QVector3D offset;
         float scale;
         float angle;
+        QMatrix4x4 transform;
+        QMatrix4x4 invTransform;
     };
 
     QList<Cluster> m_clusters;

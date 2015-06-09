@@ -17,27 +17,27 @@
 
 #include "building.h"
 #include "surface/surface.h"
-#include "txt/desfile.h"
-#include <QGLContext>
+#include "collisionmanager.h"
 
 
 namespace fight {
 
 
-Building::Building(ModuleManager &modMan, const QString &name, int size, float angle, Surface *surface, int x, int y, int refx, int refy) :
-    Object(modMan, name),
+Building::Building(Scenario *scenario, const QString &name, int size, float angle, int x, int y, int refx, int refy) :
+    Object(scenario, name),
     m_size(size),
     m_angle(angle)
 {
     txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
 
     int i = 0;
+    QVector3D scale = scenario->surface()->scale();
 
     while (file.sections().contains(QString("cluster%1").arg(i))) {
         file.setSection(QString("cluster%1").arg(i));
 
         Cluster cluster;
-        cluster.module = modMan.get(file.value("base").toString());
+        cluster.module = scenario->moduleManager().get(file.value("base").toString());
 
         file.setSection(QString("size%1").arg(i));
         cluster.scale = file.value("scale").toFloat() * 16;
@@ -47,7 +47,7 @@ Building::Building(ModuleManager &modMan, const QString &name, int size, float a
         int offsetY = file.value("OffsetY").toInt();
         cluster.offset.setX(offsetX);
         cluster.offset.setY(offsetY);
-        cluster.offset *= surface->scale();
+        cluster.offset *= scale;
 
         int clusterX = x + offsetX;
         int clusterY = y + offsetY - size;
@@ -60,14 +60,14 @@ Building::Building(ModuleManager &modMan, const QString &name, int size, float a
             if (file.value("SurfaceLifting").toString() == "p")
             {
                 if (heightRef == 0)
-                    surface->setHeight(clusterX, clusterY, refx, refy, 0);
+                    scenario->surface()->setHeight(clusterX, clusterY, refx, refy, 0);
                 else
                 {
                     qDebug("Untested: HeightReference = -1");
-                    surface->setHeight(clusterX, clusterY, clusterX, clusterY, -4); // TODO: test
+                    scenario->surface()->setHeight(clusterX, clusterY, clusterX, clusterY, -4); // TODO: test
                 }
             }
-            cluster.offset.setZ(surface->heightAt((clusterX + 0.5f)*surface->scale().x(), (clusterY + 0.5f)*surface->scale().y()));
+            cluster.offset.setZ(scenario->surface()->heightAt((clusterX + 0.5f)*scale.x(), (clusterY + 0.5f)*scale.y()));
         }
 
         switch (file.value("cardinal").toString().toAscii()[0]) {
@@ -88,6 +88,26 @@ Building::Building(ModuleManager &modMan, const QString &name, int size, float a
         m_clusters << cluster;
         i++;
     }
+
+    QMutableListIterator<Cluster> it(m_clusters);
+    while (it.hasNext()) 
+    {
+        Cluster &cluster = it.next();
+
+        QMatrix4x4 m;
+        m.translate((x + 0.5f)*scale.x(), (y + 0.5f - size)*scale.y(), 0);
+        m.rotate(m_angle, 0, 0, 1);
+        m.translate(cluster.offset.x(), cluster.offset.y(), cluster.offset.z());
+        m.scale(cluster.scale);
+        m.rotate(cluster.angle, 0, 0, 1);
+        m_box.add(cluster.module.box().transform(m));
+        
+        cluster.transform = m;
+        cluster.invTransform = m.inverted();
+    }
+
+    m_type = BuildingObject;
+    scenario->collisionManager()->addObject(this);
 }
 
 
@@ -109,6 +129,30 @@ void Building::draw()
         glPopMatrix();
     }
     glPopMatrix();
+}
+
+
+bool Building::intersect(const QVector3D &start, const QVector3D &dir, float radius, float &distance, QVector3D &normal)
+{
+    bool collision = false;
+    QMutableListIterator<Cluster> it(m_clusters);
+    while (it.hasNext()) 
+    {
+        Cluster &cluster = it.next();
+        float d;
+        QVector3D norm;
+        if (cluster.module.intersect(cluster.invTransform * start, (cluster.invTransform * QVector4D(dir, 0)).toVector3D()*cluster.scale, radius/cluster.scale, d, norm))
+        {
+            d *= cluster.scale;
+            if (!collision || distance > d)
+            {
+                distance = d;
+                normal = (cluster.transform * QVector4D(normal, 0)).toVector3D()/cluster.scale;
+                collision = true;
+            }
+        }
+    }
+    return collision;
 }
 
 

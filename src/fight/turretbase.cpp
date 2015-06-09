@@ -17,21 +17,19 @@
 
 #include "turret.h"
 #include "turretbase.h"
-#include "txt/desfile.h"
-#include <QGLContext>
 
 
 namespace fight {
 
 
-TurretBase::TurretBase(ModuleManager &modMan, const QString &name) :
-    Object(modMan, name)
+TurretBase::TurretBase(Scenario *scenario, const QString &name) :
+    Object(scenario, name)
 {
     txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
     file.setSection("gunturret");
     if (!file.contains("name"))
         file.setSection("torpedoturret");
-    m_turret = new Turret(modMan, file.value("name").toString());
+    m_turret = new Turret(scenario->moduleManager(), file.value("name").toString());
 
     m_turretPosition.setX(file.value("RelativePositionX").toFloat());
     m_turretPosition.setY(file.value("RelativePositionY").toFloat());

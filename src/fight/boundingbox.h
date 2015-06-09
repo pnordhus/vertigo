@@ -15,22 +15,41 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "mine.h"
+#ifndef FIGHT_BOUNDINGBOX_H
+#define FIGHT_BOUNDINGBOX_H
+
+
+#include <QVector3D>
+#include <QMatrix4x4>
 
 
 namespace fight {
 
 
-Mine::Mine(Scenario *scenario, const QString &name) :
-    Object(scenario, name)
+class BoundingBox
 {
-    txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
-    file.setSection("cluster");
-    m_base = scenario->moduleManager().get(file.value("name").toString());
+public:
+    BoundingBox();
+    BoundingBox(const BoundingBox &box);
+    BoundingBox(const QVector3D &min, const QVector3D &max);
 
-    file.setSection("size");
-    m_scale = file.value("scale").toFloat() / 16;
-}
+public:
+    const QVector3D& minPoint() const { return m_min; }
+    const QVector3D& maxPoint() const { return m_max; }
+    QVector3D dim() const { return m_max - m_min; }
+    BoundingBox transform(QMatrix4x4 m);
+
+    void add(const QVector3D &point);
+    void add(const BoundingBox &box);
+    bool test(const QVector3D &center, float radius) const;
+
+public:
+    QVector3D m_min;
+    QVector3D m_max;
+};
 
 
 } // namespace fight
+
+
+#endif // FIGHT_BOUNDINGBOX_H

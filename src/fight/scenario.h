@@ -19,17 +19,20 @@
 #define FIGHT_SCENARIO_H
 
 
-#include "object.h"
-#include "effects/effectmanager.h"
-#include "game/renderer.h"
-#include "txt/desfile.h"
 #include <QTime>
+#include "txt/desfile.h"
+#include "game/renderer.h"
+#include "object.h"
+#include "condition.h"
 
 
 namespace fight {
 
 
+class Object;
 class Surface;
+class EffectManager;
+class CollisionManager;
 
 
 class Scenario : public game::Renderer
@@ -42,6 +45,15 @@ public:
 
 signals:
     void success();
+
+public:
+    const QVector3D& position() const { return m_position; }
+    const QMatrix4x4& cameraMatrixInverted() const { return m_cameraMatrixInverted; }
+    Surface *surface() const { return m_surface; }
+    gfx::TextureManager& textureManager() { return m_textureManager; }
+    ModuleManager& moduleManager() { return m_moduleManager; }
+    EffectManager* effectManager() { return m_effectManager; }
+    CollisionManager* collisionManager() { return m_collisionManager; }
 
 protected:
     void draw();
@@ -74,7 +86,8 @@ private:
     txt::DesFile m_file;
     gfx::TextureManager m_textureManager;
     ModuleManager m_moduleManager;
-    EffectManager m_effectManager;
+    EffectManager *m_effectManager;
+    CollisionManager *m_collisionManager;
     QList<Object*> m_objects;
     QList<Object*> m_lightSources;
 
@@ -88,6 +101,33 @@ private:
     float m_backwards;
 
     QMatrix4x4 m_cameraMatrix;
+    QMatrix4x4 m_cameraMatrixInverted;
+
+    struct ConditionEntry
+    {
+        Condition *condTrigger;
+        int cond1;
+        int dep1;
+        int ref1;
+        int op;
+        int cond2;
+        int dep2;
+        int ref2;
+        int del;
+        ConditionEvent *condSignal;
+        ConditionEvent *condAttacked;
+        ConditionEvent *condIdentified;
+        ConditionEvent *condParalyzed;
+        ConditionEvent *condFinished;
+        ConditionEvent *condBoarded;
+    };
+    ConditionAutopilot m_condAutopilot;
+    ConditionFailure m_condFailure;
+    QMap<int, Condition> m_condObjectives;
+    QList<ConditionSpace *> m_condSpaces;
+
+private:
+    void initCondition(const QMap<int, ConditionEntry> &entries, int cond, int dep, int ref, Condition *condDepend);
 };
 
 

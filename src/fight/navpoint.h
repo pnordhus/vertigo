@@ -20,7 +20,6 @@
 
 
 #include "object.h"
-#include <QTime>
 
 
 namespace fight {
@@ -29,7 +28,7 @@ namespace fight {
 class NavPoint : public Object
 {
 public:
-    NavPoint(ModuleManager &modMan, int num);
+    NavPoint(Scenario *scenario, int num);
 
 public:
     void draw();

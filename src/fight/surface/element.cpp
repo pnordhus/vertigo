@@ -29,11 +29,15 @@ Element::Element(Surface *surface, QRect rect) :
     m_maxZ(-1e3),
     m_minZ(1e3)
 {
+    m_heights = new float[rect.width()*rect.height()];
+    for (int i = 0; i < rect.width()*rect.height(); i++)
+        m_heights[i] = -1e3;
 }
 
 
 Element::~Element()
 {
+    delete m_heights;
 }
 
 
@@ -54,10 +58,28 @@ void Element::addVertex(int textureId, QVector3D position, QVector3D normal, QVe
         m_maxZ = position.z();
     if (m_minZ > position.z())
         m_minZ = position.z();
+
+    int ix, iy;
+    ix = position.x()/m_surface->scale().x() + 1e-3 - m_rect.x();
+    iy = position.y()/m_surface->scale().y() + 1e-3 - m_rect.y();
+    if (ix >= 0 && ix < m_rect.width() && iy >= 0 && iy < m_rect.height() && m_heights[iy*m_rect.width() + ix] < position.z())
+        m_heights[iy*m_rect.width() + ix] = position.z();
+    ix = position.x()/m_surface->scale().x() - 1e-3 - m_rect.x();
+    iy = position.y()/m_surface->scale().y() + 1e-3 - m_rect.y();
+    if (ix >= 0 && ix < m_rect.width() && iy >= 0 && iy < m_rect.height() && m_heights[iy*m_rect.width() + ix] < position.z())
+        m_heights[iy*m_rect.width() + ix] = position.z();
+    ix = position.x()/m_surface->scale().x() + 1e-3 - m_rect.x();
+    iy = position.y()/m_surface->scale().y() - 1e-3 - m_rect.y();
+    if (ix >= 0 && ix < m_rect.width() && iy >= 0 && iy < m_rect.height() && m_heights[iy*m_rect.width() + ix] < position.z())
+        m_heights[iy*m_rect.width() + ix] = position.z();
+    ix = position.x()/m_surface->scale().x() - 1e-3 - m_rect.x();
+    iy = position.y()/m_surface->scale().y() - 1e-3 - m_rect.y();
+    if (ix >= 0 && ix < m_rect.width() && iy >= 0 && iy < m_rect.height() && m_heights[iy*m_rect.width() + ix] < position.z())
+        m_heights[iy*m_rect.width() + ix] = position.z();
 }
 
 
-void Element::addTriangle(int textureId, short a, short b, short c)
+void Element::addTriangle(int textureId, quint16 a, quint16 b, quint16 c)
 {
     m_subsets[textureId].indices << a << b << c;
 }
@@ -66,6 +88,17 @@ void Element::addTriangle(int textureId, short a, short b, short c)
 QVector3D Element::center() const
 {
     return QVector3D(m_rect.center().x() * m_surface->scale().x(), m_rect.center().y() * m_surface->scale().y(), m_minZ + (m_maxZ - m_minZ)/2);
+}
+
+
+bool Element::testCollision(const QVector3D &center, float radius)
+{
+    int ix = center.x()/m_surface->scale().x() - m_rect.x();
+    int iy = center.y()/m_surface->scale().y() - m_rect.y();
+    if (ix >= 0 && ix < m_rect.width() && iy >= 0 && iy < m_rect.height() &&
+        m_heights[iy*m_rect.width() + ix] > center.z() - radius)
+        return true;
+    return false;
 }
 
 

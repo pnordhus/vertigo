@@ -42,12 +42,13 @@ public:
 public:
     int numVertices(int textureId);
     void addVertex(int textureId, QVector3D position, QVector3D normal, QVector2D texCoords);
-    void addTriangle(int textureId, short a, short b, short c);
+    void addTriangle(int textureId, quint16 a, quint16 b, quint16 c);
 
     void draw();
     float maxZ() const { return m_maxZ; }
     float minZ() const { return m_minZ; }
     QVector3D center() const;
+    bool testCollision(const QVector3D &center, float radius);
 
 private:
     struct ElementSubset
@@ -55,7 +56,7 @@ private:
         QVector<QVector3D> vertices;
         QVector<QVector3D> normals;
         QVector<QVector2D> texCoords;
-        QVector<short> indices;
+        QVector<quint16> indices;
     };
 
 private:
@@ -63,6 +64,7 @@ private:
     QRect m_rect;
     float m_maxZ;
     float m_minZ;
+    float *m_heights;
 
     QMap<int, ElementSubset> m_subsets;
 };

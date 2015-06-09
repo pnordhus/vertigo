@@ -19,37 +19,86 @@
 #define FIGHT_OBJECT_H
 
 
-#include "modulemanager.h"
 #include <QVector3D>
+#include <QVector2D>
 #include <QMatrix4x4>
+#include <QGLContext>
+#include "modulemanager.h"
+#include "scenario.h"
+#include "boundingbox.h"
+#include "condition.h"
 
 
 namespace fight {
 
 
+class Scenario;
+class CollisionCache;
+
+
+enum ObjectType
+{
+    UnknownObject,
+    BuildingObject,
+    TrashObject,
+};
+
+
 class Object
 {
 public:
-    Object();
-    Object(ModuleManager &modMan, const QString &name, float scale = 1/32.0f);
-    virtual ~Object() {}
+    Object(Scenario *scenario);
+    Object(Scenario *scenario, const QString &name, float scale = 1/32.0f);
+    ~Object();
 
 public:
-    virtual void draw();
-    void setPosition(const QVector3D &pos);
+    void setEnabled(bool);
+    void enable();
+    void disable();
+    bool isEnabled() const { return m_enabled; }
+    virtual void setPosition(const QVector3D &pos);
     QVector3D position() const { return m_position; }
 
+    ObjectType type() const { return m_type; }
+    const BoundingBox& box() const { return m_box; }
+    bool isStatic() const { return m_static; }
+    CollisionCache *collisionCache() const { return m_collisionCache; }
+    void setCollisionCache(CollisionCache *cache);
+
+    Condition* condEnable() { return &m_condEnable; }
+    ConditionEvent* eventDestroy() { return &m_eventDestroy; }
+    ConditionEvent* eventAttack() { return &m_eventAttack; }
+    ConditionEvent* eventIdentify() { return &m_eventIdentify; }
+    ConditionEvent* eventParalyze() { return &m_eventParalyze; }
+    ConditionEvent* eventFinish() { return &m_eventFinish; }
+    ConditionEvent* eventBoard() { return &m_eventBoard; }
+
 public:
-    static void setCamera(const QMatrix4x4 &cameraMatrix);
+    virtual void update();
+    virtual void draw();
+    virtual bool intersect(const QVector3D &start, const QVector3D &dir, float radius, float &distance, QVector3D &normal);
+    virtual void destroy();
 
 protected:
+    Scenario *m_scenario;
+
+    bool m_enabled;
     Module m_base;
     float m_scale;
     QVector3D m_position;
 
-protected:
-    static QMatrix4x4 m_cameraMatrix;
-    static QMatrix4x4 m_cameraMatrixInverted;
+    ObjectType m_type;
+    BoundingBox m_box;
+    bool m_static;
+    CollisionCache *m_collisionCache;
+
+    ConditionEnable m_condEnable;
+    ConditionEvent m_eventDestroy;
+    ConditionEvent m_eventAttack;
+    ConditionEvent m_eventIdentify;
+    ConditionEvent m_eventParalyze;
+    ConditionEvent m_eventFinish;
+    ConditionEvent m_eventBoard;
 };
 
 

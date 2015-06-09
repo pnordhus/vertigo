@@ -16,36 +16,77 @@
  ***************************************************************************/
 
 #include "object.h"
-#include "txt/desfile.h"
-#include <QGLContext>
 
 
 namespace fight {
 
 
-QMatrix4x4 Object::m_cameraMatrix;
-QMatrix4x4 Object::m_cameraMatrixInverted;
-
-
-Object::Object()
+Object::Object(Scenario *scenario) :
+    m_scenario(scenario),
+    m_enabled(true),
+    m_type(UnknownObject),
+    m_static(true),
+    m_collisionCache(NULL),
+    m_condEnable(this)
 {
 }
 
 
-Object::Object(ModuleManager &modMan, const QString &name, float scale)
+Object::Object(Scenario *scenario, const QString &name, float scale) :
+    m_scenario(scenario),
+    m_enabled(true),
+    m_type(UnknownObject),
+    m_static(true),
+    m_collisionCache(NULL),
+    m_condEnable(this)
 {
     txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
     file.setSection("cluster");
-    m_base = modMan.get(file.value("base").toString());
+    m_base = scenario->moduleManager().get(file.value("base").toString());
 
     file.setSection("size");
     m_scale = file.value("scale").toFloat() * scale;
 }
 
 
+Object::~Object()
+{
+    delete m_collisionCache;
+}
+
+
+void Object::setEnabled(bool enabled)
+{
+    m_enabled = enabled;
+}
+
+
+void Object::enable()
+{
+    m_enabled = true;
+}
+
+
+void Object::disable()
+{
+    m_enabled = false;
+}
+
+
+void Object::setCollisionCache(CollisionCache *cache)
+{
+    m_collisionCache = cache;
+}
+
+
 void Object::setPosition(const QVector3D &pos)
 {
     m_position = pos;
+}
+
+
+void Object::update()
+{
 }
 
 
@@ -59,10 +100,16 @@ void Object::draw()
 }
 
 
-void Object::setCamera(const QMatrix4x4 &cameraMatrix)
+bool Object::intersect(const QVector3D &start, const QVector3D &dir, float radius, float &distance, QVector3D &normal)
 {
-    m_cameraMatrix = cameraMatrix;
-    m_cameraMatrixInverted = cameraMatrix.inverted();
+    return false;
+}
+
+
+void Object::destroy()
+{
+    disable();
+    m_eventDestroy.complete();
 }
 
 

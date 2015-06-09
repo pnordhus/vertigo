@@ -15,21 +15,39 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "mine.h"
+#include "trash.h"
+#include "billboard.h"
 
 
 namespace fight {
 
+Effects Trash::trashCollection[9] = {Trash_0, Trash_0, Trash_1, Trash_1, Trash_2, Trash_2, Trash_3, Trash_3, Trash_4};
 
-Mine::Mine(Scenario *scenario, const QString &name) :
-    Object(scenario, name)
+Trash::Trash(Scenario *scenario, Billboard *billboard, float angle) : 
+    Effect(scenario, billboard, angle, 1)
 {
-    txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
-    file.setSection("cluster");
-    m_base = scenario->moduleManager().get(file.value("name").toString());
+    m_type = TrashObject;
+}
 
-    file.setSection("size");
-    m_scale = file.value("scale").toFloat() / 16;
+
+void Trash::setPosition(const QVector3D &pos)
+{
+    Object::setPosition(pos);
+    BoundingBox box = m_billboard->box();
+    m_box = BoundingBox(pos + box.minPoint(), pos + box.maxPoint());
+}
+
+
+bool Trash::intersect(const QVector3D &start, const QVector3D &dir, float radius, float &distance, QVector3D &normal)
+{
+    return m_billboard->intersect(start - m_position, dir, distance);
+}
+
+
+void Trash::destroy()
+{
+    m_scenario->effectManager()->addEffect(Explosion_5, m_position, 0, m_box.dim().lengthSquared() > 15 ? 2 : 1);
+    Object::destroy();
 }
 
 

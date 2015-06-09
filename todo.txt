@@ -1,0 +1,23 @@
+
+Phisics
+- Currents
+
+AI
+- otyp  5 - escort
+- otyp 10 - boarding
+- otyp 11 - self-destruct
+
+HUD
+- Messages
+- Friendly fire messages
+
+Effects
+- Bubbles
+- Explosions: debris, dead bodies
+- Dust clouds behind crawlers and tanks
+- Torpedo trails
+- Cluster torpedo
+
+Sound effects
+- Sound of nearby engines
+- Collision sound
