@@ -34,7 +34,8 @@ Widget::Widget(Widget *parent) :
 
 Widget::~Widget()
 {
-    qDeleteAll(m_children);
+    QList<Widget*> children = m_children;
+    qDeleteAll(children);
     setParentWidget(NULL);
 }
 
