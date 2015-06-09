@@ -498,8 +498,7 @@ void Chapter::playMovies()
     } else {
         sfx::SoundSystem::get()->pauseAll();
         Q_ASSERT(m_movie == NULL);
-        m_movie = new Movie;
-        connect(m_movie, SIGNAL(finished()), SLOT(movieFinished()));
+        m_movie = new Movie([this]() { movieFinished(); });
         m_movie->play(m_movies.takeFirst());
         emit setRenderer(m_movie);
     }

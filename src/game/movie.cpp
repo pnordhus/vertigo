@@ -23,8 +23,9 @@
 namespace game {
 
 
-Movie::Movie() :
-    m_pause(false)
+Movie::Movie(std::function<void()> &&funcFinished) :
+    m_pause(false),
+    m_funcFinished(std::move(funcFinished))
 {
     hideCursor();
 }
@@ -60,7 +61,7 @@ void Movie::play(const QString &filename)
 void Movie::draw()
 {
     if (m_video.atEnd() && !m_stream.isPlaying()) {
-        emit finished();
+        m_funcFinished();
     } else {
         if (!m_pause) {
             if (m_stream.queued() < 2 || m_stream.processed() > 0) {
@@ -85,8 +86,9 @@ void Movie::draw()
 
 void Movie::keyPressEvent(QKeyEvent *event)
 {
-    if (event->key() == Qt::Key_Escape)
-        emit finished();
+    if (event->key() == Qt::Key_Escape) {
+        m_funcFinished();
+    }
 
     if (event->key() == Qt::Key_Space) {
         m_pause = !m_pause;

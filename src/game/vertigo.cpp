@@ -134,8 +134,7 @@ void Vertigo::startGame(const QString &name)
     m_name = name;
 
     Q_ASSERT(m_intro == NULL);
-    m_intro = new Movie;
-    connect(m_intro, SIGNAL(finished()), SLOT(introFinished()));
+    m_intro = new Movie([this]() { introFinished(); });
 
     m_window->setRenderer(m_intro);
     m_intro->play("gfx:mvi/film/d02.mvi");

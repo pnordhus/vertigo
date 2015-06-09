@@ -24,19 +24,15 @@
 #include "gfx/texture.h"
 #include "gfx/video.h"
 
+#include <functional>
 
 namespace game {
 
 
 class Movie : public Renderer
 {
-    Q_OBJECT
-
 public:
-    Movie();
-
-signals:
-    void finished();
+    Movie(std::function<void()> &&funcFinished);
 
 public:
     void play(const QString &filename);
@@ -53,6 +49,7 @@ private:
     gfx::Texture m_texture;
     sfx::Stream m_stream;
     bool m_pause;
+    std::function<void()> m_funcFinished;
 };
 
 
