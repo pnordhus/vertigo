@@ -33,8 +33,6 @@ class Boat;
 
 class Depot : public ui::Frame
 {
-    Q_OBJECT
-
 private:
     enum State { Flipping, Loading, Ready, Repair };
     enum LoadingState { Arrows, List1, List2 };
@@ -43,7 +41,7 @@ public:
     Depot();
     ~Depot();
 
-private slots:
+private:
     void flip();
     void loadMounting(int index);
     void itemListClicked1(int index);
@@ -52,8 +50,6 @@ private slots:
     void buy();
     void sell();
     void repair();
-
-private:
     void updateInfo();
     void updateCredits();
     void updateButtons();

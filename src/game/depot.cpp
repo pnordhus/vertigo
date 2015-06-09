@@ -144,13 +144,11 @@ Depot::Depot() :
     updateButtons();
 
 
-    m_itemList1 = new ui::ItemList(m_backgroundLabel, true);
+    m_itemList1 = new ui::ItemList([this](int n) { itemListClicked1(n); }, m_backgroundLabel, true);
     m_itemList1->setPosition(8, 8);
-    connect(m_itemList1, SIGNAL(clicked(int)), SLOT(itemListClicked1(int)));
 
-    m_itemList2 = new ui::ItemList(m_backgroundLabel, false);
+    m_itemList2 = new ui::ItemList([this](int n) { itemListClicked2(n); }, m_backgroundLabel, false);
     m_itemList2->setPosition(8, 293);
-    connect(m_itemList2, SIGNAL(clicked(int)), SLOT(itemListClicked2(int)));
 
     for (int i = 0; i < m_boat->mountings().count(); i++)
     {
@@ -294,11 +292,13 @@ void Depot::updateInfo()
     m_itemTexture.createEmpty(m_videoItem.width(), m_videoItem.height(), gfx::Texture::RGBA);
 
     int price = Items::getDepotPrice(item->model);
-    if (m_selectedList == 2)
-        if (m_boat->canSell(item->model, m_boat->mountings().at(m_mounting)->name))
+    if (m_selectedList == 2) {
+        if (m_boat->canSell(item->model, m_boat->mountings().at(m_mounting)->name)) {
             m_lblItemPrice->setText(txt::StringTable::get(txt::Depot_Bid) + QString("%1").arg(price));
-        else
+        } else {
             m_lblItemPrice->setText(txt::StringTable::get(txt::Depot_Value) + QString("%1").arg(price));
+        }
+    }
     if (m_selectedList == 1)
     {
         int oldModel;

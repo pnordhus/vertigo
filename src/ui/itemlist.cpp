@@ -23,12 +23,13 @@
 namespace ui {
 
 
-ItemList::ItemList(Widget *parent, bool showChecks, int maxItems) :
+ItemList::ItemList(std::function<void(int)> &&funcClicked, Widget *parent, bool showChecks, int maxItems) :
     Widget(parent),
     m_items(0),
     m_firstItem(0),
     m_selectedItem(-1),
-    m_offset(0)
+    m_offset(0),
+    m_funcClicked(std::move(funcClicked))
 {
     setSize(539, 48);
 
@@ -175,7 +176,7 @@ bool ItemList::mousePressEvent(const QPoint &pos, Qt::MouseButton button)
         int index = m_firstItem + (pos.x() - rect.x())/54;
         if (index >= 0 && index < m_items)
         {
-            emit clicked(index);
+            m_funcClicked(index);
             return true;
         }
     }

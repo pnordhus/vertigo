@@ -154,7 +154,6 @@ set(MOC_SOURCES
     game/briefing.h
     game/chapter.h
     game/departure.h
-    game/depot.h
     game/desktop.h
     game/dialog.h
     game/encom.h
@@ -168,7 +167,6 @@ set(MOC_SOURCES
     game/window.h
 
     ui/frame.h
-    ui/itemlist.h
     ui/widget.h
 )
 

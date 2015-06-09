@@ -34,10 +34,8 @@ namespace ui {
 
 class ItemList : public Widget
 {
-    Q_OBJECT
-
 public:
-    ItemList(Widget *parent, bool showChecks, int maxItems = 31);
+    ItemList(std::function<void(int)> &&funcClicked, Widget *parent, bool showChecks, int maxItems = 31);
     ~ItemList();
 
 public:
@@ -45,9 +43,6 @@ public:
     void addItem(const gfx::Image &icon, bool red, bool green);
     void selectItem(int index);
     void clear();
-
-signals:
-    void clicked(int);
 
 private:
     void draw();
@@ -73,6 +68,7 @@ private:
     int m_selectedItem;
     int m_offset;
     QTime m_time;
+    std::function<void(int)> m_funcClicked;
 };
 
 
