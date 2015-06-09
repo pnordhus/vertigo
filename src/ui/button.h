@@ -18,22 +18,16 @@
 #ifndef UI_BUTTON_H
 #define UI_BUTTON_H
 
-
 #include "label.h"
 
+#include <functional>
 
 namespace ui {
 
-
 class Button : public Label
 {
-    Q_OBJECT
-
 public:
-    Button(Widget *parent = NULL);
-
-signals:
-    void clicked();
+    Button(std::function<void()> &&funcClicked, Widget *parent = NULL);
 
 public:
     void setOffset(int offset);
@@ -50,10 +44,9 @@ private:
     int m_offset;
     gfx::Texture m_pressedTexture;
     gfx::Texture m_disabledTexture;
+    std::function<void()> m_funcClicked;
 };
 
-
 } // namespace ui
-
 
 #endif // UI_BUTTON_H

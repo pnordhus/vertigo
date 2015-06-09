@@ -112,39 +112,34 @@ Depot::Depot() :
     m_boatLabel->setPosition(16, 75);
 
 
-    m_btnFlip = new ui::Button(m_backgroundLabel);
+    m_btnFlip = new ui::Button([this]() { flip(); }, m_backgroundLabel);
     m_btnFlip->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdfliu.img", colorTable));
     m_btnFlip->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdflid.img", colorTable));
     m_btnFlip->setDisabledTexture(gfx::Image::load("gfx:img/desktop/depot/gdfliu.img", colorTableDisabled));
     m_btnFlip->setPosition(304, 243);
-    connect(m_btnFlip, SIGNAL(clicked()), SLOT(flip()));
 
-    m_btnRepair = new ui::Button(m_backgroundLabel);
+    m_btnRepair = new ui::Button([this]() { repair(); }, m_backgroundLabel);
     m_btnRepair->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdammou.img", colorTable));
     m_btnRepair->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdammod.img", colorTable));
     m_btnRepair->setPosition(304, 75);
-    connect(m_btnRepair, SIGNAL(clicked()), SLOT(repair()));
 
-    m_btnBuy = new ui::Button(m_backgroundLabel);
+    m_btnBuy = new ui::Button([this]() { buy(); }, m_backgroundLabel);
     m_btnBuy->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdbuyu.img", colorTable));
     m_btnBuy->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdbuyd.img", colorTable));
     m_btnBuy->setDisabledTexture(gfx::Image::load("gfx:img/desktop/depot/gdbuyu.img", colorTableDisabled));
     m_btnBuy->setPosition(507, 243);
-    connect(m_btnBuy, SIGNAL(clicked()), SLOT(buy()));
 
-    m_btnSell = new ui::Button(m_backgroundLabel);
+    m_btnSell = new ui::Button([this]() { sell(); }, m_backgroundLabel);
     m_btnSell->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdselu.img", colorTable));
     m_btnSell->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdseld.img", colorTable));
     m_btnSell->setDisabledTexture(gfx::Image::load("gfx:img/desktop/depot/gdselu.img", colorTableDisabled));
     m_btnSell->setPosition(507, 75);
-    connect(m_btnSell, SIGNAL(clicked()), SLOT(sell()));
 
-    m_btnInfo = new ui::Button(m_backgroundLabel);
+    m_btnInfo = new ui::Button([this]() { toggleInfo(); }, m_backgroundLabel);
     m_btnInfo->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdtinfu.img", colorTable));
     m_btnInfo->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdtinfd.img", colorTable));
     m_btnInfo->setDisabledTexture(gfx::Image::load("gfx:img/desktop/depot/gdtinfu.img", colorTableDisabled));
     m_btnInfo->setPosition(507, 131);
-    connect(m_btnInfo, SIGNAL(clicked()), SLOT(toggleInfo()));
 
     updateButtons();
 
@@ -160,11 +155,10 @@ Depot::Depot() :
     for (int i = 0; i < m_boat->mountings().count(); i++)
     {
         Boat::Mounting *mounting = m_boat->mountings().at(i);
-        ui::Arrow *arrow = new ui::Arrow(mounting->dir, mounting->pos, true, m_backgroundLabel);
+        ui::Arrow *arrow = new ui::Arrow(mounting->dir, mounting->pos, true, [this](int n) { loadMounting(n); }, m_backgroundLabel);
         arrow->setText(mounting->name);
         arrow->setValue(i);
         arrow->hide();
-        connect(arrow, SIGNAL(clicked(int)), SLOT(loadMounting(int)));
         m_mountingArrows << arrow;
     }
 

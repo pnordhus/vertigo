@@ -68,10 +68,9 @@ Desktop::Desktop(const QString &name) :
     label->setPosition(8, 10 + gfx::Font(gfx::Font::Large).height());
     label->setText(file.value("Description").toString());
 
-    m_btnNotebook = new ui::Button(&m_lblBackground);
+    m_btnNotebook = new ui::Button([this]() { showNotebook(); }, &m_lblBackground);
     m_btnNotebook->setTexture(gfx::Image::loadPCX("gfx:pic/notebook/nbklein.pcx"));
     m_btnNotebook->setPosition(572, 424);
-    connect(m_btnNotebook, SIGNAL(clicked()), SLOT(showNotebook()));
 
     m_notebook.hide();
     connect(&m_notebook, SIGNAL(close()), SLOT(hideNotebook()));
@@ -114,13 +113,11 @@ Desktop::Desktop(const QString &name) :
         lblArrow->setTexture(gfx::Image::load(QString("gfx:img/desktop/gui/arr%1%2lar.img").arg(arrowY).arg(arrowX), colorTable));
         lblArrow->setPosition(offsetArrow.x() + file.value("X").toInt(), offsetArrow.y() + file.value("Y").toInt());
 
-        ui::Button *button = new ui::Button(m_widgetRooms);
+        ui::Button *button = new ui::Button([this, index]() { showRoom(index); }, m_widgetRooms);
         button->setOffset(0);
         button->setFont(gfx::Font::Medium);
         button->setText(name);
         button->setPosition(offset.x() + file.value("X").toInt(), offset.y() + file.value("Y").toInt());
-        button->setProperty("index", index);
-        connect(button, SIGNAL(clicked()), SLOT(showRoom()));
 
         RoomEntry room;
         room.name = file.value("room").toString();
@@ -202,12 +199,6 @@ void Desktop::hideNotebook()
     sfx::SoundSystem::get()->sound(sfx::NotebookBackground)->stop();
     sfx::SoundSystem::get()->sound(sfx::NotebookHide)->play();
     m_backgroundSound.setVolume(1.0f);
-}
-
-
-void Desktop::showRoom()
-{
-    showRoom(sender()->property("index").toInt());
 }
 
 

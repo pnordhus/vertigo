@@ -52,7 +52,6 @@ public:
 private slots:
     void showNotebook();
     void hideNotebook();
-    void showRoom();
     void hideRoom();
     void showDialog(Dialog *dialog);
     void hideDialog();

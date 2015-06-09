@@ -60,9 +60,8 @@ Room::Room(int index, const QString &title, const QString &name) :
         const int rate = file.value("Rate", 0).toInt();
         m_dockSound.load("sfx:snd/room/" + sound + ".pcm", rate);
 
-        ui::Arrow *arrow = new ui::Arrow(file.value("Arrow").toString(), QPoint(file.value("X").toInt(), file.value("Y").toInt()), false, m_backgroundLabel);
+        ui::Arrow *arrow = new ui::Arrow(file.value("Arrow").toString(), QPoint(file.value("X").toInt(), file.value("Y").toInt()), false, [this](int) { showDock(); }, m_backgroundLabel);
         arrow->setText(name);
-        connect(arrow, SIGNAL(clicked(int)), SLOT(showDock()));
     }
 
     int personId = 1;
@@ -74,9 +73,8 @@ Room::Room(int index, const QString &title, const QString &name) :
 
         Person *person = new Person;
 
-        person->arrow = new ui::Arrow(file.value("Arrow").toString(), QPoint(file.value("X").toInt(), file.value("Y").toInt()), false, m_backgroundLabel);
+        person->arrow = new ui::Arrow(file.value("Arrow").toString(), QPoint(file.value("X").toInt(), file.value("Y").toInt()), false, [this](int n) { startDialog(n); }, m_backgroundLabel);
         person->arrow->hide();
-        connect(person->arrow, SIGNAL(clicked(int)), SLOT(startDialog(int)));
 
         m_persons.insert(personId, person);
 
@@ -90,9 +88,8 @@ Room::Room(int index, const QString &title, const QString &name) :
     {
         Person *person = new Person;
 
-        person->arrow = new ui::Arrow(file.value("Arrow").toString(), QPoint(file.value("X").toInt(), file.value("Y").toInt()), false, m_backgroundLabel);
+        person->arrow = new ui::Arrow(file.value("Arrow").toString(), QPoint(file.value("X").toInt(), file.value("Y").toInt()), false, [this](int n) { startDialog(n); }, m_backgroundLabel);
         person->arrow->hide();
-        connect(person->arrow, SIGNAL(clicked(int)), SLOT(startDialog(int)));
 
         m_persons.insert(personId, person);
         m_dockMan = person;

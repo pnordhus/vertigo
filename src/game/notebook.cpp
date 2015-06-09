@@ -53,22 +53,17 @@ Notebook::Notebook() :
         widget = createLabel(m_lblMain, txt::Notebook_Title, 30);
         widget = createLabel(m_lblMain, txt::Notebook_TitleLine, 40);
 
-        widget = createButton(m_lblMain, txt::Notebook_Missions, 90);
-        connect(widget, SIGNAL(clicked()), SLOT(showMissions()));
+        widget = createButton([this]() { showMissions(); }, m_lblMain, txt::Notebook_Missions, 90);
 
-        widget = createButton(m_lblMain, txt::Notebook_LoadSave, 110);
+        widget = createButton([]() {}, m_lblMain, txt::Notebook_LoadSave, 110);
 
-        widget = createButton(m_lblMain, txt::Notebook_Options, 130);
-        connect(widget, SIGNAL(clicked()), SLOT(showOptions()));
+        widget = createButton([this]() { showOptions(); }, m_lblMain, txt::Notebook_Options, 130);
 
-        widget = createButton(m_lblMain, txt::Notebook_Map, 150);
-        connect(widget, SIGNAL(clicked()), SLOT(showMap()));
+        widget = createButton([this]() { showMap(); }, m_lblMain, txt::Notebook_Map, 150);
 
-        widget = createButton(m_lblMain, txt::Notebook_Back, 170);
-        connect(widget, SIGNAL(clicked()), SIGNAL(close()));
+        widget = createButton([this]() { emit close(); }, m_lblMain, txt::Notebook_Back, 170);
 
-        widget = createButton(m_lblMain, txt::Notebook_QuitGame, 210);
-        connect(widget, SIGNAL(clicked()), Chapter::get(), SLOT(quit()));
+        widget = createButton([]() { Chapter::get()->quit(); }, m_lblMain, txt::Notebook_QuitGame, 210);
     }
 
     {
@@ -76,25 +71,15 @@ Notebook::Notebook() :
         m_lblOptions->setPosition(162, 73);
         m_lblOptions->setTexture(m_background);
 
-        ui::Widget *widget;
+        createLabel(m_lblOptions, txt::Notebook_Options_Title, 30);
+        createLabel(m_lblOptions, txt::Notebook_Options_TitleLine, 40);
 
-        widget = createLabel(m_lblOptions, txt::Notebook_Options_Title, 30);
-        widget = createLabel(m_lblOptions, txt::Notebook_Options_TitleLine, 40);
-
-        widget = createButton(m_lblOptions, txt::Notebook_Sound, 90);
-
-        widget = createButton(m_lblOptions, txt::Notebook_Graphics, 110);
-
-        widget = createButton(m_lblOptions, txt::Notebook_Movies, 130);
-        connect(widget, SIGNAL(clicked()), SLOT(showMovies()));
-
-        widget = createButton(m_lblOptions, txt::Notebook_InputDevices, 150);
-
-        widget = createButton(m_lblOptions, txt::Notebook_MoviePlayer, 170);
-        connect(widget, SIGNAL(clicked()), SLOT(showMoviePlayer()));
-
-        widget = createButton(m_lblOptions, txt::Notebook_Back, 220);
-        connect(widget, SIGNAL(clicked()), SLOT(hideOptions()));
+        createButton([]() {}, m_lblOptions, txt::Notebook_Sound, 90);
+        createButton([]() {}, m_lblOptions, txt::Notebook_Graphics, 110);
+        createButton([this]() { showMovies(); }, m_lblOptions, txt::Notebook_Movies, 130);
+        createButton([]() {}, m_lblOptions, txt::Notebook_InputDevices, 150);
+        createButton([this]() { showMoviePlayer(); }, m_lblOptions, txt::Notebook_MoviePlayer, 170);
+        createButton([this]() { hideOptions(); }, m_lblOptions, txt::Notebook_Back, 220);
 
         m_lblOptions->hide();
     }
@@ -104,25 +89,14 @@ Notebook::Notebook() :
         m_lblMovies->setPosition(162, 73);
         m_lblMovies->setTexture(m_background);
 
-        ui::Widget *widget;
+        createLabel(m_lblMovies, txt::Notebook_Movies_Title, 30);
+        createLabel(m_lblMovies, txt::Notebook_Movies_TitleLine, 40);
 
-        widget = createLabel(m_lblMovies, txt::Notebook_Movies_Title, 30);
-        widget = createLabel(m_lblMovies, txt::Notebook_Movies_TitleLine, 40);
+        m_btnMoviesAutopilot = createButton([this]() { Chapter::get()->toggleMovieAutopilot(); updateMovies(); }, m_lblMovies, txt::Notebook_Movies_Autopilot_Yes, 90);
+        m_btnMoviesApproach = createButton([this]() { Chapter::get()->toggleMovieApproach(); updateMovies(); }, m_lblMovies, txt::Notebook_Movies_Approach_Yes, 110);
+        m_btnMoviesHarbour = createButton([this]() { Chapter::get()->toggleMovieHarbour(); updateMovies(); }, m_lblMovies, txt::Notebook_Movies_Harbour_Yes, 130);
 
-        m_btnMoviesAutopilot = createButton(m_lblMovies, txt::Notebook_Movies_Autopilot_Yes, 90);
-        connect(m_btnMoviesAutopilot, SIGNAL(clicked()), Chapter::get(), SLOT(toggleMovieAutopilot()));
-        connect(m_btnMoviesAutopilot, SIGNAL(clicked()), SLOT(updateMovies()));
-
-        m_btnMoviesApproach = createButton(m_lblMovies, txt::Notebook_Movies_Approach_Yes, 110);
-        connect(m_btnMoviesApproach, SIGNAL(clicked()), Chapter::get(), SLOT(toggleMovieApproach()));
-        connect(m_btnMoviesApproach, SIGNAL(clicked()), SLOT(updateMovies()));
-
-        m_btnMoviesHarbour = createButton(m_lblMovies, txt::Notebook_Movies_Harbour_Yes, 130);
-        connect(m_btnMoviesHarbour, SIGNAL(clicked()), Chapter::get(), SLOT(toggleMovieHarbour()));
-        connect(m_btnMoviesHarbour, SIGNAL(clicked()), SLOT(updateMovies()));
-
-        widget = createButton(m_lblMovies, txt::Notebook_Back, 170);
-        connect(widget, SIGNAL(clicked()), SLOT(hideMovies()));
+        createButton([this]() { hideMovies(); }, m_lblMovies, txt::Notebook_Back, 170);
 
         m_lblMovies->hide();
         updateMovies();
@@ -149,9 +123,9 @@ ui::Label* Notebook::createLabel(ui::Widget *parent, txt::String text, float pos
 }
 
 
-ui::Button* Notebook::createButton(ui::Widget *parent, txt::String text, float posY)
+ui::Button* Notebook::createButton(std::function<void()> &&funcClick, ui::Widget *parent, txt::String text, float posY)
 {
-    ui::Button *button = new ui::Button(parent);
+    ui::Button *button = new ui::Button(std::move(funcClick), parent);
     button->setFont(m_fontGreen);
     button->setText(txt::StringTable::get(text));
     button->setPosition(0, posY);
@@ -201,11 +175,10 @@ void Notebook::showMissions()
     list->setSize(304, 220);
     list->setText(tasks);
 
-    ui::Button *button = new ui::Button(m_lblMissions);
+    ui::Button *button = new ui::Button([this]() { hideMissions(); }, m_lblMissions);
     button->setFont(m_fontGreen);
     button->setText(txt::StringTable::get(txt::Notebook_Back));
     button->setPosition(180, 270);
-    connect(button, SIGNAL(clicked()), SLOT(hideMissions()));
 }
 
 
@@ -255,23 +228,18 @@ void Notebook::showMoviePlayer()
     m_lblMoviePlayer->setPosition(162, 73);
     m_lblMoviePlayer->setTexture(m_background);
 
-    ui::Widget *widget;
-
-    widget = createLabel(m_lblMoviePlayer, txt::Notebook_MoviePlayer_Title, 10);
-    widget = createLabel(m_lblMoviePlayer, txt::Notebook_MoviePlayer_TitleLine, 20);
+    createLabel(m_lblMoviePlayer, txt::Notebook_MoviePlayer_Title, 10);
+    createLabel(m_lblMoviePlayer, txt::Notebook_MoviePlayer_TitleLine, 20);
 
     const QSet<int>& movies = Chapter::get()->playedMovies();
     int y = 40;
 
     foreach (int movie, movies) {
-        ui::Button *button = createButton(m_lblMoviePlayer, txt::String(txt::FirstMovie + movie), y);
-        button->setProperty("movie", movie);
-        connect(button, SIGNAL(clicked()), SLOT(playMovie()));
+        createButton([this, movie]() { Chapter::get()->playMovie(movie); }, m_lblMoviePlayer, txt::String(txt::FirstMovie + movie), y);
         y += 10;
     }
 
-    widget = createButton(m_lblMoviePlayer, txt::Notebook_Back, y + 10);
-    connect(widget, SIGNAL(clicked()), SLOT(hideMoviePlayer()));
+    createButton([this]() { hideMoviePlayer(); }, m_lblMoviePlayer, txt::Notebook_Back, y + 10);
 }
 
 
@@ -281,12 +249,6 @@ void Notebook::hideMoviePlayer()
     m_lblMoviePlayer->deleteLater();
     m_lblMoviePlayer = NULL;
     m_lblOptions->show();
-}
-
-
-void Notebook::playMovie()
-{
-    Chapter::get()->playMovie(sender()->property("movie").toInt());
 }
 
 

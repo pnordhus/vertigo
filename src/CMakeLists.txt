@@ -167,8 +167,6 @@ set(MOC_SOURCES
     game/vertigo.h
     game/window.h
 
-    ui/arrow.h
-    ui/button.h
     ui/frame.h
     ui/itemlist.h
     ui/widget.h

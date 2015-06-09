@@ -21,10 +21,11 @@
 namespace ui {
 
 
-Button::Button(Widget *parent) :
+Button::Button(std::function<void()> &&funcClicked, Widget *parent) :
     Label(parent),
     m_pressed(false),
-    m_offset(1)
+    m_offset(1),
+    m_funcClicked(std::move(funcClicked))
 {
 
 }
@@ -83,7 +84,7 @@ void Button::mouseReleaseEvent(const QPoint &pos, Qt::MouseButton button)
 {
     if (button == Qt::LeftButton) {
         if (m_pressed && mapToGlobal(m_drawRect).contains(pos))
-            emit clicked();
+            m_funcClicked();
         m_pressed = false;
     }
 }

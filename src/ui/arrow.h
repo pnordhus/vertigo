@@ -15,23 +15,17 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-
 #ifndef UI_ARROW_H
 #define UI_ARROW_H
 
-
 #include "button.h"
-
 
 namespace ui {
 
-
-class Arrow : public QObject
+class Arrow
 {
-    Q_OBJECT
-
 public:
-    Arrow(const QString &dir, const QPoint &pos, bool large, Widget *parent);
+    Arrow(const QString &dir, const QPoint &pos, bool large, std::function<void(int)> &&funcClicked, Widget *parent);
     ~Arrow();
 
 public:
@@ -41,12 +35,6 @@ public:
     void setValue(int value);
     void setText(const QString &text);
 
-signals:
-    void clicked(int);
-
-private slots:
-    void clicked();
-
 private:
     Label *m_label;
     Button *m_button;
@@ -55,10 +43,9 @@ private:
     QPoint m_position;
     int m_value;
     bool m_large;
+    std::function<void(int)> m_funcClicked;
 };
 
-
 } // namespace ui
-
 
 #endif // UI_ARROW_H

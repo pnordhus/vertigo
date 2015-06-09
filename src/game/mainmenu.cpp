@@ -70,29 +70,26 @@ MainMenu::MainMenu(bool skipToTitle) :
         label->setText(txt::StringTable::get(txt::MainMenu));
 
         ui::Button *button;
-        button = new ui::Button(m_lblMain);
+        button = new ui::Button([this]() { showNew(); }, m_lblMain);
         button->setFont(fontLarge);
         button->setPosition(0, 288);
         button->setWidth(640);
         button->setAlignment(ui::Label::AlignHCenter);
         button->setText(txt::StringTable::get(txt::MainMenu_NewGame));
-        connect(button, SIGNAL(clicked()), SLOT(showNew()));
 
-        button = new ui::Button(m_lblMain);
+        button = new ui::Button([this]() { showLoad(); }, m_lblMain);
         button->setFont(fontLarge);
         button->setPosition(0, 308);
         button->setWidth(640);
         button->setAlignment(ui::Label::AlignHCenter);
         button->setText(txt::StringTable::get(txt::MainMenu_Load));
-        connect(button, SIGNAL(clicked()), SLOT(showLoad()));
 
-        button = new ui::Button(m_lblMain);
+        button = new ui::Button([this]() { emit quit(); }, m_lblMain);
         button->setFont(fontLarge);
         button->setPosition(0, 408);
         button->setWidth(640);
         button->setAlignment(ui::Label::AlignHCenter);
         button->setText(txt::StringTable::get(txt::MainMenu_QuitGame));
-        connect(button, SIGNAL(clicked()), SIGNAL(quit()));
     }
 
     if (skipToTitle)
@@ -207,13 +204,12 @@ void MainMenu::showNew()
     label->setPosition(145, 256 - gfx::Font(gfx::Font::Medium).height() - 2);
     label->setText(txt::StringTable::get(txt::MainMenu_NewGame));
 
-    ui::Button *button = new ui::Button(m_lblNew);
+    ui::Button *button = new ui::Button([this]() { hideNew(); }, m_lblNew);
     button->setPosition(0, 428);
     button->setWidth(640);
     button->setAlignment(ui::Button::AlignHCenter);
     button->setFont(gfx::Font::Large);
     button->setText(txt::StringTable::get(txt::MainMenu));
-    connect(button, SIGNAL(clicked()), SLOT(hideNew()));
 }
 
 
@@ -243,14 +239,13 @@ void MainMenu::showLoad()
     QList<Chapter::SavedGame> games = Chapter::savedGames();
     qSort(games);
     foreach (const Chapter::SavedGame &game, games) {
-        ui::Button *button = new ui::Button(m_lblLoad);
+        QString name = game.name;
+        ui::Button *button = new ui::Button([this, name]() { emit loadGame(name); }, m_lblLoad);
         button->setPosition(0, y);
         button->setWidth(640);
         button->setAlignment(ui::Button::AlignHCenter);
         button->setFont(gfx::Font::Large);
         button->setText(QString("%1: %2").arg(game.name, game.station));
-        button->setProperty("name", game.name);
-        connect(button, SIGNAL(clicked()), SLOT(loadGame()));
 
         y += 13;
 
@@ -264,13 +259,12 @@ void MainMenu::showLoad()
         y += 20;
     }
 
-    ui::Button *button = new ui::Button(m_lblLoad);
+    ui::Button *button = new ui::Button([this]() { hideLoad(); }, m_lblLoad);
     button->setPosition(0, 428);
     button->setWidth(640);
     button->setAlignment(ui::Button::AlignHCenter);
     button->setFont(gfx::Font::Large);
     button->setText(txt::StringTable::get(txt::MainMenu));
-    connect(button, SIGNAL(clicked()), SLOT(hideLoad()));
 }
 
 
@@ -280,12 +274,6 @@ void MainMenu::hideLoad()
     m_lblLoad->deleteLater();
     m_lblLoad = NULL;
     m_lblMain->show();
-}
-
-
-void MainMenu::loadGame()
-{
-    emit loadGame(sender()->property("name").toString());
 }
 
 

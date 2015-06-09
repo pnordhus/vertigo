@@ -89,10 +89,9 @@ void Frame::setupFrame(const QSize &size, const QString &title, bool closable)
     texture.update((size.width() - 170) / 2, 0, gfx::Image::load("gfx:img/desktop/gui/bortw.img", colorTable));
 
     if (closable) {
-        ui::Button *buttonClose = new ui::Button(this);
+        ui::Button *buttonClose = new ui::Button([this]() { closeFrame(); }, this);
         buttonClose->setTexture(gfx::Image::load("gfx:img/desktop/gui/gdexitu.img", colorTable));
         buttonClose->setPressedTexture(gfx::Image::load("gfx:img/desktop/gui/gdexitd.img", colorTable));
-        connect(buttonClose, SIGNAL(clicked()), SLOT(closeFrame()));
     }
 
     setTexture(texture);

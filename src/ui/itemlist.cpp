@@ -41,21 +41,19 @@ ItemList::ItemList(Widget *parent, bool showChecks, int maxItems) :
     for (int i = 0; i < 256; i++)
         colorTableDisabled << qRgba(qRed(colorTable[i]), qGreen(colorTable[i]), qBlue(colorTable[i]), 128);
 
-    m_btnLeft = new ui::Button(this);
+    m_btnLeft = new ui::Button([this]() { scrollLeft(); }, this);
     m_btnLeft->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdlefu.img", colorTable));
     m_btnLeft->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdlefd.img", colorTable));
     m_btnLeft->setDisabledTexture(gfx::Image::load("gfx:img/desktop/depot/gdlefu.img", colorTableDisabled));
     m_btnLeft->setPosition(13, 8);
     m_btnLeft->disable();
-    connect(m_btnLeft, SIGNAL(clicked()), SLOT(scrollLeft()));
 
-    m_btnRight = new ui::Button(this);
+    m_btnRight = new ui::Button([this]() { scrollRight(); }, this);
     m_btnRight->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdrigu.img", colorTable));
     m_btnRight->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdrigd.img", colorTable));
     m_btnRight->setDisabledTexture(gfx::Image::load("gfx:img/desktop/depot/gdrigu.img", colorTableDisabled));
     m_btnRight->setPosition(493, 8);
     m_btnRight->disable();
-    connect(m_btnRight, SIGNAL(clicked()), SLOT(scrollRight()));
 
     m_chkGreen = gfx::Image::load("gfx:img/desktop/depot/chkgre.img", colorTable);
     m_chkRed = gfx::Image::load("gfx:img/desktop/depot/chkred.img", colorTable);
@@ -121,11 +119,13 @@ void ItemList::clear()
 void ItemList::draw()
 {
     const int scrollTime = 50;
-    if (m_offset != 0)
-        if (m_time.elapsed() < scrollTime)
+    if (m_offset != 0) {
+        if (m_time.elapsed() < scrollTime) {
             m_offset = (m_offset > 0 ? 54 : -54)*(scrollTime - m_time.elapsed())/scrollTime;
-        else
+        } else {
             m_offset = 0;
+        }
+    }
 
     m_texture.draw(54, 0, QRectF(m_firstItem*54 + m_offset, 0, 435, 48));
     if (m_textureChecks.isValid())

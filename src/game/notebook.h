@@ -37,7 +37,7 @@ public:
 signals:
     void close();
 
-private slots:
+private:
     void showMissions();
     void hideMissions();
     void showOptions();
@@ -49,11 +49,10 @@ private slots:
     void showMap();
     void hideMap();
     void updateMovies();
-    void playMovie();
 
 private:
     ui::Label* createLabel(ui::Widget *parent, txt::String text, float posY);
-    ui::Button* createButton(ui::Widget *parent, txt::String text, float posY);
+    ui::Button* createButton(std::function<void()> &&funcClick, ui::Widget *parent, txt::String text, float posY);
 
 private:
     bool mousePressEvent(const QPoint &pos, Qt::MouseButton button);

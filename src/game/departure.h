@@ -37,10 +37,6 @@ signals:
 
 private:
     bool mousePressEvent(const QPoint &pos, Qt::MouseButton button);
-
-private slots:
-    void select();
-    void startMission();
 };
 
 

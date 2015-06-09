@@ -53,8 +53,6 @@ private:
     void draw();
     bool mousePressEvent(const QPoint &pos, Qt::MouseButton button);
     void updateButtons();
-
-private slots:
     void scrollLeft();
     void scrollRight();
 

@@ -49,7 +49,6 @@ private slots:
     void hideNew();
     void showLoad();
     void hideLoad();
-    void loadGame();
 
 private:
     void draw();

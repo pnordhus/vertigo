@@ -19,14 +19,13 @@
 #include "gfx/colortable.h"
 #include "gfx/image.h"
 
-
 namespace ui {
 
-
-Arrow::Arrow(const QString &dir, const QPoint &pos, bool large, Widget *parent) :
+Arrow::Arrow(const QString &dir, const QPoint &pos, bool large, std::function<void(int)> &&funcClicked, Widget *parent) :
     m_position(pos),
     m_value(0),
-    m_large(large)
+    m_large(large),
+    m_funcClicked(std::move(funcClicked))
 {
     const gfx::ColorTable colorTable("gfx:pal/gui/border.pal");
 
@@ -44,12 +43,10 @@ Arrow::Arrow(const QString &dir, const QPoint &pos, bool large, Widget *parent) 
     m_label->setTexture(gfx::Image::load(QString("gfx:img/desktop/gui/arr%1%2%3.img").arg(arrowY).arg(arrowX).arg(large ? "med" : "sma"), colorTable));
     m_label->setPosition(pos);
 
-    m_button = new Button(parent);
+    m_button = new Button([this]() { m_funcClicked(m_value); }, parent);
     m_button->setFont(m_large ? gfx::Font::Medium : gfx::Font::Small);
     m_button->setOffset(0);
-    connect(m_button, SIGNAL(clicked()), SLOT(clicked()));
 }
-
 
 Arrow::~Arrow()
 {
@@ -57,13 +54,11 @@ Arrow::~Arrow()
     delete m_label;
 }
 
-
 void Arrow::hide()
 {
     m_label->hide();
     m_button->hide();
 }
-
 
 void Arrow::show()
 {
@@ -71,18 +66,15 @@ void Arrow::show()
     m_button->show();
 }
 
-
 bool Arrow::isVisible()
 {
     return m_label->isVisible();
 }
 
-
 void Arrow::setValue(int value)
 {
     m_value = value;
 }
-
 
 void Arrow::setText(const QString &text)
 {
@@ -106,12 +98,5 @@ void Arrow::setText(const QString &text)
     m_label->setPosition(m_position + offsetArrow);
     m_button->setPosition(m_position + offsetArrow + offset);
 }
-
-
-void Arrow::clicked()
-{
-    emit clicked(m_value);
-}
-
 
 } // namespace ui

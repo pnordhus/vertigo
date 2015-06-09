@@ -57,14 +57,13 @@ Departure::Departure()
         if (!station.isEnabled())
             continue;
 
-        ui::Button *button = new ui::Button(lblMap);
+        const int index = station.index();
+        ui::Button *button = new ui::Button([this, index]() { Chapter::get()->setStation(index); }, lblMap);
         button->setFont(font);
         button->setText(station.name());
         button->setPosition(0, y);
         button->setWidth(180);
         button->setAlignment(ui::Label::AlignHCenter);
-        button->setProperty("index", station.index());
-        connect(button, SIGNAL(clicked()), SLOT(select()));
 
         y += font.height() + 4;
     }
@@ -73,14 +72,13 @@ Departure::Departure()
 
     foreach (Mission* mission, Chapter::get()->missions()) {
         if (mission->station() == -1) {
-            ui::Button *button = new ui::Button(lblMap);
+            const QString shortName = mission->shortName();
+            ui::Button *button = new ui::Button([this, shortName]() { Chapter::get()->startMission(shortName); }, lblMap);
             button->setFont(font);
             button->setText(mission->name());
             button->setPosition(0, y);
             button->setWidth(180);
             button->setAlignment(ui::Label::AlignHCenter);
-            button->setProperty("mission", mission->shortName());
-            connect(button, SIGNAL(clicked()), SLOT(startMission()));
 
             y += font.height() + 4;
         }
@@ -88,13 +86,12 @@ Departure::Departure()
 
     y += 4;
 
-    ui::Button *button = new ui::Button(lblMap);
+    ui::Button *button = new ui::Button([this]() { emit close(); }, lblMap);
     button->setFont(font);
     button->setText(txt::StringTable::get(txt::Departure_Abort));
     button->setPosition(0, y);
     button->setWidth(180);
     button->setAlignment(ui::Label::AlignHCenter);
-    connect(button, SIGNAL(clicked()), SIGNAL(close()));
 }
 
 
@@ -108,18 +105,5 @@ bool Departure::mousePressEvent(const QPoint &pos, Qt::MouseButton button)
 
     return false;
 }
-
-
-void Departure::select()
-{
-    Chapter::get()->setStation(sender()->property("index").toInt());
-}
-
-
-void Departure::startMission()
-{
-    Chapter::get()->startMission(sender()->property("mission").toString());
-}
-
 
 } // namespace game
