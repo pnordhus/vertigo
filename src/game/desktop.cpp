@@ -292,8 +292,7 @@ void Desktop::showDeparture()
 {
     Q_ASSERT(m_room);
     Q_ASSERT(!m_departure);
-    m_departure = new Departure;
-    connect(m_departure, SIGNAL(close()), SLOT(hideDeparture()));
+    m_departure = new Departure([this]() { hideDeparture(); });
     setRootWidget(m_departure);
     showCursor();
     m_room->hide();

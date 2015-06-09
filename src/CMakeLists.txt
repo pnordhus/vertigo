@@ -152,7 +152,6 @@ set(SOURCES
 
 set(MOC_SOURCES
     game/chapter.h
-    game/departure.h
     game/desktop.h
     game/dialog.h
     game/mainmenu.h

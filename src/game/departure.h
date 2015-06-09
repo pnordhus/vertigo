@@ -18,29 +18,24 @@
 #ifndef GAME_DEPARTURE_H
 #define GAME_DEPARTURE_H
 
-
 #include "ui/label.h"
 
+#include <functional>
 
 namespace game {
 
-
 class Departure : public ui::Label
 {
-    Q_OBJECT
-
 public:
-    Departure();
-
-signals:
-    void close();
+    Departure(std::function<void()> &&funcClose);
 
 private:
     bool mousePressEvent(const QPoint &pos, Qt::MouseButton button);
+
+private:
+    std::function<void()> m_funcClose;
 };
 
-
 } // namespace game
-
 
 #endif // GAME_DEPARTURE_H

@@ -24,7 +24,8 @@
 namespace game {
 
 
-Departure::Departure()
+Departure::Departure(std::function<void()> &&funcClose) :
+    m_funcClose(std::move(funcClose))
 {
     const gfx::ColorTable colorTable("gfx:pal/notebook/notebook.pal");
     gfx::Font font("gfx:fnt/nfont1b.fnt", colorTable, true);
@@ -86,7 +87,7 @@ Departure::Departure()
 
     y += 4;
 
-    ui::Button *button = new ui::Button([this]() { emit close(); }, lblMap);
+    ui::Button *button = new ui::Button([this]() { m_funcClose(); }, lblMap);
     button->setFont(font);
     button->setText(txt::StringTable::get(txt::Departure_Abort));
     button->setPosition(0, y);
@@ -99,7 +100,7 @@ bool Departure::mousePressEvent(const QPoint &pos, Qt::MouseButton button)
 {
 
     if (button == Qt::RightButton) {
-        emit close();
+        m_funcClose();
         return true;
     }
 
