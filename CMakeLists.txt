@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 
-project(vertigo)
+project(vertigo CXX)
 
 find_package(Qt4 4.6.0 REQUIRED)
 find_package(OpenGL REQUIRED)
