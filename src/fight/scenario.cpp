@@ -31,6 +31,10 @@
 #include <QKeyEvent>
 #include "math.h"
 
+#ifndef GLU_VERSION
+#include <GL/glu.h>
+#endif // GLU_VERSION
+
 
 namespace fight {
 
