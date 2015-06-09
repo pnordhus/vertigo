@@ -24,20 +24,16 @@
 #include "gfx/video.h"
 #include "txt/desfile.h"
 
+#include <functional>
 
 namespace game {
 
 
-class MiniMovie : public QObject
+class MiniMovie
 {
-    Q_OBJECT
-
 public:
-    MiniMovie(const QString &path);
+    MiniMovie(const QString &path, std::function<void()> &&funcFinished);
     ~MiniMovie();
-
-signals:
-    void videoFinished();
 
 public:
     void load(txt::DesFile &file);
@@ -62,6 +58,7 @@ private:
     QList<Video*> m_videos;
     QTime m_time;
     gfx::ColorTable m_colorTable;
+    std::function<void()> m_funcFinished;
 };
 
 

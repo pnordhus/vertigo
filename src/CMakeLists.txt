@@ -157,15 +157,12 @@ set(MOC_SOURCES
     game/dialog.h
     game/encom.h
     game/mainmenu.h
-    game/minimovie.h
     game/movie.h
     game/notebook.h
     game/renderer.h
     game/room.h
     game/vertigo.h
     game/window.h
-
-    ui/widget.h
 )
 
 qt4_wrap_cpp(MOC_SOURCES ${MOC_SOURCES})

@@ -23,8 +23,9 @@
 namespace game {
 
 
-MiniMovie::MiniMovie(const QString &path) :
-    m_path(path)
+MiniMovie::MiniMovie(const QString &path, std::function<void()> &&funcFinished) :
+    m_path(path),
+    m_funcFinished(std::move(funcFinished))
 {
 
 }
@@ -98,8 +99,9 @@ void MiniMovie::update(gfx::Texture texture)
     if (oneshotPlaying) {
         foreach (Video *video, m_videos) {
             if (video->oneShot) {
-                if (!video->video.isPlaying())
-                    emit videoFinished();
+                if (!video->video.isPlaying()) {
+                    m_funcFinished();
+                }
                 break;
             }
         }
@@ -128,7 +130,7 @@ void MiniMovie::stopOneshot()
         if (video->oneShot)
             video->video.stop();
     }
-    emit videoFinished();
+    m_funcFinished();
 }
 
 

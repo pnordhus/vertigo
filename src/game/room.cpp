@@ -28,7 +28,7 @@ namespace game {
 Room::Room(int index, const QString &title, const QString &name, std::function<void()> &&funcClose) :
     Frame(std::move(funcClose)),
     m_index(index),
-    m_miniMovie("gfx:mvi/room"),
+    m_miniMovie("gfx:mvi/room", [this]() { miniMovieFinished(); }),
     m_name(name),
     m_dockMan(NULL)
 {
@@ -49,8 +49,6 @@ Room::Room(int index, const QString &title, const QString &name, std::function<v
 
     m_miniMovie.load(file);
     m_miniMovie.start();
-    connect(&m_miniMovie, SIGNAL(videoFinished()), SIGNAL(showDeparture()));
-    connect(&m_miniMovie, SIGNAL(videoFinished()), m_backgroundLabel, SLOT(enable()));
 
     m_backgroundSound.playLoop();
 
@@ -184,5 +182,10 @@ void Room::startDialog(int dialogId)
         emit showDepot();
 }
 
+void Room::miniMovieFinished()
+{
+    emit showDeparture();
+    m_backgroundLabel->enable();
+}
 
 } // namespace game

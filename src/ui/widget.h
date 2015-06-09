@@ -29,13 +29,11 @@ namespace ui {
 
 class Widget : public QObject
 {
-    Q_OBJECT
-
 public:
     Widget(Widget *parent = NULL);
     ~Widget();
 
-public slots:
+public:
     void setEnabled(bool);
     void enable();
     void disable();

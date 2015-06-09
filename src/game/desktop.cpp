@@ -33,7 +33,7 @@ Desktop::Desktop(const QString &name) :
     m_enCom(NULL),
     m_departure(NULL),
     m_depot(NULL),
-    m_miniMovie("gfx:mvi/desktop"),
+    m_miniMovie("gfx:mvi/desktop", [this]() {}),
     m_first(true)
 {
     const gfx::ColorTable colorTable("gfx:pal/gui/border.pal");

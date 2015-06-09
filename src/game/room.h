@@ -59,6 +59,9 @@ private slots:
     void startDialog(int dialogId);
 
 private:
+    void miniMovieFinished();
+
+private:
     struct Person
     {
         ui::Arrow *arrow;
