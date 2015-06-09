@@ -28,14 +28,9 @@ namespace game {
 
 class EnCom : public ui::Label
 {
-    Q_OBJECT
-
 public:
-    EnCom(Dialog *dialog);
+    EnCom(Dialog *dialog, std::function<void()> &&funcClose);
     ~EnCom();
-
-signals:
-    void close();
 
 private:
     Dialog *m_dialog;

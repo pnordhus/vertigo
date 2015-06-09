@@ -24,7 +24,7 @@
 namespace game {
 
 
-EnCom::EnCom(Dialog *dialog) :
+EnCom::EnCom(Dialog *dialog, std::function<void()> &&funcClose) :
     m_dialog(dialog)
 {
     const gfx::ColorTable colorTableBorder("gfx:pal/gui/border.pal");
@@ -74,7 +74,7 @@ EnCom::EnCom(Dialog *dialog) :
     m_dialog->setParentWidget(labelMain);
     m_dialog->setPosition(16, 68);
     m_dialog->setWidth(304 - 32);
-    connect(m_dialog, SIGNAL(close()), SIGNAL(close()));
+    m_dialog->funcClose = std::move(funcClose);
 }
 
 

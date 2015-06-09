@@ -256,8 +256,7 @@ void Desktop::showEnCom(Dialog *dialog)
 {
     Q_ASSERT(!m_enCom);
 
-    m_enCom = new EnCom(dialog);
-    connect(m_enCom, SIGNAL(close()), SLOT(hideEnCom()));
+    m_enCom = new EnCom(dialog, [this]() { hideEnCom(); });
     setRootWidget(m_enCom);
 
     m_btnNotebook->hide();

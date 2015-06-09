@@ -155,7 +155,6 @@ set(MOC_SOURCES
     game/departure.h
     game/desktop.h
     game/dialog.h
-    game/encom.h
     game/mainmenu.h
     game/movie.h
     game/notebook.h
