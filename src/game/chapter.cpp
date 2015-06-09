@@ -407,8 +407,7 @@ void Chapter::startMission()
 
     if (m_briefing)
         m_briefing->deleteLater();
-    m_briefing = new Briefing();
-    connect(m_briefing, SIGNAL(startEngine()), SLOT(startScenario()));
+    m_briefing = new Briefing([this]() { startScenario(); });
     emit setRenderer(m_briefing);
 }
 

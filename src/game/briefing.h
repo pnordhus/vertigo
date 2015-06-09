@@ -25,22 +25,18 @@
 #include "ui/label.h"
 #include <QTime>
 
+#include <functional>
 
 namespace game {
 
 
 class Briefing : public Menu
 {
-    Q_OBJECT
-
 private:
     enum State { Init, Text, Targets, Hints, Arrow, PressKey };
 
 public:
-    Briefing();
-
-signals:
-    void startEngine();
+    Briefing(std::function<void()> &&funcStart);
 
 private:
     void activate();
@@ -63,6 +59,7 @@ private:
     State m_state;
     bool m_toggleState;
     int m_nextLine;
+    std::function<void()> m_funcStart;
 };
 
 

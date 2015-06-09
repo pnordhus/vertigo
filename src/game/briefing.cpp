@@ -29,9 +29,10 @@
 namespace game {
 
 
-Briefing::Briefing() :
+Briefing::Briefing(std::function<void()> &&funcStart) :
     m_state(Init),
-    m_toggleState(false) 
+    m_toggleState(false),
+    m_funcStart(std::move(funcStart))
 {
     hideCursor();
 
@@ -210,8 +211,9 @@ void Briefing::draw()
 
 void Briefing::keyPressEvent(QKeyEvent *event)
 {
-    if (m_state == PressKey)
-        emit startEngine();
+    if (m_state == PressKey) {
+        m_funcStart();
+    }
 }
 
 
