@@ -29,7 +29,7 @@
 #include "conditionmanager.h"
 #include <QGLContext>
 #include <QKeyEvent>
-#include "math.h"
+#include <cmath>
 
 #ifndef GLU_VERSION
 #include <GL/glu.h>
@@ -515,8 +515,8 @@ void Scenario::draw()
         glLightfv(GL_LIGHT1, GL_AMBIENT, light_ambient);
         glLightfv(GL_LIGHT1, GL_DIFFUSE, light_diffuse);
         
-        GLfloat light_position[] = { object->position().x(), object->position().y(), object->position().z(), 1.0 };
-        GLfloat spot_direction[] = { cos(0.005*m_time.elapsed()), sin(0.005*m_time.elapsed()), 0.0 };
+        const GLfloat light_position[] = { static_cast<float>(object->position().x()), static_cast<float>(object->position().y()), static_cast<float>(object->position().z()), 1.0f };
+        const GLfloat spot_direction[] = { std::cos(0.005f*m_time.elapsed()), std::sin(0.005f*m_time.elapsed()), 0.0f };
 
         glLightfv(GL_LIGHT1, GL_POSITION, light_position);
         glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, spot_direction);
