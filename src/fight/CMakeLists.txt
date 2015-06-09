@@ -2,8 +2,18 @@ add_subdirectory(effects)
 add_subdirectory(surface)
 
 set(SOURCES
+    boundingbox.cpp
+    boundingbox.h
     building.cpp
     building.h
+    collisionmanager.cpp
+    collisionmanager.h
+    collisionmesh.cpp
+    collisionmesh.h
+    condition.cpp
+    condition.h
+    conditionmanager.cpp
+    conditionmanager.h
     mine.cpp
     mine.h
     module.cpp

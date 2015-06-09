@@ -7,6 +7,8 @@ set(SOURCES
     effectmanager.h
     projectile.cpp
     projectile.h
+    trash.cpp
+    trash.h
 )
 
 add_library(effects ${SOURCES})
