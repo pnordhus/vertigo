@@ -20,6 +20,7 @@
 #include "vertigo.h"
 #include "window.h"
 #include "txt/stringtable.h"
+#include <QApplication>
 #include <QDir>
 #include <QFileDialog>
 #include <QSettings>
@@ -83,7 +84,7 @@ bool Vertigo::start(const QString &scenario)
     if (scenario.isEmpty()) {
         createMainMenu(false);
     } else {
-        fight::Scenario *s = new fight::Scenario(scenario);
+        fight::Scenario *s = new fight::Scenario(scenario, QApplication::quit);
         m_window->setRenderer(s);
     }
 

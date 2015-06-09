@@ -39,7 +39,7 @@
 namespace fight {
 
 
-Scenario::Scenario(const QString &name) :
+Scenario::Scenario(const QString &name, std::function<void()> &&funcSuccess) :
     m_moduleManager(m_textureManager),
     m_left(0.0f),
     m_right(0.0f),
@@ -48,7 +48,8 @@ Scenario::Scenario(const QString &name) :
     m_forwards(0.0f),
     m_backwards(0.0f),
     m_condAutopilot(this),
-    m_condFailure(this)
+    m_condFailure(this),
+    m_funcSuccess(std::move(funcSuccess))
 {
     m_effectManager = new EffectManager(this);
     m_collisionManager = new CollisionManager();
@@ -550,7 +551,7 @@ void Scenario::draw()
 void Scenario::keyPressEvent(QKeyEvent *e)
 {
     if (e->key() == Qt::Key_Escape)
-        emit success();
+        m_funcSuccess();
 
     if (e->key() == Qt::Key_Left)
         m_left = 1.0f;

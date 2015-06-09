@@ -421,8 +421,7 @@ void Chapter::startScenario()
 
     Q_ASSERT(m_mission);
     Q_ASSERT(m_scenario == NULL);
-    m_scenario = new fight::Scenario(m_mission->scenario());
-    connect(m_scenario, SIGNAL(success()), SLOT(finishMission()));
+    m_scenario = new fight::Scenario(m_mission->scenario(), [this]() { finishMission(); });
     emit setRenderer(m_scenario);
 }
 

@@ -151,8 +151,6 @@ set(SOURCES
 )
 
 set(MOC_SOURCES
-    fight/scenario.h
-
     game/briefing.h
     game/chapter.h
     game/departure.h

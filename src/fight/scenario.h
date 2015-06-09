@@ -25,6 +25,7 @@
 #include "object.h"
 #include "condition.h"
 
+#include <functional>
 
 namespace fight {
 
@@ -37,14 +38,9 @@ class CollisionManager;
 
 class Scenario : public game::Renderer
 {
-    Q_OBJECT
-
 public:
-    Scenario(const QString &name);
+    Scenario(const QString &name, std::function<void()> &&funcSuccess);
     ~Scenario();
-
-signals:
-    void success();
 
 public:
     const QVector3D& position() const { return m_position; }
@@ -125,6 +121,7 @@ private:
     ConditionFailure m_condFailure;
     QMap<int, Condition> m_condObjectives;
     QList<ConditionSpace *> m_condSpaces;
+    std::function<void()> m_funcSuccess;
 
 private:
     void initCondition(const QMap<int, ConditionEntry> &entries, int cond, int dep, int ref, Condition *condDepend);
