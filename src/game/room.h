@@ -36,7 +36,7 @@ class Room : public ui::Frame
     Q_OBJECT
 
 public:
-    Room(int index, const QString &title, const QString &name);
+    Room(int index, const QString &title, const QString &name, std::function<void()> &&funcClose);
     ~Room();
 
 signals:

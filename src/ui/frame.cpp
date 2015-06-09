@@ -21,16 +21,14 @@
 #include "gfx/image.h"
 #include "sfx/soundsystem.h"
 
-
 namespace ui {
 
-
-Frame::Frame(ui::Widget *parent) :
-    Label(parent)
+Frame::Frame(std::function<void()> &&funcClose, ui::Widget *parent) :
+    Label(parent),
+    m_funcClose(std::move(funcClose))
 {
 
 }
-
 
 void Frame::setupFrame(const QSize &size, const QString &title, bool closable)
 {
@@ -100,7 +98,6 @@ void Frame::setupFrame(const QSize &size, const QString &title, bool closable)
     sfx::SoundSystem::get()->sound(sfx::FrameOpen)->play();
 }
 
-
 int Frame::updateBorder(gfx::Texture texture, const gfx::ColorTable &colorTable, int x, int id)
 {
     QImage image = gfx::Image::load(QString("gfx:img/desktop/gui/bort%1.img").arg(id), colorTable);
@@ -117,13 +114,12 @@ int Frame::updateBorder(gfx::Texture texture, const gfx::ColorTable &colorTable,
 void Frame::closeFrame()
 {
     sfx::SoundSystem::get()->sound(sfx::FrameClose)->play();
-    emit close();
+    m_funcClose();
 }
 
 QImage Frame::getBorder(const gfx::ColorTable &colorTable, int id)
 {
     return gfx::Image::load(QString("gfx:img/desktop/gui/bort%1.img").arg(id), colorTable);
 }
-
 
 } // namespace ui

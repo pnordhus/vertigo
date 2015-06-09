@@ -38,7 +38,7 @@ private:
     enum LoadingState { Arrows, List1, List2 };
 
 public:
-    Depot();
+    Depot(std::function<void()> &&funcClose);
     ~Depot();
 
 private:

@@ -28,7 +28,8 @@
 namespace game {
 
 
-Depot::Depot() :
+Depot::Depot(std::function<void()> &&funcClose) :
+    Frame(std::move(funcClose)),
     m_boat(Chapter::get()->boat()),
     m_state(Flipping),
     m_side(1)

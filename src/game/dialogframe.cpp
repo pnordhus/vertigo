@@ -6,7 +6,8 @@
 namespace game {
 
 
-DialogFrame::DialogFrame(Dialog* dialog, const QString &roomName) :
+DialogFrame::DialogFrame(Dialog* dialog, const QString &roomName, std::function<void()> &&funcClose) :
+    Frame(std::move(funcClose)),
     m_dialog(dialog)
 {
     Q_ASSERT(dialog);
@@ -32,7 +33,7 @@ DialogFrame::DialogFrame(Dialog* dialog, const QString &roomName) :
     m_dialog->setParentWidget(this);
     m_dialog->setPosition(25, 23);
     m_dialog->setWidth(360 - 32);
-    connect(m_dialog, SIGNAL(close()), SLOT(closeFrame()));
+    m_dialog->funcClose = [this]() { closeFrame(); };
 }
 
 

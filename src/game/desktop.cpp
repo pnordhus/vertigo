@@ -205,8 +205,7 @@ void Desktop::hideNotebook()
 void Desktop::showRoom(int index)
 {
     Q_ASSERT(!m_room);
-    m_room = new Room(index, m_rooms[index].title, m_rooms[index].name);
-    connect(m_room, SIGNAL(close()), SLOT(hideRoom()));
+    m_room = new Room(index, m_rooms[index].title, m_rooms[index].name, [this]() { hideRoom(); });
     connect(m_room, SIGNAL(startDialog(Dialog*)), SLOT(showDialog(Dialog*)));
     connect(m_room, SIGNAL(startEnCom(Dialog*)), SLOT(showEnCom(Dialog*)));
     connect(m_room, SIGNAL(showDeparture()), SLOT(showDeparture()));
@@ -236,8 +235,7 @@ void Desktop::showDialog(Dialog *dialog)
     Q_ASSERT(m_room);
     Q_ASSERT(!m_dialog);
 
-    m_dialog = new DialogFrame(dialog, m_room->name());
-    connect(m_dialog, SIGNAL(close()), SLOT(hideDialog()));
+    m_dialog = new DialogFrame(dialog, m_room->name(), [this]() { hideDialog(); });
     setRootWidget(m_dialog);
     m_dialog->setPosition((640 - m_dialog->width()) / 2, (480 - m_dialog->height()) / 2);
 }
@@ -319,8 +317,7 @@ void Desktop::showDepot()
 {
     Q_ASSERT(m_room);
     Q_ASSERT(!m_depot);
-    m_depot = new Depot();
-    connect(m_depot, SIGNAL(close()), SLOT(hideDepot()));
+    m_depot = new Depot([this]() { hideDepot(); });
     setRootWidget(m_depot);
     m_depot->setPosition((640 - m_depot->width()) / 2, (480 - m_depot->height()) / 2);
     setClick(false);

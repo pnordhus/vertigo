@@ -12,7 +12,7 @@ namespace game {
 class DialogFrame : public ui::Frame
 {
 public:
-    DialogFrame(Dialog* dialog, const QString &roomName);
+    DialogFrame(Dialog* dialog, const QString &roomName, std::function<void()> &&funcClose);
     ~DialogFrame();
 
 private:

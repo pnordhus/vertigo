@@ -25,7 +25,8 @@
 namespace game {
 
 
-Room::Room(int index, const QString &title, const QString &name) :
+Room::Room(int index, const QString &title, const QString &name, std::function<void()> &&funcClose) :
+    Frame(std::move(funcClose)),
     m_index(index),
     m_miniMovie("gfx:mvi/room"),
     m_name(name),

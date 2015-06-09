@@ -209,10 +209,11 @@ void Dialog::select()
     if (m_finished) {
         if (m_changeChapter != -1)
             emit changeChapter(m_changeChapter);
-        if (m_gameOver)
+        if (m_gameOver) {
             emit gameOver();
-        else
-            emit close();
+        } else {
+            funcClose();
+        }
     }
 
     if (!m_option || m_finished) {

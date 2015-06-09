@@ -18,38 +18,33 @@
 #ifndef UI_FRAME_H
 #define UI_FRAME_H
 
-
 #include "label.h"
 #include "gfx/colortable.h"
 #include "gfx/texture.h"
 
+#include <functional>
 
 namespace ui {
 
-
 class Frame : public ui::Label
 {
-    Q_OBJECT
-
 public:
-    Frame(ui::Widget *parent = NULL);
-
-signals:
-    void close();
+    Frame(std::function<void()> &&funcClose, ui::Widget *parent = NULL);
 
 public:
     void setupFrame(const QSize &size, const QString &title, bool closable);
 
-protected slots:
+protected:
     void closeFrame();
 
 private:
     static int updateBorder(gfx::Texture texture, const gfx::ColorTable &colorTable, int x, int id);
     static QImage getBorder(const gfx::ColorTable &colorTable, int id);
+
+private:
+    std::function<void()> m_funcClose;
 };
 
-
 } // namespace ui
-
 
 #endif // UI_FRAME_H

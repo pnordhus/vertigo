@@ -166,7 +166,6 @@ set(MOC_SOURCES
     game/vertigo.h
     game/window.h
 
-    ui/frame.h
     ui/widget.h
 )
 

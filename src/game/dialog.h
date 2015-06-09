@@ -23,6 +23,7 @@
 #include <QMap>
 #include <QSet>
 
+#include <functional>
 
 namespace game {
 
@@ -97,8 +98,9 @@ private:
 public:
     Dialog(int chapter, int id, ui::Widget *parent = NULL);
 
+    std::function<void()> funcClose;
+
 signals:
-    void close();
     void remove(int);
     void addMessage(int);
     void addTask(int);
