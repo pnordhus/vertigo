@@ -150,13 +150,7 @@ set(SOURCES
     ui/widget.h
 )
 
-set(MOC_SOURCES
-    game/window.h
-)
-
-qt4_wrap_cpp(MOC_SOURCES ${MOC_SOURCES})
-
-add_executable(vertigo WIN32 ${SOURCES} ${MOC_SOURCES})
+add_executable(vertigo WIN32 ${SOURCES})
 target_link_libraries(vertigo ${QT_LIBRARIES} ${OPENGL_LIBRARY} ${OPENAL_LIBRARY})
 set_property(TARGET vertigo PROPERTY CXX_STANDARD 11)
 install(TARGETS vertigo DESTINATION bin)

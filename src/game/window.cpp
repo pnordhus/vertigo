@@ -17,23 +17,19 @@
 
 #include "renderer.h"
 #include "window.h"
+
 #include "gfx/colortable.h"
 #include "gfx/image.h"
-#include <QAction>
+
+#include <QKeyEvent>
 #include <QSettings>
 #include <QTimer>
 
 namespace game {
 
-
 Window::Window() :
     m_renderer(NULL)
 {
-    QAction *actionFullScreen = new QAction(this);
-    actionFullScreen->setShortcuts(QList<QKeySequence>() << (Qt::CTRL + Qt::Key_F) << (Qt::ALT + Qt::Key_Return) << (Qt::ALT + Qt::Key_Enter));
-    connect(actionFullScreen, SIGNAL(triggered()), SLOT(toggleFullScreen()));
-    addAction(actionFullScreen);
-
     const gfx::ColorTable colorTable("gfx:pal/gui/cursor.pal");
     m_cursor = gfx::Image::loadCursor("gfx:img/desktop/gui/cur_norm.img", colorTable);
     setWindowTitle("Vertigo");
@@ -45,7 +41,6 @@ Window::Window() :
     connect(timer, SIGNAL(timeout()), SLOT(update()));
     timer->start(20);
 }
-
 
 void Window::setRenderer(Renderer *renderer)
 {
@@ -62,25 +57,16 @@ void Window::setRenderer(Renderer *renderer)
     }
 }
 
-
-void Window::toggleFullScreen()
-{
-    setWindowState(windowState() ^ Qt::WindowFullScreen);
-}
-
-
 void Window::initializeGL()
 {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
-
 void Window::resizeGL(int w, int h)
 {
     glViewport(0, 0, w, h);
 }
-
 
 void Window::paintGL()
 {
@@ -95,13 +81,16 @@ void Window::paintGL()
     }
 }
 
-
 void Window::keyPressEvent(QKeyEvent *event)
 {
+    const Qt::KeyboardModifiers modifiers = event->modifiers() & ~Qt::KeypadModifier;
+    if ((modifiers == Qt::CTRL && event->key() == Qt::Key_F) || (modifiers == Qt::ALT && (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter))) {
+        setWindowState(windowState() ^ Qt::WindowFullScreen);
+    }
+
     if (m_renderer)
         m_renderer->keyPressEvent(event);
 }
-
 
 void Window::keyReleaseEvent(QKeyEvent *event)
 {
@@ -109,13 +98,11 @@ void Window::keyReleaseEvent(QKeyEvent *event)
         m_renderer->keyReleaseEvent(event);
 }
 
-
 void Window::mousePressEvent(QMouseEvent *event)
 {
     if (m_renderer)
         m_renderer->mousePressEvent(event);
 }
-
 
 void Window::mouseReleaseEvent(QMouseEvent *event)
 {
@@ -123,13 +110,11 @@ void Window::mouseReleaseEvent(QMouseEvent *event)
         m_renderer->mouseReleaseEvent(event);
 }
 
-
 void Window::mouseMoveEvent(QMouseEvent *event)
 {
     if (m_renderer)
         m_renderer->mouseMoveEvent(event);
 }
-
 
 void Window::closeEvent(QCloseEvent *event)
 {
@@ -137,19 +122,16 @@ void Window::closeEvent(QCloseEvent *event)
     QGLWidget::closeEvent(event);
 }
 
-
 void Window::saveSettings()
 {
     QSettings settings;
     settings.setValue("MainWindow/geometry", saveGeometry());
 }
 
-
 void Window::loadSettings()
 {
     QSettings settings;
     restoreGeometry(settings.value("MainWindow/geometry").toByteArray());
 }
-
 
 } // namespace game

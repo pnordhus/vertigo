@@ -18,28 +18,19 @@
 #ifndef GAME_WINDOW_H
 #define GAME_WINDOW_H
 
-
 #include <QGLWidget>
-
 
 namespace game {
 
-
 class Renderer;
-
 
 class Window : public QGLWidget
 {
-    Q_OBJECT
-
 public:
     Window();
 
-public slots:
+public:
     void setRenderer(Renderer *renderer);
-
-private slots:
-    void toggleFullScreen();
 
 private:
     void initializeGL();
@@ -59,8 +50,6 @@ private:
     Renderer *m_renderer;
 };
 
-
 } // namespace game
-
 
 #endif // GAME_WINDOW_H
