@@ -25,9 +25,10 @@
 namespace game {
 
 
-Notebook::Notebook() :
+Notebook::Notebook(std::function<void()> funcClose) :
     m_lblMissions(NULL),
-    m_lblMoviePlayer(NULL)
+    m_lblMoviePlayer(NULL),
+    m_funcClose(std::move(funcClose))
 {
     const gfx::ColorTable colorTable("gfx:pal/notebook/notebook.pal");
     m_fontGreen.load("gfx:fnt/nfont1a.fnt", colorTable, true);
@@ -61,7 +62,7 @@ Notebook::Notebook() :
 
         widget = createButton([this]() { showMap(); }, m_lblMain, txt::Notebook_Map, 150);
 
-        widget = createButton([this]() { emit close(); }, m_lblMain, txt::Notebook_Back, 170);
+        widget = createButton(m_funcClose, m_lblMain, txt::Notebook_Back, 170);
 
         widget = createButton([]() { Chapter::get()->quit(); }, m_lblMain, txt::Notebook_QuitGame, 210);
     }
@@ -123,9 +124,9 @@ ui::Label* Notebook::createLabel(ui::Widget *parent, txt::String text, float pos
 }
 
 
-ui::Button* Notebook::createButton(std::function<void()> &&funcClick, ui::Widget *parent, txt::String text, float posY)
+ui::Button* Notebook::createButton(std::function<void()> funcClick, ui::Widget *parent, txt::String text, float posY)
 {
-    ui::Button *button = new ui::Button(std::move(funcClick), parent);
+    ui::Button *button = new ui::Button(funcClick, parent);
     button->setFont(m_fontGreen);
     button->setText(txt::StringTable::get(text));
     button->setPosition(0, posY);
@@ -311,7 +312,7 @@ bool Notebook::mousePressEvent(const QPoint &pos, Qt::MouseButton button)
             return true;
         }
         if (m_lblMain->isVisible()) {
-            emit close();
+            m_funcClose();
             return true;
         }
     }

@@ -29,13 +29,8 @@ namespace game {
 
 class Notebook : public ui::Label
 {
-    Q_OBJECT
-
 public:
-    Notebook();
-
-signals:
-    void close();
+    Notebook(std::function<void()> funcClose);
 
 private:
     void showMissions();
@@ -52,7 +47,7 @@ private:
 
 private:
     ui::Label* createLabel(ui::Widget *parent, txt::String text, float posY);
-    ui::Button* createButton(std::function<void()> &&funcClick, ui::Widget *parent, txt::String text, float posY);
+    ui::Button* createButton(std::function<void()> funcClick, ui::Widget *parent, txt::String text, float posY);
 
 private:
     bool mousePressEvent(const QPoint &pos, Qt::MouseButton button);
@@ -71,6 +66,7 @@ private:
     ui::Button *m_btnMoviesAutopilot;
     ui::Button *m_btnMoviesApproach;
     ui::Button *m_btnMoviesHarbour;
+    std::function<void()> m_funcClose;
 };
 
 

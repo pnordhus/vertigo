@@ -27,7 +27,7 @@ namespace ui {
 class Button : public Label
 {
 public:
-    Button(std::function<void()> &&funcClicked, Widget *parent = NULL);
+    Button(std::function<void()> funcClicked, Widget *parent = NULL);
 
 public:
     void setOffset(int offset);

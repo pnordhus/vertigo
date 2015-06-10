@@ -21,7 +21,7 @@
 namespace ui {
 
 
-Button::Button(std::function<void()> &&funcClicked, Widget *parent) :
+Button::Button(std::function<void()> funcClicked, Widget *parent) :
     Label(parent),
     m_pressed(false),
     m_offset(1),

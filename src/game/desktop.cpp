@@ -28,6 +28,7 @@ namespace game {
 
 
 Desktop::Desktop(const QString &name) :
+    m_notebook([this]() { hideNotebook(); }),
     m_room(NULL),
     m_dialog(NULL),
     m_enCom(NULL),
@@ -73,7 +74,6 @@ Desktop::Desktop(const QString &name) :
     m_btnNotebook->setPosition(572, 424);
 
     m_notebook.hide();
-    connect(&m_notebook, SIGNAL(close()), SLOT(hideNotebook()));
 
     m_widgetRooms = new ui::Label(&m_lblBackground);
     foreach (const QString &section, file.sections().filter(QRegExp("^room"))) {
