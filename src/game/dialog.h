@@ -30,8 +30,6 @@ namespace game {
 
 class Dialog : public ui::Widget
 {
-    Q_OBJECT
-
 private:
     struct Option
     {
@@ -96,24 +94,23 @@ private:
     };
 
 public:
-    Dialog(int chapter, int id, ui::Widget *parent = NULL);
+    Dialog(int chapter, int id, ui::Widget *parent,
+       std::function<void(int)> funcRemove,
+       std::function<void(int)> funcAddMessage,
+       std::function<void(int)> funcAddTask,
+       std::function<void(int)> funcRemoveTask,
+       std::function<void(int)> funcChangeChapter,
+       std::function<void(int)> funcAddDialog,
+       std::function<void(int)> funcRemoveDialog,
+       std::function<void(int)> funcAddCredit,
+       std::function<void(int)> funcEnableStation,
+       std::function<void(int)> funcDisableStation,
+       std::function<void(QString, int)> funcAddMission,
+       std::function<void(int, QString)> funcReplaceApproachMovie,
+       std::function<void()> funcGameOver
+    );
 
     std::function<void()> funcClose;
-
-signals:
-    void remove(int);
-    void addMessage(int);
-    void addTask(int);
-    void removeTask(int);
-    void changeChapter(int);
-    void addDialog(int);
-    void removeDialog(int);
-    void addCredit(int);
-    void enableStation(int);
-    void disableStation(int);
-    void addMission(const QString&, int = -1);
-    void replaceApproachMovie(int, const QString&);
-    void gameOver();
 
 public:
     int id() const { return m_id; }
@@ -159,6 +156,19 @@ private:
     bool m_gameOver;
     bool m_isSmallTalk;
     QList<Precondition> m_preconditions;
+    std::function<void(int)> m_funcRemove;
+    std::function<void(int)> m_funcAddMessage;
+    std::function<void(int)> m_funcAddTask;
+    std::function<void(int)> m_funcRemoveTask;
+    std::function<void(int)> m_funcChangeChapter;
+    std::function<void(int)> m_funcAddDialog;
+    std::function<void(int)> m_funcRemoveDialog;
+    std::function<void(int)> m_funcAddCredit;
+    std::function<void(int)> m_funcEnableStation;
+    std::function<void(int)> m_funcDisableStation;
+    std::function<void(QString, int)> m_funcAddMission;
+    std::function<void(int, QString)> m_funcReplaceApproachMovie;
+    std::function<void()> m_funcGameOver;
 };
 
 

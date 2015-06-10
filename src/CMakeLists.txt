@@ -151,8 +151,6 @@ set(SOURCES
 )
 
 set(MOC_SOURCES
-    game/chapter.h
-    game/dialog.h
     game/vertigo.h
     game/window.h
 )

@@ -611,20 +611,21 @@ void Chapter::addDialog(int dialogId)
 {
     Q_ASSERT(!m_pendingDialogues.contains(dialogId));
 
-    Dialog *dialog = new Dialog(m_code, dialogId);
-    connect(dialog, SIGNAL(remove(int)), SLOT(finishDialog(int)));
-    connect(dialog, SIGNAL(addMessage(int)), SLOT(addMessage(int)));
-    connect(dialog, SIGNAL(addTask(int)), SLOT(addTask(int)));
-    connect(dialog, SIGNAL(removeTask(int)), SLOT(removeTask(int)));
-    connect(dialog, SIGNAL(changeChapter(int)), SLOT(changeChapter(int)));
-    connect(dialog, SIGNAL(addDialog(int)), SLOT(addDialog(int)));
-    connect(dialog, SIGNAL(removeDialog(int)), SLOT(removeDialog(int)));
-    connect(dialog, SIGNAL(addCredit(int)), SLOT(addCredit(int)));
-    connect(dialog, SIGNAL(enableStation(int)), SLOT(enableStation(int)));
-    connect(dialog, SIGNAL(disableStation(int)), SLOT(disableStation(int)));
-    connect(dialog, SIGNAL(addMission(QString,int)), SLOT(addMission(QString,int)));
-    connect(dialog, SIGNAL(replaceApproachMovie(int,QString)), SLOT(replaceApproachMovie(int,QString)));
-    connect(dialog, SIGNAL(gameOver()), SLOT(gameOver()));
+    Dialog *dialog = new Dialog(m_code, dialogId, nullptr,
+        [this](int n) { finishDialog(n); },
+        [this](int n) { addMessage(n); },
+        [this](int n) { addTask(n); },
+        [this](int n) { removeTask(n); },
+        [this](int n) { changeChapter(n); },
+        [this](int n) { addDialog(n); },
+        [this](int n) { removeDialog(n); },
+        [this](int n) { addCredit(n); },
+        [this](int n) { enableStation(n); },
+        [this](int n) { disableStation(n); },
+        [this](QString mission, int station) { addMission(mission, station); },
+        [this](int station, QString movie) { replaceApproachMovie(station, movie); },
+        [this]() { gameOver(); }
+    );
     m_pendingDialogues.insert(dialogId, dialog);
 }
 

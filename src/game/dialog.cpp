@@ -27,14 +27,41 @@
 namespace game {
 
 
-Dialog::Dialog(int chapter, int id, ui::Widget *parent) :
+Dialog::Dialog(int chapter, int id, ui::Widget *parent,
+    std::function<void(int)> funcRemove,
+    std::function<void(int)> funcAddMessage,
+    std::function<void(int)> funcAddTask,
+    std::function<void(int)> funcRemoveTask,
+    std::function<void(int)> funcChangeChapter,
+    std::function<void(int)> funcAddDialog,
+    std::function<void(int)> funcRemoveDialog,
+    std::function<void(int)> funcAddCredit,
+    std::function<void(int)> funcEnableStation,
+    std::function<void(int)> funcDisableStation,
+    std::function<void(QString, int)> funcAddMission,
+    std::function<void(int, QString)> funcReplaceApproachMovie,
+    std::function<void()> funcGameOver
+) :
     ui::Widget(parent),
     m_id(id),
     m_option(NULL),
     m_finished(false),
     m_remove(false),
     m_changeChapter(-1),
-    m_gameOver(false)
+    m_gameOver(false),
+    m_funcRemove(std::move(funcRemove)),
+    m_funcAddMessage(std::move(funcAddMessage)),
+    m_funcAddTask(std::move(funcAddTask)),
+    m_funcRemoveTask(std::move(funcRemoveTask)),
+    m_funcChangeChapter(std::move(funcChangeChapter)),
+    m_funcAddDialog(std::move(funcAddDialog)),
+    m_funcRemoveDialog(std::move(funcRemoveDialog)),
+    m_funcAddCredit(std::move(funcAddCredit)),
+    m_funcEnableStation(std::move(funcEnableStation)),
+    m_funcDisableStation(std::move(funcDisableStation)),
+    m_funcAddMission(std::move(funcAddMission)),
+    m_funcReplaceApproachMovie(std::move(funcReplaceApproachMovie)),
+    m_funcGameOver(std::move(funcGameOver))
 {
     const QString baseName = QString("txt:dia/%1/%2").arg(chapter, 3, 10, QChar('0')).arg(id, 6, 10, QChar('0'));
 
@@ -132,8 +159,9 @@ void Dialog::select()
     m_optionIndex = 0;
     if (m_option) {
         if (m_option->message > 0) {
-            if (m_option->message < 9999000)
-                emit addMessage(m_option->message);
+            if (m_option->message < 9999000) {
+                m_funcAddMessage(m_option->message);
+            }
 
             foreach (const Message &message, m_messages.values(m_option->message)) {
                 switch (message.type) {
@@ -141,11 +169,11 @@ void Dialog::select()
                     break;
 
                 case Message::AddTask:
-                    emit addTask(message.value);
+                    m_funcAddTask(message.value);
                     break;
 
                 case Message::RemoveTask:
-                    emit removeTask(message.value);
+                    m_funcRemoveTask(message.value);
                     break;
 
                 case Message::ChangeChapter:
@@ -153,35 +181,35 @@ void Dialog::select()
                     break;
 
                 case Message::AddDialog:
-                    emit addDialog(message.value);
+                    m_funcAddDialog(message.value);
                     break;
 
                 case Message::RemoveDialog:
-                    emit removeDialog(message.value);
+                    m_funcRemoveDialog(message.value);
                     break;
 
                 case Message::AddCredit:
-                    emit addCredit(message.value);
+                    m_funcAddCredit(message.value);
                     break;
 
                 case Message::EnableStation:
-                    emit enableStation(message.value);
+                    m_funcEnableStation(message.value);
                     break;
 
                 case Message::DisableStation:
-                    emit disableStation(message.value);
+                    m_funcDisableStation(message.value);
                     break;
 
                 case Message::AddMissionStation:
-                    emit addMission(message.name, message.value);
+                    m_funcAddMission(message.name, message.value);
                     break;
 
                 case Message::AddMissionArea:
-                    emit addMission(message.name);
+                    m_funcAddMission(message.name, -1);
                     break;
 
                 case Message::ReplaceApproachMovie:
-                    emit replaceApproachMovie(message.value, message.name + ".mvi");
+                    m_funcReplaceApproachMovie(message.value, message.name + ".mvi");
                     break;
 
                 case Message::GameOver:
@@ -195,7 +223,7 @@ void Dialog::select()
             switch (m_option->next) {
             case RemoveDialog:
                 m_remove = true;
-                emit remove(m_id);
+                m_funcRemove(m_id);
                 break;
             }
         }
@@ -208,9 +236,9 @@ void Dialog::select()
 
     if (m_finished) {
         if (m_changeChapter != -1)
-            emit changeChapter(m_changeChapter);
+            m_funcChangeChapter(m_changeChapter);
         if (m_gameOver) {
-            emit gameOver();
+            m_funcGameOver();
         } else {
             funcClose();
         }

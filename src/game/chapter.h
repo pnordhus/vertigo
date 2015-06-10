@@ -37,8 +37,6 @@ namespace game {
 
 class Chapter : public QObject
 {
-    Q_OBJECT
-
 public:
     struct SavedGame
     {
@@ -56,14 +54,13 @@ public:
     Chapter(const QString &name, std::function<void(Renderer*)> funcSetRenderer, std::function<void()> funcEndGame);
     ~Chapter();
 
-public slots:
+public:
     void quit();
     void toggleMovieAutopilot();
     void toggleMovieApproach();
     void toggleMovieHarbour();
     void addCredit(int credit);
 
-public:
     void save() const;
     void load(const QString &name);
     void loadChapter(int chapter);
