@@ -25,32 +25,25 @@
 #include "ui/label.h"
 #include <QTime>
 
+#include <functional>
 
 namespace game {
 
 
 class MainMenu : public Menu
 {
-    Q_OBJECT
-
 private:
     enum State { Invalid, Presents, Title };
 
 public:
-    MainMenu(bool skipToTitle);
+    MainMenu(bool skipToTitle, std::function<void(QString)> funcStartGame, std::function<void(QString)> funcLoadGame, std::function<void()> funcQuit);
 
-signals:
-    void startGame(const QString &name);
-    void loadGame(const QString &name);
-    void quit();
-
-private slots:
+private:
     void showNew();
     void hideNew();
     void showLoad();
     void hideLoad();
 
-private:
     void draw();
     void activate();
     void deactivate();
@@ -69,6 +62,8 @@ private:
     QString m_name;
     bool m_cursor;
     QTime m_time;
+    std::function<void(QString)> m_funcStartGame;
+    std::function<void(QString)> m_funcLoadGame;
 };
 
 

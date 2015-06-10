@@ -154,7 +154,6 @@ set(MOC_SOURCES
     game/chapter.h
     game/desktop.h
     game/dialog.h
-    game/mainmenu.h
     game/renderer.h
     game/room.h
     game/vertigo.h

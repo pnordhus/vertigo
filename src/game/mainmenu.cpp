@@ -28,11 +28,13 @@
 namespace game {
 
 
-MainMenu::MainMenu(bool skipToTitle) :
+MainMenu::MainMenu(bool skipToTitle, std::function<void(QString)> funcStartGame, std::function<void(QString)> funcLoadGame, std::function<void()> funcQuit) :
     m_state(Invalid),
     m_lblNew(NULL),
     m_lblLoad(NULL),
-    m_cursor(false)
+    m_cursor(false),
+    m_funcStartGame(std::move(funcStartGame)),
+    m_funcLoadGame(std::move(funcLoadGame))
 {
     const gfx::ColorTable colorTable("gfx:pal/gui/border.pal");
 
@@ -84,7 +86,7 @@ MainMenu::MainMenu(bool skipToTitle) :
         button->setAlignment(ui::Label::AlignHCenter);
         button->setText(txt::StringTable::get(txt::MainMenu_Load));
 
-        button = new ui::Button([this]() { emit quit(); }, m_lblMain);
+        button = new ui::Button(funcQuit, m_lblMain);
         button->setFont(fontLarge);
         button->setPosition(0, 408);
         button->setWidth(640);
@@ -174,8 +176,9 @@ void MainMenu::keyPressEvent(QKeyEvent *event)
     Menu::keyPressEvent(event);
 
     if (m_lblNew && m_lblNew->isVisible()) {
-        if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
-            emit startGame(m_name.trimmed());
+        if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return) {
+            m_funcStartGame(m_name.trimmed());
+        }
 
         if (event->key() == Qt::Key_Backspace)
             m_name.chop(1);
@@ -240,7 +243,7 @@ void MainMenu::showLoad()
     qSort(games);
     foreach (const Chapter::SavedGame &game, games) {
         QString name = game.name;
-        ui::Button *button = new ui::Button([this, name]() { emit loadGame(name); }, m_lblLoad);
+        ui::Button *button = new ui::Button([this, name]() { m_funcLoadGame(name); }, m_lblLoad);
         button->setPosition(0, y);
         button->setWidth(640);
         button->setAlignment(ui::Button::AlignHCenter);

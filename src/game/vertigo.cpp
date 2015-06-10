@@ -96,10 +96,11 @@ bool Vertigo::start(const QString &scenario)
 void Vertigo::createMainMenu(bool skipToTitle)
 {
     Q_ASSERT(!m_mainMenu);
-    m_mainMenu = new MainMenu(skipToTitle);
-    connect(m_mainMenu, SIGNAL(startGame(QString)), SLOT(startGame(QString)));
-    connect(m_mainMenu, SIGNAL(loadGame(QString)), SLOT(loadGame(QString)));
-    connect(m_mainMenu, SIGNAL(quit()), m_window, SLOT(close()));
+    m_mainMenu = new MainMenu(skipToTitle,
+        [this](QString name) { startGame(name); },
+        [this](QString name) { loadGame(name); },
+        [this]() { m_window->close(); }
+    );
     m_window->setRenderer(m_mainMenu);
 }
 
