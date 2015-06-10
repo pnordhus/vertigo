@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
 
-project(vertigo CXX)
+project(vertigo)
 
 find_package(Qt4 4.6.0 REQUIRED)
 find_package(OpenGL REQUIRED)
