@@ -42,12 +42,6 @@ void Renderer::setRect(const QRect &rect)
 }
 
 
-void Renderer::setCursorVisible(bool visible)
-{
-    m_cursorVisible = visible;
-}
-
-
 void Renderer::showCursor()
 {
     m_cursorVisible = true;

@@ -32,8 +32,6 @@ namespace game {
 
 class Renderer : public QObject
 {
-    Q_OBJECT
-
 public:
     Renderer();
 
@@ -41,11 +39,6 @@ public:
     virtual void draw() = 0;
     virtual void activate() {}
     virtual void deactivate() {}
-
-public slots:
-    void setCursorVisible(bool visible);
-    void showCursor();
-    void hideCursor();
 
 public:
     void setWindow(QWidget *window);
@@ -65,6 +58,8 @@ public:
     virtual void mouseMoveEvent(QMouseEvent *) {}
 
 protected:
+    void showCursor();
+    void hideCursor();
     void setupOrthographicMatrix(float w, float h);
     QWidget* window() const { return m_window; }
 
