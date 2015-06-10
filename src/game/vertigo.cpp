@@ -108,9 +108,10 @@ void Vertigo::createMainMenu(bool skipToTitle)
 void Vertigo::createChapter()
 {
     Q_ASSERT(m_chapter == NULL);
-    m_chapter = new Chapter(m_name);
-    connect(m_chapter, SIGNAL(setRenderer(Renderer*)), m_window, SLOT(setRenderer(Renderer*)));
-    connect(m_chapter, SIGNAL(endGame()), SLOT(endGame()));
+    m_chapter = new Chapter(m_name,
+        [this](Renderer *renderer) { m_window->setRenderer(renderer); },
+        [this]() { endGame(); }
+    );
 }
 
 

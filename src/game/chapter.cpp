@@ -31,7 +31,7 @@ namespace game {
 Chapter *Chapter::m_singleton = NULL;
 
 
-Chapter::Chapter(const QString &name) :
+Chapter::Chapter(const QString &name, std::function<void(Renderer*)> funcSetRenderer, std::function<void()> funcEndGame) :
     m_code(-1),
     m_area(NULL),
     m_desktop(NULL),
@@ -43,7 +43,9 @@ Chapter::Chapter(const QString &name) :
     m_scenario(NULL),
     m_boat(NULL),
     m_end(false),
-    m_name(name)
+    m_name(name),
+    m_funcSetRenderer(std::move(funcSetRenderer)),
+    m_funcEndGame(std::move(funcEndGame))
 {
     Q_ASSERT(m_singleton == NULL);
     m_singleton = this;
@@ -408,7 +410,7 @@ void Chapter::startMission()
     if (m_briefing)
         m_briefing->deleteLater();
     m_briefing = new Briefing([this]() { startScenario(); });
-    emit setRenderer(m_briefing);
+    m_funcSetRenderer(m_briefing);
 }
 
 
@@ -421,7 +423,7 @@ void Chapter::startScenario()
     Q_ASSERT(m_mission);
     Q_ASSERT(m_scenario == NULL);
     m_scenario = new fight::Scenario(m_mission->scenario(), [this]() { finishMission(); });
-    emit setRenderer(m_scenario);
+    m_funcSetRenderer(m_scenario);
 }
 
 
@@ -487,27 +489,27 @@ void Chapter::playMovies()
         if (m_mission) {
             startMission();
         } else if (m_end) {
-            emit endGame();
+            m_funcEndGame();
         } else {
             if (m_save) {
                 save();
                 m_save = false;
             }
-            emit setRenderer(m_desktop);
+            m_funcSetRenderer(m_desktop);
         }
     } else {
         sfx::SoundSystem::get()->pauseAll();
         Q_ASSERT(m_movie == NULL);
         m_movie = new Movie([this]() { movieFinished(); });
         m_movie->play(m_movies.takeFirst());
-        emit setRenderer(m_movie);
+        m_funcSetRenderer(m_movie);
     }
 }
 
 
 void Chapter::movieFinished()
 {
-    emit setRenderer(NULL);
+    m_funcSetRenderer(nullptr);
     delete m_movie;
     m_movie = NULL;
     playMovies();
@@ -516,7 +518,7 @@ void Chapter::movieFinished()
 
 void Chapter::quit()
 {
-    emit endGame();
+    m_funcEndGame();
 }
 
 
@@ -528,7 +530,7 @@ void Chapter::replaceApproachMovie(int station, const QString &movie)
 
 void Chapter::gameOver()
 {
-    emit endGame();
+    m_funcEndGame();
 }
 
 

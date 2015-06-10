@@ -53,12 +53,8 @@ public:
     };
 
 public:
-    Chapter(const QString &name);
+    Chapter(const QString &name, std::function<void(Renderer*)> funcSetRenderer, std::function<void()> funcEndGame);
     ~Chapter();
-
-signals:
-    void setRenderer(Renderer*);
-    void endGame();
 
 public slots:
     void quit();
@@ -151,6 +147,8 @@ private:
     Boat *m_boat;
     bool m_end;
     QString m_name;
+    std::function<void(Renderer*)> m_funcSetRenderer;
+    std::function<void()> m_funcEndGame;
 };
 
 
