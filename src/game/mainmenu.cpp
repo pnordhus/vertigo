@@ -26,7 +26,7 @@
 
 namespace game {
 
-MainMenu::MainMenu(bool skipToTitle, std::function<void(QString)> funcStartGame, std::function<void(QString)> funcLoadGame, std::function<void()> funcQuit) :
+MainMenu::MainMenu(std::function<void(QString)> funcStartGame, std::function<void(QString)> funcLoadGame, std::function<void()> funcQuit) :
     m_state(Invalid),
     m_lblVersion(&m_title),
     m_lblBar1(&m_title),
@@ -108,11 +108,7 @@ MainMenu::MainMenu(bool skipToTitle, std::function<void(QString)> funcStartGame,
     m_btnLoadBack.setFont(gfx::Font::Large);
     m_btnLoadBack.setText(txt::StringTable::get(txt::MainMenu));
 
-    if (skipToTitle) {
-        changeState(Title);
-    } else {
-        changeState(Presents);
-    }
+    changeState(Presents);
 }
 
 void MainMenu::draw()
@@ -184,6 +180,7 @@ void MainMenu::keyPressEvent(QKeyEvent *event)
     if (m_lblNew.isVisible()) {
         if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return) {
             m_funcStartGame(m_name.trimmed());
+            showMain();
         }
 
         if (event->key() == Qt::Key_Backspace)
@@ -228,7 +225,7 @@ void MainMenu::showLoad()
     foreach (const Chapter::SavedGame &game, games) {
         QString name = game.name;
 
-        m_btnLoadSave.emplace_back([this, name]() { m_funcLoadGame(name); }, &m_lblLoad);
+        m_btnLoadSave.emplace_back([this, name]() { m_funcLoadGame(name); showMain(); }, &m_lblLoad);
         ui::Button &button = m_btnLoadSave.back();
         button.setPosition(0, y);
         button.setWidth(640);

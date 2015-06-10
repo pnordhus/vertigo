@@ -21,7 +21,7 @@
 #include "gfx/image.h"
 #include <QAction>
 #include <QSettings>
-
+#include <QTimer>
 
 namespace game {
 
@@ -40,6 +40,10 @@ Window::Window() :
     setMouseTracking(true);
     makeCurrent();
     loadSettings();
+
+    QTimer *timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), SLOT(update()));
+    timer->start(20);
 }
 
 

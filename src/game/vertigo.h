@@ -18,25 +18,19 @@
 #ifndef GAME_VERTIGO_H
 #define GAME_VERTIGO_H
 
+#include "mainmenu.h"
+#include "window.h"
 
 #include "gfx/fontmanager.h"
 #include "sfx/soundsystem.h"
-#include <QObject>
-
 
 namespace game {
 
-
 class Chapter;
-class MainMenu;
 class Movie;
-class Window;
 
-
-class Vertigo : public QObject
+class Vertigo
 {
-    Q_OBJECT
-
 public:
     Vertigo();
     ~Vertigo();
@@ -44,29 +38,24 @@ public:
 public:
     bool start(const QString &scenario);
 
-private slots:
-    void update();
+private:
     void startGame(const QString &name);
     void loadGame(const QString &name);
     void endGame();
     void introFinished();
-
-private:
     void createMainMenu(bool skipToTitle);
     void createChapter();
 
 private:
-    Window *m_window;
-    MainMenu *m_mainMenu;
+    Window m_window;
+    sfx::SoundSystem m_soundSystem;
+    gfx::FontManager m_fontManager;
+    MainMenu m_mainMenu;
     Movie *m_intro;
     Chapter *m_chapter;
-    sfx::SoundSystem *m_soundSystem;
-    gfx::FontManager *m_fontManager;
     QString m_name;
 };
 
-
 } // namespace game
-
 
 #endif // GAME_VERTIGO_H

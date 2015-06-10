@@ -32,7 +32,7 @@ private:
     enum State { Invalid, Presents, Title };
 
 public:
-    MainMenu(bool skipToTitle, std::function<void(QString)> funcStartGame, std::function<void(QString)> funcLoadGame, std::function<void()> funcQuit);
+    MainMenu(std::function<void(QString)> funcStartGame, std::function<void(QString)> funcLoadGame, std::function<void()> funcQuit);
 
 private:
     void showMain();

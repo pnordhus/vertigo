@@ -16,110 +16,52 @@
  ***************************************************************************/
 
 #include "chapter.h"
-#include "mainmenu.h"
 #include "vertigo.h"
-#include "window.h"
-#include "txt/stringtable.h"
-#include <QApplication>
-#include <QDir>
-#include <QFileDialog>
-#include <QSettings>
-#include <QTimer>
+
 #include "fight/scenario.h"
 
+#include <QApplication>
 
 namespace game {
 
-
 Vertigo::Vertigo() :
-    m_window(NULL),
-    m_mainMenu(NULL),
+    m_mainMenu(
+       [this](QString name) { startGame(name); },
+       [this](QString name) { loadGame(name); },
+       [this]() { m_window.close(); }
+    ),
     m_intro(NULL),
-    m_chapter(NULL),
-    m_soundSystem(NULL),
-    m_fontManager(NULL)
+    m_chapter(NULL)
 {
-
 }
-
 
 Vertigo::~Vertigo()
 {
     delete m_chapter;
     delete m_intro;
-    delete m_mainMenu;
-    delete m_window;
-    delete m_soundSystem;
-    delete m_fontManager;
 }
-
 
 bool Vertigo::start(const QString &scenario)
 {
-    QDir::addSearchPath("dat", "data:dat");
-    QDir::addSearchPath("gfx", "data:gfx");
-    QDir::addSearchPath("sfx", "data:sfx");
-    QDir::addSearchPath("txt", "data:txt");
-    QDir::addSearchPath("vfx", "data:vfx");
-
-    QSettings s;
-    QDir::setSearchPaths("data", QStringList() << s.value("datadir").toString());
-    while (!txt::StringTable::load()) {
-        const QString dir = QFileDialog::getExistingDirectory(NULL, "Select Schleichfahrt / Archimedean Dynasty directory", s.value("datadir").toString());
-        if (dir.isNull())
-            return false;
-        s.setValue("datadir", dir);
-        QDir::setSearchPaths("data", QStringList() << s.value("datadir").toString());
-    }
-
-    m_soundSystem = new sfx::SoundSystem;
-
-    m_window = new Window;
-    m_fontManager = new gfx::FontManager;
-
-    QTimer *timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), SLOT(update()));
-    timer->start(20);
-
     if (scenario.isEmpty()) {
-        createMainMenu(false);
+        m_window.setRenderer(&m_mainMenu);
     } else {
         fight::Scenario *s = new fight::Scenario(scenario, []() { QApplication::quit(); });
-        m_window->setRenderer(s);
+        m_window.setRenderer(s);
     }
 
-    m_window->show();
+    m_window.show();
     return true;
 }
-
-
-void Vertigo::createMainMenu(bool skipToTitle)
-{
-    Q_ASSERT(!m_mainMenu);
-    m_mainMenu = new MainMenu(skipToTitle,
-        [this](QString name) { startGame(name); },
-        [this](QString name) { loadGame(name); },
-        [this]() { m_window->close(); }
-    );
-    m_window->setRenderer(m_mainMenu);
-}
-
 
 void Vertigo::createChapter()
 {
     Q_ASSERT(m_chapter == NULL);
     m_chapter = new Chapter(m_name,
-        [this](Renderer *renderer) { m_window->setRenderer(renderer); },
+        [this](Renderer *renderer) { m_window.setRenderer(renderer); },
         [this]() { endGame(); }
     );
 }
-
-
-void Vertigo::update()
-{
-    m_window->update();
-}
-
 
 void Vertigo::startGame(const QString &name)
 {
@@ -131,45 +73,36 @@ void Vertigo::startGame(const QString &name)
             return;
     }
 
-    m_mainMenu->deleteLater();
-    m_mainMenu = NULL;
     m_name = name;
 
     Q_ASSERT(m_intro == NULL);
     m_intro = new Movie([this]() { introFinished(); });
 
-    m_window->setRenderer(m_intro);
+    m_window.setRenderer(m_intro);
     m_intro->play("gfx:mvi/film/d02.mvi");
 }
 
-
 void Vertigo::loadGame(const QString &name)
 {
-    m_mainMenu->deleteLater();
-    m_mainMenu = NULL;
-
     createChapter();
     m_chapter->load(name);
 }
-
 
 void Vertigo::endGame()
 {
     m_chapter->deleteLater();
     m_chapter = NULL;
-    createMainMenu(true);
+    m_window.setRenderer(&m_mainMenu);
 }
-
 
 void Vertigo::introFinished()
 {
-    m_window->setRenderer(NULL);
+    m_window.setRenderer(NULL);
     delete m_intro;
     m_intro = NULL;
 
     createChapter();
     m_chapter->loadChapter(1);
 }
-
 
 } // namespace game
