@@ -37,9 +37,6 @@ class Renderer : public QObject
 public:
     Renderer();
 
-signals:
-    void centerMouse();
-
 public:
     virtual void draw() = 0;
     virtual void activate() {}

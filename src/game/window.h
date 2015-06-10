@@ -40,7 +40,6 @@ public slots:
 
 private slots:
     void toggleFullScreen();
-    void centerMouse();
 
 private:
     void initializeGL();

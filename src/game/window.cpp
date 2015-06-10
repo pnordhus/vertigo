@@ -47,7 +47,6 @@ void Window::setRenderer(Renderer *renderer)
 {
     if (m_renderer) {
         m_renderer->deactivate();
-        m_renderer->disconnect(this, SLOT(centerMouse()));
         m_renderer->setWindow(NULL);
     }
 
@@ -55,15 +54,8 @@ void Window::setRenderer(Renderer *renderer)
 
     if (m_renderer) {
         m_renderer->setWindow(this);
-        connect(m_renderer, SIGNAL(centerMouse()), SLOT(centerMouse()));
         m_renderer->activate();
     }
-}
-
-
-void Window::centerMouse()
-{
-    QCursor::setPos(mapToGlobal(rect().center()));
 }
 
 
