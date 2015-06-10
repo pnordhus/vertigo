@@ -84,7 +84,7 @@ bool Vertigo::start(const QString &scenario)
     if (scenario.isEmpty()) {
         createMainMenu(false);
     } else {
-        fight::Scenario *s = new fight::Scenario(scenario, QApplication::quit);
+        fight::Scenario *s = new fight::Scenario(scenario, (std::function<void()>)QApplication::quit);
         m_window->setRenderer(s);
     }
 
