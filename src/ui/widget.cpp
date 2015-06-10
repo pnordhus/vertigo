@@ -22,10 +22,10 @@
 namespace ui {
 
 
-Widget::Widget(Widget *parent) :
+Widget::Widget(Widget *parent, bool visible) :
     m_parent(NULL),
     m_enabled(true),
-    m_visible(true)
+    m_visible(visible)
 {
     setSize(640, 480);
     setParentWidget(parent);

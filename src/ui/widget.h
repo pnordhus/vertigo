@@ -30,7 +30,7 @@ namespace ui {
 class Widget : public QObject
 {
 public:
-    Widget(Widget *parent = NULL);
+    Widget(Widget *parent = NULL, bool visible = true);
     ~Widget();
 
 public:

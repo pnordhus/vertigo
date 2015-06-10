@@ -24,14 +24,24 @@
 #include <QGLContext>
 #include <QKeyEvent>
 
-
 namespace game {
-
 
 MainMenu::MainMenu(bool skipToTitle, std::function<void(QString)> funcStartGame, std::function<void(QString)> funcLoadGame, std::function<void()> funcQuit) :
     m_state(Invalid),
-    m_lblNew(NULL),
-    m_lblLoad(NULL),
+    m_lblVersion(&m_title),
+    m_lblBar1(&m_title),
+    m_lblBar2(&m_title),
+    m_lblMain(&m_title),
+    m_lblMainTitle(&m_lblMain),
+    m_btnMainNew([this]() { showNew(); }, &m_lblMain),
+    m_btnMainLoad([this]() { showLoad(); }, &m_lblMain),
+    m_btnMainQuit(funcQuit, &m_lblMain),
+    m_lblNew(&m_title, false),
+    m_lblNewTitle(&m_lblNew),
+    m_btnNewBack([this]() { showMain(); }, &m_lblNew),
+    m_lblLoad(&m_title, false),
+    m_lblLoadTitle(&m_lblLoad),
+    m_btnLoadBack([this]() { showMain(); }, &m_lblLoad),
     m_cursor(false),
     m_funcStartGame(std::move(funcStartGame)),
     m_funcLoadGame(std::move(funcLoadGame))
@@ -48,64 +58,68 @@ MainMenu::MainMenu(bool skipToTitle, std::function<void(QString)> funcStartGame,
 
     m_backgroundSound.load("sfx:snd/bground/b02.pcl", "sfx:snd/bground/b02.pcr");
 
-    ui::Label *label;
+    m_lblVersion.setFont(fontSmall);
+    m_lblVersion.setPosition(2, 2);
+    m_lblVersion.setText("Vertigo 0.1");
+    m_lblBar1.setTexture(texBar);
+    m_lblBar1.setPosition(140, 256);
+    m_lblBar2.setTexture(texBar);
+    m_lblBar2.setPosition(140, 448);
 
-    label = new ui::Label(&m_title);
-    label->setFont(fontSmall);
-    label->setPosition(2, 2);
-    label->setText("Vertigo 0.1");
+    m_lblMainTitle.setFont(fontMedium);
+    m_lblMainTitle.setPosition(145, 256 - fontMedium.height() - 2);
+    m_lblMainTitle.setText(txt::StringTable::get(txt::MainMenu));
 
-    label = new ui::Label(&m_title);
-    label->setTexture(texBar);
-    label->setPosition(140, 256);
+    m_btnMainNew.setFont(fontLarge);
+    m_btnMainNew.setPosition(0, 288);
+    m_btnMainNew.setWidth(640);
+    m_btnMainNew.setAlignment(ui::Label::AlignHCenter);
+    m_btnMainNew.setText(txt::StringTable::get(txt::MainMenu_NewGame));
 
-    label = new ui::Label(&m_title);
-    label->setTexture(texBar);
-    label->setPosition(140, 448);
+    m_btnMainLoad.setFont(fontLarge);
+    m_btnMainLoad.setPosition(0, 308);
+    m_btnMainLoad.setWidth(640);
+    m_btnMainLoad.setAlignment(ui::Label::AlignHCenter);
+    m_btnMainLoad.setText(txt::StringTable::get(txt::MainMenu_Load));
 
-    {
-        m_lblMain = new ui::Label(&m_title);
+    m_btnMainQuit.setFont(fontLarge);
+    m_btnMainQuit.setPosition(0, 408);
+    m_btnMainQuit.setWidth(640);
+    m_btnMainQuit.setAlignment(ui::Label::AlignHCenter);
+    m_btnMainQuit.setText(txt::StringTable::get(txt::MainMenu_QuitGame));
 
-        label = new ui::Label(m_lblMain);
-        label->setFont(fontMedium);
-        label->setPosition(145, 256 - fontMedium.height() - 2);
-        label->setText(txt::StringTable::get(txt::MainMenu));
+    m_lblNewTitle.setFont(gfx::Font::Medium);
+    m_lblNewTitle.setPosition(145, 256 - gfx::Font(gfx::Font::Medium).height() - 2);
+    m_lblNewTitle.setText(txt::StringTable::get(txt::MainMenu_NewGame));
 
-        ui::Button *button;
-        button = new ui::Button([this]() { showNew(); }, m_lblMain);
-        button->setFont(fontLarge);
-        button->setPosition(0, 288);
-        button->setWidth(640);
-        button->setAlignment(ui::Label::AlignHCenter);
-        button->setText(txt::StringTable::get(txt::MainMenu_NewGame));
+    m_btnNewBack.setPosition(0, 428);
+    m_btnNewBack.setWidth(640);
+    m_btnNewBack.setAlignment(ui::Button::AlignHCenter);
+    m_btnNewBack.setFont(gfx::Font::Large);
+    m_btnNewBack.setText(txt::StringTable::get(txt::MainMenu));
 
-        button = new ui::Button([this]() { showLoad(); }, m_lblMain);
-        button->setFont(fontLarge);
-        button->setPosition(0, 308);
-        button->setWidth(640);
-        button->setAlignment(ui::Label::AlignHCenter);
-        button->setText(txt::StringTable::get(txt::MainMenu_Load));
+    m_lblLoadTitle.setFont(gfx::Font::Medium);
+    m_lblLoadTitle.setPosition(145, 256 - gfx::Font(gfx::Font::Medium).height() - 2);
+    m_lblLoadTitle.setText(txt::StringTable::get(txt::MainMenu_Load));
 
-        button = new ui::Button(funcQuit, m_lblMain);
-        button->setFont(fontLarge);
-        button->setPosition(0, 408);
-        button->setWidth(640);
-        button->setAlignment(ui::Label::AlignHCenter);
-        button->setText(txt::StringTable::get(txt::MainMenu_QuitGame));
-    }
+    m_btnLoadBack.setPosition(0, 428);
+    m_btnLoadBack.setWidth(640);
+    m_btnLoadBack.setAlignment(ui::Button::AlignHCenter);
+    m_btnLoadBack.setFont(gfx::Font::Large);
+    m_btnLoadBack.setText(txt::StringTable::get(txt::MainMenu));
 
-    if (skipToTitle)
+    if (skipToTitle) {
         changeState(Title);
-    else
+    } else {
         changeState(Presents);
+    }
 }
-
 
 void MainMenu::draw()
 {
     Menu::draw();
 
-    if (m_lblNew) {
+    if (m_lblNew.isVisible()) {
         if (m_time.elapsed() > 300) {
             m_time.start();
             m_cursor = !m_cursor;
@@ -117,18 +131,15 @@ void MainMenu::draw()
     }
 }
 
-
 void MainMenu::activate()
 {
     m_backgroundSound.playLoop();
 }
 
-
 void MainMenu::deactivate()
 {
     m_backgroundSound.stop();
 }
-
 
 void MainMenu::changeState(State state)
 {
@@ -148,7 +159,6 @@ void MainMenu::changeState(State state)
     }
 }
 
-
 void MainMenu::mousePressEvent(QMouseEvent *event)
 {
     Menu::mousePressEvent(event);
@@ -163,19 +173,15 @@ void MainMenu::mousePressEvent(QMouseEvent *event)
     }
 
     if (event->button() == Qt::RightButton) {
-        if (m_lblNew && m_lblNew->isVisible())
-            hideNew();
-        if (m_lblLoad && m_lblLoad->isVisible())
-            hideLoad();
+        showMain();
     }
 }
-
 
 void MainMenu::keyPressEvent(QKeyEvent *event)
 {
     Menu::keyPressEvent(event);
 
-    if (m_lblNew && m_lblNew->isVisible()) {
+    if (m_lblNew.isVisible()) {
         if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return) {
             m_funcStartGame(m_name.trimmed());
         }
@@ -193,91 +199,55 @@ void MainMenu::keyPressEvent(QKeyEvent *event)
     }
 }
 
+void MainMenu::showMain()
+{
+    m_lblMain.show();
+    m_lblNew.hide();
+    m_lblLoad.hide();
+}
 
 void MainMenu::showNew()
 {
-    m_lblMain->hide();
-
-    Q_ASSERT(!m_lblNew);
-    m_lblNew = new ui::Label(&m_title);
+    m_lblMain.hide();
+    m_lblNew.show();
     m_name = "dead-eye";
-
-    ui::Label *label = new ui::Label(m_lblNew);
-    label->setFont(gfx::Font::Medium);
-    label->setPosition(145, 256 - gfx::Font(gfx::Font::Medium).height() - 2);
-    label->setText(txt::StringTable::get(txt::MainMenu_NewGame));
-
-    ui::Button *button = new ui::Button([this]() { hideNew(); }, m_lblNew);
-    button->setPosition(0, 428);
-    button->setWidth(640);
-    button->setAlignment(ui::Button::AlignHCenter);
-    button->setFont(gfx::Font::Large);
-    button->setText(txt::StringTable::get(txt::MainMenu));
 }
-
-
-void MainMenu::hideNew()
-{
-    Q_ASSERT(m_lblNew);
-    m_lblNew->deleteLater();
-    m_lblNew = NULL;
-    m_lblMain->show();
-}
-
 
 void MainMenu::showLoad()
 {
-    m_lblMain->hide();
-
-    Q_ASSERT(!m_lblLoad);
-    m_lblLoad = new ui::Label(&m_title);
-
-    ui::Label *label = new ui::Label(m_lblLoad);
-    label->setFont(gfx::Font::Medium);
-    label->setPosition(145, 256 - gfx::Font(gfx::Font::Medium).height() - 2);
-    label->setText(txt::StringTable::get(txt::MainMenu_Load));
+    m_lblMain.hide();
+    m_lblLoad.show();
 
     int y = 282;
+
+    m_lblLoadSave.clear();
+    m_btnLoadSave.clear();
 
     QList<Chapter::SavedGame> games = Chapter::savedGames();
     qSort(games);
     foreach (const Chapter::SavedGame &game, games) {
         QString name = game.name;
-        ui::Button *button = new ui::Button([this, name]() { m_funcLoadGame(name); }, m_lblLoad);
-        button->setPosition(0, y);
-        button->setWidth(640);
-        button->setAlignment(ui::Button::AlignHCenter);
-        button->setFont(gfx::Font::Large);
-        button->setText(QString("%1: %2").arg(game.name, game.station));
+
+        m_btnLoadSave.emplace_back([this, name]() { m_funcLoadGame(name); }, &m_lblLoad);
+        ui::Button &button = m_btnLoadSave.back();
+        button.setPosition(0, y);
+        button.setWidth(640);
+        button.setAlignment(ui::Button::AlignHCenter);
+        button.setFont(gfx::Font::Large);
+        button.setText(QString("%1: %2").arg(game.name, game.station));
 
         y += 13;
 
-        ui::Label *label = new ui::Label(m_lblLoad);
-        label->setPosition(0, y);
-        label->setWidth(640);
-        label->setAlignment(ui::Button::AlignHCenter);
-        label->setFont(gfx::Font::Small);
-        label->setText(game.time.toString(Qt::DefaultLocaleShortDate));
+        m_lblLoadSave.emplace_back(&m_lblLoad);
+        ui::Label &label = m_lblLoadSave.back();
+        label.setPosition(0, y);
+        label.setWidth(640);
+        label.setAlignment(ui::Button::AlignHCenter);
+        label.setFont(gfx::Font::Small);
+        label.setText(game.time.toString(Qt::DefaultLocaleShortDate));
 
         y += 20;
     }
-
-    ui::Button *button = new ui::Button([this]() { hideLoad(); }, m_lblLoad);
-    button->setPosition(0, 428);
-    button->setWidth(640);
-    button->setAlignment(ui::Button::AlignHCenter);
-    button->setFont(gfx::Font::Large);
-    button->setText(txt::StringTable::get(txt::MainMenu));
 }
-
-
-void MainMenu::hideLoad()
-{
-    Q_ASSERT(m_lblLoad);
-    m_lblLoad->deleteLater();
-    m_lblLoad = NULL;
-    m_lblMain->show();
-}
-
 
 } // namespace game

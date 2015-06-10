@@ -18,17 +18,13 @@
 #ifndef GAME_MAINMENU_H
 #define GAME_MAINMENU_H
 
-
 #include "menu.h"
 #include "gfx/texture.h"
 #include "sfx/sound.h"
-#include "ui/label.h"
+#include "ui/button.h"
 #include <QTime>
 
-#include <functional>
-
 namespace game {
-
 
 class MainMenu : public Menu
 {
@@ -39,10 +35,9 @@ public:
     MainMenu(bool skipToTitle, std::function<void(QString)> funcStartGame, std::function<void(QString)> funcLoadGame, std::function<void()> funcQuit);
 
 private:
+    void showMain();
     void showNew();
-    void hideNew();
     void showLoad();
-    void hideLoad();
 
     void draw();
     void activate();
@@ -55,9 +50,22 @@ private:
     State m_state;
     ui::Label m_presents;
     ui::Label m_title;
-    ui::Label *m_lblMain;
-    ui::Label *m_lblNew;
-    ui::Label *m_lblLoad;
+    ui::Label m_lblVersion;
+    ui::Label m_lblBar1;
+    ui::Label m_lblBar2;
+    ui::Label m_lblMain;
+    ui::Label m_lblMainTitle;
+    ui::Button m_btnMainNew;
+    ui::Button m_btnMainLoad;
+    ui::Button m_btnMainQuit;
+    ui::Label m_lblNew;
+    ui::Label m_lblNewTitle;
+    ui::Button m_btnNewBack;
+    ui::Label m_lblLoad;
+    ui::Label m_lblLoadTitle;
+    ui::Button m_btnLoadBack;
+    std::list<ui::Label> m_lblLoadSave;
+    std::list<ui::Button> m_btnLoadSave;
     sfx::Sound m_backgroundSound;
     QString m_name;
     bool m_cursor;
@@ -66,8 +74,6 @@ private:
     std::function<void(QString)> m_funcLoadGame;
 };
 
-
 } // namespace game
-
 
 #endif // GAME_MAINMENU_H

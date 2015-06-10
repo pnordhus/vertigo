@@ -21,8 +21,8 @@
 namespace ui {
 
 
-Label::Label(Widget *parent) :
-    Widget(parent),
+Label::Label(Widget *parent, bool visible) :
+    Widget(parent, visible),
     m_alignment(AlignNone)
 {
 

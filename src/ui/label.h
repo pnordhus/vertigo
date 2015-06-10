@@ -40,7 +40,7 @@ public:
     Q_DECLARE_FLAGS(Alignment, AlignmentFlags);
 
 public:
-    Label(Widget *parent = NULL);
+    Label(Widget *parent = NULL, bool visible = true);
     Label(const gfx::Font &font, Widget *parent = NULL);
 
 public:
