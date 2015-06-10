@@ -25,12 +25,23 @@
 namespace game {
 
 
-Room::Room(int index, const QString &title, const QString &name, std::function<void()> &&funcClose) :
+Room::Room(int index, const QString &title, const QString &name,
+    std::function<void()> funcClose,
+    std::function<void(Dialog*)> funcStartDialog,
+    std::function<void(Dialog*)> funcStartEnCom,
+    std::function<void()> funcShowDeparture,
+    std::function<void()> funcShowDepot,
+    std::function<void()> funcHideCursor) :
     Frame(std::move(funcClose)),
     m_index(index),
     m_miniMovie("gfx:mvi/room", [this]() { miniMovieFinished(); }),
     m_name(name),
-    m_dockMan(NULL)
+    m_dockMan(NULL),
+    m_funcStartDialog(std::move(funcStartDialog)),
+    m_funcStartEnCom(std::move(funcStartEnCom)),
+    m_funcShowDeparture(std::move(funcShowDeparture)),
+    m_funcShowDepot(std::move(funcShowDepot)),
+    m_funcHideCursor(std::move(funcHideCursor))
 {
     txt::DesFile file("dat:world/" + name + ".des");
     file.setSection("Room");
@@ -137,8 +148,9 @@ void Room::restart()
     }
 
     dialogs = Chapter::get()->dialogsEnCom(true);
-    if (!dialogs.isEmpty())
-        emit startEnCom(dialogs.first());
+    if (!dialogs.isEmpty()) {
+        m_funcStartEnCom(dialogs.first());
+    }
 }
 
 
@@ -167,7 +179,7 @@ bool Room::mousePressEvent(const QPoint &pos, Qt::MouseButton button)
 
 void Room::showDock()
 {
-    emit hideCursor();
+    m_funcHideCursor();
     m_backgroundLabel->disable();
     m_dockSound.play();
     m_miniMovie.playOneshot();
@@ -176,15 +188,16 @@ void Room::showDock()
 
 void Room::startDialog(int dialogId)
 {
-    if (dialogId > 0)
-        emit startDialog(Chapter::get()->dialog(dialogId));
-    else
-        emit showDepot();
+    if (dialogId > 0) {
+        m_funcStartDialog(Chapter::get()->dialog(dialogId));
+    } else {
+        m_funcShowDepot();
+    }
 }
 
 void Room::miniMovieFinished()
 {
-    emit showDeparture();
+    m_funcShowDeparture();
     m_backgroundLabel->enable();
 }
 

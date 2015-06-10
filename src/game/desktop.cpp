@@ -205,12 +205,14 @@ void Desktop::hideNotebook()
 void Desktop::showRoom(int index)
 {
     Q_ASSERT(!m_room);
-    m_room = new Room(index, m_rooms[index].title, m_rooms[index].name, [this]() { hideRoom(); });
-    connect(m_room, SIGNAL(startDialog(Dialog*)), SLOT(showDialog(Dialog*)));
-    connect(m_room, SIGNAL(startEnCom(Dialog*)), SLOT(showEnCom(Dialog*)));
-    connect(m_room, SIGNAL(showDeparture()), SLOT(showDeparture()));
-    connect(m_room, SIGNAL(showDepot()), SLOT(showDepot()));
-    connect(m_room, SIGNAL(hideCursor()), SLOT(hideCursor()));
+    m_room = new Room(index, m_rooms[index].title, m_rooms[index].name,
+        [this]() { hideRoom(); },
+        [this](Dialog *dialog) { showDialog(dialog); },
+        [this](Dialog *dialog) { showEnCom(dialog); },
+        [this]() { showDeparture(); },
+        [this]() { showDepot(); },
+        [this]() { hideCursor(); }
+    );
     setRootWidget(m_room);
     m_btnNotebook->hide();
     m_room->setPosition((640 - m_room->width()) / 2, (480 - m_room->height()) / 2);

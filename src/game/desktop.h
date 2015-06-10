@@ -37,8 +37,6 @@ namespace game {
 
 class Desktop : public Menu
 {
-    Q_OBJECT
-
 public:
     Desktop(const QString &name);
     ~Desktop();
@@ -49,7 +47,7 @@ public:
     const QString& name() const { return m_name; }
     const QString& approachMovie() const { return m_approachMovie; }
 
-private slots:
+private:
     void showNotebook();
     void hideNotebook();
     void hideRoom();
@@ -62,7 +60,6 @@ private slots:
     void showDepot();
     void hideDepot();
 
-private:
     void activate();
     void deactivate();
     void showRoom(int index);

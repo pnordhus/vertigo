@@ -33,18 +33,16 @@ class Dialog;
 
 class Room : public ui::Frame
 {
-    Q_OBJECT
-
 public:
-    Room(int index, const QString &title, const QString &name, std::function<void()> &&funcClose);
+    Room(int index, const QString &title, const QString &name,
+         std::function<void()> funcClose,
+         std::function<void(Dialog*)> funcStartDialog,
+         std::function<void(Dialog*)> funcStartEnCom,
+         std::function<void()> funcShowDeparture,
+         std::function<void()> funcShowDepot,
+         std::function<void()> funcHideCursor
+    );
     ~Room();
-
-signals:
-    void startDialog(Dialog*);
-    void startEnCom(Dialog*);
-    void showDeparture();
-    void showDepot();
-    void hideCursor();
 
 public:
     const QString& name() const { return m_name; }
@@ -54,11 +52,9 @@ protected:
     void draw();
     bool mousePressEvent(const QPoint &pos, Qt::MouseButton button);
 
-private slots:
+private:
     void showDock();
     void startDialog(int dialogId);
-
-private:
     void miniMovieFinished();
 
 private:
@@ -79,6 +75,11 @@ private:
     QMap<int, Person*> m_persons;
     Person* m_dockMan;
     QString m_dockManName;
+    std::function<void(Dialog*)> m_funcStartDialog;
+    std::function<void(Dialog*)> m_funcStartEnCom;
+    std::function<void()> m_funcShowDeparture;
+    std::function<void()> m_funcShowDepot;
+    std::function<void()> m_funcHideCursor;
 };
 
 

@@ -152,10 +152,8 @@ set(SOURCES
 
 set(MOC_SOURCES
     game/chapter.h
-    game/desktop.h
     game/dialog.h
     game/renderer.h
-    game/room.h
     game/vertigo.h
     game/window.h
 )
