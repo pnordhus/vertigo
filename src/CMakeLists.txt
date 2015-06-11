@@ -152,5 +152,4 @@ set(SOURCES
 
 add_executable(vertigo WIN32 ${SOURCES})
 target_link_libraries(vertigo ${QT_LIBRARIES} ${OPENGL_LIBRARY} ${OPENAL_LIBRARY})
-set_property(TARGET vertigo PROPERTY CXX_STANDARD 11)
 install(TARGETS vertigo DESTINATION bin)
