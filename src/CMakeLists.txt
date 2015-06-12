@@ -2,6 +2,7 @@ set(QT_USE_QTMAIN true)
 set(QT_USE_QTOPENGL true)
 include(${QT_USE_FILE})
 
+include_directories(${SDL2_INCLUDE_DIR})
 include_directories(${OPENAL_INCLUDE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -151,5 +152,5 @@ set(SOURCES
 )
 
 add_executable(vertigo WIN32 ${SOURCES})
-target_link_libraries(vertigo ${QT_LIBRARIES} ${OPENGL_LIBRARY} ${OPENAL_LIBRARY})
+target_link_libraries(vertigo ${QT_LIBRARIES} ${SDL2_LIBRARY} ${OPENGL_LIBRARY} ${OPENAL_LIBRARY})
 install(TARGETS vertigo DESTINATION bin)
