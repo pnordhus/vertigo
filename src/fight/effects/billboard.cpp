@@ -134,7 +134,7 @@ void Billboard::draw(QVector3D position, float angle, float scale, int time, con
 
     glPushMatrix();
     glTranslatef(position.x(), position.y(), position.z());
-    glMultMatrixd(cameraMatrixInverted.data());
+    multMatrix(cameraMatrixInverted.data());
     glScalef(m_scale*scale, m_scale*scale, 1);
     glRotatef(angle, 0, 0, 1);
     glScalef(m_stages[currentStage].scale.x(), m_stages[currentStage].scale.y(), 1);

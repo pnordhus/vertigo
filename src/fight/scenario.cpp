@@ -480,7 +480,7 @@ void Scenario::draw()
     gluPerspective(60, float(rect().width()) / rect().height(), 0.1f, 10000.0f);
 
     glMatrixMode(GL_MODELVIEW);
-    glLoadMatrixd(m_cameraMatrix.data());
+    loadMatrix(m_cameraMatrix.data());
     glTranslatef(-m_position.x(), -m_position.y(), -m_position.z());
 
     GLfloat global_ambient[] = { 0.5f, 0.5f, 1.0f, 1.0f };

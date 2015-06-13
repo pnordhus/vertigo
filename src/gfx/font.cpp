@@ -155,8 +155,9 @@ QRect FontPrivate::draw(const QString &text, int x, int y, int w, int h, bool al
             lineWidth = 0;
         }
 
-        for (int i = 0; i < word.length(); i++) {
-            quint8 c = word[i].toLatin1();
+        const QByteArray latin1 = word.toLatin1();
+        for (int i = 0; i < latin1.length(); i++) {
+            quint8 c = latin1[i];
             if (c == '~') {
                 i++;
                 c = word[i].toLatin1();
@@ -236,8 +237,9 @@ int FontPrivate::height(int w, const QStringList &strings) const
 int FontPrivate::width(const QString &text) const
 {
     int totalW = 0;
-    for (int i = 0; i < text.size(); i++) {
-        quint8 c = text[i].toLatin1();
+    const QByteArray latin1 = text.toLatin1();
+    for (int i = 0; i < latin1.size(); i++) {
+        quint8 c = latin1[i];
         if (c == '~') {
             i++;
             continue;

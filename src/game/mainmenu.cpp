@@ -186,7 +186,7 @@ void MainMenu::keyPressEvent(QKeyEvent *event)
         if (event->key() == Qt::Key_Backspace)
             m_name.chop(1);
 
-        QString text = event->text().toLower().toAscii();
+        QString text = event->text().toLower().toLatin1();
         text.remove(QRegExp("[^a-z\\-0-9 ]*"));
         if (!text.isEmpty())
             m_name += text;

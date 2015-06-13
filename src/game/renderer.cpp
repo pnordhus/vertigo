@@ -21,6 +21,15 @@
 
 namespace game {
 
+void getMatrix(GLenum param, float *data)
+{
+    glGetFloatv(param, data);
+}
+
+void getMatrix(GLenum param, double *data)
+{
+    glGetDoublev(param, data);
+}
 
 Renderer::Renderer() :
     m_cursorVisible(true),
@@ -82,7 +91,7 @@ void Renderer::setupOrthographicMatrix(float w, float h)
     glLoadIdentity();
     glOrtho(-left, w + left, h + top, -top, -1, 1);
 
-    glGetDoublev(GL_PROJECTION_MATRIX, m_projection.data());
+    getMatrix(GL_PROJECTION_MATRIX, m_projection.data());
     m_projection.optimize();
 
     glMatrixMode(GL_MODELVIEW);

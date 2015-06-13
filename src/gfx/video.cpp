@@ -19,6 +19,7 @@
 #include "video.h"
 #include <QDataStream>
 
+#include <cstring>
 
 namespace gfx {
 
@@ -365,7 +366,7 @@ QImage Video::createImage()
             if (even)
                 *line++ = lastIndex;
         } else {
-            qMemCopy(line, index, m_width);
+            std::memcpy(line, index, m_width);
             index += m_width;
         }
     }

@@ -35,6 +35,25 @@ namespace fight {
 class Scenario;
 class CollisionCache;
 
+inline void loadMatrix(const float *data)
+{
+    glLoadMatrixf(data);
+}
+
+inline void loadMatrix(const double *data)
+{
+    glLoadMatrixd(data);
+}
+
+inline void multMatrix(const float *data)
+{
+    glMultMatrixf(data);
+}
+
+inline void multMatrix(const double *data)
+{
+    glMultMatrixd(data);
+}
 
 enum ObjectType
 {

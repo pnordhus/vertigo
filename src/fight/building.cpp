@@ -70,7 +70,7 @@ Building::Building(Scenario *scenario, const QString &name, int size, float angl
             cluster.offset.setZ(scenario->surface()->heightAt((clusterX + 0.5f)*scale.x(), (clusterY + 0.5f)*scale.y()));
         }
 
-        switch (file.value("cardinal").toString().toAscii()[0]) {
+        switch (file.value("cardinal").toString().toLatin1()[0]) {
         case 'n':
             cluster.angle = 0;
             break;

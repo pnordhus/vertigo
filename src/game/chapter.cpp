@@ -30,6 +30,14 @@ namespace game {
 
 Chapter *Chapter::m_singleton = NULL;
 
+static QString dataLocation()
+{
+#if QT_VERSION >= 0x050000
+    return QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+#else
+    return QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+#endif
+}
 
 Chapter::Chapter(const QString &name, std::function<void(Renderer*)> funcSetRenderer, std::function<void()> funcEndGame) :
     m_code(-1),
@@ -331,7 +339,7 @@ void Chapter::save() const
         }
     }
 
-    const QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+    const QString path = dataLocation();
     file.save(QString("%1/save/%2.des").arg(path, m_name));
 }
 
@@ -339,7 +347,7 @@ void Chapter::save() const
 void Chapter::load(const QString &name)
 {
     m_name = name;
-    const QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+    const QString path = dataLocation();
     load(QString("%1/save/%2.des").arg(path, name), true);
 }
 
@@ -696,7 +704,7 @@ QList<Chapter::SavedGame> Chapter::savedGames()
 {
     QList<SavedGame> saves;
 
-    const QString path = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+    const QString path = dataLocation();
     QDir dir(path + "/save");
     QRegExp reg("(.*)\\.des");
     foreach (const QString &save, dir.entryList()) {

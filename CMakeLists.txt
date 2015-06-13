@@ -9,7 +9,10 @@ set(SDL2_BUILDING_LIBRARY 1)
 add_definitions(-DSDL_MAIN_HANDLED)
 
 find_package(SDL2 REQUIRED)
-find_package(Qt4 4.6.0 REQUIRED)
+find_package(Qt5OpenGL)
+if(NOT Qt5OpenGL_FOUND)
+    find_package(Qt4 4.6.0 REQUIRED)
+endif()
 find_package(OpenGL REQUIRED)
 find_package(OpenAL REQUIRED)
 
