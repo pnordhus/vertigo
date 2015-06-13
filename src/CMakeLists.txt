@@ -149,6 +149,11 @@ set(SOURCES
     ui/list.h
     ui/widget.cpp
     ui/widget.h
+
+    util/error.cpp
+    util/error.h
+    util/file.cpp
+    util/file.h
 )
 
 add_executable(vertigo WIN32 ${SOURCES})

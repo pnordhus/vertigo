@@ -18,6 +18,7 @@
 #include "vertigo.h"
 
 #include "txt/stringtable.h"
+#include "util/file.h"
 
 #include <QApplication>
 #include <QDir>
@@ -45,12 +46,14 @@ int main(int argc, char *argv[])
 
     QSettings s;
     QDir::setSearchPaths("data", QStringList() << s.value("datadir").toString());
+    util::File::setDataPath(s.value("datadir").toString().toUtf8().constData());
     while (!txt::StringTable::load()) {
         const QString dir = QFileDialog::getExistingDirectory(NULL, "Select Schleichfahrt / Archimedean Dynasty directory", s.value("datadir").toString());
         if (dir.isNull())
             return false;
         s.setValue("datadir", dir);
         QDir::setSearchPaths("data", QStringList() << s.value("datadir").toString());
+        util::File::setDataPath(s.value("datadir").toString().toUtf8().constData());
     }
 
     game::Vertigo vertigo;
