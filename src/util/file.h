@@ -33,7 +33,7 @@ public:
 
     std::size_t position()
     {
-        return m_stream.tellg();
+        return static_cast<std::size_t>(m_stream.tellg());
     }
 
     void skipBytes(std::size_t numBytes);

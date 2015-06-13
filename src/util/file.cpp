@@ -19,6 +19,8 @@
 
 #include "error.h"
 
+#include "SDL.h"
+
 namespace util {
 
 File::File()
@@ -29,7 +31,13 @@ File::File()
 File::File(const std::string &name) :
     m_name(m_dataPath + name)
 {
-    m_stream.open(m_dataPath + name, std::ios_base::in | std::ios_base::binary);
+#ifdef _MSC_VER
+	wchar_t *nameUTF16 = reinterpret_cast<wchar_t*>(SDL_iconv_string("UTF-16LE", "UTF-8", m_name.c_str(), m_name.size() + 1));
+	m_stream.open(nameUTF16, std::ios_base::in | std::ios_base::binary);
+	SDL_free(nameUTF16);
+#else
+	m_stream.open(m_name, std::ios_base::in | std::ios_base::binary);
+#endif
     ASSERT(m_stream.good());
 }
 
