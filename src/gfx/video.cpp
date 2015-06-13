@@ -42,7 +42,7 @@ void Video::open(const QString &filename)
     m_entries.clear();
     m_frame.clear();
 
-    m_file = util::File(QString(filename).replace(":", "/").toUtf8().constData());
+    m_file.open(QString(filename).replace(":", "/").toUtf8().constData());
 
     std::uint32_t totalFrames;
     std::uint32_t audioFrames;
@@ -242,7 +242,7 @@ QByteArray Video::getAudio()
     return QByteArray();
 }
 
-void Video::mergeChannel(QByteArray &data, int size, int channelIndex)
+void Video::mergeChannel(QByteArray &data, std::size_t size, int channelIndex)
 {
     ASSERT(data.size() >= 2 * size);
     for (std::size_t i = 0; i < size; ++i) {
@@ -255,7 +255,7 @@ bool Video::atEnd() const
     return m_videoPos >= std::uint32_t(m_entries.size());
 }
 
-void Video::loadColorTable(int size)
+void Video::loadColorTable(std::size_t size)
 {
     m_colorTable.load(m_file);
     if (size > 256 * 3) {
@@ -266,12 +266,12 @@ void Video::loadColorTable(int size)
     std::memset(m_frame.data(), 0, m_frame.size());
 }
 
-void Video::loadVideoFull(int size)
+void Video::loadVideoFull(std::size_t size)
 {
     decode(size, m_frame);
 }
 
-void Video::loadVideoDiff(int size)
+void Video::loadVideoDiff(std::size_t size)
 {
     std::uint32_t sizeIndices;
     std::uint32_t sizeIndicesUnpacked;
@@ -297,9 +297,9 @@ void Video::loadVideoDiff(int size)
 
     std::uint32_t num = 0;
     std::uint32_t pos = 0;
-    for (unsigned int i = 0; i < sizeBitmapUnpacked; i++) {
+    for (unsigned int i = 0; i < sizeBitmapUnpacked && pos < m_frame.size(); i++) {
         for (int j = 7; j >= 0; j--) {
-            if ((bitmap[i] >> j) & 0x01) {
+            if ((static_cast<unsigned char>(bitmap[i]) >> j) & 0x01) {
                 m_frame[pos] = indices[num];
                 num++;
             }
@@ -308,7 +308,7 @@ void Video::loadVideoDiff(int size)
     }
 }
 
-void Video::decode(int size, std::vector<char> &output)
+void Video::decode(std::size_t size, std::vector<char> &output)
 {
     const std::size_t startOffset = m_file.position();
     std::int32_t sizeCompressed;
@@ -320,7 +320,7 @@ void Video::decode(int size, std::vector<char> &output)
     m_file.seek(startOffset + size);
 }
 
-bool Video::decompressLZW(int size, std::vector<char> &out)
+bool Video::decompressLZW(std::size_t size, std::vector<char> &out)
 {
     struct DictEntry
     {
@@ -382,7 +382,7 @@ bool Video::decompressLZW(int size, std::vector<char> &out)
 
         std::uint16_t i = next;
         out.resize(out.size() + dictionary[next].length);
-        for (int c = 0; c < dictionary[next].length; ++c) {
+        for (std::size_t c = 0; c < dictionary[next].length; ++c) {
             out[out.size() - c - 1] = dictionary[i].c;
             cLast = dictionary[i].c;
             i = dictionary[i].prev;

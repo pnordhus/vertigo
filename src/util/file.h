@@ -31,6 +31,8 @@ public:
     File();
     File(const std::string &name);
 
+    void open(const std::string &name);
+
     std::size_t position()
     {
         return static_cast<std::size_t>(m_stream.tellg());

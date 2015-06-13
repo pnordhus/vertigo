@@ -48,12 +48,12 @@ public:
 
 private:
     void reset();
-    void mergeChannel(QByteArray &data, int size, int channelIndex);
-    void loadColorTable(int size);
-    void loadVideoFull(int size);
-    void loadVideoDiff(int size);
-    void decode(int size, std::vector<char> &output);
-    bool decompressLZW(int size, std::vector<char> &out);
+    void mergeChannel(QByteArray &data, std::size_t size, int channelIndex);
+    void loadColorTable(std::size_t size);
+    void loadVideoFull(std::size_t size);
+    void loadVideoDiff(std::size_t size);
+    void decode(std::size_t size, std::vector<char> &output);
+    bool decompressLZW(std::size_t size, std::vector<char> &out);
     QImage createImage();
     QImage createEmpty();
 

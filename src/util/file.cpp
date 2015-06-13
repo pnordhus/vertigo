@@ -28,9 +28,16 @@ File::File()
 
 }
 
-File::File(const std::string &name) :
-    m_name(m_dataPath + name)
+File::File(const std::string &name)
 {
+    open(name);
+}
+
+void File::open(const std::string &name)
+{
+    m_name = m_dataPath + name;
+
+    m_stream.close();
 #ifdef _MSC_VER
 	wchar_t *nameUTF16 = reinterpret_cast<wchar_t*>(SDL_iconv_string("UTF-16LE", "UTF-8", m_name.c_str(), m_name.size() + 1));
 	m_stream.open(nameUTF16, std::ios_base::in | std::ios_base::binary);
