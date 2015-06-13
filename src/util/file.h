@@ -20,6 +20,7 @@
 
 #include "error.h"
 
+#include <cstdint>
 #include <fstream>
 
 namespace util {
@@ -63,7 +64,7 @@ public:
 
 private:
     void readLittleEndian(char *buffer, std::size_t size) {
-        for (int i = 0; i < size; i++) {
+        for (std::size_t i = 0; i < size; i++) {
             auto c = m_stream.get();
             ASSERT(c != std::ifstream::traits_type::eof());
             buffer[i] = static_cast<char>(c);
