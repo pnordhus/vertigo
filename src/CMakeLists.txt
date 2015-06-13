@@ -116,8 +116,6 @@ set(SOURCES
     gfx/fontmanager.h
     gfx/image.cpp
     gfx/image.h
-    gfx/rle.cpp
-    gfx/rle.h
     gfx/texture.cpp
     gfx/texture.h
     gfx/texturemanager.cpp

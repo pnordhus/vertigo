@@ -17,7 +17,6 @@
 
 #include "colortable.h"
 #include "image.h"
-#include "rle.h"
 #include <QBitmap>
 #include <QCursor>
 #include <QFile>
@@ -211,12 +210,12 @@ Image Image::load(QIODevice *device, Type type, const QVector<QRgb> &colorTable)
     switch (type) {
     case Bitmap:
         stream >> length;
-        image = RLE::decodeImage(device->read(length), width, height, colorTable[0]);
+        image = decodeImage(device->read(length), width, height, colorTable[0]);
         break;
 
     case PaletteRLE:
         stream >> length;
-        image = RLE::decodeImage(device->read(length), width, height, colorTable);
+        image = decodeImage(device->read(length), width, height, colorTable);
         break;
 
     case Palette:
@@ -226,8 +225,97 @@ Image Image::load(QIODevice *device, Type type, const QVector<QRgb> &colorTable)
 
     case RGB565:
         stream >> length;
-        image = RLE::decodeImage(device->read(length), width, height);
+        image = decodeImage(device->read(length), width, height);
         break;
+    }
+
+    return image;
+}
+
+
+QImage Image::decodeImage(const QByteArray &data, int width, int height, const QRgb &color)
+{
+    QDataStream stream(data);
+    stream.setByteOrder(QDataStream::LittleEndian);
+
+    QImage image(width, height, QImage::Format_ARGB32);
+
+    for (int y = 0; y < height; y++) {
+        int x = 0;
+        while (x < width && !stream.atEnd()) {
+            quint16 transparent = 0;
+            quint16 opaque = 0;
+            stream >> transparent >> opaque;
+
+            for (uint i = 0; i < transparent; i++)
+                image.setPixel(x++, y, qRgba(0, 0, 0, 0));
+
+            for (uint i = 0; i < opaque; i++)
+                image.setPixel(x++, y, color);
+        }
+    }
+
+    return image;
+}
+
+
+QImage Image::decodeImage(const QByteArray &data, int width, int height, const QVector<QRgb> &colorTable)
+{
+    QDataStream stream(data);
+    stream.setByteOrder(QDataStream::LittleEndian);
+
+    QImage image(width, height, QImage::Format_ARGB32);
+
+    for (int y = 0; y < height; y++) {
+        int x = 0;
+        while (x < width && !stream.atEnd()) {
+            quint16 transparent = 0;
+            quint16 opaque = 0;
+            stream >> transparent >> opaque;
+
+            for (uint i = 0; i < transparent; i++)
+                image.setPixel(x++, y, qRgba(0, 0, 0, 0));
+
+            for (uint i = 0; i < opaque; i++) {
+                quint8 index;
+                stream >> index;
+                image.setPixel(x++, y, colorTable[index]);
+            }
+        }
+    }
+
+    return image;
+}
+
+
+QImage Image::decodeImage(const QByteArray &data, int width, int height)
+{
+    QDataStream stream(data);
+    stream.setByteOrder(QDataStream::LittleEndian);
+
+    QImage image(width, height, QImage::Format_ARGB32);
+
+    for (int y = 0; y < height; y++) {
+        int x = 0;
+        while (x < width && !stream.atEnd()) {
+            quint16 transparent = 0;
+            quint16 opaque = 0;
+            stream >> transparent >> opaque;
+
+            for (uint i = 0; i < transparent; i++)
+                image.setPixel(x++, y, qRgba(0, 0, 0, 0));
+
+            for (uint i = 0; i < opaque; i++) {
+                quint16 value;
+                stream >> value;
+
+                const quint8 r = (value >> 8) & 0xf8;
+                const quint8 g = (value >> 3) & 0xfc;
+                const quint8 b = (value << 3) & 0xf8;
+
+                image.setPixel(x++, y, qRgb(r, g, b));
+            }
+        }
     }
 
     return image;

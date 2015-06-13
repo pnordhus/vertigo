@@ -17,7 +17,6 @@
 
 #include "fontmanager.h"
 #include "image.h"
-#include "rle.h"
 #include <QFile>
 #include <QGLContext>
 
