@@ -52,23 +52,17 @@ public:
         return c;
     }
 
-    File &operator >> (std::uint32_t &value) {
-        readLittleEndian(reinterpret_cast<char*>(&value), sizeof(value));
-        return *this;
-    }
-
-    File &operator >> (std::int32_t &value) {
-        readLittleEndian(reinterpret_cast<char*>(&value), sizeof(value));
-        return *this;
-    }
-
-private:
-    void readLittleEndian(char *buffer, std::size_t size) {
-        for (std::size_t i = 0; i < size; i++) {
+    template <typename T>
+    typename std::enable_if<std::is_integral<T>::value && !std::is_same<T, bool>::value, File&>::type
+    operator >> (T &value) {
+        typename std::make_unsigned<T>::type tmp = 0;
+        for (std::size_t i = 0; i < sizeof(T); ++i) {
             auto c = m_stream.get();
             ASSERT(c != std::ifstream::traits_type::eof());
-            buffer[i] = static_cast<char>(c);
+            tmp = static_cast<decltype(tmp)>(c) << (8 * i) | tmp;
         }
+        value = *reinterpret_cast<T*>(&tmp);
+        return *this;
     }
 
 private:
