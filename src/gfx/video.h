@@ -18,15 +18,14 @@
 #ifndef GFX_VIDEO_H
 #define GFX_VIDEO_H
 
-
 #include "colortable.h"
 #include "image.h"
-#include <QFile>
+
+#include "util/file.h"
+
 #include <QTime>
 
-
 namespace gfx {
-
 
 class Video
 {
@@ -44,51 +43,49 @@ public:
     Image getFrame();
     QByteArray getAudio();
     bool atEnd() const;
-    quint32 width() const { return m_width; }
-    quint32 height() const { return m_height; }
+    std::uint32_t width() const { return m_width; }
+    std::uint32_t height() const { return m_height; }
 
 private:
     void reset();
-    void mergeChannel(QByteArray &data, const QByteArray &channel, int channelIndex);
-    void loadColorTable(const QByteArray &data);
-    void loadVideoFull(const QByteArray &data);
-    void loadVideoDiff(const QByteArray &data);
+    void mergeChannel(QByteArray &data, int size, int channelIndex);
+    void loadColorTable(int size);
+    void loadVideoFull(int size);
+    void loadVideoDiff(int size);
+    void decode(int size, std::vector<char> &output);
+    bool decompressLZW(int size, std::vector<char> &out);
     QImage createImage();
     QImage createEmpty();
 
 private:
-    Q_DISABLE_COPY(Video);
-
     struct Entry
     {
         enum Type { ColorTable = 5, VideoFull = 1, VideoDiff = 2, AudioLeft = 3, AudioRight = 4 };
         Type type;
-        quint32 length;
-        quint32 offset;
+        std::uint32_t length;
+        std::uint32_t offset;
     };
 
-    QList<Entry> m_entries;
+    std::vector<Entry> m_entries;
     ColorTable m_colorTable;
-    QByteArray m_indexMap;
-    QByteArray m_frame;
-    QFile m_file;
+    std::vector<char> m_indexMap;
+    std::vector<char> m_frame;
+    util::File m_file;
 
-    quint32 m_width;
-    quint32 m_height;
-    quint32 m_videoPos;
-    quint32 m_nextVideoPos;
-    quint32 m_audioPos;
-    quint32 m_lastAudioPos;
+    std::uint32_t m_width;
+    std::uint32_t m_height;
+    std::uint32_t m_videoPos;
+    std::uint32_t m_nextVideoPos;
+    std::uint32_t m_audioPos;
+    std::uint32_t m_lastAudioPos;
     bool m_hasAudio;
-    quint32 m_frameRate;
+    std::uint32_t m_frameRate;
 
     QTime m_time;
     bool m_playing;
     bool m_looping;
 };
 
-
 } // namespace gfx
-
 
 #endif // GFX_VIDEO_H

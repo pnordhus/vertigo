@@ -16,17 +16,13 @@
  ***************************************************************************/
 
 #include "colortable.h"
-#include <QFile>
-
 
 namespace gfx {
-
 
 ColorTable::ColorTable()
 {
 
 }
-
 
 ColorTable::ColorTable(const QVector<QRgb> &colorTable) :
     QVector<QRgb>(colorTable)
@@ -34,37 +30,31 @@ ColorTable::ColorTable(const QVector<QRgb> &colorTable) :
 
 }
 
-
 ColorTable::ColorTable(const QString &filename)
 {
     loadFromFile(filename);
 }
 
-
 bool ColorTable::loadFromFile(const QString &filename)
 {
-    QFile file(filename);
-    if (!file.open(QFile::ReadOnly))
-        return false;
+    util::File file(QString(filename).replace(":", "/").toUtf8().data());
 
     quint16 type;
-    QDataStream stream(&file);
-    stream >> type;
-    if (type == 0x0208)
-        stream.skipRawData(12);
-    else
-        stream.skipRawData(2);
-    load(file.read(256 * 3));
+    file >> type;
+    if (type == 0x0802) {
+        file.skipBytes(12);
+    } else {
+        file.skipBytes(2);
+    }
+    load(file);
     return true;
 }
-
 
 void ColorTable::toRgb565()
 {
     for (int i = 0; i < size(); i++)
         (*this)[i] = qRgb(qRed(at(i)) & 0xf8, qGreen(at(i)) & 0xfc, qBlue(at(i)) & 0xf8);
 }
-
 
 void ColorTable::load(const QByteArray &data)
 {
@@ -75,5 +65,16 @@ void ColorTable::load(const QByteArray &data)
         append(qRgb(data[i + 0], data[i + 1], data[i + 2]));
 }
 
+void ColorTable::load(util::File &file)
+{
+    clear();
+
+    std::vector<char> data;
+    data.resize(256 * 3);
+    file.read(data.data(), data.size());
+    for (int i = 0; i < data.size(); i += 3) {
+        append(qRgb(data[i + 0], data[i + 1], data[i + 2]));
+    }
+}
 
 } // namespace gfx
