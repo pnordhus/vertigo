@@ -70,8 +70,8 @@ Room::Room(int index, const QString &title, const QString &name,
         const int rate = file.value("Rate", 0).toInt();
         m_dockSound.load("sfx:snd/room/" + sound + ".pcm", rate);
 
-        ui::Arrow *arrow = new ui::Arrow(file.value("Arrow").toString(), QPoint(file.value("X").toInt(), file.value("Y").toInt()), false, [this](int) { showDock(); }, m_backgroundLabel);
-        arrow->setText(name);
+        m_arrows.emplace_back(file.value("Arrow").toString(), QPoint(file.value("X").toInt(), file.value("Y").toInt()), false, [this](int) { showDock(); }, m_backgroundLabel);
+        m_arrows.back().setText(name);
     }
 
     int personId = 1;
@@ -81,11 +81,8 @@ Room::Room(int index, const QString &title, const QString &name,
         if (!file.contains("Arrow"))
             break;
 
-        Person *person = new Person;
-
-        person->arrow = new ui::Arrow(file.value("Arrow").toString(), QPoint(file.value("X").toInt(), file.value("Y").toInt()), false, [this](int n) { startDialog(n); }, m_backgroundLabel);
-        person->arrow->hide();
-
+        Person *person = new Person(file.value("Arrow").toString(), QPoint(file.value("X").toInt(), file.value("Y").toInt()), false, [this](int n) { startDialog(n); }, m_backgroundLabel);
+        person->arrow.hide();
         m_persons.insert(personId, person);
 
         personId++;
@@ -96,10 +93,8 @@ Room::Room(int index, const QString &title, const QString &name,
         file.setSection("WeaponMan");
     if (file.contains("Name"))
     {
-        Person *person = new Person;
-
-        person->arrow = new ui::Arrow(file.value("Arrow").toString(), QPoint(file.value("X").toInt(), file.value("Y").toInt()), false, [this](int n) { startDialog(n); }, m_backgroundLabel);
-        person->arrow->hide();
+        Person *person = new Person(file.value("Arrow").toString(), QPoint(file.value("X").toInt(), file.value("Y").toInt()), false, [this](int n) { startDialog(n); }, m_backgroundLabel);
+        person->arrow.hide();
 
         m_persons.insert(personId, person);
         m_dockMan = person;
@@ -123,28 +118,28 @@ void Room::restart()
     QList<Dialog*> dialogs = Chapter::get()->dialogs(m_index);
 
     foreach (Person* person, m_persons)
-        person->arrow->hide();
+        person->arrow.hide();
 
     foreach (Dialog* dialog, dialogs) {
         Person *person = m_persons.value(dialog->person());
         if (!person) {
             foreach (person, m_persons) {
-                if (person->arrow->isVisible() == false && person->female == dialog->isFemale())
+                if (person->arrow.isVisible() == false && person->female == dialog->isFemale())
                     break;
             }
         }
 
         Q_ASSERT(person);
-        person->arrow->show();
-        person->arrow->setText(dialog->name());
-        person->arrow->setValue(dialog->id());
+        person->arrow.show();
+        person->arrow.setText(dialog->name());
+        person->arrow.setValue(dialog->id());
     }
 
-    if (m_dockMan && !m_dockMan->arrow->isVisible())
+    if (m_dockMan && !m_dockMan->arrow.isVisible())
     {
-        m_dockMan->arrow->show();
-        m_dockMan->arrow->setText(m_dockManName);
-        m_dockMan->arrow->setValue(0);
+        m_dockMan->arrow.show();
+        m_dockMan->arrow.setText(m_dockManName);
+        m_dockMan->arrow.setValue(0);
     }
 
     dialogs = Chapter::get()->dialogsEnCom(true);

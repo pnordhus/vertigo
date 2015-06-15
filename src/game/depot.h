@@ -26,6 +26,7 @@
 #include "ui/list.h"
 #include "ui/itemlist.h"
 
+#include <map>
 
 namespace game {
 
@@ -39,7 +40,6 @@ private:
 
 public:
     Depot(std::function<void()> &&funcClose);
-    ~Depot();
 
 private:
     void flip();
@@ -88,7 +88,7 @@ private:
     Boat *m_boat;
     int m_side;
     int m_mounting;
-    QList<ui::Arrow*> m_mountingArrows;
+    std::map<int, ui::Arrow> m_mountingArrows;
     QList<int> m_list1;
     QList<int> m_list2;
     int m_selectedList;

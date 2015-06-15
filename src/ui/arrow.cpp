@@ -25,7 +25,9 @@ Arrow::Arrow(const QString &dir, const QPoint &pos, bool large, std::function<vo
     m_position(pos),
     m_value(0),
     m_large(large),
-    m_funcClicked(std::move(funcClicked))
+    m_funcClicked(std::move(funcClicked)),
+    m_label(parent),
+    m_button([this]() { m_funcClicked(m_value); }, parent)
 {
     const gfx::ColorTable colorTable("gfx:pal/gui/border.pal");
 
@@ -39,36 +41,28 @@ Arrow::Arrow(const QString &dir, const QPoint &pos, bool large, std::function<vo
     if (m_top)
         arrowY = 'b';
 
-    m_label = new Label(parent);
-    m_label->setTexture(gfx::Image::load(QString("gfx:img/desktop/gui/arr%1%2%3.img").arg(arrowY).arg(arrowX).arg(large ? "med" : "sma"), colorTable));
-    m_label->setPosition(pos);
+    m_label.setTexture(gfx::Image::load(QString("gfx:img/desktop/gui/arr%1%2%3.img").arg(arrowY).arg(arrowX).arg(large ? "med" : "sma"), colorTable));
+    m_label.setPosition(pos);
 
-    m_button = new Button([this]() { m_funcClicked(m_value); }, parent);
-    m_button->setFont(m_large ? gfx::Font::Medium : gfx::Font::Small);
-    m_button->setOffset(0);
-}
-
-Arrow::~Arrow()
-{
-    delete m_button;
-    delete m_label;
+    m_button.setFont(m_large ? gfx::Font::Medium : gfx::Font::Small);
+    m_button.setOffset(0);
 }
 
 void Arrow::hide()
 {
-    m_label->hide();
-    m_button->hide();
+    m_label.hide();
+    m_button.hide();
 }
 
 void Arrow::show()
 {
-    m_label->show();
-    m_button->show();
+    m_label.show();
+    m_button.show();
 }
 
 bool Arrow::isVisible()
 {
-    return m_label->isVisible();
+    return m_label.isVisible();
 }
 
 void Arrow::setValue(int value)
@@ -94,9 +88,9 @@ void Arrow::setText(const QString &text)
         offset.setX(-1 - width);
     }
 
-    m_button->setText(text);
-    m_label->setPosition(m_position + offsetArrow);
-    m_button->setPosition(m_position + offsetArrow + offset);
+    m_button.setText(text);
+    m_label.setPosition(m_position + offsetArrow);
+    m_button.setPosition(m_position + offsetArrow + offset);
 }
 
 } // namespace ui

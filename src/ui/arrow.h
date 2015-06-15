@@ -26,7 +26,6 @@ class Arrow
 {
 public:
     Arrow(const QString &dir, const QPoint &pos, bool large, std::function<void(int)> &&funcClicked, Widget *parent);
-    ~Arrow();
 
 public:
     void hide();
@@ -36,14 +35,14 @@ public:
     void setText(const QString &text);
 
 private:
-    Label *m_label;
-    Button *m_button;
     bool m_left;
     bool m_top;
     QPoint m_position;
     int m_value;
     bool m_large;
     std::function<void(int)> m_funcClicked;
+    Label m_label;
+    Button m_button;
 };
 
 } // namespace ui
