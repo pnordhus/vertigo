@@ -16,20 +16,21 @@
  ***************************************************************************/
 
 #include "itemlist.h"
+
 #include "gfx/colortable.h"
 #include "gfx/image.h"
 
-
 namespace ui {
-
 
 ItemList::ItemList(std::function<void(int)> &&funcClicked, Widget *parent, bool showChecks, int maxItems) :
     Widget(parent),
+    m_funcClicked(std::move(funcClicked)),
+    m_btnLeft([this]() { scrollLeft(); }, this),
+    m_btnRight([this]() { scrollRight(); }, this),
     m_items(0),
     m_firstItem(0),
     m_selectedItem(-1),
-    m_offset(0),
-    m_funcClicked(std::move(funcClicked))
+    m_offset(0)
 {
     setSize(539, 48);
 
@@ -42,19 +43,17 @@ ItemList::ItemList(std::function<void(int)> &&funcClicked, Widget *parent, bool 
     for (int i = 0; i < 256; i++)
         colorTableDisabled << qRgba(qRed(colorTable[i]), qGreen(colorTable[i]), qBlue(colorTable[i]), 128);
 
-    m_btnLeft = new ui::Button([this]() { scrollLeft(); }, this);
-    m_btnLeft->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdlefu.img", colorTable));
-    m_btnLeft->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdlefd.img", colorTable));
-    m_btnLeft->setDisabledTexture(gfx::Image::load("gfx:img/desktop/depot/gdlefu.img", colorTableDisabled));
-    m_btnLeft->setPosition(13, 8);
-    m_btnLeft->disable();
+    m_btnLeft.setTexture(gfx::Image::load("gfx:img/desktop/depot/gdlefu.img", colorTable));
+    m_btnLeft.setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdlefd.img", colorTable));
+    m_btnLeft.setDisabledTexture(gfx::Image::load("gfx:img/desktop/depot/gdlefu.img", colorTableDisabled));
+    m_btnLeft.setPosition(13, 8);
+    m_btnLeft.disable();
 
-    m_btnRight = new ui::Button([this]() { scrollRight(); }, this);
-    m_btnRight->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdrigu.img", colorTable));
-    m_btnRight->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdrigd.img", colorTable));
-    m_btnRight->setDisabledTexture(gfx::Image::load("gfx:img/desktop/depot/gdrigu.img", colorTableDisabled));
-    m_btnRight->setPosition(493, 8);
-    m_btnRight->disable();
+    m_btnRight.setTexture(gfx::Image::load("gfx:img/desktop/depot/gdrigu.img", colorTable));
+    m_btnRight.setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdrigd.img", colorTable));
+    m_btnRight.setDisabledTexture(gfx::Image::load("gfx:img/desktop/depot/gdrigu.img", colorTableDisabled));
+    m_btnRight.setPosition(493, 8);
+    m_btnRight.disable();
 
     m_chkGreen = gfx::Image::load("gfx:img/desktop/depot/chkgre.img", colorTable);
     m_chkRed = gfx::Image::load("gfx:img/desktop/depot/chkred.img", colorTable);
@@ -63,17 +62,10 @@ ItemList::ItemList(std::function<void(int)> &&funcClicked, Widget *parent, bool 
     m_sndButton.load("sfx:snd/desktop/button.pcm");
 }
 
-
-ItemList::~ItemList()
-{
-}
-
-
 void ItemList::addItem(const gfx::Image &icon)
 {
     addItem(icon, false, false);
 }
-
 
 void ItemList::addItem(const gfx::Image &icon, bool red, bool green)
 {
@@ -90,7 +82,6 @@ void ItemList::addItem(const gfx::Image &icon, bool red, bool green)
     updateButtons();
 }
 
-
 void ItemList::selectItem(int index)
 {
     m_selectedItem = index;
@@ -103,7 +94,6 @@ void ItemList::selectItem(int index)
     }
 }
 
-
 void ItemList::clear()
 {
     m_texture.createEmpty(m_texture.width(), m_texture.height(), gfx::Texture::RGBA);
@@ -115,7 +105,6 @@ void ItemList::clear()
     m_offset = 0;
     updateButtons();
 }
-
 
 void ItemList::draw()
 {
@@ -141,7 +130,6 @@ void ItemList::draw()
         m_textureFrame.draw(54 + x, 0, QRectF(0, 0, 435 - x, m_textureFrame.height()));
 }
 
-
 void ItemList::scrollLeft()
 {
     if (m_firstItem > 0)
@@ -154,7 +142,6 @@ void ItemList::scrollLeft()
     updateButtons();
 }
 
-
 void ItemList::scrollRight()
 {
     if (m_firstItem + 8 < m_items)
@@ -166,7 +153,6 @@ void ItemList::scrollRight()
     }
     updateButtons();
 }
-
 
 bool ItemList::mousePressEvent(const QPoint &pos, Qt::MouseButton button)
 {
@@ -184,12 +170,10 @@ bool ItemList::mousePressEvent(const QPoint &pos, Qt::MouseButton button)
     return false;
 }
 
-
 void ItemList::updateButtons()
 {
-    m_btnLeft->setEnabled(m_firstItem > 0);
-    m_btnRight->setEnabled(m_firstItem + 8 < m_items);
+    m_btnLeft.setEnabled(m_firstItem > 0);
+    m_btnRight.setEnabled(m_firstItem + 8 < m_items);
 }
-
 
 } // namespace ui

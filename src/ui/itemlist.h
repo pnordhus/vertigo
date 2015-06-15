@@ -15,28 +15,24 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-
 #ifndef UI_ITEMLIST_H
 #define UI_ITEMLIST_H
 
-
-#include "widget.h"
 #include "button.h"
-#include "label.h"
+#include "widget.h"
+
 #include "gfx/texture.h"
 #include "gfx/image.h"
 #include "sfx/sound.h"
+
 #include <QTime>
 
-
 namespace ui {
-
 
 class ItemList : public Widget
 {
 public:
     ItemList(std::function<void(int)> &&funcClicked, Widget *parent, bool showChecks, int maxItems = 31);
-    ~ItemList();
 
 public:
     void addItem(const gfx::Image &icon);
@@ -52,15 +48,16 @@ private:
     void scrollRight();
 
 private:
+    std::function<void(int)> m_funcClicked;
+
     gfx::Texture m_texture;
     gfx::Texture m_textureChecks;
     gfx::Texture m_textureFrame;
     gfx::Image m_chkGreen;
     gfx::Image m_chkRed;
 
-    ui::Label *m_lblList;
-    ui::Button *m_btnLeft;
-    ui::Button *m_btnRight;
+    ui::Button m_btnLeft;
+    ui::Button m_btnRight;
     sfx::Sound m_sndButton;
 
     int m_items;
@@ -68,11 +65,8 @@ private:
     int m_selectedItem;
     int m_offset;
     QTime m_time;
-    std::function<void(int)> m_funcClicked;
 };
 
-
 } // namespace ui
-
 
 #endif // UI_ITEMLIST_H
