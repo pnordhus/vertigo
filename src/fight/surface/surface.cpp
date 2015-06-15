@@ -29,7 +29,8 @@ namespace fight {
 
 
 Surface::Surface(const QString &name, int maxheightscale, int mapping) :
-    m_mapping(mapping)
+    m_mapping(mapping),
+	m_tesselator(Level, this)
 {
     txt::DesFile file(QString("vfx:surface/%1.des").arg(name));
     file.setSection("height");
@@ -73,8 +74,6 @@ Surface::Surface(const QString &name, int maxheightscale, int mapping) :
         gfx::ColorTable colorTable(QString("vfx:texture/%1_%2.s16").arg(sName).arg(i, 3, 10, QChar('0')));
         m_textures << gfx::Image::load(QString("vfx:texture/%1_%2.imb").arg(tName).arg(i, 3, 10, QChar('0')), colorTable);
     }
-
-    m_tesselator = Tesselator::get(this);
 }
 
 
@@ -84,15 +83,15 @@ Surface::~Surface()
 }
 
 
-float Surface::heightAt(float x, float y) const
+float Surface::heightAt(float x, float y)
 {
-    return m_tesselator->heightAt(QVector2D(x / m_scale.x(), y / m_scale.y())) * m_scale.z();
+    return m_tesselator.heightAt(QVector2D(x / m_scale.x(), y / m_scale.y())) * m_scale.z();
 }
 
 
-float Surface::heightAt(float x, float y, QVector3D &normal) const
+float Surface::heightAt(float x, float y, QVector3D &normal)
 {
-    return m_tesselator->heightAt(QVector2D(x / m_scale.x(), y / m_scale.y()), normal) * m_scale.z();
+    return m_tesselator.heightAt(QVector2D(x / m_scale.x(), y / m_scale.y()), normal) * m_scale.z();
 }
 
 
@@ -121,7 +120,7 @@ bool Surface::testCollision(const QVector3D &start, const QVector3D &end, float 
     Element *element = getElement(QPoint(x0*8, y0*8));
     if (element->testCollision(end, radius))
     {
-        if (m_tesselator->intersect(QVector3D(start.x()/m_scale.x(), start.y()/m_scale.y(), start.z()/m_scale.z()), QVector3D(end.x()/m_scale.x(), end.y()/m_scale.y(), end.z()/m_scale.z()), radius/m_scale.z(), position, normal))
+        if (m_tesselator.intersect(QVector3D(start.x()/m_scale.x(), start.y()/m_scale.y(), start.z()/m_scale.z()), QVector3D(end.x()/m_scale.x(), end.y()/m_scale.y(), end.z()/m_scale.z()), radius/m_scale.z(), position, normal))
         {
             position *= m_scale;
             return true;
@@ -142,7 +141,7 @@ Element* Surface::getElement(QPoint pos)
     int id = (pos.y() << 16) + pos.x();
     if (m_elements.contains(id))
         return m_elements[id];
-    Element *element = m_tesselator->tesselate(QRect(pos, QSize(8, 8)), Level, m_scale, m_textureMap, m_textureDir, m_mapping);
+    Element *element = m_tesselator.tesselate(QRect(pos, QSize(8, 8)), Level, m_scale, m_textureMap, m_textureDir, m_mapping);
     m_elements.insert(id, element);
     return element;
 }

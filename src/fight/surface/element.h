@@ -26,6 +26,9 @@
 #include <QVector3D>
 #include <QPoint>
 
+#include <glm/vec3.hpp>
+#include <glm/vec2.hpp>
+
 
 namespace fight {
 
@@ -41,7 +44,7 @@ public:
 
 public:
     int numVertices(int textureId);
-    void addVertex(int textureId, QVector3D position, QVector3D normal, QVector2D texCoords);
+	void addVertex(int textureId, const glm::vec3 &position, const glm::vec3 &normal, const glm::vec2 &texCoords);
     void addTriangle(int textureId, quint16 a, quint16 b, quint16 c);
 
     void draw();

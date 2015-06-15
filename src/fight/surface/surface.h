@@ -21,6 +21,7 @@
 
 #include "../vector.h"
 #include "gfx/texture.h"
+#include "tesselator.h"
 #include <QVector>
 #include <QMap>
 #include <QVector2D>
@@ -30,7 +31,6 @@
 namespace fight {
 
 
-class Tesselator;
 class Element;
 
 
@@ -42,8 +42,8 @@ public:
 
 public:
     void draw(QVector3D position, QVector3D direction);
-    float heightAt(float x, float y) const;
-    float heightAt(float x, float y, QVector3D &normal) const;
+    float heightAt(float x, float y);
+    float heightAt(float x, float y, QVector3D &normal);
     QVector3D scale() const { return m_scale; }
     float height(int x, int y) const;
     void bindTexture(int textureId);
@@ -63,7 +63,7 @@ private:
 
 private:
     static const int Level = 3;
-    Tesselator *m_tesselator;
+    Tesselator m_tesselator;
     QMap<int, Element*> m_elements;
 };
 

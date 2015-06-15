@@ -93,7 +93,7 @@ private:
     void playMovies();
     void startMission();
 
-private slots:
+private:
     void movieFinished();
     void finishDialog(int dialogId);
     void addMessage(int message);

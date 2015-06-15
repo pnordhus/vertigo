@@ -18,14 +18,19 @@
 #include "betaspline.h"
 #include "gfx/image.h"
 
+#include <glm/geometric.hpp>
+
 
 namespace fight {
 
 
-BetaSpline::BetaSpline(int Level, float defaultBeta1, float defaultBeta2)
+BetaSpline::BetaSpline(std::function<float(int, int)> height, int level, float defaultBeta1, float defaultBeta2) :
+	m_height(height),
+	m_level(level)
 {
-	this->Level = Level;
-	int n = 2*(Level - 1);
+	if (m_level < 2)
+		return;
+	int n = 2*(m_level - 1);
 
 	beta1 = defaultBeta1;
 	beta2 = defaultBeta2;
@@ -39,27 +44,11 @@ BetaSpline::BetaSpline(int Level, float defaultBeta1, float defaultBeta2)
 	int i, j;
 
 	for (i = 0; i < 4; i++)
-	{
-        B[i] = new float[n + 1];
 		for (j = 0; j < n + 1; j++)
-			B[i][j] = b(i, (float)j/n);
-	}
+			B[i].push_back(b(i, (float)j/n));
 	for (i = 0; i < 4; i++)
-	{
-        BS[i] = new float[n + 1];
 		for (j = 0; j < n + 1; j++)
-			BS[i][j] = bs(i, (float)j/n);
-	}
-}
-
-
-BetaSpline::~BetaSpline()
-{
-	for (int i = 0; i < 4; i++)
-    {
-        delete B[i];
-        delete BS[i];
-    }
+			BS[i].push_back(bs(i, (float)j/n));
 }
 
 
@@ -119,18 +108,18 @@ float BetaSpline::bs(int i, float t)
 }
 
 
-void BetaSpline::InitFrame(float height(int,int), int x, int y)
+void BetaSpline::InitFrame(int x, int y)
 {
 	for (short k = 0; k < 4; k++) 
 		for (short l = 0; l < 4; l++) 
-            frame[k][l] = QVector3D(l - 1, k - 1, height(x + l - 1, y + k - 1));
+            frame[k][l] = glm::vec3(l - 1, k - 1, m_height(x + l - 1, y + k - 1));
 }
 
 
-QVector3D BetaSpline::Beta_3_3(float u, float v)
+glm::vec3 BetaSpline::Beta_3_3(float u, float v)
 {
 	short k, l;
-	QVector3D t = QVector3D(0, 0, 0);
+	glm::vec3 t = glm::vec3(0, 0, 0);
 
 	for (k = 0; k < 4; k++) 
 		for (l = 0; l < 4; l++) 
@@ -139,10 +128,10 @@ QVector3D BetaSpline::Beta_3_3(float u, float v)
 }
 
 
-QVector3D BetaSpline::Beta_3_3(int u, int v)
+glm::vec3 BetaSpline::Beta_3_3(int u, int v)
 {
 	short k, l;
-	QVector3D t = QVector3D(0, 0, 0);
+	glm::vec3 t = glm::vec3(0, 0, 0);
 
 	for (k = 0; k < 4; k++) 
 		for (l = 0; l < 4; l++) 
@@ -150,11 +139,28 @@ QVector3D BetaSpline::Beta_3_3(int u, int v)
 	return t;
 }
 
-QVector3D BetaSpline::Beta_norm(int u, int v)
+
+glm::vec3 BetaSpline::Beta_norm(float u, float v)
 {
 	short k, l;
-	QVector3D t = QVector3D(0, 0, 0);
-	QVector3D o = QVector3D(0, 0, 0);
+	glm::vec3 t = glm::vec3(0, 0, 0);
+	glm::vec3 o = glm::vec3(0, 0, 0);
+
+	for (k = 0; k < 4; k++)
+		for (l = 0; l < 4; l++)
+			t += frame[k][l] * (bs(l, u) * b(k, v));
+	for (k = 0; k < 4; k++)
+		for (l = 0; l < 4; l++)
+			o += frame[k][l] * (b(l, u) * bs(k, v));
+	return glm::cross(t, o);
+}
+
+
+glm::vec3 BetaSpline::Beta_norm(int u, int v)
+{
+	short k, l;
+	glm::vec3 t = glm::vec3(0, 0, 0);
+	glm::vec3 o = glm::vec3(0, 0, 0);
 
 	for (k = 0; k < 4; k++)
 		for (l = 0; l < 4; l++)
@@ -162,23 +168,24 @@ QVector3D BetaSpline::Beta_norm(int u, int v)
 	for (k = 0; k < 4; k++) 
 		for (l = 0; l < 4; l++) 
 			o += frame[k][l] * (B[l][u] * BS[k][v]);
-    return QVector3D::crossProduct(t, o);
+    return glm::cross(t, o);
 }
 
-void BetaSpline::Beta_TB(int u, int v, QVector3D *tangent, QVector3D *binormal)
+
+void BetaSpline::Beta_TB(int u, int v, glm::vec3 &tangent, glm::vec3 &binormal)
 {
 	short k, l;
-	*tangent = QVector3D(0, 0, 0);
-	*binormal = QVector3D(0, 0, 0);
+	tangent = glm::vec3(0, 0, 0);
+	binormal = glm::vec3(0, 0, 0);
 
 	for (k = 0; k < 4; k++)
 		for (l = 0; l < 4; l++)
-			*tangent += frame[k][l] * (BS[l][u] * B[k][v]);
-    tangent->normalize();
+			tangent += frame[k][l] * (BS[l][u] * B[k][v]);
+	tangent = glm::normalize(tangent);
 	for (k = 0; k < 4; k++) 
 		for (l = 0; l < 4; l++) 
-			*binormal += frame[k][l] * (B[l][u] * BS[k][v]);
-	binormal->normalize();
+			binormal += frame[k][l] * (B[l][u] * BS[k][v]);
+	binormal = glm::normalize(binormal);
 }
 
 

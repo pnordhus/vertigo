@@ -19,7 +19,9 @@
 #define SURFACE_BETASPLINE_H
 
 
-#include <QVector3D>
+#include <functional>
+#include <vector>
+#include <glm/vec3.hpp>
 
 
 namespace fight {
@@ -28,32 +30,33 @@ namespace fight {
 class BetaSpline
 {
 public:
-    BetaSpline(int Level, float defaultBeta1, float defaultBeta2);
-    ~BetaSpline();
+	BetaSpline(std::function<float(int, int)> height, int level, float defaultBeta1, float defaultBeta2);
 
 public:
-    void InitFrame(float height(int,int), int x, int y);
+    void InitFrame(int x, int y);
 
-    QVector3D Beta_3_3(float u, float v);
-    QVector3D Beta_3_3(int u, int v);
-    QVector3D Beta_norm(int u, int v);
-    void Beta_TB(int u, int v, QVector3D *tangent, QVector3D *binormal);
+    glm::vec3 Beta_3_3(float u, float v);
+	glm::vec3 Beta_3_3(int u, int v);
+	glm::vec3 Beta_norm(float u, float v);
+	glm::vec3 Beta_norm(int u, int v);
+	void Beta_TB(int u, int v, glm::vec3 &tangent, glm::vec3 &binormal);
 
 private:
     float b(int i, float t);
     float bs(int i, float t);
 
 private:
-    int Level;
+	std::function<float(int, int)> m_height;
+    int m_level;
 
 	float beta1, beta2;
 	float b12, b13, b22, b23;
 	float delta, d;
 
-	float* B[4];
-	float* BS[4];
+	std::vector<float> B[4];
+	std::vector<float> BS[4];
 
-	QVector3D frame[4][4];
+	glm::vec3 frame[4][4];
 };
 
 
