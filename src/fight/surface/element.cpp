@@ -49,33 +49,33 @@ int Element::numVertices(int textureId)
 }
 
 
-void Element::addVertex(int textureId, QVector3D position, QVector3D normal, QVector2D texCoords)
+void Element::addVertex(int textureId, const glm::vec3 &position, const glm::vec3 &normal, const glm::vec2 &texCoords)
 {
-    m_subsets[textureId].vertices << position;
-    m_subsets[textureId].normals << normal;
-    m_subsets[textureId].texCoords << texCoords;
-    if (m_maxZ < position.z())
-        m_maxZ = position.z();
-    if (m_minZ > position.z())
-        m_minZ = position.z();
+	m_subsets[textureId].vertices << QVector3D(position.x, position.y, position.z);
+	m_subsets[textureId].normals << QVector3D(normal.x, normal.y, normal.z);
+	m_subsets[textureId].texCoords << QVector2D(texCoords.x, texCoords.y);
+    if (m_maxZ < position.z)
+        m_maxZ = position.z;
+    if (m_minZ > position.z)
+        m_minZ = position.z;
 
     int ix, iy;
-    ix = position.x()/m_surface->scale().x() + 1e-3 - m_rect.x();
-    iy = position.y()/m_surface->scale().y() + 1e-3 - m_rect.y();
-    if (ix >= 0 && ix < m_rect.width() && iy >= 0 && iy < m_rect.height() && m_heights[iy*m_rect.width() + ix] < position.z())
-        m_heights[iy*m_rect.width() + ix] = position.z();
-    ix = position.x()/m_surface->scale().x() - 1e-3 - m_rect.x();
-    iy = position.y()/m_surface->scale().y() + 1e-3 - m_rect.y();
-    if (ix >= 0 && ix < m_rect.width() && iy >= 0 && iy < m_rect.height() && m_heights[iy*m_rect.width() + ix] < position.z())
-        m_heights[iy*m_rect.width() + ix] = position.z();
-    ix = position.x()/m_surface->scale().x() + 1e-3 - m_rect.x();
-    iy = position.y()/m_surface->scale().y() - 1e-3 - m_rect.y();
-    if (ix >= 0 && ix < m_rect.width() && iy >= 0 && iy < m_rect.height() && m_heights[iy*m_rect.width() + ix] < position.z())
-        m_heights[iy*m_rect.width() + ix] = position.z();
-    ix = position.x()/m_surface->scale().x() - 1e-3 - m_rect.x();
-    iy = position.y()/m_surface->scale().y() - 1e-3 - m_rect.y();
-    if (ix >= 0 && ix < m_rect.width() && iy >= 0 && iy < m_rect.height() && m_heights[iy*m_rect.width() + ix] < position.z())
-        m_heights[iy*m_rect.width() + ix] = position.z();
+    ix = position.x/m_surface->scale().x() + 1e-3 - m_rect.x();
+    iy = position.y/m_surface->scale().y() + 1e-3 - m_rect.y();
+    if (ix >= 0 && ix < m_rect.width() && iy >= 0 && iy < m_rect.height() && m_heights[iy*m_rect.width() + ix] < position.z)
+        m_heights[iy*m_rect.width() + ix] = position.z;
+    ix = position.x/m_surface->scale().x() - 1e-3 - m_rect.x();
+    iy = position.y/m_surface->scale().y() + 1e-3 - m_rect.y();
+    if (ix >= 0 && ix < m_rect.width() && iy >= 0 && iy < m_rect.height() && m_heights[iy*m_rect.width() + ix] < position.z)
+        m_heights[iy*m_rect.width() + ix] = position.z;
+    ix = position.x/m_surface->scale().x() + 1e-3 - m_rect.x();
+    iy = position.y/m_surface->scale().y() - 1e-3 - m_rect.y();
+    if (ix >= 0 && ix < m_rect.width() && iy >= 0 && iy < m_rect.height() && m_heights[iy*m_rect.width() + ix] < position.z)
+        m_heights[iy*m_rect.width() + ix] = position.z;
+    ix = position.x/m_surface->scale().x() - 1e-3 - m_rect.x();
+    iy = position.y/m_surface->scale().y() - 1e-3 - m_rect.y();
+    if (ix >= 0 && ix < m_rect.width() && iy >= 0 && iy < m_rect.height() && m_heights[iy*m_rect.width() + ix] < position.z)
+        m_heights[iy*m_rect.width() + ix] = position.z;
 }
 
 

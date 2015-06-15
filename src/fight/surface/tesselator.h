@@ -23,6 +23,10 @@
 #include <QVector2D>
 #include <QVector3D>
 
+#include <vector>
+#include <glm/vec3.hpp>
+#include <glm/vec2.hpp>
+
 
 namespace fight {
 
@@ -39,22 +43,18 @@ public:
     ~Tesselator();
 
 public:
-    static Tesselator* get(Surface *surface);
-
-public:
-    float heightAt(QVector2D pos) const;
-    float heightAt(QVector2D pos, QVector3D &normal) const;
+	float heightAt(const QVector2D &pos);
+	float heightAt(const QVector2D &pos, QVector3D &normal);
     Element* tesselate(QRect rect, int level, QVector3D scale, QByteArray &textureMap, QByteArray &textureDir, int mapping);
     bool intersect(const QVector3D &start, const QVector3D &end, float radius, QVector3D &position, QVector3D &normal);
 
 private:
     void InitIndices(int MaxLevel);
     void PrepareElementSubset(int level, QVector3D scale, int x, int y, int textureId, QVector2D t0, QVector2D tu, QVector2D tv, Element *element);
-    static float height(int x, int y);
 
 private:
-    QList<BetaSpline*> m_splines;
-    quint16 *indices;
+	std::vector<BetaSpline> m_splines;
+	quint16 *indices;
 
     Surface *m_surface;
 };
