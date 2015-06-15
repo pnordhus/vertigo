@@ -18,14 +18,12 @@
 #ifndef GAME_NOTEBOOK_H
 #define GAME_NOTEBOOK_H
 
-
 #include "gfx/font.h"
-#include "ui/button.h"
 #include "txt/stringtable.h"
-
+#include "ui/button.h"
+#include "ui/list.h"
 
 namespace game {
-
 
 class Notebook : public ui::Label
 {
@@ -46,8 +44,10 @@ private:
     void updateMovies();
 
 private:
-    ui::Label* createLabel(ui::Widget *parent, txt::String text, float posY);
-    ui::Button* createButton(std::function<void()> funcClick, ui::Widget *parent, txt::String text, float posY);
+    void createLabel(ui::Widget *parent, txt::String text, float posY);
+    void createButton(std::function<void()> funcClick, ui::Widget *parent, txt::String text, float posY);
+    void setupLabel(ui::Label &label, txt::String text, float posY);
+    void setupButton(ui::Button &button, txt::String text, float posY);
 
 private:
     bool mousePressEvent(const QPoint &pos, Qt::MouseButton button);
@@ -56,21 +56,25 @@ private:
     gfx::Font m_fontGreen;
     gfx::Font m_fontYellow;
     gfx::Texture m_background;
-    ui::Label *m_lblBackground;
-    ui::Label *m_lblMain;
-    ui::Label *m_lblMissions;
-    ui::Label *m_lblOptions;
-    ui::Label *m_lblMovies;
-    ui::Label *m_lblMoviePlayer;
-    ui::Label *m_lblMap;
-    ui::Button *m_btnMoviesAutopilot;
-    ui::Button *m_btnMoviesApproach;
-    ui::Button *m_btnMoviesHarbour;
+    ui::Label m_lblBackground;
+    ui::Label m_lblMain;
+    ui::Label m_lblMissions;
+    ui::Label m_lblOptions;
+    ui::Label m_lblMovies;
+    ui::Label m_lblMoviePlayer;
+    ui::Label m_lblMap;
+    ui::Button m_btnMoviesAutopilot;
+    ui::Button m_btnMoviesApproach;
+    ui::Button m_btnMoviesHarbour;
+    ui::Button m_btnMoviePlayerHide;
+    ui::Button m_btnMissionsBack;
+    ui::List m_listMissions;
+    std::list<ui::Label> m_labels;
+    std::list<ui::Button> m_buttons;
+    std::list<ui::Button> m_movieButtons;
     std::function<void()> m_funcClose;
 };
 
-
 } // namespace game
-
 
 #endif // GAME_NOTEBOOK_H

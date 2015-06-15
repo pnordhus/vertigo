@@ -18,7 +18,8 @@
 #ifndef UI_FRAME_H
 #define UI_FRAME_H
 
-#include "label.h"
+#include "button.h"
+
 #include "gfx/colortable.h"
 #include "gfx/texture.h"
 
@@ -43,6 +44,8 @@ private:
 
 private:
     std::function<void()> m_funcClose;
+    ui::Label m_lblTitle;
+    ui::Button m_btnClose;
 };
 
 } // namespace ui
