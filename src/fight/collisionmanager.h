@@ -20,6 +20,7 @@
 
 
 #include "boundingbox.h"
+#include <QList>
 
 
 namespace fight {
@@ -34,16 +35,16 @@ public:
     CollisionCache();
 
 public:
-    void addObject(Object *object, bool collision, const QVector3D &position, const QVector3D &normal);
-    bool testObject(Object *object, bool &collision, QVector3D &position, QVector3D &normal);
+    void addObject(Object *object, bool collision, const glm::vec3 &position, const glm::vec3 &normal);
+    bool testObject(Object *object, bool &collision, glm::vec3 &position, glm::vec3 &normal);
 
 private:
     struct CacheEntry
     {
         Object *object;
         bool collision;
-        QVector3D position;
-        QVector3D normal;
+        glm::vec3 position;
+        glm::vec3 normal;
     };
 
 private:
@@ -58,8 +59,8 @@ public:
 
 public:
     void addObject(Object *object);
-    Object* testCollision(const QVector3D &start, const QVector3D &end, float radius, QVector3D &position, QVector3D &normal);
-    Object* testCollision(Object *cacheObject, const QVector3D &end, float radius, QVector3D &position, QVector3D &normal);
+    Object* testCollision(const glm::vec3 &start, const glm::vec3 &end, float radius, glm::vec3 &position, glm::vec3 &normal);
+    Object* testCollision(Object *cacheObject, const glm::vec3 &end, float radius, glm::vec3 &position, glm::vec3 &normal);
 
 private:
 

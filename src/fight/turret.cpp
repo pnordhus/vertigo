@@ -30,14 +30,14 @@ Turret::Turret(ModuleManager &modMan, const QString &name)
     m_body = modMan.get(file.value("body").toString());
 
     m_armLeft = modMan.get(file.value("arml").toString());
-    m_armLeftPosition.setX(file.value("ArmLOffsetX").toFloat());
-    m_armLeftPosition.setY(file.value("ArmLOffsetY").toFloat());
-    m_armLeftPosition.setZ(file.value("ArmLOffsetZ").toFloat());
+    m_armLeftPosition.x = file.value("ArmLOffsetX").toFloat();
+    m_armLeftPosition.y = file.value("ArmLOffsetY").toFloat();
+    m_armLeftPosition.z = file.value("ArmLOffsetZ").toFloat();
 
     m_armRight = modMan.get(file.value("armr").toString());
-    m_armRightPosition.setX(file.value("ArmROffsetX").toFloat());
-    m_armRightPosition.setY(file.value("ArmROffsetY").toFloat());
-    m_armRightPosition.setZ(file.value("ArmROffsetZ").toFloat());
+    m_armRightPosition.x = file.value("ArmROffsetX").toFloat();
+    m_armRightPosition.y = file.value("ArmROffsetY").toFloat();
+    m_armRightPosition.z = file.value("ArmROffsetZ").toFloat();
 
     file.setSection("size");
     m_scale = file.value("scale").toFloat() / 16;
@@ -50,12 +50,12 @@ void Turret::draw()
     m_body.draw();
 
     glPushMatrix();
-    glTranslatef(m_armLeftPosition.x(), m_armLeftPosition.y(), m_armLeftPosition.z());
+    glTranslatef(m_armLeftPosition.x, m_armLeftPosition.y, m_armLeftPosition.z);
     m_armLeft.draw();
     glPopMatrix();
 
     glPushMatrix();
-    glTranslatef(m_armRightPosition.x(), m_armRightPosition.y(), m_armRightPosition.z());
+    glTranslatef(m_armRightPosition.x, m_armRightPosition.y, m_armRightPosition.z);
     m_armRight.draw();
     glPopMatrix();
 

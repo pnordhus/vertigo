@@ -43,7 +43,7 @@ public:
     ~Scenario();
 
 public:
-    const QVector3D& position() const { return m_position; }
+    const glm::vec3& position() const { return m_position; }
     const QMatrix4x4& cameraMatrixInverted() const { return m_cameraMatrixInverted; }
     Surface *surface() const { return m_surface; }
     gfx::TextureManager& textureManager() { return m_textureManager; }
@@ -57,7 +57,7 @@ protected:
     void keyReleaseEvent(QKeyEvent *);
 
 private:
-    QVector3D getPosition() const;
+    glm::vec3 getPosition() const;
 
 private:
     enum Type
@@ -78,7 +78,7 @@ private:
     };
 
     Surface *m_surface;
-    QVector3D m_position;
+    glm::vec3 m_position;
     txt::DesFile m_file;
     gfx::TextureManager m_textureManager;
     ModuleManager m_moduleManager;

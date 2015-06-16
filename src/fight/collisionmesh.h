@@ -20,8 +20,10 @@
 
 
 #include <QVector>
-#include <QVector3D>
-#include <QVector4D>
+
+#include <vector>
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
 
 
 namespace fight {
@@ -33,26 +35,26 @@ public:
     CollisionMesh();
 
 public:
-    void addTriangles(const QVector<QVector3D> &vertices, const QVector<quint16> &indices);
-    bool intersect(const QVector3D &start, const QVector3D &dir, float radius, float &distance, QVector3D &normal);
+    void addTriangles(const std::vector<glm::vec3> &vertices, const std::vector<quint16> &indices);
+    bool intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal);
 
-    static bool intersectSphereLine(const QVector3D &point, const QVector3D &dir, float radiusSquared, float &t);
+    static bool intersectSphereLine(const glm::vec3 &point, const glm::vec3 &dir, float radiusSquared, float &t);
 
 private:
     struct Triangle
     {
-        QVector3D vertices[3];
-        QVector3D u;
-        QVector3D v;
-        QVector4D plane;
+        glm::vec3 vertices[3];
+        glm::vec3 u;
+        glm::vec3 v;
+        glm::vec4 plane;
         float uu, uv, vv, invD;
-        QVector3D lineDir[3];
+        glm::vec3 lineDir[3];
     };
 
-    bool isPointInsideTriangle(const Triangle &tri, const QVector3D &point);
+    bool isPointInsideTriangle(const Triangle &tri, const glm::vec3 &point);
 
 private:
-    QList<Triangle> m_triangles;
+    std::vector<Triangle> m_triangles;
 };
 
 

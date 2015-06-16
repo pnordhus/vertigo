@@ -79,7 +79,7 @@ void Object::setCollisionCache(CollisionCache *cache)
 }
 
 
-void Object::setPosition(const QVector3D &pos)
+void Object::setPosition(const glm::vec3 &pos)
 {
     m_position = pos;
 }
@@ -93,14 +93,14 @@ void Object::update()
 void Object::draw()
 {
     glPushMatrix();
-    glTranslatef(m_position.x(), m_position.y(), m_position.z());
+    glTranslatef(m_position.x, m_position.y, m_position.z);
     glScalef(m_scale, m_scale, m_scale);
     m_base.draw();
     glPopMatrix();
 }
 
 
-bool Object::intersect(const QVector3D &start, const QVector3D &dir, float radius, float &distance, QVector3D &normal)
+bool Object::intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal)
 {
     return false;
 }

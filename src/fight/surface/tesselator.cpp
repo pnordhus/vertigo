@@ -16,11 +16,12 @@
  ***************************************************************************/
 
 #include "tesselator.h"
-#include "betaspline.h"
 #include "element.h"
 #include "surface.h"
 
+#include <deque>
 #include <glm/geometric.hpp>
+#include <glm/gtx/norm.hpp>
 
 
 namespace fight {
@@ -36,20 +37,13 @@ Tesselator::Tesselator(int MaxLevel, Surface *surface) :
 }
 
 
-Tesselator::~Tesselator()
-{
-    delete indices;
-}
-
-
 void Tesselator::InitIndices(int MaxLevel)
 {
-	int i, j, k, l, t;
+	int i, j, l, t;
 	int Level;
 
-	indices = new quint16[4*(MaxLevel - 1)*(MaxLevel - 1)*3];
+	indices.reserve(4*(MaxLevel - 1)*(MaxLevel - 1)*3);
 
-	k = 0;
 	i = 0;
 	j = 1;
 	Level = 2;
@@ -61,19 +55,19 @@ void Tesselator::InitIndices(int MaxLevel)
 		{
 			for (l = 0; l < Level - 2; l++)
 			{
-				indices[k++] = (quint16)i;
-				indices[k++] = (quint16)j;
-				indices[k++] = (quint16)(j + 1);
+                indices.push_back(i);
+                indices.push_back(j);
+				indices.push_back(j + 1);
 
-				indices[k++] = (quint16)i;
+                indices.push_back(i);
 				j++;
-				indices[k++] = (quint16)j;
+                indices.push_back(j);
 				i = (i - i0 + 1)%(4*Level - 8) + i0;
-				indices[k++] = (quint16)i;
+                indices.push_back(i);
 			}
-			indices[k++] = (quint16)i;
-			indices[k++] = (quint16)j;
-			indices[k++] = (quint16)((j - j0 + 1)%(4*Level - 4) + j0);
+            indices.push_back(i);
+            indices.push_back(j);
+            indices.push_back((j - j0 + 1)%(4*Level - 4) + j0);
 			j++;
 		}
 		i = j0;
@@ -82,12 +76,8 @@ void Tesselator::InitIndices(int MaxLevel)
 }
 
 
-void Tesselator::PrepareElementSubset(int level, QVector3D qscale, int x, int y, int textureId, QVector2D qt0, QVector2D qtu, QVector2D qtv, Element *element)
+void Tesselator::PrepareElementSubset(int level, const glm::vec3 &scale, int x, int y, int textureId, const glm::vec2 &t0, const glm::vec2 &tu, const glm::vec2 &tv, Element *element)
 {
-	glm::vec3 scale = glm::vec3(qscale.x(), qscale.y(), qscale.z());
-	glm::vec2 t0 = glm::vec2(qt0.x(), qt0.y());
-	glm::vec2 tu = glm::vec2(qtu.x(), qtu.y());
-	glm::vec2 tv = glm::vec2(qtv.x(), qtv.y());
 	int i, j, k, l;
 
 	k = element->numVertices(textureId);
@@ -133,12 +123,12 @@ void Tesselator::PrepareElementSubset(int level, QVector3D qscale, int x, int y,
 }
 
 
-float Tesselator::heightAt(const QVector2D &pos)
+float Tesselator::heightAt(const glm::vec2 &pos)
 {
-    const int x = pos.x();
-    const int y = pos.y();
-    const float dx = pos.x() - x;
-    const float dy = pos.y() - y;
+    const int x = pos.x;
+    const int y = pos.y;
+    const float dx = pos.x - x;
+    const float dy = pos.y - y;
 
     BetaSpline &spline = m_splines[2];
 	spline.InitFrame(x, y);
@@ -147,85 +137,82 @@ float Tesselator::heightAt(const QVector2D &pos)
 }
 
 
-float Tesselator::heightAt(const QVector2D &pos, QVector3D &normal)
+float Tesselator::heightAt(const glm::vec2 &pos, glm::vec3 &normal)
 {
-    const int x = pos.x();
-    const int y = pos.y();
-    const float dx = pos.x() - x;
-    const float dy = pos.y() - y;
+    const int x = pos.x;
+    const int y = pos.y;
+    const float dx = pos.x - x;
+    const float dy = pos.y - y;
 
     BetaSpline &spline = m_splines[2];
 	spline.InitFrame(x, y);
 
-    glm::vec3 glmnormal = spline.Beta_norm(dx, dy);
-	normal = QVector3D(glmnormal.x, glmnormal.y, glmnormal.z);
+    normal = spline.Beta_norm(dx, dy);
     return spline.Beta_3_3(dx, dy).z;
 }
 
 
-bool Tesselator::intersect(const QVector3D &start, const QVector3D &end, float radius, QVector3D &position, QVector3D &normal)
+bool Tesselator::intersect(const glm::vec3 &start, const glm::vec3 &end, float radius, glm::vec3 &position, glm::vec3 &normal)
 {
     BetaSpline &spline = m_splines[2];
 
-    int x = start.x();
-    int y = start.y();
+    int x = start.x;
+    int y = start.y;
 	spline.InitFrame(x, y);
-    float dx = start.x() - x;
-    float dy = start.y() - y;
+    float dx = start.x - x;
+    float dy = start.y - y;
 
     float z = spline.Beta_3_3(dx, dy).z;
-    position = QVector3D(start.x(), start.y(), z + radius + 1e-5);
-    if (z > start.z() - radius)
+    position = glm::vec3(start.x, start.y, z + radius + 1e-5);
+    if (z > start.z - radius)
     {
-		glm::vec3 glmnormal = spline.Beta_norm(dx, dy);
-		normal = QVector3D(glmnormal.x, glmnormal.y, glmnormal.z);
+        normal = spline.Beta_norm(dx, dy);
 		return true;
     }
 
-    if (x != (int)end.x() || y != (int)end.y())
+    if (x != (int)end.x || y != (int)end.y)
     {
-        x = end.x();
-        y = end.y();
+        x = end.x;
+        y = end.y;
     	spline.InitFrame(x, y);
     }
-    dx = end.x() - x;
-    dy = end.y() - y;
+    dx = end.x - x;
+    dy = end.y - y;
 
     z = spline.Beta_3_3(dx, dy).z;
-    if (z <= end.z() - radius)
+    if (z <= end.z - radius)
         return false;
 
-    QVector3D l = start;
-    QVector3D r = end;
-    QVector3D m;
-    while ((l - r).lengthSquared() > 0.01f)
+    glm::vec3 l = start;
+    glm::vec3 r = end;
+    glm::vec3 m;
+    while (glm::distance2(l, r) > 0.01f)
     {
-        m = (l + r)/2;
+        m = glm::mix(l, r, 0.5f);
 
-        if (x != (int)m.x() || y != (int)m.y())
+        if (x != (int)m.x || y != (int)m.y)
         {
-            x = m.x();
-            y = m.y();
+            x = m.x;
+            y = m.y;
     	    spline.InitFrame(x, y);
         }
-        dx = m.x() - x;
-        dy = m.y() - y;
+        dx = m.x - x;
+        dy = m.y - y;
 
         z = spline.Beta_3_3(dx, dy).z;
-        if (z > m.z() - radius)
+        if (z > m.z - radius)
             r = m;
         else
             l = m;
     }
 
     position = l;
-	glm::vec3 glmnormal = spline.Beta_norm(dx, dy);
-	normal = QVector3D(glmnormal.x, glmnormal.y, glmnormal.z);
+    normal = spline.Beta_norm(dx, dy);
 	return true;
 }
 
 
-Element* Tesselator::tesselate(QRect rect, int level, QVector3D scale, QByteArray &textureMap, QByteArray &textureDir, int mapping)
+Element* Tesselator::tesselate(QRect rect, int level, const glm::vec3 &scale, QByteArray &textureMap, QByteArray &textureDir, int mapping)
 {
     Element* element = new Element(m_surface, rect);
 
@@ -265,19 +252,22 @@ Element* Tesselator::tesselate(QRect rect, int level, QVector3D scale, QByteArra
             const bool flip = !(d & 0x04);
 
             const float margin = 0.002f;
-            QList<QVector2D> texCoords;
-            texCoords << QVector2D(0.5f + subTextureX - margin, 0.0f + subTextureY + margin);
-            texCoords << QVector2D(0.0f + subTextureX + margin, 0.0f + subTextureY + margin);
-            texCoords << QVector2D(0.0f + subTextureX + margin, 0.5f + subTextureY - margin);
-            texCoords << QVector2D(0.5f + subTextureX - margin, 0.5f + subTextureY - margin);
+            std::deque<glm::vec2> texCoords;
+            texCoords.emplace_back(0.5f + subTextureX - margin, 0.0f + subTextureY + margin);
+            texCoords.emplace_back(0.0f + subTextureX + margin, 0.0f + subTextureY + margin);
+            texCoords.emplace_back(0.0f + subTextureX + margin, 0.5f + subTextureY - margin);
+            texCoords.emplace_back(0.5f + subTextureX - margin, 0.5f + subTextureY - margin);
 
             if (flip) {
-                qSwap(texCoords[0], texCoords[1]);
-                qSwap(texCoords[2], texCoords[3]);
+                std::swap(texCoords[0], texCoords[1]);
+                std::swap(texCoords[2], texCoords[3]);
             }
 
             for (; rotate > 0; rotate--)
-                texCoords.append(texCoords.takeFirst());
+            {
+                texCoords.push_back(texCoords.front());
+                texCoords.pop_front();
+            }
 
             PrepareElementSubset(level, scale, x, y, texture, texCoords[1], texCoords[0] - texCoords[1], texCoords[2] - texCoords[1], element);
         }

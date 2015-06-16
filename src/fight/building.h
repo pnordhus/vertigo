@@ -35,17 +35,17 @@ public:
 
 public:
     void draw();
-    bool intersect(const QVector3D &start, const QVector3D &dir, float radius, float &distance, QVector3D &normal);
+    bool intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal);
 
 private:
     struct Cluster
     {
         Module module;
-        QVector3D offset;
+        glm::vec3 offset;
         float scale;
         float angle;
-        QMatrix4x4 transform;
-        QMatrix4x4 invTransform;
+        glm::mat4 transform;
+        glm::mat4 invTransform;
     };
 
     QList<Cluster> m_clusters;

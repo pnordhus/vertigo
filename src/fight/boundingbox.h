@@ -19,8 +19,10 @@
 #define FIGHT_BOUNDINGBOX_H
 
 
-#include <QVector3D>
-#include <QMatrix4x4>
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
+#include <glm/mat4x4.hpp>
 
 
 namespace fight {
@@ -31,21 +33,21 @@ class BoundingBox
 public:
     BoundingBox();
     BoundingBox(const BoundingBox &box);
-    BoundingBox(const QVector3D &min, const QVector3D &max);
+    BoundingBox(const glm::vec3 &min, const glm::vec3 &max);
 
 public:
-    const QVector3D& minPoint() const { return m_min; }
-    const QVector3D& maxPoint() const { return m_max; }
-    QVector3D dim() const { return m_max - m_min; }
-    BoundingBox transform(QMatrix4x4 m);
+    const glm::vec3& minPoint() const { return m_min; }
+    const glm::vec3& maxPoint() const { return m_max; }
+    glm::vec3 dim() const { return m_max - m_min; }
+    BoundingBox transform(const glm::mat4 &m)  const;
 
-    void add(const QVector3D &point);
+    void add(const glm::vec3 &point);
     void add(const BoundingBox &box);
-    bool test(const QVector3D &center, float radius) const;
+    bool test(const glm::vec3 &center, float radius) const;
 
 public:
-    QVector3D m_min;
-    QVector3D m_max;
+    glm::vec3 m_min;
+    glm::vec3 m_max;
 };
 
 

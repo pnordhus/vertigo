@@ -45,35 +45,35 @@ int Element::numVertices(int textureId)
 {
     if (!m_subsets.contains(textureId))
         m_subsets.insert(textureId, ElementSubset());
-    return m_subsets[textureId].vertices.count();
+    return m_subsets[textureId].vertices.size();
 }
 
 
 void Element::addVertex(int textureId, const glm::vec3 &position, const glm::vec3 &normal, const glm::vec2 &texCoords)
 {
-	m_subsets[textureId].vertices << QVector3D(position.x, position.y, position.z);
-	m_subsets[textureId].normals << QVector3D(normal.x, normal.y, normal.z);
-	m_subsets[textureId].texCoords << QVector2D(texCoords.x, texCoords.y);
+	m_subsets[textureId].vertices.emplace_back(position.x, position.y, position.z);
+    m_subsets[textureId].normals.emplace_back(normal.x, normal.y, normal.z);
+    m_subsets[textureId].texCoords.emplace_back(texCoords.x, texCoords.y);
     if (m_maxZ < position.z)
         m_maxZ = position.z;
     if (m_minZ > position.z)
         m_minZ = position.z;
 
     int ix, iy;
-    ix = position.x/m_surface->scale().x() + 1e-3 - m_rect.x();
-    iy = position.y/m_surface->scale().y() + 1e-3 - m_rect.y();
+    ix = position.x/m_surface->scale().x + 1e-3 - m_rect.x();
+    iy = position.y/m_surface->scale().y + 1e-3 - m_rect.y();
     if (ix >= 0 && ix < m_rect.width() && iy >= 0 && iy < m_rect.height() && m_heights[iy*m_rect.width() + ix] < position.z)
         m_heights[iy*m_rect.width() + ix] = position.z;
-    ix = position.x/m_surface->scale().x() - 1e-3 - m_rect.x();
-    iy = position.y/m_surface->scale().y() + 1e-3 - m_rect.y();
+    ix = position.x/m_surface->scale().x - 1e-3 - m_rect.x();
+    iy = position.y/m_surface->scale().y + 1e-3 - m_rect.y();
     if (ix >= 0 && ix < m_rect.width() && iy >= 0 && iy < m_rect.height() && m_heights[iy*m_rect.width() + ix] < position.z)
         m_heights[iy*m_rect.width() + ix] = position.z;
-    ix = position.x/m_surface->scale().x() + 1e-3 - m_rect.x();
-    iy = position.y/m_surface->scale().y() - 1e-3 - m_rect.y();
+    ix = position.x/m_surface->scale().x + 1e-3 - m_rect.x();
+    iy = position.y/m_surface->scale().y - 1e-3 - m_rect.y();
     if (ix >= 0 && ix < m_rect.width() && iy >= 0 && iy < m_rect.height() && m_heights[iy*m_rect.width() + ix] < position.z)
         m_heights[iy*m_rect.width() + ix] = position.z;
-    ix = position.x/m_surface->scale().x() - 1e-3 - m_rect.x();
-    iy = position.y/m_surface->scale().y() - 1e-3 - m_rect.y();
+    ix = position.x/m_surface->scale().x - 1e-3 - m_rect.x();
+    iy = position.y/m_surface->scale().y - 1e-3 - m_rect.y();
     if (ix >= 0 && ix < m_rect.width() && iy >= 0 && iy < m_rect.height() && m_heights[iy*m_rect.width() + ix] < position.z)
         m_heights[iy*m_rect.width() + ix] = position.z;
 }
@@ -81,22 +81,24 @@ void Element::addVertex(int textureId, const glm::vec3 &position, const glm::vec
 
 void Element::addTriangle(int textureId, quint16 a, quint16 b, quint16 c)
 {
-    m_subsets[textureId].indices << a << b << c;
+    m_subsets[textureId].indices.push_back(a);
+    m_subsets[textureId].indices.push_back(b);
+    m_subsets[textureId].indices.push_back(c);
 }
 
 
-QVector3D Element::center() const
+glm::vec3 Element::center() const
 {
-    return QVector3D(m_rect.center().x() * m_surface->scale().x(), m_rect.center().y() * m_surface->scale().y(), m_minZ + (m_maxZ - m_minZ)/2);
+    return glm::vec3(m_rect.center().x() * m_surface->scale().x, m_rect.center().y() * m_surface->scale().y, m_minZ + (m_maxZ - m_minZ)/2);
 }
 
 
-bool Element::testCollision(const QVector3D &center, float radius)
+bool Element::testCollision(const glm::vec3 &center, float radius)
 {
-    int ix = center.x()/m_surface->scale().x() - m_rect.x();
-    int iy = center.y()/m_surface->scale().y() - m_rect.y();
+    int ix = center.x/m_surface->scale().x - m_rect.x();
+    int iy = center.y/m_surface->scale().y - m_rect.y();
     if (ix >= 0 && ix < m_rect.width() && iy >= 0 && iy < m_rect.height() &&
-        m_heights[iy*m_rect.width() + ix] > center.z() - radius)
+        m_heights[iy*m_rect.width() + ix] > center.z - radius)
         return true;
     return false;
 }
@@ -119,7 +121,7 @@ void Element::draw()
         glVertexPointer(3, GL_FLOAT, 0, subset.vertices.data());
         glNormalPointer(GL_FLOAT, 0, subset.normals.data());
         glTexCoordPointer(2, GL_FLOAT, 0, subset.texCoords.data());
-        glDrawElements(GL_TRIANGLES, subset.indices.count(), GL_UNSIGNED_SHORT, subset.indices.data());
+        glDrawElements(GL_TRIANGLES, subset.indices.size(), GL_UNSIGNED_SHORT, subset.indices.data());
     }
 
     glDisableClientState(GL_NORMAL_ARRAY);

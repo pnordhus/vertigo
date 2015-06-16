@@ -46,7 +46,7 @@ Surface::Surface(const QString &name, int maxheightscale, int mapping) :
         stream.setByteOrder(QDataStream::LittleEndian);
         stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
         stream >> sx >> sy >> sz;
-        m_scale = QVector3D(sx / 32.0f, sy / 32.0f, maxheightscale / sz);
+        m_scale = glm::vec3(sx / 32.0f, sy / 32.0f, maxheightscale / sz);
     }
 
     {
@@ -85,13 +85,13 @@ Surface::~Surface()
 
 float Surface::heightAt(float x, float y)
 {
-    return m_tesselator.heightAt(QVector2D(x / m_scale.x(), y / m_scale.y())) * m_scale.z();
+    return m_tesselator.heightAt(glm::vec2(x / m_scale.x, y / m_scale.y)) * m_scale.z;
 }
 
 
-float Surface::heightAt(float x, float y, QVector3D &normal)
+float Surface::heightAt(float x, float y, glm::vec3 &normal)
 {
-    return m_tesselator.heightAt(QVector2D(x / m_scale.x(), y / m_scale.y()), normal) * m_scale.z();
+    return m_tesselator.heightAt(glm::vec2(x / m_scale.x, y / m_scale.y), normal) * m_scale.z;
 }
 
 
@@ -113,14 +113,14 @@ void Surface::setHeight(int x, int y, int refx, int refy, int offset)
 }
 
 
-bool Surface::testCollision(const QVector3D &start, const QVector3D &end, float radius, QVector3D &position, QVector3D &normal)
+bool Surface::testCollision(const glm::vec3 &start, const glm::vec3 &end, float radius, glm::vec3 &position, glm::vec3 &normal)
 {
-    int x0 = end.x() / m_scale.x() / 8;
-    int y0 = end.y() / m_scale.y() / 8;
+    int x0 = end.x / m_scale.x / 8;
+    int y0 = end.y / m_scale.y / 8;
     Element *element = getElement(QPoint(x0*8, y0*8));
     if (element->testCollision(end, radius))
     {
-        if (m_tesselator.intersect(QVector3D(start.x()/m_scale.x(), start.y()/m_scale.y(), start.z()/m_scale.z()), QVector3D(end.x()/m_scale.x(), end.y()/m_scale.y(), end.z()/m_scale.z()), radius/m_scale.z(), position, normal))
+        if (m_tesselator.intersect(start/m_scale, end/m_scale, radius/m_scale.z, position, normal))
         {
             position *= m_scale;
             return true;
@@ -147,10 +147,10 @@ Element* Surface::getElement(QPoint pos)
 }
 
 
-void Surface::draw(QVector3D position, QVector3D direction)
+void Surface::draw(const glm::vec3 &position, const glm::vec3 &direction)
 {
-    int x0 = position.x() / m_scale.x() / 8;
-    int y0 = position.y() / m_scale.y() / 8;
+    int x0 = position.x / m_scale.x / 8;
+    int y0 = position.y / m_scale.y / 8;
 
     for (int y = y0 - 2; y <= y0 + 2; y++)
         for (int x = x0 - 2; x <= x0 + 2; x++)

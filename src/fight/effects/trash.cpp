@@ -18,6 +18,7 @@
 #include "trash.h"
 #include "billboard.h"
 
+#include <glm/gtx/norm.hpp>
 
 namespace fight {
 
@@ -30,7 +31,7 @@ Trash::Trash(Scenario *scenario, Billboard *billboard, float angle) :
 }
 
 
-void Trash::setPosition(const QVector3D &pos)
+void Trash::setPosition(const glm::vec3 &pos)
 {
     Object::setPosition(pos);
     BoundingBox box = m_billboard->box();
@@ -38,7 +39,7 @@ void Trash::setPosition(const QVector3D &pos)
 }
 
 
-bool Trash::intersect(const QVector3D &start, const QVector3D &dir, float radius, float &distance, QVector3D &normal)
+bool Trash::intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal)
 {
     return m_billboard->intersect(start - m_position, dir, distance);
 }
@@ -46,7 +47,7 @@ bool Trash::intersect(const QVector3D &start, const QVector3D &dir, float radius
 
 void Trash::destroy()
 {
-    m_scenario->effectManager()->addEffect(Explosion_5, m_position, 0, m_box.dim().lengthSquared() > 15 ? 2 : 1);
+    m_scenario->effectManager()->addEffect(Explosion_5, m_position, 0, glm::length2(m_box.dim()) > 15 ? 2 : 1);
     Object::destroy();
 }
 

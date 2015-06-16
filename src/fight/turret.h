@@ -20,7 +20,6 @@
 
 
 #include "modulemanager.h"
-#include <QVector3D>
 
 
 namespace fight {
@@ -38,8 +37,8 @@ private:
     Module m_body;
     Module m_armLeft;
     Module m_armRight;
-    QVector3D m_armLeftPosition;
-    QVector3D m_armRightPosition;
+    glm::vec3 m_armLeftPosition;
+    glm::vec3 m_armRightPosition;
     float m_scale;
 };
 

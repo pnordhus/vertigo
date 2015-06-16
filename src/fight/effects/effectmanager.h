@@ -19,9 +19,9 @@
 #define FIGHT_EFFECTMANAGER_H
 
 
-#include <QVector3D>
 #include <QMap>
 
+#include <glm/vec3.hpp>
 
 namespace fight {
 
@@ -113,10 +113,10 @@ public:
 public:
     Billboard* getBillboard(Effects effect) const { return m_billboards[effect]; }
     Effect* create(Effects effect, float angle = 0, float scale = 1);
-    Trash *createTrash(Effects trash, const QVector3D &position);
+    Trash *createTrash(Effects trash, const glm::vec3 &position);
 
-    void addEffect(Effects effect, const QVector3D &position, float angle = 0, float scale = 1);
-    void addProjectile(Effects effect, const QVector3D &position, const QVector3D &direction);
+    void addEffect(Effects effect, const glm::vec3 &position, float angle = 0, float scale = 1);
+    void addProjectile(Effects effect, const glm::vec3 &position, const glm::vec3 &direction);
 
     void update();
     void draw();

@@ -31,9 +31,9 @@ TurretBase::TurretBase(Scenario *scenario, const QString &name) :
         file.setSection("torpedoturret");
     m_turret = new Turret(scenario->moduleManager(), file.value("name").toString());
 
-    m_turretPosition.setX(file.value("RelativePositionX").toFloat());
-    m_turretPosition.setY(file.value("RelativePositionY").toFloat());
-    m_turretPosition.setZ(file.value("RelativePositionZ").toFloat());
+    m_turretPosition.x = file.value("RelativePositionX").toFloat();
+    m_turretPosition.y = file.value("RelativePositionY").toFloat();
+    m_turretPosition.z = file.value("RelativePositionZ").toFloat();
 }
 
 
@@ -46,11 +46,11 @@ TurretBase::~TurretBase()
 void TurretBase::draw()
 {
     glPushMatrix();
-    glTranslatef(m_position.x(), m_position.y(), m_position.z());
+    glTranslatef(m_position.x, m_position.y, m_position.z);
     glScalef(m_scale, m_scale, m_scale);
     m_base.draw();
 
-    glTranslatef(m_turretPosition.x(), m_turretPosition.y(), m_turretPosition.z());
+    glTranslatef(m_turretPosition.x, m_turretPosition.y, m_turretPosition.z);
     m_turret->draw();
     glPopMatrix();
 }

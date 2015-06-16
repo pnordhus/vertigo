@@ -31,13 +31,13 @@ public:
     Projectile(Scenario *scenario, Billboard *billboard);
 
 public:
-    void setPosition(const QVector3D &pos);
-    void setDirection(const QVector3D &direction);
+    void setPosition(const glm::vec3 &pos);
+    void setDirection(const glm::vec3 &direction);
     void update();
 
 private:
-    QVector3D m_originPos;
-    QVector3D m_direction;
+    glm::vec3 m_originPos;
+    glm::vec3 m_direction;
 };
 
 

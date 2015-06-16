@@ -117,8 +117,8 @@ Scenario::Scenario(const QString &name, std::function<void()> &&funcSuccess) :
                 }
 
                 object = new Object(this, types.value(dType));
-                QVector3D pos = getPosition();
-                pos.setZ(pos.z() + 20.0f);
+                glm::vec3 pos = getPosition();
+                pos.z += 20.0f;
                 object->setPosition(pos);
             }
             break;
@@ -132,8 +132,8 @@ Scenario::Scenario(const QString &name, std::function<void()> &&funcSuccess) :
                 }
 
                 object = new Object(this, types.value(dType));
-                QVector3D pos = getPosition();
-                pos.setZ(pos.z() + 20.0f);
+                glm::vec3 pos = getPosition();
+                pos.z += 20.0f;
                 object->setPosition(pos);
             }
             break;
@@ -181,35 +181,35 @@ Scenario::Scenario(const QString &name, std::function<void()> &&funcSuccess) :
                 for (int i = 0; i < 27; i++)
                 {
                     Effect *effect = m_effectManager->create((Effects)(Explosion_0 + i));
-                    effect->setPosition(m_position + QVector3D(i*5, 0, 0));
+                    effect->setPosition(m_position + glm::vec3(i*5, 0, 0));
                     effect->setPermanent(true);
                     m_objects << effect;
                 }
                 for (int i = 0; i < 9; i++)
                 {
                     Effect *effect = m_effectManager->create((Effects)(Shoot_0 + i));
-                    effect->setPosition(m_position + QVector3D(i*5, -10, 0));
+                    effect->setPosition(m_position + glm::vec3(i*5, -10, 0));
                     effect->setPermanent(true);
                     m_objects << effect;
                 }
                 for (int i = 0; i < 23; i++)
                 {
                     Effect *effect = m_effectManager->create((Effects)(Debris_0 + i));
-                    effect->setPosition(m_position + QVector3D(i*5, -20, 0));
+                    effect->setPosition(m_position + glm::vec3(i*5, -20, 0));
                     effect->setPermanent(true);
                     m_objects << effect;
                 }
                 for (int i = 0; i < 5; i++)
                 {
                     Effect *effect = m_effectManager->create((Effects)(Trash_0 + i));
-                    effect->setPosition(m_position + QVector3D(i*5, -30, 0));
+                    effect->setPosition(m_position + glm::vec3(i*5, -30, 0));
                     effect->setPermanent(true);
                     m_objects << effect;
                 }
                 for (int i = 0; i < 3; i++)
                 {
                     Effect *effect = m_effectManager->create((Effects)(Bubble_0 + i));
-                    effect->setPosition(m_position + QVector3D(i*5, -40, 0));
+                    effect->setPosition(m_position + glm::vec3(i*5, -40, 0));
                     effect->setPermanent(true);
                     m_objects << effect;
                 }
@@ -226,7 +226,7 @@ Scenario::Scenario(const QString &name, std::function<void()> &&funcSuccess) :
         case TypeNavPoint:
             {
                 object = new NavPoint(this, m_file.value("dtyp").toInt());
-                object->setPosition(getPosition() + QVector3D(-0.5f*m_surface->scale().x(), -0.5f*m_surface->scale().y(), 12));
+                object->setPosition(getPosition() + glm::vec3(-0.5f*m_surface->scale().x, -0.5f*m_surface->scale().y, 12));
             }
             break;
 
@@ -245,7 +245,7 @@ Scenario::Scenario(const QString &name, std::function<void()> &&funcSuccess) :
 
         case TypeTrash:
             {
-                QVector3D pos = getPosition();
+                glm::vec3 pos = getPosition();
                 if (entry.cond1 != 0 || entry.del != 0)
                     entry.condTrigger = new Condition(0); // TODO: Fix memory leak
                 entry.condSignal = new Condition(9); // TODO: Fix memory leak
@@ -268,12 +268,12 @@ Scenario::Scenario(const QString &name, std::function<void()> &&funcSuccess) :
             {
                 if (m_file.value("pz").toInt() != 0)
                     qDebug() << "Unexpected space parameter";
-                ConditionSpace *space = new ConditionSpace(m_file.value("px").toInt()*m_surface->scale().x(),
-                                                           m_file.value("py").toInt()*m_surface->scale().y(),
-                                                           m_file.value("dimx").toInt()*m_surface->scale().x(),
-                                                           m_file.value("dimy").toInt()*m_surface->scale().y(),
-                                                           m_file.value("minz").toInt()*m_surface->scale().z(),
-                                                           m_file.value("maxz").toInt()*m_surface->scale().z());
+                ConditionSpace *space = new ConditionSpace(m_file.value("px").toInt()*m_surface->scale().x,
+                                                           m_file.value("py").toInt()*m_surface->scale().y,
+                                                           m_file.value("dimx").toInt()*m_surface->scale().x,
+                                                           m_file.value("dimy").toInt()*m_surface->scale().y,
+                                                           m_file.value("minz").toInt()*m_surface->scale().z,
+                                                           m_file.value("maxz").toInt()*m_surface->scale().z);
                 if (entry.cond1 != 0 || entry.del != 0)
                     entry.condTrigger = space->condEnable();
                 else
@@ -437,12 +437,13 @@ void Scenario::draw()
     m_cameraMatrix.rotate(angleY, QVector3D(0, 0, 1));
     m_cameraMatrixInverted = m_cameraMatrix.inverted();
 
-    QVector3D prevPos = m_position;
-    m_position += m_cameraMatrix.row(2).toVector3D() * (m_backwards - m_forwards) * 5.0f;
+    glm::vec3 prevPos = m_position;
+    QVector3D dir = m_cameraMatrix.row(2).toVector3D();
+    m_position += glm::vec3(dir.x(), dir.y(), dir.z()) * (m_backwards - m_forwards) * 5.0f;
 
     if (m_position != prevPos)
     {
-        QVector3D pos, normal;
+        glm::vec3 pos, normal;
         if (m_surface->testCollision(prevPos, m_position, 1.5f, pos, normal))
             m_position = pos;
         Object *collision = m_collisionManager->testCollision(prevPos, m_position, 1.5f, pos, normal);
@@ -456,9 +457,9 @@ void Scenario::draw()
 
     ConditionManager::update();
 
-    float height = m_surface->heightAt(m_position.x(), m_position.y());
+    float height = m_surface->heightAt(m_position.x, m_position.y);
     foreach (ConditionSpace *space, m_condSpaces)
-        space->test(m_position.x(), m_position.y(), m_position.z() - height);
+        space->test(m_position.x, m_position.y, m_position.z - height);
 
     foreach (Object *object, m_objects)
         if (object->isEnabled())
@@ -480,8 +481,8 @@ void Scenario::draw()
     gluPerspective(60, float(rect().width()) / rect().height(), 0.1f, 10000.0f);
 
     glMatrixMode(GL_MODELVIEW);
-    loadMatrix(m_cameraMatrix.data());
-    glTranslatef(-m_position.x(), -m_position.y(), -m_position.z());
+    glLoadMatrixd(m_cameraMatrix.data());
+    glTranslatef(-m_position.x, -m_position.y, -m_position.z);
 
     GLfloat global_ambient[] = { 0.5f, 0.5f, 1.0f, 1.0f };
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, global_ambient);
@@ -516,7 +517,7 @@ void Scenario::draw()
         glLightfv(GL_LIGHT1, GL_AMBIENT, light_ambient);
         glLightfv(GL_LIGHT1, GL_DIFFUSE, light_diffuse);
         
-        const GLfloat light_position[] = { static_cast<float>(object->position().x()), static_cast<float>(object->position().y()), static_cast<float>(object->position().z()), 1.0f };
+        const GLfloat light_position[] = { static_cast<float>(object->position().x), static_cast<float>(object->position().y), static_cast<float>(object->position().z), 1.0f };
         const GLfloat spot_direction[] = { std::cos(0.005f*m_time.elapsed()), std::sin(0.005f*m_time.elapsed()), 0.0f };
 
         glLightfv(GL_LIGHT1, GL_POSITION, light_position);
@@ -538,7 +539,8 @@ void Scenario::draw()
     glFogf(GL_FOG_START, 100.0);
     glFogf(GL_FOG_END, 200.0);
 
-    m_surface->draw(m_position, -m_cameraMatrix.row(2).toVector3D());
+    dir = -m_cameraMatrix.row(2).toVector3D();
+    m_surface->draw(m_position, glm::vec3(dir.x(), dir.y(), dir.z()));
 
     foreach (Object *object, m_objects)
         if (object->isEnabled())
@@ -571,7 +573,10 @@ void Scenario::keyPressEvent(QKeyEvent *e)
         m_backwards = 0.2f;
 
     if (e->key() == Qt::Key_Space)
-        m_effectManager->addProjectile(Shoot_Vendetta, m_position, -m_cameraMatrix.row(2).toVector3D());
+    {
+        QVector3D dir = -m_cameraMatrix.row(2).toVector3D();
+        m_effectManager->addProjectile(Shoot_Vendetta, m_position, glm::vec3(dir.x(), dir.y(), dir.z()));
+    }
 }
 
 
@@ -596,15 +601,15 @@ void Scenario::keyReleaseEvent(QKeyEvent *e)
 }
 
 
-QVector3D Scenario::getPosition() const
+glm::vec3 Scenario::getPosition() const
 {
-    QVector3D pos;
-    pos.setX(m_file.value("px").toInt() + 0.5f);
-    pos.setY(m_file.value("py").toInt() + 0.5f);
-    pos.setZ(m_file.value("pz").toInt() + m_file.value("hei").toInt());
+    glm::vec3 pos;
+    pos.x = m_file.value("px").toInt() + 0.5f;
+    pos.y = m_file.value("py").toInt() + 0.5f;
+    pos.z = m_file.value("pz").toInt() + m_file.value("hei").toInt();
 
     pos *= m_surface->scale();
-    pos += QVector3D(0, 0, m_surface->heightAt(pos.x(), pos.y()));
+    pos.z += m_surface->heightAt(pos.x, pos.y);
 
     return pos;
 }

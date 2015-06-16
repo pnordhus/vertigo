@@ -19,9 +19,6 @@
 #define FIGHT_OBJECT_H
 
 
-#include <QVector3D>
-#include <QVector2D>
-#include <QMatrix4x4>
 #include <QGLContext>
 #include "modulemanager.h"
 #include "scenario.h"
@@ -35,25 +32,6 @@ namespace fight {
 class Scenario;
 class CollisionCache;
 
-inline void loadMatrix(const float *data)
-{
-    glLoadMatrixf(data);
-}
-
-inline void loadMatrix(const double *data)
-{
-    glLoadMatrixd(data);
-}
-
-inline void multMatrix(const float *data)
-{
-    glMultMatrixf(data);
-}
-
-inline void multMatrix(const double *data)
-{
-    glMultMatrixd(data);
-}
 
 enum ObjectType
 {
@@ -75,8 +53,8 @@ public:
     void enable();
     void disable();
     bool isEnabled() const { return m_enabled; }
-    virtual void setPosition(const QVector3D &pos);
-    QVector3D position() const { return m_position; }
+    virtual void setPosition(const glm::vec3 &pos);
+    const glm::vec3& position() const { return m_position; }
 
     ObjectType type() const { return m_type; }
     const BoundingBox& box() const { return m_box; }
@@ -95,7 +73,7 @@ public:
 public:
     virtual void update();
     virtual void draw();
-    virtual bool intersect(const QVector3D &start, const QVector3D &dir, float radius, float &distance, QVector3D &normal);
+    virtual bool intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal);
     virtual void destroy();
 
 protected:
@@ -104,7 +82,7 @@ protected:
     bool m_enabled;
     Module m_base;
     float m_scale;
-    QVector3D m_position;
+    glm::vec3 m_position;
 
     ObjectType m_type;
     BoundingBox m_box;

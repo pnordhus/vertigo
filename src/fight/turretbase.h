@@ -38,7 +38,7 @@ public:
     void draw();
 
 private:
-    QVector3D m_turretPosition;
+    glm::vec3 m_turretPosition;
     Turret *m_turret;
 };
 

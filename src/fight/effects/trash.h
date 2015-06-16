@@ -32,8 +32,8 @@ public:
     Trash(Scenario *scenario, Billboard *billboard, float angle);
 
 public:
-    void setPosition(const QVector3D &pos);
-    bool intersect(const QVector3D &start, const QVector3D &dir, float radius, float &distance, QVector3D &normal);
+    void setPosition(const glm::vec3 &pos);
+    bool intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal);
     void destroy();
 
 public:

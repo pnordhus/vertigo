@@ -77,7 +77,7 @@ Effect* EffectManager::create(Effects effect, float angle, float scale)
 }
 
 
-void EffectManager::addEffect(Effects effect, const QVector3D &position, float angle, float scale)
+void EffectManager::addEffect(Effects effect, const glm::vec3 &position, float angle, float scale)
 {
     Effect *object = create(effect, angle, scale);
     object->setPosition(position);
@@ -85,7 +85,7 @@ void EffectManager::addEffect(Effects effect, const QVector3D &position, float a
 }
 
 
-void EffectManager::addProjectile(Effects effect, const QVector3D &position, const QVector3D &direction)
+void EffectManager::addProjectile(Effects effect, const glm::vec3 &position, const glm::vec3 &direction)
 {
     Projectile *object = new Projectile(m_scenario, getBillboard(effect));
     object->setPosition(position);
@@ -94,14 +94,14 @@ void EffectManager::addProjectile(Effects effect, const QVector3D &position, con
 }
 
 
-Trash *EffectManager::createTrash(Effects trash, const QVector3D &position)
+Trash *EffectManager::createTrash(Effects trash, const glm::vec3 &position)
 {
     Trash *object = new Trash(m_scenario, getBillboard(trash), qrand()%360);
     
-    QVector3D pos = position + QVector3D(qrand()%50 - 25, qrand()%50 - 25, qrand()%25 - 25);
-    float height = m_scenario->surface()->heightAt(pos.x(), pos.y()) + 2;
-    if (pos.z() < height)
-        pos.setZ(height);
+    glm::vec3 pos = position + glm::vec3(qrand()%50 - 25, qrand()%50 - 25, qrand()%25 - 25);
+    float height = m_scenario->surface()->heightAt(pos.x, pos.y) + 2;
+    if (pos.z < height)
+        pos.z = height;
     object->setPosition(pos);
 
     m_scenario->collisionManager()->addObject(object);

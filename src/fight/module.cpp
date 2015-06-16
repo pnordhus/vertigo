@@ -16,10 +16,10 @@
  ***************************************************************************/
 
 #include "module.h"
-#include "vector.h"
 #include <QDataStream>
 #include <QFile>
 #include <QGLContext>
+#include <QVector3D>
 
 
 namespace fight {
@@ -44,14 +44,15 @@ void ModulePrivate::load(gfx::TextureManager &texMan, const QString &name)
     stream >> numVertices;
     stream.skipRawData(4);
 
-    QVector<QVector3D> vertices;
+    std::vector<glm::vec3> vertices;
     vertices.reserve(numVertices);
 
     for (unsigned int i = 0; i < numVertices; i++) {
         quint32 index;
-        QVector3D v;
-        stream >> index >> v;
-        vertices << v;
+        QVector3D qv;
+        stream >> index >> qv;
+        glm::vec3 v = glm::vec3(qv.x(), qv.y(), qv.z());
+        vertices.push_back(v);
         m_box.add(v);
     }
 
@@ -75,7 +76,7 @@ void ModulePrivate::load(gfx::TextureManager &texMan, const QString &name)
             stream >> numVertices2;
             stream.skipRawData(4);
 
-            QVector<QVector2D> texCoords;
+            std::vector<glm::vec2> texCoords;
             texCoords.reserve(numVertices2 * 2);
 
             for (unsigned int i = 0; i < numVertices2; i++) {
@@ -87,7 +88,7 @@ void ModulePrivate::load(gfx::TextureManager &texMan, const QString &name)
                 stream.skipRawData(2);
                 stream >> t;
 
-                texCoords << QVector2D(s / 255.0f, t / 255.0f);
+                texCoords.emplace_back(s / 255.0f, t / 255.0f);
             }
             quint32 nameLength;
             stream >> nameLength;
@@ -95,12 +96,12 @@ void ModulePrivate::load(gfx::TextureManager &texMan, const QString &name)
 
             const QString textureName = file.read(nameLength);
 
-            QVector<quint32> indices;
+            std::vector<quint32> indices;
             indices.reserve(3 * numVertices2);
             for (unsigned int i = 0; i < 3 * numVertices2; i++) {
                 quint32 index;
                 stream >> index;
-                indices << index;
+                indices.push_back(index);
             }
 
             int textureId;
@@ -115,14 +116,18 @@ void ModulePrivate::load(gfx::TextureManager &texMan, const QString &name)
             }
 
             Mesh &mesh = m_meshes[textureId];
-            int i0 = mesh.vertices.count();
+            int i0 = mesh.vertices.size();
 
             for (unsigned int j = 0; j < numVertices2; j++)
             {
-                mesh.vertices << vertices[indices[3 * j]];
-                mesh.texCoords << texCoords[j];
+                mesh.vertices.push_back(vertices[indices[3 * j]]);
+                mesh.texCoords.push_back(texCoords[j]);
                 if (j > 1)
-                    mesh.indices << i0 << i0 + j - 1 << i0 + j;
+                {
+                    mesh.indices.push_back(i0);
+                    mesh.indices.push_back(i0 + j - 1);
+                    mesh.indices.push_back(i0 + j);
+                }
             }
         }
     }
@@ -145,12 +150,12 @@ void ModulePrivate::draw()
         glVertexPointer(3, GL_FLOAT, 0, m_meshes[i].vertices.data());
         //glNormalPointer(GL_FLOAT, 0, m_meshes[i].normals.data());
         glTexCoordPointer(2, GL_FLOAT, 0, m_meshes[i].texCoords.data());
-        glDrawElements(GL_TRIANGLES, m_meshes[i].indices.count(), GL_UNSIGNED_SHORT, m_meshes[i].indices.data());
+        glDrawElements(GL_TRIANGLES, m_meshes[i].indices.size(), GL_UNSIGNED_SHORT, m_meshes[i].indices.data());
     }
 }
 
 
-bool ModulePrivate::intersect(const QVector3D &start, const QVector3D &dir, float radius, float &distance, QVector3D &normal)
+bool ModulePrivate::intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal)
 {
     return m_collisionMesh.intersect(start, dir, radius, distance, normal);
 }
