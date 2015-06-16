@@ -31,7 +31,7 @@ Tesselator::Tesselator(int MaxLevel, Surface *surface) :
 {
 	std::function<float(int, int)> height = [this](int x, int y) { return m_surface->height(x, y); };
 	for (int i = 0; i <= MaxLevel; i++)
-		m_splines.emplace_back(height, i, 1, 0);
+		m_splines.emplace_back(height, i, 1.0f, 0.0f);
     InitIndices(MaxLevel);
 }
 
