@@ -72,7 +72,8 @@ Billboard::Billboard(gfx::TextureManager &texMan, txt::DesFile &file, int index)
                 break;
         }
 
-        Stage stage;
+        m_stages.emplace_back();
+        Stage &stage = m_stages.back();
         stage.texture = texMan.getModule(file.value("imgblockname").toString(), true);
 
         glm::vec2 t0(file.value("x1").toInt() / 255.0f, file.value("y1").toInt() / 255.0f);
@@ -101,22 +102,20 @@ Billboard::Billboard(gfx::TextureManager &texMan, txt::DesFile &file, int index)
 
         stage.scale = glm::vec2(width, height)*scale*2.0f; // TODO: test scale
         stage.offset = glm::vec2(1, -1) - glm::vec2(center.x/width, -center.y/height)*2.0f;
-
-        m_stages << stage;
     }
 
-    if (m_stages.count() < numOfStages)
+    if (m_stages.size() < numOfStages)
     {
         if (numInX == 0)
             numInX = (int)(1.0f/width);
-        i = m_stages.count() - 1;
+        i = m_stages.size() - 1;
         for (j = 1; j < numOfStages - i; j++)
         {
-            Stage stage = m_stages[i];
+            m_stages.push_back(m_stages[i]);
+            Stage &stage = m_stages.back();
             int x = (int)(stage.texCoords[0].x/width + 1e-5);
             for (k = 0; k < 4; k++)
                 stage.texCoords[k] += glm::vec2(width*((x + j)%numInX - x), height*((x + j)/numInX));
-            m_stages << stage;
         }
     }
 }
@@ -125,7 +124,7 @@ Billboard::Billboard(gfx::TextureManager &texMan, txt::DesFile &file, int index)
 
 void Billboard::draw(const glm::vec3 &position, float angle, float scale, int time, const glm::mat4 &cameraMatrixInverted)
 {
-    int currentStage = time/m_displayTime%m_stages.count();
+    int currentStage = time/m_displayTime%m_stages.size();
 
     glEnable(GL_TEXTURE_2D);
     glEnableClientState(GL_VERTEX_ARRAY);

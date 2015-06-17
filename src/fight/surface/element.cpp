@@ -27,24 +27,14 @@ Element::Element(Surface *surface, QRect rect) :
     m_surface(surface),
     m_rect(rect),
     m_maxZ(-1e3),
-    m_minZ(1e3)
+    m_minZ(1e3),
+    m_heights(rect.width()*rect.height(), -1e3)
 {
-    m_heights = new float[rect.width()*rect.height()];
-    for (int i = 0; i < rect.width()*rect.height(); i++)
-        m_heights[i] = -1e3;
-}
-
-
-Element::~Element()
-{
-    delete m_heights;
 }
 
 
 int Element::numVertices(int textureId)
 {
-    if (!m_subsets.contains(textureId))
-        m_subsets.insert(textureId, ElementSubset());
     return m_subsets[textureId].vertices.size();
 }
 
@@ -111,12 +101,10 @@ void Element::draw()
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
 
-    QMapIterator<int, ElementSubset> it(m_subsets);
-    while (it.hasNext()) {
-        it.next();
-
-        const ElementSubset &subset = it.value();
-        m_surface->bindTexture(it.key());
+    for (auto pair : m_subsets)
+    {
+        const ElementSubset &subset = pair.second;
+        m_surface->bindTexture(pair.first);
 
         glVertexPointer(3, GL_FLOAT, 0, subset.vertices.data());
         glNormalPointer(GL_FLOAT, 0, subset.normals.data());

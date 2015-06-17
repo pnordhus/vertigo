@@ -20,8 +20,7 @@
 
 
 #include "gfx/texture.h"
-#include <QMap>
-
+#include <map>
 #include <glm/vec3.hpp>
 #include <glm/vec2.hpp>
 
@@ -36,7 +35,6 @@ class Element
 {
 public:
     Element(Surface *surface, QRect rect);
-    ~Element();
 
 public:
     int numVertices(int textureId);
@@ -63,9 +61,9 @@ private:
     QRect m_rect;
     float m_maxZ;
     float m_minZ;
-    float *m_heights;
+    std::vector<float> m_heights;
 
-    QMap<int, ElementSubset> m_subsets;
+    std::map<int, ElementSubset> m_subsets;
 };
 
 

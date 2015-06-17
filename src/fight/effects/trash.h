@@ -20,7 +20,6 @@
 
 
 #include "effect.h"
-#include "effectmanager.h"
 
 
 namespace fight {
@@ -29,10 +28,9 @@ namespace fight {
 class Trash : public Effect
 {
 public:
-    Trash(Scenario *scenario, Billboard *billboard, float angle);
+    Trash(Scenario *scenario, Billboard *billboard, const glm::vec3 &position);
 
 public:
-    void setPosition(const glm::vec3 &pos);
     bool intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal);
     void destroy();
 

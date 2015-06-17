@@ -43,15 +43,15 @@ void Projectile::setDirection(const glm::vec3 &direction)
 }
 
 
-void Projectile::update()
+bool Projectile::update()
 {
     m_elapsedTime = m_time.elapsed();
     if (m_elapsedTime == 0)
-        return;
+        return false;
     if (m_elapsedTime*m_billboard->velocity()/1000 > m_billboard->range())
     {
         disable();
-        return;
+        return true;
     }
 
     glm::vec3 newPos = m_originPos + m_direction*(m_elapsedTime*m_billboard->velocity()/1000);
@@ -61,6 +61,7 @@ void Projectile::update()
     {
         m_scenario->effectManager()->addEffect(Explosion_12, pos);
         disable();
+        return true;
     }
     Object *collision = m_scenario->collisionManager()->testCollision(this, newPos, m_billboard->collisionRadius(), pos, normal);
     if (collision)
@@ -70,9 +71,11 @@ void Projectile::update()
         else
             m_scenario->effectManager()->addEffect(Explosion_11, pos, qrand()%360);
         disable();
+        return true;
     }
 
     m_position = newPos;
+    return false;
 }
 
 

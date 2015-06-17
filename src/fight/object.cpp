@@ -85,8 +85,9 @@ void Object::setPosition(const glm::vec3 &pos)
 }
 
 
-void Object::update()
+bool Object::update()
 {
+    return false;
 }
 
 

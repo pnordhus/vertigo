@@ -21,8 +21,9 @@
 #include "scenario.h"
 #include "surface/surface.h"
 #include "effects/effect.h"
-#include "effects/effectmanager.h"
+#include "effects/projectile.h"
 #include "effects/trash.h"
+#include "effects/effectmanager.h"
 #include "collisionmanager.h"
 #include "turretbase.h"
 #include "navpoint.h"
@@ -177,40 +178,15 @@ Scenario::Scenario(const QString &name, std::function<void()> &&funcSuccess) :
 
             {
                 for (int i = 0; i < 27; i++)
-                {
-                    Effect *effect = m_effectManager->create((Effects)(Explosion_0 + i));
-                    effect->setPosition(m_position + glm::vec3(i*5, 0, 0));
-                    effect->setPermanent(true);
-                    m_objects << effect;
-                }
+                    m_effectManager->addEffect((Effects)(Explosion_0 + i), m_position + glm::vec3(i*5, 0, 0)).setPermanent(true);
                 for (int i = 0; i < 9; i++)
-                {
-                    Effect *effect = m_effectManager->create((Effects)(Shoot_0 + i));
-                    effect->setPosition(m_position + glm::vec3(i*5, -10, 0));
-                    effect->setPermanent(true);
-                    m_objects << effect;
-                }
+                    m_effectManager->addEffect((Effects)(Shoot_0 + i), m_position + glm::vec3(i*5, -10, 0)).setPermanent(true);
                 for (int i = 0; i < 23; i++)
-                {
-                    Effect *effect = m_effectManager->create((Effects)(Debris_0 + i));
-                    effect->setPosition(m_position + glm::vec3(i*5, -20, 0));
-                    effect->setPermanent(true);
-                    m_objects << effect;
-                }
+                    m_effectManager->addEffect((Effects)(Debris_0 + i), m_position + glm::vec3(i*5, -20, 0)).setPermanent(true);
                 for (int i = 0; i < 5; i++)
-                {
-                    Effect *effect = m_effectManager->create((Effects)(Trash_0 + i));
-                    effect->setPosition(m_position + glm::vec3(i*5, -30, 0));
-                    effect->setPermanent(true);
-                    m_objects << effect;
-                }
+                    m_effectManager->addEffect((Effects)(Trash_0 + i), m_position + glm::vec3(i*5, -30, 0)).setPermanent(true);
                 for (int i = 0; i < 3; i++)
-                {
-                    Effect *effect = m_effectManager->create((Effects)(Bubble_0 + i));
-                    effect->setPosition(m_position + glm::vec3(i*5, -40, 0));
-                    effect->setPermanent(true);
-                    m_objects << effect;
-                }
+                    m_effectManager->addEffect((Effects)(Bubble_0 + i), m_position + glm::vec3(i*5, -40, 0)).setPermanent(true);
             }
             break;
 
@@ -249,7 +225,7 @@ Scenario::Scenario(const QString &name, std::function<void()> &&funcSuccess) :
                 entry.condSignal = new Condition(9); // TODO: Fix memory leak
                 for (int i = 0; i < 9; i++)
                 {
-                    Object *trash = m_effectManager->createTrash(Trash::trashCollection[i], pos);
+                    Trash *trash = new Trash(this, m_effectManager->getBillboard(Trash::trashCollection[i]), pos);
                     m_objects << trash;
                     if (entry.condTrigger != NULL)
                     {
@@ -514,11 +490,8 @@ void Scenario::draw()
         glLightfv(GL_LIGHT1, GL_AMBIENT, light_ambient);
         glLightfv(GL_LIGHT1, GL_DIFFUSE, light_diffuse);
         
-        const GLfloat light_position[] = { static_cast<float>(object->position().x), static_cast<float>(object->position().y), static_cast<float>(object->position().z), 1.0f };
-        const GLfloat spot_direction[] = { std::cos(0.005f*m_time.elapsed()), std::sin(0.005f*m_time.elapsed()), 0.0f };
-
-        glLightfv(GL_LIGHT1, GL_POSITION, light_position);
-        glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, spot_direction);
+        glLightfv(GL_LIGHT1, GL_POSITION, glm::value_ptr(object->position()));
+        glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, glm::value_ptr(glm::vec3(glm::cos(0.005f*m_time.elapsed()), glm::sin(0.005f*m_time.elapsed()), 0.0f)));
 
         glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 90.0);
         glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, 0.1);

@@ -71,7 +71,7 @@ public:
     ConditionEvent* eventBoard() { return &m_eventBoard; }
 
 public:
-    virtual void update();
+    virtual bool update();
     virtual void draw();
     virtual bool intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal);
     virtual void destroy();
@@ -96,7 +96,13 @@ protected:
     ConditionEvent m_eventParalyze;
     ConditionEvent m_eventFinish;
     ConditionEvent m_eventBoard;
+
+private:
+    Object(const Object& x) : m_condEnable(this) { }
 };
+
+
+static bool updateObject(Object &o) { return o.update(); }
 
 
 } // namespace fight

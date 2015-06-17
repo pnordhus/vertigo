@@ -36,7 +36,7 @@ public:
     BoundingBox box();
     bool intersect(const glm::vec3 &start, const glm::vec3 &dir, float &distance);
     
-    int duration() const { return m_stages.count()*m_displayTime; }
+    int duration() const { return m_stages.size()*m_displayTime; }
     float range() const { return m_range; }
     float velocity() const { return m_velocity; }
     float collisionRadius() const { return m_collisionRadius; }
@@ -53,7 +53,7 @@ private:
     };
 
     int m_displayTime;
-    QList<Stage> m_stages;
+    std::vector<Stage> m_stages;
     float m_scale;
 
     float m_range;
