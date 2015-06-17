@@ -19,27 +19,21 @@
 #include "image.h"
 #include <QBitmap>
 #include <QCursor>
-#include <QFile>
 #include <QPainter>
 #include <QPixmap>
 
-
 namespace gfx {
-
-
 
 Image::Image()
 {
 
 }
 
-
 Image::Image(const QImage &image) :
     QImage(image)
 {
 
 }
-
 
 Image& Image::toRgb565()
 {
@@ -49,40 +43,28 @@ Image& Image::toRgb565()
     return *this;
 }
 
-
 Image Image::load(const QString &filename, const QVector<QRgb> &colorTable)
 {
-    QFile file(filename);
-    file.open(QFile::ReadOnly);
-
-    QDataStream stream(&file);
-    stream.setByteOrder(QDataStream::LittleEndian);
-
-    quint16 type;
-    stream >> type;
-
-    return load(&file, Type(type), colorTable);
+    util::File file(QString(filename).replace(":", "/").toUtf8().data());
+    std::uint16_t type;
+    file >> type;
+    return load(file, Type(type), colorTable);
 }
-
 
 Image Image::load(const QString &filename, int w, int h, bool colorKey)
 {
-    QFile file(filename);
-    file.open(QFile::ReadOnly);
-
-    QDataStream stream(&file);
-    stream.setByteOrder(QDataStream::LittleEndian);
+    util::File file(QString(filename).replace(":", "/").toUtf8().data());
 
     QImage image(w, h, colorKey ? QImage::Format_ARGB32 : QImage::Format_RGB888);
 
     for (int y = 0; y < h; y++) {
         for (int x = 0; x < w; x++) {
-            quint16 value;
-            stream >> value;
+            std::uint16_t value;
+            file >> value;
 
-            const quint8 r = (value >> 8) & 0xf8;
-            const quint8 g = (value >> 3) & 0xfc;
-            const quint8 b = (value << 3) & 0xf8;
+            const std::uint8_t r = (value >> 8) & 0xf8;
+            const std::uint8_t g = (value >> 3) & 0xfc;
+            const std::uint8_t b = (value << 3) & 0xf8;
             if (colorKey && r == 0 && g == 0 && b == 0)
                 image.setPixel(x, y, qRgba(0,0,0,0));
             else
@@ -93,59 +75,54 @@ Image Image::load(const QString &filename, int w, int h, bool colorKey)
     return image;
 }
 
-
 Image Image::loadPCX(const QString &filename)
 {
-    QFile file(filename);
-    file.open(QFile::ReadOnly);
+    util::File file(QString(filename).replace(":", "/").toUtf8().data());
 
     struct
     {
-//        quint8 manufacturer;
-//        quint8 version;
-        quint8 encoding;
-        quint8 bitsPerPixel;
-        qint16 xMin, yMin, xMax, yMax;
-//        qint16 hDpi, vDpi;
-//        quint8 colormap[48];
-//        quint8 reserved;
-        quint8 nPlanes;
-        qint16 bytesPerLine;
-//        qint16 paletteInfo;
-//        qint16 hScreenSize;
-//        qint16 vScreenSize;
-//        quint8 filler[54];
+//        std::uint8_t manufacturer;
+//        std::uint8_t version;
+        std::uint8_t encoding;
+        std::uint8_t bitsPerPixel;
+        std::int16_t xMin, yMin, xMax, yMax;
+//        std::int16_t hDpi, vDpi;
+//        std::uint8_t colormap[48];
+//        std::uint8_t reserved;
+        std::uint8_t nPlanes;
+        std::int16_t bytesPerLine;
+//        std::int16_t paletteInfo;
+//        std::int16_t hScreenSize;
+//        std::int16_t vScreenSize;
+//        std::uint8_t filler[54];
     } header;
 
-    QDataStream stream(&file);
-    stream.setByteOrder(QDataStream::LittleEndian);
-
-    stream.skipRawData(2);
-    stream >> header.encoding >> header.bitsPerPixel;
-    stream >> header.xMin >> header.yMin >> header.xMax >> header.yMax;
-    stream.skipRawData(53);
-    stream >> header.nPlanes >> header.bytesPerLine;
-    stream.skipRawData(60);
+    file.skipBytes(2);
+    file >> header.encoding >> header.bitsPerPixel;
+    file >> header.xMin >> header.yMin >> header.xMax >> header.yMax;
+    file.skipBytes(53);
+    file >> header.nPlanes >> header.bytesPerLine;
+    file.skipBytes(60);
 
     const int width = (header.xMax - header.xMin) + 1;
     const int height = (header.yMax - header.yMin) + 1;
 
-    Q_ASSERT(header.bitsPerPixel == 8);
-    Q_ASSERT(header.nPlanes == 1);
-    Q_ASSERT(header.encoding == 1);
+    ASSERT(header.bitsPerPixel == 8);
+    ASSERT(header.nPlanes == 1);
+    ASSERT(header.encoding == 1);
 
     QImage image(width, height, QImage::Format_Indexed8);
 
     for (int y = 0; y < height; y++) {
-        quint8 *scanLine = image.scanLine(y);
+        std::uint8_t *scanLine = image.scanLine(y);
 
         int x = 0;
         while (x < header.bytesPerLine) {
-            quint8 c;
-            stream >> c;
+            std::uint8_t c;
+            file >> c;
             if ((c & 0xc0) == 0xc0) {
                 const int count = c & 0x3f;
-                stream >> c;
+                file >> c;
                 for (int i = 0; i < count; i++)
                     scanLine[x++] = c;
             } else {
@@ -154,20 +131,19 @@ Image Image::loadPCX(const QString &filename)
         }
     }
 
-    quint8 c;
+    std::uint8_t c;
     do {
-        stream >> c;
+        file >> c;
     } while (c != 12);
 
     gfx::ColorTable colorTable;
-    colorTable.load(file.read(256 * 3));
+    colorTable.load(file);
     colorTable[0] = qRgba(0,0,0,0);
 
     image.setColorTable(colorTable);
 
     return image;
 }
-
 
 QCursor Image::loadCursor(const QString &filename, const QVector<QRgb> &colorTable)
 {
@@ -192,60 +168,52 @@ QCursor Image::loadCursor(const QString &filename, const QVector<QRgb> &colorTab
     return QCursor(pixmap, 3, 4);
 }
 
-
-Image Image::load(QIODevice *device, Type type, const QVector<QRgb> &colorTable)
+Image Image::load(util::File &file, Type type, const QVector<QRgb> &colorTable)
 {
-    QDataStream stream(device);
-    stream.setByteOrder(QDataStream::LittleEndian);
+    std::uint32_t width;
+    std::uint32_t height;
+    std::int32_t x;
+    std::int32_t y;
 
-    quint32 width;
-    quint32 height;
-    qint32 x;
-    qint32 y;
-    quint32 length;
-
-    stream >> width >> height >> x >> y;
+    file >> width >> height >> x >> y;
 
     QImage image;
     switch (type) {
     case Bitmap:
-        stream >> length;
-        image = decodeImage(device->read(length), width, height, colorTable[0]);
+        image = decodeImage(file, width, height, colorTable[0]);
         break;
 
     case PaletteRLE:
-        stream >> length;
-        image = decodeImage(device->read(length), width, height, colorTable);
+        image = decodeImage(file, width, height, colorTable);
         break;
 
     case Palette:
-        image = QImage((const quint8*) (device->read(width * height)).constData(), width, height, width, QImage::Format_Indexed8).copy();
+        image = QImage((const quint8*) file.read(width * height).data(), width, height, width, QImage::Format_Indexed8).copy();
         image.setColorTable(colorTable);
         break;
 
     case RGB565:
-        stream >> length;
-        image = decodeImage(device->read(length), width, height);
+        image = decodeImage(file, width, height);
         break;
     }
 
     return image;
 }
 
-
-QImage Image::decodeImage(const QByteArray &data, int width, int height, const QRgb &color)
+QImage Image::decodeImage(util::File &file, int width, int height, const QRgb &color)
 {
-    QDataStream stream(data);
-    stream.setByteOrder(QDataStream::LittleEndian);
+    std::uint32_t length;
+    file >> length;
+    const std::size_t offset = file.position();
 
     QImage image(width, height, QImage::Format_ARGB32);
 
     for (int y = 0; y < height; y++) {
         int x = 0;
-        while (x < width && !stream.atEnd()) {
-            quint16 transparent = 0;
-            quint16 opaque = 0;
-            stream >> transparent >> opaque;
+        while (x < width && !file.atEnd()) {
+            std::uint16_t transparent = 0;
+            std::uint16_t opaque = 0;
+            file >> transparent >> opaque;
 
             for (uint i = 0; i < transparent; i++)
                 image.setPixel(x++, y, qRgba(0, 0, 0, 0));
@@ -254,72 +222,71 @@ QImage Image::decodeImage(const QByteArray &data, int width, int height, const Q
                 image.setPixel(x++, y, color);
         }
     }
-
+    file.seek(offset + length);
     return image;
 }
 
-
-QImage Image::decodeImage(const QByteArray &data, int width, int height, const QVector<QRgb> &colorTable)
+QImage Image::decodeImage(util::File &file, int width, int height, const QVector<QRgb> &colorTable)
 {
-    QDataStream stream(data);
-    stream.setByteOrder(QDataStream::LittleEndian);
+    std::uint32_t length;
+    file >> length;
+    const std::size_t offset = file.position();
 
     QImage image(width, height, QImage::Format_ARGB32);
 
     for (int y = 0; y < height; y++) {
         int x = 0;
-        while (x < width && !stream.atEnd()) {
-            quint16 transparent = 0;
-            quint16 opaque = 0;
-            stream >> transparent >> opaque;
+        while (x < width && !file.atEnd()) {
+            std::uint16_t transparent = 0;
+            std::uint16_t opaque = 0;
+            file >> transparent >> opaque;
 
             for (uint i = 0; i < transparent; i++)
                 image.setPixel(x++, y, qRgba(0, 0, 0, 0));
 
             for (uint i = 0; i < opaque; i++) {
-                quint8 index;
-                stream >> index;
+                std::uint8_t index;
+                file >> index;
                 image.setPixel(x++, y, colorTable[index]);
             }
         }
     }
-
+    file.seek(offset + length);
     return image;
 }
 
-
-QImage Image::decodeImage(const QByteArray &data, int width, int height)
+QImage Image::decodeImage(util::File &file, int width, int height)
 {
-    QDataStream stream(data);
-    stream.setByteOrder(QDataStream::LittleEndian);
+    std::uint32_t length;
+    file >> length;
+    const std::size_t offset = file.position();
 
     QImage image(width, height, QImage::Format_ARGB32);
 
     for (int y = 0; y < height; y++) {
         int x = 0;
-        while (x < width && !stream.atEnd()) {
-            quint16 transparent = 0;
-            quint16 opaque = 0;
-            stream >> transparent >> opaque;
+        while (x < width && !file.atEnd()) {
+            std::uint16_t transparent = 0;
+            std::uint16_t opaque = 0;
+            file >> transparent >> opaque;
 
             for (uint i = 0; i < transparent; i++)
                 image.setPixel(x++, y, qRgba(0, 0, 0, 0));
 
             for (uint i = 0; i < opaque; i++) {
-                quint16 value;
-                stream >> value;
+                std::uint16_t value;
+                file >> value;
 
-                const quint8 r = (value >> 8) & 0xf8;
-                const quint8 g = (value >> 3) & 0xfc;
-                const quint8 b = (value << 3) & 0xf8;
+                const std::uint8_t r = (value >> 8) & 0xf8;
+                const std::uint8_t g = (value >> 3) & 0xfc;
+                const std::uint8_t b = (value << 3) & 0xf8;
 
                 image.setPixel(x++, y, qRgb(r, g, b));
             }
         }
     }
-
+    file.seek(offset + length);
     return image;
 }
-
 
 } // namespace gfx

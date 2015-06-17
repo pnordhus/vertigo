@@ -18,12 +18,11 @@
 #ifndef GFX_IMAGE_H
 #define GFX_IMAGE_H
 
+#include "util/file.h"
 
 #include <QImage>
 
-
 namespace gfx {
-
 
 class Image : public QImage
 {
@@ -40,19 +39,16 @@ public:
 public:
     static Image load(const QString &filename, const QVector<QRgb> &colorTable = QVector<QRgb>());
     static Image load(const QString &filename, int w, int h, bool colorKey = false);
-    static Image load(QIODevice *device, Type type, const QVector<QRgb> &colorTable);
+    static Image load(util::File& file, Type type, const QVector<QRgb> &colorTable);
     static Image loadPCX(const QString &filename);
     static QCursor loadCursor(const QString &filename, const QVector<QRgb> &colorTable);
 
 private:
-    static QImage decodeImage(const QByteArray &data, int width, int height, const QRgb &color);
-    static QImage decodeImage(const QByteArray &data, int width, int height, const QVector<QRgb> &colorTable);
-    static QImage decodeImage(const QByteArray &data, int width, int height);
-
+    static QImage decodeImage(util::File& file, int width, int height, const QRgb& color);
+    static QImage decodeImage(util::File& file, int width, int height, const QVector<QRgb> &colorTable);
+    static QImage decodeImage(util::File& file, int width, int height);
 };
 
-
 } // namespace gfx
-
 
 #endif // GFX_IMAGE_H

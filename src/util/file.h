@@ -22,6 +22,7 @@
 
 #include <cstdint>
 #include <fstream>
+#include <vector>
 
 namespace util {
 
@@ -32,6 +33,11 @@ public:
     File(const std::string &name);
 
     void open(const std::string &name);
+
+    bool atEnd() const
+    {
+        return m_stream.eof();
+    }
 
     std::size_t position()
     {
@@ -45,6 +51,13 @@ public:
     {
         m_stream.read(buffer, size);
         ASSERT(m_stream.good());
+    }
+
+    std::vector<char> read(std::size_t size)
+    {
+        std::vector<char> buffer(size, 0);
+        read(buffer.data(), buffer.size());
+        return buffer;
     }
 
     char getChar()
