@@ -16,6 +16,7 @@
  ***************************************************************************/
 
 #include "navpoint.h"
+#include "scenario.h"
 
 
 namespace fight {

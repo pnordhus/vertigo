@@ -19,27 +19,26 @@
 #define FIGHT_TURRET_H
 
 
-#include "modulemanager.h"
+#include "object.h"
+#include "module.h"
 
 
 namespace fight {
 
 
-class Turret
+class Turret : public Object
 {
 public:
-    Turret(ModuleManager &modMan, const QString &name);
+    Turret(Scenario *scenario, const QString &name);
 
 public:
     void draw();
 
 private:
-    Module m_body;
-    Module m_armLeft;
-    Module m_armRight;
+    Module *m_armLeft;
+    Module *m_armRight;
     glm::vec3 m_armLeftPosition;
     glm::vec3 m_armRightPosition;
-    float m_scale;
 };
 
 

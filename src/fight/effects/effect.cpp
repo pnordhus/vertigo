@@ -17,6 +17,7 @@
 
 #include "effect.h"
 #include "billboard.h"
+#include "../scenario.h"
 
 
 namespace fight {

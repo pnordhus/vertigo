@@ -22,7 +22,7 @@
 #include "billboard.h"
 #include "effect.h"
 #include "projectile.h"
-#include <glm/vec3.hpp>
+#include <memory>
 
 namespace fight {
 
@@ -38,8 +38,8 @@ public:
 public:
     Billboard* getBillboard(Effects effect) { return &m_billboards.at(effect); }
 
-    Effect& addEffect(Effects effect, const glm::vec3 &position, float angle = 0, float scale = 1);
-    Projectile& addProjectile(Effects projectile, const glm::vec3 &position, const glm::vec3 &direction);
+    Effect* addEffect(Effects effect, const glm::vec3 &position, float angle = 0, float scale = 1);
+    Projectile* addProjectile(Effects projectile, const glm::vec3 &position, const glm::vec3 &direction);
 
     void update();
     void draw();
@@ -47,8 +47,7 @@ public:
 private:
     Scenario *m_scenario;
     std::map<Effects, Billboard> m_billboards;
-    std::list<Effect> m_effects;
-    std::list<Projectile> m_projectiles;
+    std::list<std::unique_ptr<Effect>> m_effects;
 };
 
 

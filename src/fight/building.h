@@ -40,7 +40,7 @@ public:
 private:
     struct Cluster
     {
-        Module module;
+        Module *module;
         glm::vec3 offset;
         float scale;
         float angle;
@@ -48,7 +48,7 @@ private:
         glm::mat4 invTransform;
     };
 
-    QList<Cluster> m_clusters;
+    std::vector<Cluster> m_clusters;
     int m_size;
     float m_angle;
 };

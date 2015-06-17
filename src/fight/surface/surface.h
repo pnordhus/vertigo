@@ -19,11 +19,8 @@
 #define FIGHT_SURFACE_H
 
 
-#include "gfx/texture.h"
+#include "element.h"
 #include "tesselator.h"
-#include <QMap>
-
-#include <glm/vec3.hpp>
 
 
 namespace fight {
@@ -35,8 +32,8 @@ class Element;
 class Surface
 {
 public:
-    Surface(const QString &name, int maxheightscale, int mapping);
-    ~Surface();
+    Surface();
+    void load(const QString &name, int maxheightscale, int mapping);
 
 public:
     void draw(const glm::vec3 &position, const glm::vec3 &direction);
@@ -49,10 +46,11 @@ public:
     bool testCollision(const glm::vec3 &start, const glm::vec3 &end, float radius, glm::vec3 &position, glm::vec3 &normal);
 
 private:
-    Element* getElement(QPoint pos);
+    Element& getElement(QPoint pos);
 
 private:
-    QList<gfx::Texture> m_textures;
+    std::vector<gfx::Texture> m_textures;
+    std::map<int, Element> m_elements;
     QImage m_heightMap;
     QByteArray m_textureMap;
     QByteArray m_textureDir;
@@ -62,7 +60,6 @@ private:
 private:
     static const int Level = 3;
     Tesselator m_tesselator;
-    QMap<int, Element*> m_elements;
 };
 
 

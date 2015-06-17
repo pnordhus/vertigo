@@ -27,19 +27,17 @@ TurretBase::TurretBase(Scenario *scenario, const QString &name) :
 {
     txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
     file.setSection("gunturret");
-    if (!file.contains("name"))
-        file.setSection("torpedoturret");
-    m_turret = new Turret(scenario->moduleManager(), file.value("name").toString());
-
-    m_turretPosition.x = file.value("RelativePositionX").toFloat();
-    m_turretPosition.y = file.value("RelativePositionY").toFloat();
-    m_turretPosition.z = file.value("RelativePositionZ").toFloat();
-}
-
-
-TurretBase::~TurretBase()
-{
-    delete m_turret;
+    if (file.contains("name"))
+    {
+        m_body.reset(new Turret(scenario, file.value("name").toString())); // TODO: TurretGun
+        m_body->setPosition(glm::vec3(file.value("RelativePositionX").toFloat(), file.value("RelativePositionY").toFloat(), file.value("RelativePositionZ").toFloat()));
+    }
+    file.setSection("torpedoturret");
+    if (file.contains("name"))
+    {
+        m_body.reset(new Turret(scenario, file.value("name").toString())); // TODO: TurretTorpedo
+        m_body->setPosition(glm::vec3(file.value("RelativePositionX").toFloat(), file.value("RelativePositionY").toFloat(), file.value("RelativePositionZ").toFloat()));
+    }
 }
 
 
@@ -48,10 +46,8 @@ void TurretBase::draw()
     glPushMatrix();
     glTranslatef(m_position.x, m_position.y, m_position.z);
     glScalef(m_scale, m_scale, m_scale);
-    m_base.draw();
-
-    glTranslatef(m_turretPosition.x, m_turretPosition.y, m_turretPosition.z);
-    m_turret->draw();
+    m_base->draw();
+    m_body->draw();
     glPopMatrix();
 }
 

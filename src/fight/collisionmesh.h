@@ -19,7 +19,7 @@
 #define FIGHT_COLLISIONMESH_H
 
 
-#include <QVector>
+#include <QRect>
 
 #include <vector>
 #include <glm/vec3.hpp>

@@ -34,7 +34,7 @@ class Surface;
 class Element
 {
 public:
-    Element(Surface *surface, QRect rect);
+    Element(Surface *surface, const QRect &rect);
 
 public:
     int numVertices(int textureId);
@@ -42,6 +42,7 @@ public:
     void addTriangle(int textureId, quint16 a, quint16 b, quint16 c);
 
     void draw();
+    QRect rect() const { return m_rect; }
     float maxZ() const { return m_maxZ; }
     float minZ() const { return m_minZ; }
     glm::vec3 center() const;

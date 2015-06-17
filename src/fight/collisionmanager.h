@@ -20,7 +20,6 @@
 
 
 #include "boundingbox.h"
-#include <QList>
 
 
 namespace fight {
@@ -48,7 +47,7 @@ private:
     };
 
 private:
-    QList<CacheEntry> m_entries;
+    std::vector<CacheEntry> m_entries;
 };
 
 
@@ -65,7 +64,7 @@ public:
 private:
 
 private:
-    QList<Object*> m_objects;
+    std::vector<Object*> m_objects;
 };
 
 

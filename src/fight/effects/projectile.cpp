@@ -17,9 +17,7 @@
 
 #include "projectile.h"
 #include "billboard.h"
-#include "effectmanager.h"
-#include "../surface/surface.h"
-#include "../collisionmanager.h"
+#include "../scenario.h"
 
 
 namespace fight {
@@ -57,19 +55,19 @@ bool Projectile::update()
     glm::vec3 newPos = m_originPos + m_direction*(m_elapsedTime*m_billboard->velocity()/1000);
 
     glm::vec3 pos, normal;
-    if (m_scenario->surface()->testCollision(m_position, newPos, m_billboard->collisionRadius(), pos, normal))
+    if (m_scenario->surface().testCollision(m_position, newPos, m_billboard->collisionRadius(), pos, normal))
     {
-        m_scenario->effectManager()->addEffect(Explosion_12, pos);
+        m_scenario->effectManager().addEffect(Explosion_12, pos);
         disable();
         return true;
     }
-    Object *collision = m_scenario->collisionManager()->testCollision(this, newPos, m_billboard->collisionRadius(), pos, normal);
+    Object *collision = m_scenario->collisionManager().testCollision(this, newPos, m_billboard->collisionRadius(), pos, normal);
     if (collision)
     {
         if (collision->type() == TrashObject)
             collision->destroy();
         else
-            m_scenario->effectManager()->addEffect(Explosion_11, pos, qrand()%360);
+            m_scenario->effectManager().addEffect(Explosion_11, pos, qrand()%360);
         disable();
         return true;
     }

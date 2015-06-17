@@ -16,8 +16,7 @@
  ***************************************************************************/
 
 #include "effectmanager.h"
-#include "billboard.h"
-#include "../surface/surface.h"
+#include "../scenario.h"
 
 
 namespace fight {
@@ -56,36 +55,35 @@ EffectManager::EffectManager(Scenario *scenario) :
 }
 
 
-Effect& EffectManager::addEffect(Effects effect, const glm::vec3 &position, float angle, float scale)
+Effect* EffectManager::addEffect(Effects effect, const glm::vec3 &position, float angle, float scale)
 {
-    m_effects.emplace_back(m_scenario, getBillboard(effect), angle, scale);
-    m_effects.back().setPosition(position);
-    return m_effects.back();
+    Effect *object = new Effect(m_scenario, getBillboard(effect), angle, scale);
+    m_effects.emplace_back(object);
+    object->setPosition(position);
+    return object;
 }
 
 
-Projectile& EffectManager::addProjectile(Effects projectile, const glm::vec3 &position, const glm::vec3 &direction)
+Projectile* EffectManager::addProjectile(Effects projectile, const glm::vec3 &position, const glm::vec3 &direction)
 {
-    m_projectiles.emplace_back(m_scenario, getBillboard(projectile));
-    m_projectiles.back().setPosition(position);
-    m_projectiles.back().setDirection(direction);
-    return m_projectiles.back();
+    Projectile *object = new Projectile(m_scenario, getBillboard(projectile));
+    m_effects.emplace_back(object);
+    object->setPosition(position);
+    object->setDirection(direction);
+    return object;
 }
 
 
 void EffectManager::update()
 {
-    m_effects.remove_if(updateObject);
-    m_projectiles.remove_if(updateObject);
+    m_effects.remove_if([](const std::unique_ptr<Effect> &effect) { return effect->update(); });
 }
 
 
 void EffectManager::draw()
 {
-    for (Effect &effect : m_effects)
-        effect.draw();
-    for (Projectile &projectile : m_projectiles)
-        projectile.draw();
+    for (const auto &effect : m_effects)
+        effect->draw();
 }
 
 

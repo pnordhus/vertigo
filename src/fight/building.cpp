@@ -16,6 +16,7 @@
  ***************************************************************************/
 
 #include "building.h"
+#include "scenario.h"
 #include "surface/surface.h"
 #include "collisionmanager.h"
 
@@ -32,12 +33,13 @@ Building::Building(Scenario *scenario, const QString &name, int size, float angl
     txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
 
     int i = 0;
-    glm::vec3 scale = scenario->surface()->scale();
+    glm::vec3 scale = scenario->surface().scale();
 
     while (file.sections().contains(QString("cluster%1").arg(i))) {
         file.setSection(QString("cluster%1").arg(i));
 
-        Cluster cluster;
+        m_clusters.emplace_back();
+        Cluster &cluster = m_clusters.back();
         cluster.module = scenario->moduleManager().get(file.value("base").toString());
 
         file.setSection(QString("size%1").arg(i));
@@ -61,14 +63,14 @@ Building::Building(Scenario *scenario, const QString &name, int size, float angl
             if (file.value("SurfaceLifting").toString() == "p")
             {
                 if (heightRef == 0)
-                    scenario->surface()->setHeight(clusterX, clusterY, refx, refy, 0);
+                    scenario->surface().setHeight(clusterX, clusterY, refx, refy, 0);
                 else
                 {
                     qDebug("Untested: HeightReference = -1");
-                    scenario->surface()->setHeight(clusterX, clusterY, clusterX, clusterY, -4); // TODO: test
+                    scenario->surface().setHeight(clusterX, clusterY, clusterX, clusterY, -4); // TODO: test
                 }
             }
-            cluster.offset.z = scenario->surface()->heightAt((clusterX + 0.5f)*scale.x, (clusterY + 0.5f)*scale.y);
+            cluster.offset.z = scenario->surface().heightAt((clusterX + 0.5f)*scale.x, (clusterY + 0.5f)*scale.y);
         }
 
         switch (file.value("cardinal").toString().toLatin1()[0]) {
@@ -86,29 +88,25 @@ Building::Building(Scenario *scenario, const QString &name, int size, float angl
             break;
         }
 
-        m_clusters << cluster;
         i++;
     }
 
-    QMutableListIterator<Cluster> it(m_clusters);
-    while (it.hasNext()) 
+    for (Cluster &cluster : m_clusters)
     {
-        Cluster &cluster = it.next();
-
         glm::mat4 m;
         m = glm::translate(m, glm::vec3((x + 0.5f)*scale.x, (y + 0.5f - size)*scale.y, 0));
         m = glm::rotate(m, glm::radians(m_angle), glm::vec3(0, 0, 1));
-        m = glm::translate(m, glm::vec3(cluster.offset.x, cluster.offset.y, cluster.offset.z));
+        m = glm::translate(m, cluster.offset);
         m = glm::scale(m, glm::vec3(cluster.scale));
         m = glm::rotate(m, glm::radians(cluster.angle), glm::vec3(0, 0, 1));
-        m_box.add(cluster.module.box().transform(m));
+        m_box.add(cluster.module->box().transform(m));
         
         cluster.transform = m;
         cluster.invTransform = glm::inverse(m);
     }
 
     m_type = BuildingObject;
-    scenario->collisionManager()->addObject(this);
+    scenario->collisionManager().addObject(this);
 }
 
 
@@ -118,15 +116,13 @@ void Building::draw()
     glTranslatef(m_position.x, m_position.y - m_size * 16.0f, 0);
     glRotatef(m_angle, 0, 0, 1);
 
-    QMutableListIterator<Cluster> it(m_clusters);
-    while (it.hasNext()) {
-        Cluster &cluster = it.next();
-
+    for (Cluster &cluster : m_clusters)
+    {
         glPushMatrix();
         glTranslatef(cluster.offset.x, cluster.offset.y, cluster.offset.z);
         glScalef(cluster.scale, cluster.scale, cluster.scale);
         glRotatef(cluster.angle, 0, 0, 1);
-        cluster.module.draw();
+        cluster.module->draw();
         glPopMatrix();
     }
     glPopMatrix();
@@ -136,13 +132,11 @@ void Building::draw()
 bool Building::intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal)
 {
     bool collision = false;
-    QMutableListIterator<Cluster> it(m_clusters);
-    while (it.hasNext()) 
+    for (Cluster &cluster : m_clusters)
     {
-        Cluster &cluster = it.next();
         float d;
         glm::vec3 norm;
-        if (cluster.module.intersect(glm::vec3(cluster.invTransform * glm::vec4(start, 1)), glm::vec3(cluster.invTransform * glm::vec4(dir, 0))*cluster.scale, radius/cluster.scale, d, norm))
+        if (cluster.module->intersect(glm::vec3(cluster.invTransform * glm::vec4(start, 1)), glm::vec3(cluster.invTransform * glm::vec4(dir, 0))*cluster.scale, radius/cluster.scale, d, norm))
         {
             d *= cluster.scale;
             if (!collision || distance > d)

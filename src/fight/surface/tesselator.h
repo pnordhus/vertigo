@@ -39,12 +39,12 @@ public:
 public:
 	float heightAt(const glm::vec2 &pos);
     float heightAt(const glm::vec2 &pos, glm::vec3 &normal);
-    Element* tesselate(QRect rect, int level, const glm::vec3 &scale, QByteArray &textureMap, QByteArray &textureDir, int mapping);
+    void tesselate(Element &element, int level, const glm::vec3 &scale, QByteArray &textureMap, QByteArray &textureDir, int mapping);
     bool intersect(const glm::vec3 &start, const glm::vec3 &end, float radius, glm::vec3 &position, glm::vec3 &normal);
 
 private:
     void InitIndices(int MaxLevel);
-    void PrepareElementSubset(int level, const glm::vec3 &scale, int x, int y, int textureId, const glm::vec2 &t0, const glm::vec2 &tu, const glm::vec2 &tv, Element *element);
+    void PrepareElementSubset(Element &element, int level, const glm::vec3 &scale, int x, int y, int textureId, const glm::vec2 &t0, const glm::vec2 &tu, const glm::vec2 &tv);
 
 private:
 	std::vector<BetaSpline> m_splines;

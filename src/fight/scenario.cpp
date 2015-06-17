@@ -23,8 +23,6 @@
 #include "effects/effect.h"
 #include "effects/projectile.h"
 #include "effects/trash.h"
-#include "effects/effectmanager.h"
-#include "collisionmanager.h"
 #include "turretbase.h"
 #include "navpoint.h"
 #include "conditionmanager.h"
@@ -40,6 +38,7 @@ namespace fight {
 
 Scenario::Scenario(const QString &name, std::function<void()> &&funcSuccess) :
     m_moduleManager(m_textureManager),
+    m_effectManager(this),
     m_left(0.0f),
     m_right(0.0f),
     m_up(0.0f),
@@ -50,34 +49,31 @@ Scenario::Scenario(const QString &name, std::function<void()> &&funcSuccess) :
     m_condFailure(this),
     m_funcSuccess(std::move(funcSuccess))
 {
-    m_effectManager = new EffectManager(this);
-    m_collisionManager = new CollisionManager();
-    
     qsrand(name.right(4).toInt());
 
     hideCursor();
     m_file.load(QString("vfx:scenario/%1.des").arg(name));
 
     m_file.setSection("surface");
-    m_surface = new Surface(m_file.value("name").toString().toLower(), m_file.value("maxheightscale").toInt(), m_file.value("patchcomb").toInt());
+    m_surface.load(m_file.value("name").toString().toLower(), m_file.value("maxheightscale").toInt(), m_file.value("patchcomb").toInt());
 
-    QMap<int, QString> types;
-    types.insert( 0, "anscout2");
-    types.insert( 1, "anscout2");
-    types.insert( 5, "guntow0");
-    types.insert( 7, "guntow2");
-    types.insert( 8, "bioscout");
-    types.insert(16, "anbombr1");
-    types.insert(10, "russcout");
-    types.insert(12, "atscout");
-    types.insert(27, "mine0");
-    types.insert(36, "tortow0");
-    types.insert(39, "anscout1");
-    types.insert(41, "atbomber");
-    types.insert(47, "build2");
-    types.insert(48, "build3");
-    types.insert(50, "build5");
-    types.insert(67, "entrobot");
+    std::map<int, QString> types;
+    types[ 0] = "anscout2";
+    types[ 1] = "anscout2";
+    types[ 5] = "guntow0";
+    types[ 7] = "guntow2";
+    types[ 8] = "bioscout";
+    types[16] = "anbombr1";
+    types[10] = "russcout";
+    types[12] = "atscout";
+    types[27] = "mine0";
+    types[36] = "tortow0";
+    types[39] = "anscout1";
+    types[41] = "atbomber";
+    types[47] = "build2";
+    types[48] = "build3";
+    types[50] = "build5";
+    types[67] = "entrobot";
 
     QMap<int, ConditionEntry> condEntries;
 
@@ -110,12 +106,12 @@ Scenario::Scenario(const QString &name, std::function<void()> &&funcSuccess) :
         case TypeBoat:
             {
                 const int dType = m_file.value("dtyp").toInt();
-                if (!types.contains(dType)) {
+                if (types.find(dType) == types.end()) {
                     qDebug() << "Unhandled dtype" << dType;
                     continue;
                 }
 
-                object = new Object(this, types.value(dType));
+                object = new Object(this, types[dType]);
                 glm::vec3 pos = getPosition();
                 pos.z += 20.0f;
                 object->setPosition(pos);
@@ -125,12 +121,12 @@ Scenario::Scenario(const QString &name, std::function<void()> &&funcSuccess) :
         case TypeBomber:
             {
                 const int dType = m_file.value("dtyp").toInt();
-                if (!types.contains(dType)) {
+                if (types.find(dType) == types.end()) {
                     qDebug() << "Unhandled dtype" << dType;
                     continue;
                 }
 
-                object = new Object(this, types.value(dType));
+                object = new Object(this, types[dType]);
                 glm::vec3 pos = getPosition();
                 pos.z += 20.0f;
                 object->setPosition(pos);
@@ -141,12 +137,12 @@ Scenario::Scenario(const QString &name, std::function<void()> &&funcSuccess) :
         case TypeTorpedoTower:
             {
                 const int dType = m_file.value("dtyp").toInt();
-                if (!types.contains(dType)) {
+                if (types.find(dType) == types.end()) {
                     qDebug() << "Unhandled dtype" << dType;
                     continue;
                 }
 
-                object = new TurretBase(this, types.value(dType));
+                object = new TurretBase(this, types[dType]);
                 object->setPosition(getPosition());
             }
             break;
@@ -161,12 +157,12 @@ Scenario::Scenario(const QString &name, std::function<void()> &&funcSuccess) :
         case TypeMine:
             {
                 const int dType = m_file.value("dtyp").toInt();
-                if (!types.contains(dType)) {
+                if (types.find(dType) == types.end()) {
                     qDebug() << "Unhandled dtype" << dType;
                     continue;
                 }
 
-                object = new Mine(this, types.value(dType));
+                object = new Mine(this, types[dType]);
                 object->setPosition(getPosition());
             }
             break;
@@ -178,15 +174,15 @@ Scenario::Scenario(const QString &name, std::function<void()> &&funcSuccess) :
 
             {
                 for (int i = 0; i < 27; i++)
-                    m_effectManager->addEffect((Effects)(Explosion_0 + i), m_position + glm::vec3(i*5, 0, 0)).setPermanent(true);
+                    m_effectManager.addEffect((Effects)(Explosion_0 + i), m_position + glm::vec3(i*5, 0, 0))->setPermanent(true);
                 for (int i = 0; i < 9; i++)
-                    m_effectManager->addEffect((Effects)(Shoot_0 + i), m_position + glm::vec3(i*5, -10, 0)).setPermanent(true);
+                    m_effectManager.addEffect((Effects)(Shoot_0 + i), m_position + glm::vec3(i*5, -10, 0))->setPermanent(true);
                 for (int i = 0; i < 23; i++)
-                    m_effectManager->addEffect((Effects)(Debris_0 + i), m_position + glm::vec3(i*5, -20, 0)).setPermanent(true);
+                    m_effectManager.addEffect((Effects)(Debris_0 + i), m_position + glm::vec3(i*5, -20, 0))->setPermanent(true);
                 for (int i = 0; i < 5; i++)
-                    m_effectManager->addEffect((Effects)(Trash_0 + i), m_position + glm::vec3(i*5, -30, 0)).setPermanent(true);
+                    m_effectManager.addEffect((Effects)(Trash_0 + i), m_position + glm::vec3(i*5, -30, 0))->setPermanent(true);
                 for (int i = 0; i < 3; i++)
-                    m_effectManager->addEffect((Effects)(Bubble_0 + i), m_position + glm::vec3(i*5, -40, 0)).setPermanent(true);
+                    m_effectManager.addEffect((Effects)(Bubble_0 + i), m_position + glm::vec3(i*5, -40, 0))->setPermanent(true);
             }
             break;
 
@@ -200,19 +196,19 @@ Scenario::Scenario(const QString &name, std::function<void()> &&funcSuccess) :
         case TypeNavPoint:
             {
                 object = new NavPoint(this, m_file.value("dtyp").toInt());
-                object->setPosition(getPosition() + glm::vec3(-0.5f*m_surface->scale().x, -0.5f*m_surface->scale().y, 12));
+                object->setPosition(getPosition() + glm::vec3(-0.5f*m_surface.scale().x, -0.5f*m_surface.scale().y, 12));
             }
             break;
 
         case TypeActiveBuilding:
             {
                 const int dType = m_file.value("dtyp").toInt();
-                if (!types.contains(dType)) {
+                if (types.find(dType) == types.end()) {
                     qDebug() << "Unhandled dtype" << dType;
                     continue;
                 }
 
-                object = new Object(this, types.value(dType), 16);
+                object = new Object(this, types[dType], 16);
                 object->setPosition(getPosition());
             }
             break;
@@ -225,8 +221,8 @@ Scenario::Scenario(const QString &name, std::function<void()> &&funcSuccess) :
                 entry.condSignal = new Condition(9); // TODO: Fix memory leak
                 for (int i = 0; i < 9; i++)
                 {
-                    Trash *trash = new Trash(this, m_effectManager->getBillboard(Trash::trashCollection[i]), pos);
-                    m_objects << trash;
+                    Trash *trash = new Trash(this, m_effectManager.getBillboard(Trash::trashCollection[i]), pos);
+                    m_objects.push_back(trash);
                     if (entry.condTrigger != NULL)
                     {
                         trash->disable();
@@ -242,12 +238,12 @@ Scenario::Scenario(const QString &name, std::function<void()> &&funcSuccess) :
             {
                 if (m_file.value("pz").toInt() != 0)
                     qDebug() << "Unexpected space parameter";
-                ConditionSpace *space = new ConditionSpace(m_file.value("px").toInt()*m_surface->scale().x,
-                                                           m_file.value("py").toInt()*m_surface->scale().y,
-                                                           m_file.value("dimx").toInt()*m_surface->scale().x,
-                                                           m_file.value("dimy").toInt()*m_surface->scale().y,
-                                                           m_file.value("minz").toInt()*m_surface->scale().z,
-                                                           m_file.value("maxz").toInt()*m_surface->scale().z);
+                ConditionSpace *space = new ConditionSpace(m_file.value("px").toInt()*m_surface.scale().x,
+                                                           m_file.value("py").toInt()*m_surface.scale().y,
+                                                           m_file.value("dimx").toInt()*m_surface.scale().x,
+                                                           m_file.value("dimy").toInt()*m_surface.scale().y,
+                                                           m_file.value("minz").toInt()*m_surface.scale().z,
+                                                           m_file.value("maxz").toInt()*m_surface.scale().z);
                 if (entry.cond1 != 0 || entry.del != 0)
                     entry.condTrigger = space->condEnable();
                 else
@@ -263,7 +259,7 @@ Scenario::Scenario(const QString &name, std::function<void()> &&funcSuccess) :
 
         if (object != NULL)
         {
-            m_objects << object;
+            m_objects.push_back(object);
             if (entry.cond1 != 0 || entry.del != 0)
                 object->disable();
             entry.condTrigger = object->condEnable();
@@ -394,9 +390,6 @@ Scenario::Scenario(const QString &name, std::function<void()> &&funcSuccess) :
 
 Scenario::~Scenario()
 {
-    delete m_surface;
-    delete m_collisionManager;
-    delete m_effectManager;
     qDeleteAll(m_objects);
     qDeleteAll(m_condSpaces);
 }
@@ -418,9 +411,9 @@ void Scenario::draw()
     if (m_position != prevPos)
     {
         glm::vec3 pos, normal;
-        if (m_surface->testCollision(prevPos, m_position, 1.5f, pos, normal))
+        if (m_surface.testCollision(prevPos, m_position, 1.5f, pos, normal))
             m_position = pos;
-        Object *collision = m_collisionManager->testCollision(prevPos, m_position, 1.5f, pos, normal);
+        Object *collision = m_collisionManager.testCollision(prevPos, m_position, 1.5f, pos, normal);
         if (collision)
         {
             if (collision->type() == TrashObject)
@@ -431,7 +424,7 @@ void Scenario::draw()
 
     ConditionManager::update();
 
-    float height = m_surface->heightAt(m_position.x, m_position.y);
+    float height = m_surface.heightAt(m_position.x, m_position.y);
     foreach (ConditionSpace *space, m_condSpaces)
         space->test(m_position.x, m_position.y, m_position.z - height);
 
@@ -439,7 +432,7 @@ void Scenario::draw()
         if (object->isEnabled())
             object->update();
 
-    m_effectManager->update();
+    m_effectManager.update();
 
 
     glEnable(GL_CULL_FACE);
@@ -483,7 +476,7 @@ void Scenario::draw()
 
     glEnable(GL_LIGHT0);
 
-    if (m_lightSources.count() > 0)
+    if (m_lightSources.size() > 0)
     {
         Object *object = m_lightSources[0];
 
@@ -510,13 +503,13 @@ void Scenario::draw()
     glFogf(GL_FOG_END, 200.0);
 
     dir = -glm::vec3(glm::row(m_cameraMatrix, 2));
-    m_surface->draw(m_position, dir);
+    m_surface.draw(m_position, dir);
 
     foreach (Object *object, m_objects)
         if (object->isEnabled())
             object->draw();
 
-    m_effectManager->draw();
+    m_effectManager.draw();
 }
 
 
@@ -545,7 +538,7 @@ void Scenario::keyPressEvent(QKeyEvent *e)
     if (e->key() == Qt::Key_Space)
     {
         glm::vec3 dir = -glm::vec3(glm::row(m_cameraMatrix, 2));
-        m_effectManager->addProjectile(Shoot_Vendetta, m_position, dir);
+        m_effectManager.addProjectile(Shoot_Vendetta, m_position, dir);
     }
 }
 
@@ -571,15 +564,16 @@ void Scenario::keyReleaseEvent(QKeyEvent *e)
 }
 
 
-glm::vec3 Scenario::getPosition() const
+glm::vec3 Scenario::getPosition()
 {
     glm::vec3 pos;
     pos.x = m_file.value("px").toInt() + 0.5f;
     pos.y = m_file.value("py").toInt() + 0.5f;
     pos.z = m_file.value("pz").toInt() + m_file.value("hei").toInt();
 
-    pos *= m_surface->scale();
-    pos.z += m_surface->heightAt(pos.x, pos.y);
+    pos *= m_surface.scale();
+    m_surface.heightAt(pos.x, pos.y);
+    pos.z += m_surface.heightAt(pos.x, pos.y);
 
     return pos;
 }

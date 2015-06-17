@@ -16,50 +16,60 @@
  ***************************************************************************/
 
 #include "turret.h"
-#include "txt/desfile.h"
-#include <QGLContext>
+#include "scenario.h"
 
 
 namespace fight {
 
 
-Turret::Turret(ModuleManager &modMan, const QString &name)
+Turret::Turret(Scenario *scenario, const QString &name) :
+    Object(scenario, name),
+    m_armLeft(nullptr),
+    m_armRight(nullptr)
 {
     txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
     file.setSection("cluster");
-    m_body = modMan.get(file.value("body").toString());
+    m_base = scenario->moduleManager().get(file.value("body").toString());
 
-    m_armLeft = modMan.get(file.value("arml").toString());
-    m_armLeftPosition.x = file.value("ArmLOffsetX").toFloat();
-    m_armLeftPosition.y = file.value("ArmLOffsetY").toFloat();
-    m_armLeftPosition.z = file.value("ArmLOffsetZ").toFloat();
+    if (file.contains("arml") && file.value("arml") != "no")
+    {
+        m_armLeft = scenario->moduleManager().get(file.value("arml").toString());
+        m_armLeftPosition.x = file.value("ArmLOffsetX").toFloat();
+        m_armLeftPosition.y = file.value("ArmLOffsetY").toFloat();
+        m_armLeftPosition.z = file.value("ArmLOffsetZ").toFloat();
+    }
 
-    m_armRight = modMan.get(file.value("armr").toString());
-    m_armRightPosition.x = file.value("ArmROffsetX").toFloat();
-    m_armRightPosition.y = file.value("ArmROffsetY").toFloat();
-    m_armRightPosition.z = file.value("ArmROffsetZ").toFloat();
-
-    file.setSection("size");
-    m_scale = file.value("scale").toFloat() / 16;
+    if (file.contains("armr") && file.value("armr") != "no")
+    {
+        m_armRight = scenario->moduleManager().get(file.value("armr").toString());
+        m_armRightPosition.x = file.value("ArmROffsetX").toFloat();
+        m_armRightPosition.y = file.value("ArmROffsetY").toFloat();
+        m_armRightPosition.z = file.value("ArmROffsetZ").toFloat();
+    }
 }
 
 
 void Turret::draw()
 {
-    glPushMatrix();
-    m_body.draw();
+    glTranslatef(m_position.x, m_position.y, m_position.z);
+    //glScalef(m_scale, m_scale, m_scale);
+    m_base->draw();
 
-    glPushMatrix();
-    glTranslatef(m_armLeftPosition.x, m_armLeftPosition.y, m_armLeftPosition.z);
-    m_armLeft.draw();
-    glPopMatrix();
+    if (m_armLeft != nullptr)
+    {
+        glPushMatrix();
+        glTranslatef(m_armLeftPosition.x, m_armLeftPosition.y, m_armLeftPosition.z);
+        m_armLeft->draw();
+        glPopMatrix();
+    }
 
-    glPushMatrix();
-    glTranslatef(m_armRightPosition.x, m_armRightPosition.y, m_armRightPosition.z);
-    m_armRight.draw();
-    glPopMatrix();
-
-    glPopMatrix();
+    if (m_armRight != nullptr)
+    {
+        glPushMatrix();
+        glTranslatef(m_armRightPosition.x, m_armRightPosition.y, m_armRightPosition.z);
+        m_armRight->draw();
+        glPopMatrix();
+    }
 }
 
 

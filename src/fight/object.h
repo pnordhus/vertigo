@@ -20,17 +20,19 @@
 
 
 #include <QGLContext>
-#include "modulemanager.h"
-#include "scenario.h"
+#include <QTime>
 #include "boundingbox.h"
 #include "condition.h"
+#include "collisionmanager.h"
+#include "modulemanager.h"
+#include "txt/desfile.h"
+#include <memory>
 
 
 namespace fight {
 
 
 class Scenario;
-class CollisionCache;
 
 
 enum ObjectType
@@ -46,7 +48,6 @@ class Object
 public:
     Object(Scenario *scenario);
     Object(Scenario *scenario, const QString &name, float scale = 1/32.0f);
-    ~Object();
 
 public:
     void setEnabled(bool);
@@ -59,7 +60,7 @@ public:
     ObjectType type() const { return m_type; }
     const BoundingBox& box() const { return m_box; }
     bool isStatic() const { return m_static; }
-    CollisionCache *collisionCache() const { return m_collisionCache; }
+    CollisionCache *collisionCache() const { return m_collisionCache.get(); }
     void setCollisionCache(CollisionCache *cache);
 
     Condition* condEnable() { return &m_condEnable; }
@@ -80,14 +81,14 @@ protected:
     Scenario *m_scenario;
 
     bool m_enabled;
-    Module m_base;
+    Module *m_base;
     float m_scale;
     glm::vec3 m_position;
 
     ObjectType m_type;
     BoundingBox m_box;
     bool m_static;
-    CollisionCache *m_collisionCache;
+    std::unique_ptr<CollisionCache> m_collisionCache;
 
     ConditionEnable m_condEnable;
     ConditionEvent m_eventDestroy;
@@ -100,9 +101,6 @@ protected:
 private:
     Object(const Object& x) : m_condEnable(this) { }
 };
-
-
-static bool updateObject(Object &o) { return o.update(); }
 
 
 } // namespace fight

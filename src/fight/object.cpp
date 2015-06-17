@@ -16,6 +16,7 @@
  ***************************************************************************/
 
 #include "object.h"
+#include "scenario.h"
 
 
 namespace fight {
@@ -26,7 +27,6 @@ Object::Object(Scenario *scenario) :
     m_enabled(true),
     m_type(UnknownObject),
     m_static(true),
-    m_collisionCache(NULL),
     m_condEnable(this)
 {
 }
@@ -37,7 +37,6 @@ Object::Object(Scenario *scenario, const QString &name, float scale) :
     m_enabled(true),
     m_type(UnknownObject),
     m_static(true),
-    m_collisionCache(NULL),
     m_condEnable(this)
 {
     txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
@@ -46,12 +45,6 @@ Object::Object(Scenario *scenario, const QString &name, float scale) :
 
     file.setSection("size");
     m_scale = file.value("scale").toFloat() * scale;
-}
-
-
-Object::~Object()
-{
-    delete m_collisionCache;
 }
 
 
@@ -75,7 +68,7 @@ void Object::disable()
 
 void Object::setCollisionCache(CollisionCache *cache)
 {
-    m_collisionCache = cache;
+    m_collisionCache.reset(cache);
 }
 
 
@@ -96,7 +89,7 @@ void Object::draw()
     glPushMatrix();
     glTranslatef(m_position.x, m_position.y, m_position.z);
     glScalef(m_scale, m_scale, m_scale);
-    m_base.draw();
+    m_base->draw();
     glPopMatrix();
 }
 

@@ -17,9 +17,7 @@
 
 #include "trash.h"
 #include "billboard.h"
-#include "effectmanager.h"
-#include "../collisionmanager.h"
-#include "../surface/surface.h"
+#include "../scenario.h"
 
 #include <glm/gtx/norm.hpp>
 
@@ -31,10 +29,10 @@ Trash::Trash(Scenario *scenario, Billboard *billboard, const glm::vec3 &position
     Effect(scenario, billboard, static_cast<float>(qrand()%360), 1)
 {
     m_type = TrashObject;
-    m_scenario->collisionManager()->addObject(this);
+    m_scenario->collisionManager().addObject(this);
 
     glm::vec3 pos = position + glm::vec3(qrand()%50 - 25, qrand()%50 - 25, qrand()%25 - 25);
-    float height = m_scenario->surface()->heightAt(pos.x, pos.y) + 2;
+    float height = m_scenario->surface().heightAt(pos.x, pos.y) + 2;
     if (pos.z < height)
         pos.z = height;
     Object::setPosition(pos);
@@ -52,7 +50,7 @@ bool Trash::intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius
 
 void Trash::destroy()
 {
-    m_scenario->effectManager()->addEffect(Explosion_5, m_position, 0, glm::length2(m_box.dim()) > 15 ? 2 : 1);
+    m_scenario->effectManager().addEffect(Explosion_5, m_position, 0, glm::length2(m_box.dim()) > 15 ? 2 : 1);
     Object::destroy();
 }
 

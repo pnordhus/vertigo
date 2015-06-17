@@ -20,10 +20,10 @@
 
 
 #include <QTime>
-#include "txt/desfile.h"
-#include "game/renderer.h"
 #include "object.h"
-#include "condition.h"
+#include "game/renderer.h"
+#include "surface/surface.h"
+#include "effects/effectmanager.h"
 
 #include <functional>
 
@@ -32,8 +32,6 @@ namespace fight {
 
 class Object;
 class Surface;
-class EffectManager;
-class CollisionManager;
 
 
 class Scenario : public game::Renderer
@@ -45,11 +43,11 @@ public:
 public:
     const glm::vec3& position() const { return m_position; }
     const glm::mat4& cameraMatrixInverted() const { return m_cameraMatrixInverted; }
-    Surface *surface() const { return m_surface; }
+    Surface& surface() { return m_surface; }
     gfx::TextureManager& textureManager() { return m_textureManager; }
     ModuleManager& moduleManager() { return m_moduleManager; }
-    EffectManager* effectManager() { return m_effectManager; }
-    CollisionManager* collisionManager() { return m_collisionManager; }
+    EffectManager& effectManager() { return m_effectManager; }
+    CollisionManager& collisionManager() { return m_collisionManager; }
 
 protected:
     void draw();
@@ -57,7 +55,7 @@ protected:
     void keyReleaseEvent(QKeyEvent *);
 
 private:
-    glm::vec3 getPosition() const;
+    glm::vec3 getPosition();
 
 private:
     enum Type
@@ -77,15 +75,17 @@ private:
         TypeActiveBuilding = 2062,
     };
 
-    Surface *m_surface;
     glm::vec3 m_position;
     txt::DesFile m_file;
+
+    Surface m_surface;
     gfx::TextureManager m_textureManager;
     ModuleManager m_moduleManager;
-    EffectManager *m_effectManager;
-    CollisionManager *m_collisionManager;
-    QList<Object*> m_objects;
-    QList<Object*> m_lightSources;
+    EffectManager m_effectManager;
+    CollisionManager m_collisionManager;
+
+    std::vector<Object*> m_objects;
+    std::vector<Object*> m_lightSources;
 
     QTime m_time;
 

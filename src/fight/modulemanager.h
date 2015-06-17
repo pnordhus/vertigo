@@ -32,11 +32,11 @@ public:
     ModuleManager(gfx::TextureManager &texMan);
 
 public:
-    Module get(const QString &name);
+    Module* get(const QString &name);
 
 private:
     gfx::TextureManager &m_textureManager;
-    QMap<QString, Module> m_modules;
+    std::map<QString, Module> m_modules;
 };
 
 

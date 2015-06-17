@@ -27,10 +27,12 @@
 namespace fight {
 
 
-class ModulePrivate : public QSharedData
+class Module
 {
 public:
-    void load(gfx::TextureManager &texMan, const QString &name);
+    Module(gfx::TextureManager &texMan, const QString &name);
+
+public:
     void draw();
     const BoundingBox& box() const { return m_box; }
     bool intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal);
@@ -38,6 +40,7 @@ public:
 private:
     struct Mesh
     {
+        gfx::Texture texture;
         std::vector<glm::vec3> vertices;
         //std::vector<glm::vec3> normals;
         std::vector<glm::vec2> texCoords;
@@ -45,52 +48,9 @@ private:
     };
 
     BoundingBox m_box;
-    QList<gfx::Texture> m_textures;
-    QList<Mesh> m_meshes;
+    std::list<Mesh> m_meshes;
     CollisionMesh m_collisionMesh;
 };
-
-
-class Module
-{
-public:
-    Module();
-    Module(gfx::TextureManager &texMan, const QString &name);
-
-public:
-    void draw();
-    const BoundingBox& box() const { return d->box(); }
-    bool intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal);
-
-private:
-    QExplicitlySharedDataPointer<ModulePrivate> d;
-};
-
-
-inline Module::Module() :
-    d(new ModulePrivate)
-{
-
-}
-
-
-inline Module::Module(gfx::TextureManager &texMan, const QString &name) :
-    d(new ModulePrivate)
-{
-    d->load(texMan, name);
-}
-
-
-inline void Module::draw()
-{
-    d->draw();
-}
-
-
-inline bool Module::intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal)
-{
-    return d->intersect(start, dir, radius, distance, normal);
-}
 
 
 } // namespace fight

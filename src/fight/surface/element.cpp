@@ -23,7 +23,7 @@
 namespace fight {
 
 
-Element::Element(Surface *surface, QRect rect) :
+Element::Element(Surface *surface, const QRect &rect) :
     m_surface(surface),
     m_rect(rect),
     m_maxZ(-1e3),
@@ -41,9 +41,9 @@ int Element::numVertices(int textureId)
 
 void Element::addVertex(int textureId, const glm::vec3 &position, const glm::vec3 &normal, const glm::vec2 &texCoords)
 {
-	m_subsets[textureId].vertices.emplace_back(position.x, position.y, position.z);
-    m_subsets[textureId].normals.emplace_back(normal.x, normal.y, normal.z);
-    m_subsets[textureId].texCoords.emplace_back(texCoords.x, texCoords.y);
+	m_subsets[textureId].vertices.push_back(position);
+    m_subsets[textureId].normals.push_back(normal);
+    m_subsets[textureId].texCoords.push_back(texCoords);
     if (m_maxZ < position.z)
         m_maxZ = position.z;
     if (m_minZ > position.z)
@@ -101,7 +101,7 @@ void Element::draw()
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
 
-    for (auto pair : m_subsets)
+    for (auto &pair : m_subsets)
     {
         const ElementSubset &subset = pair.second;
         m_surface->bindTexture(pair.first);

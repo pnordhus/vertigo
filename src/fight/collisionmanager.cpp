@@ -30,19 +30,18 @@ CollisionCache::CollisionCache()
 
 void CollisionCache::addObject(Object *object, bool collision, const glm::vec3 &position, const glm::vec3 &normal)
 {
-    CacheEntry entry;
+    m_entries.emplace_back();
+    CacheEntry &entry = m_entries.back();
     entry.object = object;
     entry.collision = collision;
     entry.position = position;
     entry.normal = normal;
-    m_entries << entry;
 }
 
 
 bool CollisionCache::testObject(Object *object, bool &collision, glm::vec3 &position, glm::vec3 &normal)
 {
-    foreach (const CacheEntry &entry, m_entries)
-    {
+    for (const CacheEntry &entry :  m_entries)
         if (entry.object == object)
         {
             collision = entry.collision;
@@ -50,7 +49,6 @@ bool CollisionCache::testObject(Object *object, bool &collision, glm::vec3 &posi
             normal = entry.normal;
             return true;
         }
-    }
     return false;
 }
 
@@ -62,7 +60,7 @@ CollisionManager::CollisionManager()
 
 void CollisionManager::addObject(Object *object)
 {
-    m_objects << object;
+    m_objects.push_back(object);
 }
 
 
@@ -73,7 +71,7 @@ Object* CollisionManager::testCollision(const glm::vec3 &start, const glm::vec3 
     dir /= distance;
 
     Object *collisionObject = NULL;
-    foreach (Object *object, m_objects)
+    for (Object *object : m_objects)
         if (object->isEnabled() && object->box().test(end, radius))
         {
             bool collision = false;
@@ -104,7 +102,7 @@ Object* CollisionManager::testCollision(Object *cacheObject, const glm::vec3 &en
     dir /= distance;
 
     Object *collisionObject = NULL;
-    foreach (Object *object, m_objects)
+    for (Object *object : m_objects)
         if (object->isEnabled() && object->box().test(end, radius))
         {
             bool collision = false;

@@ -35,8 +35,8 @@ public:
 
 private:
     int m_num;
-    Module m_state0;
-    Module m_state1;
+    Module *m_state0;
+    Module *m_state1;
     int m_state;
     QTime m_time;
 };

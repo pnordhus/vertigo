@@ -28,14 +28,14 @@ ModuleManager::ModuleManager(gfx::TextureManager &texMan) :
 }
 
 
-Module ModuleManager::get(const QString &name)
+Module* ModuleManager::get(const QString &name)
 {
-    if (m_modules.contains(name))
-        return m_modules.value(name);
-
-    Module module(m_textureManager, "vfx:module/" + name);
-    m_modules.insert(name, module);
-    return module;
+    auto it = m_modules.find(name);
+    if (it != m_modules.end())
+        return &it->second;
+    return &m_modules.emplace(std::piecewise_construct,
+        std::forward_as_tuple(name),
+        std::forward_as_tuple(m_textureManager, "vfx:module/" + name)).first->second;
 }
 
 

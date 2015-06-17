@@ -76,11 +76,11 @@ void Tesselator::InitIndices(int MaxLevel)
 }
 
 
-void Tesselator::PrepareElementSubset(int level, const glm::vec3 &scale, int x, int y, int textureId, const glm::vec2 &t0, const glm::vec2 &tu, const glm::vec2 &tv, Element *element)
+void Tesselator::PrepareElementSubset(Element &element, int level, const glm::vec3 &scale, int x, int y, int textureId, const glm::vec2 &t0, const glm::vec2 &tu, const glm::vec2 &tv)
 {
 	int i, j, k, l;
 
-	k = element->numVertices(textureId);
+	k = element.numVertices(textureId);
 
     BetaSpline &spline = m_splines[level];
 	spline.InitFrame(x, y);
@@ -93,7 +93,7 @@ void Tesselator::PrepareElementSubset(int level, const glm::vec3 &scale, int x, 
 	glm::vec3 o = spline.Beta_3_3(u, v);
 	glm::vec3 t, b;
 	spline.Beta_TB(u, v, t, b);
-    element->addVertex(textureId, (o + trans)*scale, glm::cross(t, b), t0 + tu*(u*dt) + tv*(v*dt));
+    element.addVertex(textureId, (o + trans)*scale, glm::cross(t, b), t0 + tu*(u*dt) + tv*(v*dt));
     float z = o.z;
 
 	l = 2;
@@ -109,7 +109,7 @@ void Tesselator::PrepareElementSubset(int level, const glm::vec3 &scale, int x, 
 			{
 				o = spline.Beta_3_3(u, v);
 				spline.Beta_TB(u, v, t, b);
-                element->addVertex(textureId, (o + trans)*scale, glm::cross(t, b), t0 + tu*(u*dt) + tv*(v*dt));
+                element.addVertex(textureId, (o + trans)*scale, glm::cross(t, b), t0 + tu*(u*dt) + tv*(v*dt));
 			}
 			int tmp = du;
 			du = -dv;
@@ -119,7 +119,7 @@ void Tesselator::PrepareElementSubset(int level, const glm::vec3 &scale, int x, 
 	}
 
 	for (i = 0; i < 4*(level - 1)*(level - 1); i++)
-        element->addTriangle(textureId, k + indices[i*3 + 0], k + indices[i*3 + 2], k + indices[i*3 + 1]);
+        element.addTriangle(textureId, k + indices[i*3 + 0], k + indices[i*3 + 2], k + indices[i*3 + 1]);
 }
 
 
@@ -212,12 +212,10 @@ bool Tesselator::intersect(const glm::vec3 &start, const glm::vec3 &end, float r
 }
 
 
-Element* Tesselator::tesselate(QRect rect, int level, const glm::vec3 &scale, QByteArray &textureMap, QByteArray &textureDir, int mapping)
+void Tesselator::tesselate(Element &element, int level, const glm::vec3 &scale, QByteArray &textureMap, QByteArray &textureDir, int mapping)
 {
-    Element* element = new Element(m_surface, rect);
-
-    for (int y = rect.y(); y <= rect.bottom(); y++) {
-        for (int x = rect.x(); x <= rect.right(); x++) {
+    for (int y = element.rect().y(); y <= element.rect().bottom(); y++) {
+        for (int x = element.rect().x(); x <= element.rect().right(); x++) {
             const int x1 = ((y & 0xff) << 8) + (x & 0xff);
 
             const quint8 m = textureMap[x1];
@@ -269,11 +267,9 @@ Element* Tesselator::tesselate(QRect rect, int level, const glm::vec3 &scale, QB
                 texCoords.pop_front();
             }
 
-            PrepareElementSubset(level, scale, x, y, texture, texCoords[1], texCoords[0] - texCoords[1], texCoords[2] - texCoords[1], element);
+            PrepareElementSubset(element, level, scale, x, y, texture, texCoords[1], texCoords[0] - texCoords[1], texCoords[2] - texCoords[1]);
         }
     }
-
-    return element;
 }
 
 
