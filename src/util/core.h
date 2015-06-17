@@ -1,5 +1,5 @@
 /***************************************************************************
- *  Copyright (C) 2010  Philipp Nordhus                                    *
+ *  Copyright (C) 2015  Philipp Nordhus                                    *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
  *  it under the terms of the GNU General Public License as published by   *
@@ -15,36 +15,18 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef SFX_STREAM_H
-#define SFX_STREAM_H
+#ifndef UTIL_CORE_H
+#define UTIL_CORE_H
 
-#include "util/core.h"
+namespace util {
 
-#include <vector>
-
-namespace sfx {
-
-class Stream : util::no_copy
+struct no_copy
 {
-public:
-    Stream();
-    ~Stream();
-
-public:
-    void add(const std::vector<char> &data);
-    void play();
-    void pause();
-    bool isPlaying() const;
-    int queued() const;
-    int processed() const;
-
-private:
-    void clearBuffers();
-
-private:
-    unsigned int m_source;
+    no_copy() = default;
+    no_copy(const no_copy&) = delete;
+    no_copy& operator = (const no_copy&) = delete;
 };
 
-} // namespace sfx
+} // namespace util
 
-#endif // SFX_STREAM_H
+#endif // UTIL_CORE_H

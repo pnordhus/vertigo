@@ -151,6 +151,7 @@ set(SOURCES
     ui/widget.cpp
     ui/widget.h
 
+    util/core.h
     util/error.cpp
     util/error.h
     util/file.cpp

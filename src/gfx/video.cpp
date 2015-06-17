@@ -178,10 +178,11 @@ Image Video::getFrame()
     return QImage();
 }
 
-QByteArray Video::getAudio()
+std::vector<char> Video::getAudio()
 {
-    if (!m_playing)
-        return QByteArray();
+    if (!m_playing) {
+        return std::vector<char>();
+    }
 
     const std::uint32_t lastAudioPos = m_lastAudioPos;
     m_lastAudioPos = m_audioPos;
@@ -189,8 +190,7 @@ QByteArray Video::getAudio()
     bool gotAudioLeft = false;
     bool gotAudioRight = false;
 
-    QByteArray data;
-    data.resize(22050 * 2);
+    std::vector<char> data(22050 * 2);
 
     while (m_audioPos < m_entries.size() && (!gotAudioLeft || !gotAudioRight)) {
         const Entry &entry = m_entries[m_audioPos++];
@@ -239,14 +239,14 @@ QByteArray Video::getAudio()
         return data;
     }
 
-    return QByteArray();
+    return std::vector<char>();
 }
 
-void Video::mergeChannel(QByteArray &data, std::size_t size, int channelIndex)
+void Video::mergeChannel(std::vector<char> &data, std::size_t size, int channelIndex)
 {
     ASSERT(data.size() >= 2 * size);
     for (std::size_t i = 0; i < size; ++i) {
-        data.data()[i * 2 + channelIndex] = m_file.getChar() + 0x80;
+        data[i * 2 + channelIndex] = m_file.getChar() + 0x80;
     }
 }
 

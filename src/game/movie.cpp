@@ -65,8 +65,8 @@ void Movie::draw()
     } else {
         if (!m_pause) {
             if (m_stream.queued() < 2 || m_stream.processed() > 0) {
-                const QByteArray audio = m_video.getAudio();
-                if (!audio.isEmpty()) {
+                const std::vector<char> audio = m_video.getAudio();
+                if (!audio.empty()) {
                     m_stream.add(audio);
                     if (!m_stream.isPlaying())
                         m_stream.play();

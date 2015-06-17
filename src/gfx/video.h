@@ -41,14 +41,14 @@ public:
     bool isPlaying() const { return m_playing; }
     void setFrameRate(int frameRate);
     Image getFrame();
-    QByteArray getAudio();
+    std::vector<char> getAudio();
     bool atEnd() const;
     std::uint32_t width() const { return m_width; }
     std::uint32_t height() const { return m_height; }
 
 private:
     void reset();
-    void mergeChannel(QByteArray &data, std::size_t size, int channelIndex);
+    void mergeChannel(std::vector<char> &data, std::size_t size, int channelIndex);
     void loadColorTable(std::size_t size);
     void loadVideoFull(std::size_t size);
     void loadVideoDiff(std::size_t size);
