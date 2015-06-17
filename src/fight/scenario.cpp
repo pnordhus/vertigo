@@ -29,11 +29,9 @@
 #include "conditionmanager.h"
 #include <QGLContext>
 #include <QKeyEvent>
-#include <cmath>
-
-#ifndef GLU_VERSION
-#include <GL/glu.h>
-#endif // GLU_VERSION
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/matrix_access.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 
 namespace fight {
@@ -53,7 +51,7 @@ Scenario::Scenario(const QString &name, std::function<void()> &&funcSuccess) :
 {
     m_effectManager = new EffectManager(this);
     m_collisionManager = new CollisionManager();
-
+    
     qsrand(name.right(4).toInt());
 
     hideCursor();
@@ -410,8 +408,8 @@ Scenario::Scenario(const QString &name, std::function<void()> &&funcSuccess) :
     }
 
 
-    m_cameraMatrix.rotate(initialDir, 0, 1, 0);
-    m_cameraMatrix.rotate(-90, 1, 0, 0);
+    m_cameraMatrix = glm::rotate(m_cameraMatrix, glm::radians(initialDir), glm::vec3(0, 1, 0));
+    m_cameraMatrix = glm::rotate(m_cameraMatrix, glm::radians(-90.0f), glm::vec3(1, 0, 0));
 
     m_time.restart();
     qsrand(QTime::currentTime().second() * 1000 + QTime::currentTime().msec());
@@ -433,13 +431,13 @@ void Scenario::draw()
     const float angleY = (m_right - m_left) * 2.0f;
     const float angleX = (m_up - m_down) * 2.0f;
 
-    m_cameraMatrix.rotate(angleX, m_cameraMatrix.row(0).toVector3D());
-    m_cameraMatrix.rotate(angleY, QVector3D(0, 0, 1));
-    m_cameraMatrixInverted = m_cameraMatrix.inverted();
+    m_cameraMatrix = glm::rotate(m_cameraMatrix, glm::radians(angleX), glm::vec3(glm::row(m_cameraMatrix, 0)));
+    m_cameraMatrix = glm::rotate(m_cameraMatrix, glm::radians(angleY), glm::vec3(0, 0, 1));
+    m_cameraMatrixInverted = glm::inverse(m_cameraMatrix);
 
     glm::vec3 prevPos = m_position;
-    QVector3D dir = m_cameraMatrix.row(2).toVector3D();
-    m_position += glm::vec3(dir.x(), dir.y(), dir.z()) * (m_backwards - m_forwards) * 5.0f;
+    glm::vec3 dir = glm::vec3(glm::row(m_cameraMatrix, 2));
+    m_position += dir * (m_backwards - m_forwards) * 5.0f;
 
     if (m_position != prevPos)
     {
@@ -477,11 +475,10 @@ void Scenario::draw()
     glEnable(GL_DEPTH_TEST);
 
     glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPerspective(60, float(rect().width()) / rect().height(), 0.1f, 10000.0f);
+    glLoadMatrixf(glm::value_ptr(glm::perspective(glm::radians(60.0f), float(rect().width()) / rect().height(), 0.1f, 10000.0f)));
 
     glMatrixMode(GL_MODELVIEW);
-    glLoadMatrixd(m_cameraMatrix.data());
+    glLoadMatrixf(glm::value_ptr(m_cameraMatrix));
     glTranslatef(-m_position.x, -m_position.y, -m_position.z);
 
     GLfloat global_ambient[] = { 0.5f, 0.5f, 1.0f, 1.0f };
@@ -539,8 +536,8 @@ void Scenario::draw()
     glFogf(GL_FOG_START, 100.0);
     glFogf(GL_FOG_END, 200.0);
 
-    dir = -m_cameraMatrix.row(2).toVector3D();
-    m_surface->draw(m_position, glm::vec3(dir.x(), dir.y(), dir.z()));
+    dir = -glm::vec3(glm::row(m_cameraMatrix, 2));
+    m_surface->draw(m_position, dir);
 
     foreach (Object *object, m_objects)
         if (object->isEnabled())
@@ -574,8 +571,8 @@ void Scenario::keyPressEvent(QKeyEvent *e)
 
     if (e->key() == Qt::Key_Space)
     {
-        QVector3D dir = -m_cameraMatrix.row(2).toVector3D();
-        m_effectManager->addProjectile(Shoot_Vendetta, m_position, glm::vec3(dir.x(), dir.y(), dir.z()));
+        glm::vec3 dir = -glm::vec3(glm::row(m_cameraMatrix, 2));
+        m_effectManager->addProjectile(Shoot_Vendetta, m_position, dir);
     }
 }
 

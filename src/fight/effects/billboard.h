@@ -31,7 +31,7 @@ public:
     Billboard(gfx::TextureManager &texMan, txt::DesFile &name, int index);
 
 public:
-    void draw(const glm::vec3 &position, float angle, float scale, int time, const QMatrix4x4 &cameraMatrixInverted);
+    void draw(const glm::vec3 &position, float angle, float scale, int time, const glm::mat4 &cameraMatrixInverted);
 
     BoundingBox box();
     bool intersect(const glm::vec3 &start, const glm::vec3 &dir, float &distance);

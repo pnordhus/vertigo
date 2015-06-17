@@ -44,7 +44,7 @@ public:
 
 public:
     const glm::vec3& position() const { return m_position; }
-    const QMatrix4x4& cameraMatrixInverted() const { return m_cameraMatrixInverted; }
+    const glm::mat4& cameraMatrixInverted() const { return m_cameraMatrixInverted; }
     Surface *surface() const { return m_surface; }
     gfx::TextureManager& textureManager() { return m_textureManager; }
     ModuleManager& moduleManager() { return m_moduleManager; }
@@ -96,8 +96,8 @@ private:
     float m_forwards;
     float m_backwards;
 
-    QMatrix4x4 m_cameraMatrix;
-    QMatrix4x4 m_cameraMatrixInverted;
+    glm::mat4 m_cameraMatrix;
+    glm::mat4 m_cameraMatrixInverted;
 
     struct ConditionEntry
     {

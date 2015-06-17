@@ -18,6 +18,7 @@
 #include "billboard.h"
 #include "../collisionmesh.h"
 
+#include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/norm.hpp>
 
 namespace fight {
@@ -122,7 +123,7 @@ Billboard::Billboard(gfx::TextureManager &texMan, txt::DesFile &file, int index)
 
 
 
-void Billboard::draw(const glm::vec3 &position, float angle, float scale, int time, const QMatrix4x4 &cameraMatrixInverted)
+void Billboard::draw(const glm::vec3 &position, float angle, float scale, int time, const glm::mat4 &cameraMatrixInverted)
 {
     int currentStage = time/m_displayTime%m_stages.count();
 
@@ -135,7 +136,7 @@ void Billboard::draw(const glm::vec3 &position, float angle, float scale, int ti
 
     glPushMatrix();
     glTranslatef(position.x, position.y, position.z);
-    glMultMatrixd(cameraMatrixInverted.data());
+    glMultMatrixf(glm::value_ptr(cameraMatrixInverted));
     glScalef(m_scale*scale, m_scale*scale, 1);
     glRotatef(angle, 0, 0, 1);
     glScalef(m_stages[currentStage].scale.x, m_stages[currentStage].scale.y, 1);
