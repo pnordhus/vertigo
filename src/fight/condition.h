@@ -51,7 +51,7 @@ class Condition : public ConditionEvent
     friend class ConditionEvent;
 
 public:
-    Condition(int limit = 0);
+    Condition(Scenario *scenario, int limit = 0);
 
 public:
     void setLimit(int limit);
@@ -63,6 +63,7 @@ public:
 public:
 
 protected:
+    Scenario *m_scenario;
     int m_current;
     int m_limit;
     int m_delay;
@@ -76,9 +77,6 @@ public:
 
 public:
     void complete();
-
-private:
-    Scenario *m_scenario;
 };
 
 
@@ -98,7 +96,7 @@ private:
 class ConditionEnable : public Condition
 {
 public:
-    ConditionEnable(Object *object);
+    ConditionEnable(Scenario *scenario, Object *object);
 
 public:
     void complete();
@@ -111,7 +109,7 @@ private:
 class ConditionSpace : public ConditionEvent
 {
 public:
-    ConditionSpace(int x, int y, int dimx, int dimy, int minz, int maxz);
+    ConditionSpace(Scenario *scenario, int x, int y, int dimx, int dimy, int minz, int maxz);
 
 public:
     Condition* condEnable() { return &m_condEnable; }

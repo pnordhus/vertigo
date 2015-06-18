@@ -24,6 +24,7 @@
 #include "game/renderer.h"
 #include "surface/surface.h"
 #include "effects/effectmanager.h"
+#include "conditionmanager.h"
 
 #include <functional>
 
@@ -38,7 +39,6 @@ class Scenario : public game::Renderer
 {
 public:
     Scenario(const QString &name, std::function<void()> &&funcSuccess);
-    ~Scenario();
 
 public:
     const glm::vec3& position() const { return m_position; }
@@ -48,6 +48,7 @@ public:
     ModuleManager& moduleManager() { return m_moduleManager; }
     EffectManager& effectManager() { return m_effectManager; }
     CollisionManager& collisionManager() { return m_collisionManager; }
+    ConditionManager& conditionManager() { return m_conditionManager; }
 
 protected:
     void draw();
@@ -83,8 +84,9 @@ private:
     ModuleManager m_moduleManager;
     EffectManager m_effectManager;
     CollisionManager m_collisionManager;
+    ConditionManager m_conditionManager;
 
-    std::vector<Object*> m_objects;
+    std::vector<std::unique_ptr<Object>> m_objects;
     std::vector<Object*> m_lightSources;
 
     QTime m_time;
@@ -99,32 +101,7 @@ private:
     glm::mat4 m_cameraMatrix;
     glm::mat4 m_cameraMatrixInverted;
 
-    struct ConditionEntry
-    {
-        Condition *condTrigger;
-        int cond1;
-        int dep1;
-        int ref1;
-        int op;
-        int cond2;
-        int dep2;
-        int ref2;
-        int del;
-        ConditionEvent *condSignal;
-        ConditionEvent *condAttacked;
-        ConditionEvent *condIdentified;
-        ConditionEvent *condParalyzed;
-        ConditionEvent *condFinished;
-        ConditionEvent *condBoarded;
-    };
-    ConditionAutopilot m_condAutopilot;
-    ConditionFailure m_condFailure;
-    QMap<int, Condition> m_condObjectives;
-    QList<ConditionSpace *> m_condSpaces;
     std::function<void()> m_funcSuccess;
-
-private:
-    void initCondition(const QMap<int, ConditionEntry> &entries, int cond, int dep, int ref, Condition *condDepend);
 };
 
 

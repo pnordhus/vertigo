@@ -99,7 +99,7 @@ protected:
     ConditionEvent m_eventBoard;
 
 private:
-    Object(const Object& x) : m_condEnable(this) { }
+    Object(const Object& x) : m_condEnable(x.m_scenario, this) { }
 };
 
 

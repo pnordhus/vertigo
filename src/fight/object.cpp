@@ -27,7 +27,7 @@ Object::Object(Scenario *scenario) :
     m_enabled(true),
     m_type(UnknownObject),
     m_static(true),
-    m_condEnable(this)
+    m_condEnable(scenario, this)
 {
 }
 
@@ -37,7 +37,7 @@ Object::Object(Scenario *scenario, const QString &name, float scale) :
     m_enabled(true),
     m_type(UnknownObject),
     m_static(true),
-    m_condEnable(this)
+    m_condEnable(scenario, this)
 {
     txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
     file.setSection("cluster");

@@ -39,14 +39,13 @@ namespace fight {
 Scenario::Scenario(const QString &name, std::function<void()> &&funcSuccess) :
     m_moduleManager(m_textureManager),
     m_effectManager(this),
+    m_conditionManager(this),
     m_left(0.0f),
     m_right(0.0f),
     m_up(0.0f),
     m_down(0.0f),
     m_forwards(0.0f),
     m_backwards(0.0f),
-    m_condAutopilot(this),
-    m_condFailure(this),
     m_funcSuccess(std::move(funcSuccess))
 {
     qsrand(name.right(4).toInt());
@@ -75,14 +74,12 @@ Scenario::Scenario(const QString &name, std::function<void()> &&funcSuccess) :
     types[50] = "build5";
     types[67] = "entrobot";
 
-    QMap<int, ConditionEntry> condEntries;
-
     float initialDir = 0.0f;
     foreach (const QString &section, m_file.sections().filter(QRegExp("^movable\\d*"))) {
         m_file.setSection(section);
 
         const int id = m_file.value("id").toInt();
-        ConditionEntry entry;
+        ConditionManager::ConditionEntry &entry = m_conditionManager.addEntry(id);
         entry.cond1 = m_file.value("bccond1").toInt();
         entry.dep1 = m_file.value("bcdep1").toInt();
         entry.ref1 = m_file.value("bcref1").toInt();
@@ -217,19 +214,19 @@ Scenario::Scenario(const QString &name, std::function<void()> &&funcSuccess) :
             {
                 glm::vec3 pos = getPosition();
                 if (entry.cond1 != 0 || entry.del != 0)
-                    entry.condTrigger = new Condition(0); // TODO: Fix memory leak
-                entry.condSignal = new Condition(9); // TODO: Fix memory leak
+                    entry.condTrigger = m_conditionManager.addCondition(0);
+                entry.condSignal = m_conditionManager.addCondition(9);
                 for (int i = 0; i < 9; i++)
                 {
                     Trash *trash = new Trash(this, m_effectManager.getBillboard(Trash::trashCollection[i]), pos);
-                    m_objects.push_back(trash);
+                    m_objects.emplace_back(trash);
                     if (entry.condTrigger != NULL)
                     {
                         trash->disable();
                         trash->condEnable()->setLimit(1);
                         entry.condTrigger->addDependency(trash->condEnable());
                     }
-                    trash->eventDestroy()->addDependency((Condition *)entry.condSignal);
+                    trash->eventDestroy()->addDependency(static_cast<Condition *>(entry.condSignal));
                 }
             }
             break;
@@ -238,18 +235,17 @@ Scenario::Scenario(const QString &name, std::function<void()> &&funcSuccess) :
             {
                 if (m_file.value("pz").toInt() != 0)
                     qDebug() << "Unexpected space parameter";
-                ConditionSpace *space = new ConditionSpace(m_file.value("px").toInt()*m_surface.scale().x,
-                                                           m_file.value("py").toInt()*m_surface.scale().y,
-                                                           m_file.value("dimx").toInt()*m_surface.scale().x,
-                                                           m_file.value("dimy").toInt()*m_surface.scale().y,
-                                                           m_file.value("minz").toInt()*m_surface.scale().z,
-                                                           m_file.value("maxz").toInt()*m_surface.scale().z);
+                ConditionSpace *space = m_conditionManager.addCondSpace(m_file.value("px").toInt()*m_surface.scale().x,
+                                                                        m_file.value("py").toInt()*m_surface.scale().y,
+                                                                        m_file.value("dimx").toInt()*m_surface.scale().x,
+                                                                        m_file.value("dimy").toInt()*m_surface.scale().y,
+                                                                        m_file.value("minz").toInt()*m_surface.scale().z,
+                                                                        m_file.value("maxz").toInt()*m_surface.scale().z);
                 if (entry.cond1 != 0 || entry.del != 0)
                     entry.condTrigger = space->condEnable();
                 else
                     space->condEnable()->complete();
                 entry.condSignal = space;
-                m_condSpaces.append(space);
             }
             break;
 
@@ -259,7 +255,7 @@ Scenario::Scenario(const QString &name, std::function<void()> &&funcSuccess) :
 
         if (object != NULL)
         {
-            m_objects.push_back(object);
+            m_objects.emplace_back(object);
             if (entry.cond1 != 0 || entry.del != 0)
                 object->disable();
             entry.condTrigger = object->condEnable();
@@ -270,114 +266,18 @@ Scenario::Scenario(const QString &name, std::function<void()> &&funcSuccess) :
             entry.condFinished = object->eventFinish();
             entry.condBoarded = object->eventBoard();
         }
-        condEntries.insert(id, entry);
 
         // Reading Objectives
         for (int i = 0; i < 16; i++)
         {
-            const int wccond = m_file.value(QString("wccond%1").arg(i)).toInt();
+            int wccond = m_file.value(QString("wccond%1").arg(i)).toInt();
             if (wccond == 0)
                 continue;
-            ConditionEvent *condSuccess = NULL;
-            ConditionEvent *condFailure = NULL;
-            switch (wccond)
-            {
-            case 1:
-                condSuccess = entry.condTrigger;
-                break;
-            case 2:
-                condSuccess = entry.condSignal;
-                break;
-            case 3:
-                condSuccess = entry.condAttacked;
-                break;
-            case 4:
-                condSuccess = entry.condIdentified;
-                break;
-            case 5:
-                condFailure = entry.condSignal;
-                break;
-            case 6:
-                condSuccess = entry.condParalyzed;
-                condFailure = entry.condSignal;
-                break;
-            case 7:
-                condSuccess = entry.condFinished;
-                condFailure = entry.condSignal;
-                break;
-            case 8:
-                condSuccess = entry.condBoarded;
-                condFailure = entry.condSignal;
-                break;
-            case 9:
-                condSuccess = entry.condSignal;
-                condFailure = entry.condSignal;
-                break;
-            default:
-                qDebug() << "Unhandled objective condition" << id << wccond;
-            }
-            if (condSuccess == NULL && condFailure == NULL)
-                qDebug() << "Unachievable objective" << id << i;
-            if (condSuccess != NULL)
-            {
-                int objective = i*2;
-                if (!m_condObjectives.contains(objective))
-                {
-                    m_condObjectives.insert(objective, Condition(1));
-                    if (objective < 16)
-                    {
-                        m_condObjectives[objective].addDependency(&m_condAutopilot);
-                        m_condAutopilot.setLimit(m_condAutopilot.limit() + 1);
-                    }
-                }
-                else if (wccond == 2 || wccond == 9)
-                    m_condObjectives[objective].setLimit(m_condObjectives[objective].limit() + 1);
-                condSuccess->addDependency(&m_condObjectives[objective]);
-            }
-            if (condFailure != NULL)
-            {
-                int objective = i*2 + 1;
-                if (!m_condObjectives.contains(objective))
-                {
-                    m_condObjectives.insert(objective, Condition(1));
-                    if (objective < 16)
-                        m_condObjectives[objective].addDependency(&m_condFailure);
-                }
-                else if (wccond == 9)
-                    m_condObjectives[objective].setLimit(m_condObjectives[objective].limit() + 1);
-                condFailure->addDependency(&m_condObjectives[objective]);
-                if (wccond == 6 || wccond == 8)
-                {
-                    condSuccess->addDependency(&m_condObjectives[objective], false);
-                    m_condObjectives[objective].setLimit(2);
-                }
-            }
+            m_conditionManager.updateObjective(id, i, wccond);
         }
     }
 
-    // Building Condition dependencies
-    QMapIterator<int, ConditionEntry> it(condEntries);
-    while (it.hasNext())
-    {
-        it.next();
-
-        if (it.value().cond1 == 0 && it.value().cond2 != 0)
-            qDebug() << "Abnormal condition" << it.key();
-        if (it.value().cond1 == 0)
-        {
-            if (it.value().del != 0)
-                ConditionManager::delayComplete(it.value().condTrigger, it.value().del);
-            continue;
-        }
-
-        initCondition(condEntries, it.value().cond1, it.value().dep1, it.value().ref1, it.value().condTrigger);
-        if (it.value().cond2 != 0)
-            initCondition(condEntries, it.value().cond2, it.value().dep2, it.value().ref2, it.value().condTrigger);
-        it.value().condTrigger->setLimit(it.value().cond2 != 0 && it.value().op == 0 ? 2 : 1);
-        if (it.value().op != 0 && it.value().op != 1)
-            qDebug() << "Unhandled condition operation" << it.value().op;
-        it.value().condTrigger->setDelay(it.value().del);
-    }
+    m_conditionManager.buildDependencies();
 
 
     m_cameraMatrix = glm::rotate(m_cameraMatrix, glm::radians(initialDir), glm::vec3(0, 1, 0));
@@ -385,13 +285,6 @@ Scenario::Scenario(const QString &name, std::function<void()> &&funcSuccess) :
 
     m_time.restart();
     qsrand(QTime::currentTime().second() * 1000 + QTime::currentTime().msec());
-}
-
-
-Scenario::~Scenario()
-{
-    qDeleteAll(m_objects);
-    qDeleteAll(m_condSpaces);
 }
 
 
@@ -422,13 +315,12 @@ void Scenario::draw()
         }
     }
 
-    ConditionManager::update();
+    m_conditionManager.update();
 
     float height = m_surface.heightAt(m_position.x, m_position.y);
-    foreach (ConditionSpace *space, m_condSpaces)
-        space->test(m_position.x, m_position.y, m_position.z - height);
+    m_conditionManager.testSpace(m_position.x, m_position.y, m_position.z - height);
 
-    foreach (Object *object, m_objects)
+    for (const auto &object : m_objects)
         if (object->isEnabled())
             object->update();
 
@@ -505,7 +397,7 @@ void Scenario::draw()
     dir = -glm::vec3(glm::row(m_cameraMatrix, 2));
     m_surface.draw(m_position, dir);
 
-    foreach (Object *object, m_objects)
+    for (const auto &object : m_objects)
         if (object->isEnabled())
             object->draw();
 
@@ -576,86 +468,6 @@ glm::vec3 Scenario::getPosition()
     pos.z += m_surface.heightAt(pos.x, pos.y);
 
     return pos;
-}
-
-
-void Scenario::initCondition(const QMap<int, ConditionEntry> &entries, int cond, int dep, int ref, Condition *condDepend)
-{
-    if (cond == 1 || cond == 39)
-    {
-        if (dep != 1)
-            qDebug() << "Unhandled condition dep" << cond << dep;
-        if (!entries.contains(ref))
-            qDebug() << "Condition reference not found" << ref;
-        entries[ref].condSignal->addDependency(condDepend, cond == 1);
-    }
-    if (cond == 2 || cond == 40)
-    {
-        if (dep != 1)
-            qDebug() << "Unhandled condition dep" << cond << dep;
-        if (!entries.contains(ref))
-            qDebug() << "Condition reference not found" << ref;
-        entries[ref].condAttacked->addDependency(condDepend, cond == 2);
-    }
-    if (cond == 3 || cond == 41)
-    {
-        if (dep != 1)
-            qDebug() << "Unhandled condition dep" << cond << dep;
-        if (!entries.contains(ref))
-            qDebug() << "Condition reference not found" << ref;
-        entries[ref].condIdentified->addDependency(condDepend, cond == 3);
-    }
-    if (cond == 4)
-    {
-        if (dep != 0)
-            qDebug() << "Unhandled condition dep" << cond << dep;
-        if (ref != -1)
-            qDebug() << "Unexpected reference" << cond << ref;
-        m_condAutopilot.addDependency(condDepend);
-    }
-    if (cond == 5)
-    {
-        if (dep != 0)
-            qDebug() << "Unhandled condition dep" << cond << dep;
-        if (ref != -1)
-            qDebug() << "Unexpected reference" << cond << ref;
-        m_condFailure.addDependency(condDepend);
-    }
-    if (cond >= 6 && cond <= 37)
-    {
-        int objective = cond - 6;
-        if (!m_condObjectives.contains(objective))
-            qDebug() << "Objective not found" << cond;
-        if (dep != 0)
-            qDebug() << "Unhandled condition dep" << cond << dep;
-        if (ref != -1)
-            qDebug() << "Unexpected reference" << cond << ref;
-        m_condObjectives[objective].addDependency(condDepend);
-    }
-    if (cond == 38)
-    {
-        if (dep != 1)
-            qDebug() << "Unhandled condition dep" << cond << dep;
-        if (!entries.contains(ref))
-            qDebug() << "Condition reference not found" << ref;
-        entries[ref].condParalyzed->addDependency(condDepend);
-    }
-    if (cond == 43 || cond == 44)
-    {
-        if (dep != 1)
-            qDebug() << "Unhandled condition dep" << cond << dep;
-        if (!entries.contains(ref))
-            qDebug() << "Condition reference not found" << ref;
-        entries[ref].condFinished->addDependency(condDepend, cond == 43);
-    }
-    if (cond == 45 || cond == 46)
-    {
-        if (dep != 1)
-            qDebug() << "Unhandled condition dep" << cond << dep;
-        if (!entries.contains(ref))
-            qDebug() << "Condition reference not found" << ref;
-        entries[ref].condBoarded->addDependency(condDepend, cond == 45);
-    }
 }
 
 

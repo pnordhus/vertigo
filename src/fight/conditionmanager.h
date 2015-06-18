@@ -28,17 +28,59 @@ namespace fight {
 class ConditionManager
 {
 public:
-    static void delayComplete(Condition *cond, int delay);
-    static void update();
+    ConditionManager(Scenario *scenario);
+
+public:
+    struct ConditionEntry
+    {
+        Condition *condTrigger;
+        int cond1;
+        int dep1;
+        int ref1;
+        int op;
+        int cond2;
+        int dep2;
+        int ref2;
+        int del;
+        ConditionEvent *condSignal;
+        ConditionEvent *condAttacked;
+        ConditionEvent *condIdentified;
+        ConditionEvent *condParalyzed;
+        ConditionEvent *condFinished;
+        ConditionEvent *condBoarded;
+    };
+
+public:
+    ConditionEntry& addEntry(int id);
+    void updateObjective(int id, int index, int wccond);
+    void buildDependencies();
+
+    Condition* addCondition(int limit = 0);
+    ConditionSpace* addCondSpace(int x, int y, int dimx, int dimy, int minz, int maxz);
+    void testSpace(float x, float y, float height);
+    void delayComplete(Condition *cond, int delay);
+    void update();
 
 private:
+    Scenario *m_scenario;
+    std::map<int, ConditionEntry> condEntries;
+    std::list<Condition> m_conditions;
+    std::list<ConditionSpace> m_condSpaces;
+
+    ConditionAutopilot m_condAutopilot;
+    ConditionFailure m_condFailure;
+    std::map<int, Condition> m_condObjectives;
+
     struct DelayCompleteEntry
     {
         Condition *cond;
         QTime completeTime;
     };
 
-    static QList<DelayCompleteEntry> m_entries;
+    std::list<DelayCompleteEntry> m_delayEntries;
+
+private:
+    void initCondition(int cond, int dep, int ref, Condition *condDepend);
 };
 
 

@@ -17,12 +17,15 @@
 
 #include "object.h"
 #include "conditionmanager.h"
+#include "scenario.h"
+#include <glm/common.hpp>
 
 
 namespace fight {
 
 
-Condition::Condition(int limit) :
+Condition::Condition(Scenario *scenario, int limit) :
+    m_scenario(scenario),
     m_current(0),
     m_limit(limit),
     m_delay(0)
@@ -42,7 +45,7 @@ void Condition::inc()
     if (m_current == m_limit)
     {
         if (m_delay != 0)
-            ConditionManager::delayComplete(this, m_delay);
+            m_scenario->conditionManager().delayComplete(this, m_delay);
         else
             complete();
     }
@@ -91,9 +94,8 @@ void ConditionEvent::complete()
 
 
 ConditionAutopilot::ConditionAutopilot(Scenario *scenario) :
-    Condition(0)
+    Condition(scenario, 0)
 {
-    m_scenario = scenario;
 }
 
 
@@ -105,9 +107,8 @@ void ConditionAutopilot::complete()
 
 
 ConditionFailure::ConditionFailure(Scenario *scenario) :
-    Condition(1)
+    Condition(scenario, 1)
 {
-    m_scenario = scenario;
 }
 
 
@@ -118,10 +119,10 @@ void ConditionFailure::complete()
 }
 
 
-ConditionEnable::ConditionEnable(Object *object) :
-    Condition(0)
+ConditionEnable::ConditionEnable(Scenario *scenario, Object *object) :
+    Condition(scenario, 0),
+    m_object(object)
 {
-    m_object = object;
 }
 
 
@@ -132,13 +133,14 @@ void ConditionEnable::complete()
 }
 
 
-ConditionSpace::ConditionSpace(int x, int y, int dimx, int dimy, int minz, int maxz) :
+ConditionSpace::ConditionSpace(Scenario *scenario, int x, int y, int dimx, int dimy, int minz, int maxz) :
     m_x(x),
     m_y(y),
     m_dimx(dimx),
     m_dimy(dimy),
     m_minz(minz),
-    m_maxz(maxz)
+    m_maxz(maxz),
+    m_condEnable(scenario)
 {
 }
 
@@ -147,8 +149,8 @@ void ConditionSpace::test(float x, float y, float height)
 {
     if (!m_condEnable.isCompleted() || isCompleted())
         return;
-    if (abs(x - m_x) <= m_dimx &&
-        abs(y - m_y) <= m_dimy &&
+    if (glm::abs(x - m_x) <= m_dimx &&
+        glm::abs(y - m_y) <= m_dimy &&
         height >= m_minz && height <= m_maxz)
         ConditionEvent::complete();
 }
