@@ -48,6 +48,7 @@ class Object
 public:
     Object(Scenario *scenario);
     Object(Scenario *scenario, const QString &name, float scale = 1/32.0f);
+    virtual ~Object() { }
 
 public:
     void setEnabled(bool);

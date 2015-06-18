@@ -104,6 +104,7 @@ class Effect : public Object
 {
 public:
     Effect(Scenario *scenario, Billboard *billboard, float angle, float scale);
+    virtual ~Effect() { }
 
 public:
     bool update();

@@ -24,6 +24,12 @@
 #include "gfx/fontmanager.h"
 #include "sfx/soundsystem.h"
 
+namespace fight {
+
+class Scenario;
+
+}
+
 namespace game {
 
 class Chapter;
@@ -54,6 +60,7 @@ private:
     Movie *m_intro;
     Chapter *m_chapter;
     QString m_name;
+    fight::Scenario *m_scenario;
 };
 
 } // namespace game
