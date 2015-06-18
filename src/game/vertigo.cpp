@@ -51,6 +51,11 @@ bool Vertigo::start(const QString &scenario)
     }
 
     m_window.show();
+    while (m_window.isVisible()) {
+        qApp->processEvents();
+        util::DeferredDeletable::clear();
+    }
+
     return true;
 }
 
