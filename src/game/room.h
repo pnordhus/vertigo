@@ -60,7 +60,9 @@ private:
 private:
     struct Person
     {
-        ui::Arrow *arrow;
+        template <typename... Args>
+        Person(Args... args) : arrow(std::forward<Args>(args)...), female(false) {}
+        ui::Arrow arrow;
         bool female;
     };
 
@@ -80,6 +82,7 @@ private:
     std::function<void()> m_funcShowDeparture;
     std::function<void()> m_funcShowDepot;
     std::function<void()> m_funcHideCursor;
+    std::list<ui::Arrow> m_arrows;
 };
 
 

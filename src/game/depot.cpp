@@ -31,8 +31,8 @@ namespace game {
 Depot::Depot(std::function<void()> &&funcClose) :
     Frame(std::move(funcClose)),
     m_boat(Chapter::get()->boat()),
-    m_state(Flipping),
-    m_side(1)
+    m_side(1),
+    m_state(Flipping)
 {
     const gfx::ColorTable colorTable("gfx:pal/gui/border.pal");
     gfx::ColorTable colorTableDisabled;
@@ -154,11 +154,14 @@ Depot::Depot(std::function<void()> &&funcClose) :
     for (int i = 0; i < m_boat->mountings().count(); i++)
     {
         Boat::Mounting *mounting = m_boat->mountings().at(i);
-        ui::Arrow *arrow = new ui::Arrow(mounting->dir, mounting->pos, true, [this](int n) { loadMounting(n); }, m_backgroundLabel);
-        arrow->setText(mounting->name);
-        arrow->setValue(i);
-        arrow->hide();
-        m_mountingArrows << arrow;
+        ui::Arrow &arrow = m_mountingArrows.emplace(
+            std::piecewise_construct,
+            std::forward_as_tuple(i),
+            std::forward_as_tuple(mounting->dir, mounting->pos, true, [this](int n) { loadMounting(n); }, m_backgroundLabel)
+        ).first->second;
+        arrow.setText(mounting->name);
+        arrow.setValue(i);
+        arrow.hide();
     }
 
     m_sndFlip.load("sfx:snd/desktop/shipdreh.pcm");
@@ -169,11 +172,6 @@ Depot::Depot(std::function<void()> &&funcClose) :
     m_sndSelect.load("sfx:snd/desktop/cursor2.pcm");
     m_sndButton.play();
     m_sndFlip.play();
-}
-
-
-Depot::~Depot()
-{
 }
 
 
@@ -194,8 +192,9 @@ void Depot::flip()
     }
     if (m_state == Flipping)
     {
-        foreach (ui::Arrow *arrow, m_mountingArrows)
-            arrow->hide();
+        for (auto &arrow : m_mountingArrows) {
+            arrow.second.hide();
+        }
         m_itemList1->clear();
         m_itemList2->clear();
         m_lblInfo->hide();
@@ -498,7 +497,7 @@ void Depot::draw()
                         m_mounting = i;
                     if (j == m_loadingItem)
                     {
-                        m_mountingArrows.at(i)->show();
+                        m_mountingArrows.at(i).show();
                         m_loadingItem++;
                         break;
                     }

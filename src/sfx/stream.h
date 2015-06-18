@@ -18,37 +18,33 @@
 #ifndef SFX_STREAM_H
 #define SFX_STREAM_H
 
+#include "util/core.h"
 
-#include <QByteArray>
-
+#include <vector>
 
 namespace sfx {
 
-
-class Stream
+class Stream : util::no_copy
 {
 public:
     Stream();
     ~Stream();
 
 public:
-    void add(const QByteArray &data);
+    void add(const std::vector<char> &data);
     void play();
     void pause();
     bool isPlaying() const;
-    quint32 queued() const;
-    quint32 processed() const;
+    int queued() const;
+    int processed() const;
 
 private:
-    Q_DISABLE_COPY(Stream);
     void clearBuffers();
 
 private:
-    quint32 m_source;
+    unsigned int m_source;
 };
 
-
 } // namespace sfx
-
 
 #endif // SFX_STREAM_H

@@ -25,21 +25,21 @@ namespace ui {
 
 Frame::Frame(std::function<void()> &&funcClose, ui::Widget *parent) :
     Label(parent),
-    m_funcClose(std::move(funcClose))
+    m_funcClose(std::move(funcClose)),
+    m_lblTitle(this),
+    m_btnClose([this]() { closeFrame(); }, this)
 {
-
 }
 
 void Frame::setupFrame(const QSize &size, const QString &title, bool closable)
 {
     const gfx::ColorTable colorTable("gfx:pal/gui/border.pal");
 
-    ui::Label *lblTitle = new ui::Label(this);
-    lblTitle->setFont(gfx::Font::Medium);
-    lblTitle->setText(title);
-    lblTitle->setAlignment(ui::Label::AlignHCenter);
-    lblTitle->setPosition(0, 1);
-    lblTitle->setWidth(size.width());
+    m_lblTitle.setFont(gfx::Font::Medium);
+    m_lblTitle.setText(title);
+    m_lblTitle.setAlignment(ui::Label::AlignHCenter);
+    m_lblTitle.setPosition(0, 1);
+    m_lblTitle.setWidth(size.width());
 
     QImage left = gfx::Image::load("gfx:img/desktop/gui/borl.img", colorTable);
     QImage right = gfx::Image::load("gfx:img/desktop/gui/borr.img", colorTable);
@@ -86,11 +86,9 @@ void Frame::setupFrame(const QSize &size, const QString &title, bool closable)
 
     texture.update((size.width() - 170) / 2, 0, gfx::Image::load("gfx:img/desktop/gui/bortw.img", colorTable));
 
-    if (closable) {
-        ui::Button *buttonClose = new ui::Button([this]() { closeFrame(); }, this);
-        buttonClose->setTexture(gfx::Image::load("gfx:img/desktop/gui/gdexitu.img", colorTable));
-        buttonClose->setPressedTexture(gfx::Image::load("gfx:img/desktop/gui/gdexitd.img", colorTable));
-    }
+    m_btnClose.setVisible(closable);
+    m_btnClose.setTexture(gfx::Image::load("gfx:img/desktop/gui/gdexitu.img", colorTable));
+    m_btnClose.setPressedTexture(gfx::Image::load("gfx:img/desktop/gui/gdexitd.img", colorTable));
 
     setTexture(texture);
     setSize(size);

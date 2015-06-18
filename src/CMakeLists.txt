@@ -5,6 +5,7 @@ if(Qt4_FOUND)
 endif()
 
 include_directories(${SDL2_INCLUDE_DIR})
+include_directories(${GLM_INCLUDE_DIR})
 include_directories(${OPENAL_INCLUDE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -150,6 +151,7 @@ set(SOURCES
     ui/widget.cpp
     ui/widget.h
 
+    util/core.h
     util/error.cpp
     util/error.h
     util/file.cpp

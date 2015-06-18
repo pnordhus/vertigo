@@ -15,19 +15,29 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "chapter.h"
 #include "notebook.h"
+
+#include "chapter.h"
+
 #include "gfx/colortable.h"
 #include "gfx/image.h"
-#include "ui/list.h"
-
 
 namespace game {
 
-
 Notebook::Notebook(std::function<void()> funcClose) :
-    m_lblMissions(NULL),
-    m_lblMoviePlayer(NULL),
+    m_lblBackground(this),
+    m_lblMain(&m_lblBackground),
+    m_lblMissions(&m_lblBackground, false),
+    m_lblOptions(&m_lblBackground, false),
+    m_lblMovies(&m_lblBackground, false),
+    m_lblMoviePlayer(&m_lblBackground, false),
+    m_lblMap(&m_lblBackground, false),
+    m_btnMoviesAutopilot([this]() { Chapter::get()->toggleMovieAutopilot(); updateMovies(); }, &m_lblMovies),
+    m_btnMoviesApproach([this]() { Chapter::get()->toggleMovieApproach(); updateMovies(); }, &m_lblMovies),
+    m_btnMoviesHarbour([this]() { Chapter::get()->toggleMovieHarbour(); updateMovies(); }, &m_lblMovies),
+    m_btnMoviePlayerHide([this]() { hideMoviePlayer(); }, &m_lblMoviePlayer),
+    m_btnMissionsBack([this]() { hideMissions(); }, &m_lblMissions),
+    m_listMissions(&m_lblMissions),
     m_funcClose(std::move(funcClose))
 {
     const gfx::ColorTable colorTable("gfx:pal/notebook/notebook.pal");
@@ -40,115 +50,118 @@ Notebook::Notebook(std::function<void()> funcClose) :
     image.setColorTable(QVector<QRgb>() << qRgba(0, 0, 0, 128));
     setTexture(image);
 
-    m_lblBackground = new ui::Label(this);
-    m_lblBackground->setPosition(48, 48);
-    m_lblBackground->setTexture(gfx::Image::loadPCX("gfx:pic/notebook/notebook.pcx"));
+    m_lblBackground.setPosition(48, 48);
+    m_lblBackground.setTexture(gfx::Image::loadPCX("gfx:pic/notebook/notebook.pcx"));
 
     {
-        m_lblMain = new ui::Label(m_lblBackground);
-        m_lblMain->setPosition(162, 73);
-        m_lblMain->setTexture(m_background);
+        m_lblMain.setPosition(162, 73);
+        m_lblMain.setTexture(m_background);
 
-        ui::Widget *widget;
+        createLabel(&m_lblMain, txt::Notebook_Title, 30);
+        createLabel(&m_lblMain, txt::Notebook_TitleLine, 40);
 
-        widget = createLabel(m_lblMain, txt::Notebook_Title, 30);
-        widget = createLabel(m_lblMain, txt::Notebook_TitleLine, 40);
-
-        widget = createButton([this]() { showMissions(); }, m_lblMain, txt::Notebook_Missions, 90);
-
-        widget = createButton([]() {}, m_lblMain, txt::Notebook_LoadSave, 110);
-
-        widget = createButton([this]() { showOptions(); }, m_lblMain, txt::Notebook_Options, 130);
-
-        widget = createButton([this]() { showMap(); }, m_lblMain, txt::Notebook_Map, 150);
-
-        widget = createButton(m_funcClose, m_lblMain, txt::Notebook_Back, 170);
-
-        widget = createButton([]() { Chapter::get()->quit(); }, m_lblMain, txt::Notebook_QuitGame, 210);
+        createButton([this]() { showMissions(); }, &m_lblMain, txt::Notebook_Missions, 90);
+        createButton([]() {}, &m_lblMain, txt::Notebook_LoadSave, 110);
+        createButton([this]() { showOptions(); }, &m_lblMain, txt::Notebook_Options, 130);
+        createButton([this]() { showMap(); }, &m_lblMain, txt::Notebook_Map, 150);
+        createButton(m_funcClose, &m_lblMain, txt::Notebook_Back, 170);
+        createButton([]() { Chapter::get()->quit(); }, &m_lblMain, txt::Notebook_QuitGame, 210);
     }
 
     {
-        m_lblOptions = new ui::Label(m_lblBackground);
-        m_lblOptions->setPosition(162, 73);
-        m_lblOptions->setTexture(m_background);
+        m_lblOptions.setPosition(162, 73);
+        m_lblOptions.setTexture(m_background);
 
-        createLabel(m_lblOptions, txt::Notebook_Options_Title, 30);
-        createLabel(m_lblOptions, txt::Notebook_Options_TitleLine, 40);
+        createLabel(&m_lblOptions, txt::Notebook_Options_Title, 30);
+        createLabel(&m_lblOptions, txt::Notebook_Options_TitleLine, 40);
 
-        createButton([]() {}, m_lblOptions, txt::Notebook_Sound, 90);
-        createButton([]() {}, m_lblOptions, txt::Notebook_Graphics, 110);
-        createButton([this]() { showMovies(); }, m_lblOptions, txt::Notebook_Movies, 130);
-        createButton([]() {}, m_lblOptions, txt::Notebook_InputDevices, 150);
-        createButton([this]() { showMoviePlayer(); }, m_lblOptions, txt::Notebook_MoviePlayer, 170);
-        createButton([this]() { hideOptions(); }, m_lblOptions, txt::Notebook_Back, 220);
-
-        m_lblOptions->hide();
+        createButton([]() {}, &m_lblOptions, txt::Notebook_Sound, 90);
+        createButton([]() {}, &m_lblOptions, txt::Notebook_Graphics, 110);
+        createButton([this]() { showMovies(); }, &m_lblOptions, txt::Notebook_Movies, 130);
+        createButton([]() {}, &m_lblOptions, txt::Notebook_InputDevices, 150);
+        createButton([this]() { showMoviePlayer(); }, &m_lblOptions, txt::Notebook_MoviePlayer, 170);
+        createButton([this]() { hideOptions(); }, &m_lblOptions, txt::Notebook_Back, 220);
     }
 
     {
-        m_lblMovies = new ui::Label(m_lblBackground);
-        m_lblMovies->setPosition(162, 73);
-        m_lblMovies->setTexture(m_background);
+        m_lblMovies.setPosition(162, 73);
+        m_lblMovies.setTexture(m_background);
 
-        createLabel(m_lblMovies, txt::Notebook_Movies_Title, 30);
-        createLabel(m_lblMovies, txt::Notebook_Movies_TitleLine, 40);
+        createLabel(&m_lblMovies, txt::Notebook_Movies_Title, 30);
+        createLabel(&m_lblMovies, txt::Notebook_Movies_TitleLine, 40);
 
-        m_btnMoviesAutopilot = createButton([this]() { Chapter::get()->toggleMovieAutopilot(); updateMovies(); }, m_lblMovies, txt::Notebook_Movies_Autopilot_Yes, 90);
-        m_btnMoviesApproach = createButton([this]() { Chapter::get()->toggleMovieApproach(); updateMovies(); }, m_lblMovies, txt::Notebook_Movies_Approach_Yes, 110);
-        m_btnMoviesHarbour = createButton([this]() { Chapter::get()->toggleMovieHarbour(); updateMovies(); }, m_lblMovies, txt::Notebook_Movies_Harbour_Yes, 130);
+        setupButton(m_btnMoviesAutopilot, txt::Notebook_Movies_Autopilot_Yes, 90);
+        setupButton(m_btnMoviesApproach, txt::Notebook_Movies_Approach_Yes, 110);
+        setupButton(m_btnMoviesHarbour, txt::Notebook_Movies_Harbour_Yes, 130);
 
-        createButton([this]() { hideMovies(); }, m_lblMovies, txt::Notebook_Back, 170);
+        createButton([this]() { hideMovies(); }, &m_lblMovies, txt::Notebook_Back, 170);
 
-        m_lblMovies->hide();
         updateMovies();
     }
 
     {
-        m_lblMap = new ui::Label(m_lblBackground);
-        m_lblMap->setPosition(164, 75);
-        m_lblMap->setTexture(gfx::Image::load(QString("gfx:pic/notebook/%1.r16").arg(Chapter::get()->area()->map()), 304, 284));
-        m_lblMap->hide();
+        m_lblMap.setPosition(164, 75);
+        m_lblMap.setTexture(gfx::Image::load(QString("gfx:pic/notebook/%1.r16").arg(Chapter::get()->area()->map()), 304, 284));
+    }
+
+    {
+        m_lblMoviePlayer.setPosition(162, 73);
+        m_lblMoviePlayer.setTexture(m_background);
+
+        createLabel(&m_lblMoviePlayer, txt::Notebook_MoviePlayer_Title, 10);
+        createLabel(&m_lblMoviePlayer, txt::Notebook_MoviePlayer_TitleLine, 20);
+
+        setupButton(m_btnMoviePlayerHide, txt::Notebook_Back, 30);
+    }
+
+    {
+        m_lblMissions.setPosition(162, 73);
+        m_lblMissions.setTexture(m_background);
+
+        createLabel(&m_lblMissions, txt::Notebook_Missions_Title, 10);
+        createLabel(&m_lblMissions, txt::Notebook_Missions_TitleLine, 20);
+
+        m_listMissions.setFont(m_fontYellow);
+        m_listMissions.setPosition(0, 50);
+        m_listMissions.setSize(304, 220);
+
+        m_btnMissionsBack.setFont(m_fontGreen);
+        m_btnMissionsBack.setText(txt::StringTable::get(txt::Notebook_Back));
+        m_btnMissionsBack.setPosition(180, 270);
     }
 }
 
-
-ui::Label* Notebook::createLabel(ui::Widget *parent, txt::String text, float posY)
+void Notebook::createLabel(ui::Widget *parent, txt::String text, float posY)
 {
-    ui::Label *label = new ui::Label(parent);
-    label->setFont(m_fontYellow);
-    label->setText(txt::StringTable::get(text));
-    label->setPosition(0, posY);
-    label->setWidth(304);
-    label->setAlignment(ui::Label::AlignHCenter);
-    return label;
+    m_labels.emplace_back(parent);
+    setupLabel(m_labels.back(), text, posY);
 }
 
-
-ui::Button* Notebook::createButton(std::function<void()> funcClick, ui::Widget *parent, txt::String text, float posY)
+void Notebook::createButton(std::function<void()> funcClick, ui::Widget *parent, txt::String text, float posY)
 {
-    ui::Button *button = new ui::Button(funcClick, parent);
-    button->setFont(m_fontGreen);
-    button->setText(txt::StringTable::get(text));
-    button->setPosition(0, posY);
-    button->setWidth(304);
-    button->setAlignment(ui::Label::AlignHCenter);
-    return button;
+    m_buttons.emplace_back(funcClick, parent);
+    setupButton(m_buttons.back(), text, posY);
 }
 
+void Notebook::setupLabel(ui::Label &label, txt::String text, float posY)
+{
+    label.setFont(m_fontYellow);
+    label.setText(txt::StringTable::get(text));
+    label.setPosition(0, posY);
+    label.setWidth(304);
+    label.setAlignment(ui::Label::AlignHCenter);
+}
+
+void Notebook::setupButton(ui::Button &button, txt::String text, float posY)
+{
+    setupLabel(button, text, posY);
+    button.setFont(m_fontGreen);
+}
 
 void Notebook::showMissions()
 {
-    m_lblMain->hide();
-
-    Q_ASSERT(!m_lblMissions);
-    m_lblMissions = new ui::Label(m_lblBackground);
-    m_lblMissions->setPosition(162, 73);
-    m_lblMissions->setTexture(m_background);
-
-    ui::Widget *widget;
-
-    widget = createLabel(m_lblMissions, txt::Notebook_Missions_Title, 10);
-    widget = createLabel(m_lblMissions, txt::Notebook_Missions_TitleLine, 20);
+    m_lblMain.hide();
+    m_lblMissions.show();
 
     QStringList tasks;
     foreach (const Task &task, Chapter::get()->tasks()) {
@@ -170,148 +183,116 @@ void Notebook::showMissions()
         tasks.append("");
     }
 
-    ui::List *list = new ui::List(m_lblMissions);
-    list->setFont(m_fontYellow);
-    list->setPosition(0, 50);
-    list->setSize(304, 220);
-    list->setText(tasks);
-
-    ui::Button *button = new ui::Button([this]() { hideMissions(); }, m_lblMissions);
-    button->setFont(m_fontGreen);
-    button->setText(txt::StringTable::get(txt::Notebook_Back));
-    button->setPosition(180, 270);
+    m_listMissions.setText(tasks);
 }
-
 
 void Notebook::hideMissions()
 {
-    Q_ASSERT(m_lblMissions);
-    m_lblMissions->deleteLater();
-    m_lblMissions = NULL;
-    m_lblMain->show();
+    m_lblMissions.hide();
+    m_lblMain.show();
 }
-
 
 void Notebook::showOptions()
 {
-    m_lblMain->hide();
-    m_lblOptions->show();
+    m_lblMain.hide();
+    m_lblOptions.show();
 }
-
 
 void Notebook::hideOptions()
 {
-    m_lblOptions->hide();
-    m_lblMain->show();
+    m_lblOptions.hide();
+    m_lblMain.show();
 }
-
 
 void Notebook::showMovies()
 {
-    m_lblOptions->hide();
-    m_lblMovies->show();
+    m_lblOptions.hide();
+    m_lblMovies.show();
 }
-
 
 void Notebook::hideMovies()
 {
-    m_lblMovies->hide();
-    m_lblOptions->show();
+    m_lblMovies.hide();
+    m_lblOptions.show();
 }
-
 
 void Notebook::showMoviePlayer()
 {
-    m_lblOptions->hide();
+    m_lblOptions.hide();
+    m_lblMoviePlayer.show();
 
-    Q_ASSERT(!m_lblMoviePlayer);
-    m_lblMoviePlayer = new ui::Label(m_lblBackground);
-    m_lblMoviePlayer->setPosition(162, 73);
-    m_lblMoviePlayer->setTexture(m_background);
-
-    createLabel(m_lblMoviePlayer, txt::Notebook_MoviePlayer_Title, 10);
-    createLabel(m_lblMoviePlayer, txt::Notebook_MoviePlayer_TitleLine, 20);
-
+    m_movieButtons.clear();
     const QSet<int>& movies = Chapter::get()->playedMovies();
     int y = 40;
-
     foreach (int movie, movies) {
-        createButton([this, movie]() { Chapter::get()->playMovie(movie); }, m_lblMoviePlayer, txt::String(txt::FirstMovie + movie), y);
+        m_movieButtons.emplace_back([this, movie]() { Chapter::get()->playMovie(movie); }, &m_lblMoviePlayer);
+        setupButton(m_movieButtons.back(), txt::String(txt::FirstMovie + movie), y);
         y += 10;
     }
-
-    createButton([this]() { hideMoviePlayer(); }, m_lblMoviePlayer, txt::Notebook_Back, y + 10);
+    m_btnMoviePlayerHide.setPosition(0, y + 10);
 }
-
 
 void Notebook::hideMoviePlayer()
 {
-    Q_ASSERT(m_lblMoviePlayer);
-    m_lblMoviePlayer->deleteLater();
-    m_lblMoviePlayer = NULL;
-    m_lblOptions->show();
+    m_lblMoviePlayer.hide();
+    m_lblOptions.show();
 }
-
 
 void Notebook::showMap()
 {
-    m_lblMain->hide();
-    m_lblMap->show();
+    m_lblMain.hide();
+    m_lblMap.show();
 }
-
 
 void Notebook::hideMap()
 {
-    m_lblMap->hide();
-    m_lblMain->show();
+    m_lblMap.hide();
+    m_lblMain.show();
 }
-
-
 
 void Notebook::updateMovies()
 {
     txt::String autopilot = txt::Notebook_Movies_Autopilot_No;
     if (Chapter::get()->movieAutopilot())
         autopilot = txt::Notebook_Movies_Autopilot_Yes;
-    m_btnMoviesAutopilot->setText(txt::StringTable::get(autopilot));
+    m_btnMoviesAutopilot.setText(txt::StringTable::get(autopilot));
 
     txt::String approach = txt::Notebook_Movies_Approach_No;
     if (Chapter::get()->movieApproach())
         approach = txt::Notebook_Movies_Approach_Yes;
-    m_btnMoviesApproach->setText(txt::StringTable::get(approach));
+    m_btnMoviesApproach.setText(txt::StringTable::get(approach));
 
     txt::String harbour = txt::Notebook_Movies_Harbour_No;
     if (Chapter::get()->movieHarbour())
         harbour = txt::Notebook_Movies_Harbour_Yes;
-    m_btnMoviesHarbour->setText(txt::StringTable::get(harbour));
+    m_btnMoviesHarbour.setText(txt::StringTable::get(harbour));
 }
-
 
 bool Notebook::mousePressEvent(const QPoint &pos, Qt::MouseButton button)
 {
-    if (m_lblMap->isVisible()) {
+    if (m_lblMap.isVisible()) {
         hideMap();
         return true;
     }
 
     if (button == Qt::RightButton) {
-        if (m_lblMissions && m_lblMissions->isVisible()) {
+        if (m_lblMissions.isVisible()) {
             hideMissions();
             return true;
         }
-        if (m_lblOptions->isVisible()) {
+        if (m_lblOptions.isVisible()) {
             hideOptions();
             return true;
         }
-        if (m_lblMovies->isVisible()) {
+        if (m_lblMovies.isVisible()) {
             hideMovies();
             return true;
         }
-        if (m_lblMoviePlayer && m_lblMoviePlayer->isVisible()) {
+        if (m_lblMoviePlayer.isVisible()) {
             hideMoviePlayer();
             return true;
         }
-        if (m_lblMain->isVisible()) {
+        if (m_lblMain.isVisible()) {
             m_funcClose();
             return true;
         }
@@ -319,6 +300,5 @@ bool Notebook::mousePressEvent(const QPoint &pos, Qt::MouseButton button)
 
     return false;
 }
-
 
 } // namespace game

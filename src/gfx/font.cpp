@@ -17,18 +17,14 @@
 
 #include "fontmanager.h"
 #include "image.h"
-#include <QFile>
 #include <QGLContext>
 
-
 namespace gfx {
-
 
 Font::Font(Name name)
 {
     *this = FontManager::get()->font(name);
 }
-
 
 FontPrivate::FontPrivate() :
     m_height(0)
@@ -36,26 +32,20 @@ FontPrivate::FontPrivate() :
 
 }
 
-
 void FontPrivate::load(const QString &filename, const QVector<QRgb> &colorTable, bool scale)
 {
-    QFile file(filename);
-    if (!file.open(QFile::ReadOnly))
-        return;
+    util::File file(QString(filename).replace(":", "/").toUtf8().data());
 
     int scaleFactor = scale ? 2 : 1;
     const float res = 256 * scaleFactor;
 
-    QDataStream stream(&file);
-    stream.setByteOrder(QDataStream::LittleEndian);
-
     quint8 type;
     quint32 numEntries;
 
-    stream >> type;
-    stream.skipRawData(5);
-    stream >> numEntries;
-    stream.skipRawData(8);
+    file >> type;
+    file.skipBytes(5);
+    file >> numEntries;
+    file.skipBytes(8);
 
     if (colorTable.size() == 2) {
         m_texture.createEmpty(res, res, Texture::Alpha);
@@ -74,16 +64,16 @@ void FontPrivate::load(const QString &filename, const QVector<QRgb> &colorTable,
         QImage image;
         switch (type) {
         case 2:
-            image = Image::load(&file, Image::PaletteRLE, colorTable);
+            image = Image::load(file, Image::PaletteRLE, colorTable);
             break;
 
         case 4:
         case 18:
-            image = Image::load(&file, Image::Bitmap, colorTable);
+            image = Image::load(file, Image::Bitmap, colorTable);
             break;
 
         case 20:
-            image = Image::load(&file, Image::RGB565, colorTable);
+            image = Image::load(file, Image::RGB565, colorTable);
             break;
 
         default:
@@ -115,7 +105,6 @@ void FontPrivate::load(const QString &filename, const QVector<QRgb> &colorTable,
 
     m_height = maxHeight / scaleFactor;
 }
-
 
 QRect FontPrivate::draw(const QString &text, int x, int y, int w, int h, bool alignHCenter, bool alignBottom)
 {
@@ -213,7 +202,6 @@ QRect FontPrivate::draw(const QString &text, int x, int y, int w, int h, bool al
     return rect;
 }
 
-
 int FontPrivate::height(int w, const QStringList &strings) const
 {
     int totalHeight = m_height;
@@ -232,7 +220,6 @@ int FontPrivate::height(int w, const QStringList &strings) const
     return totalHeight;
 }
 
-
 int FontPrivate::width(const QString &text) const
 {
     int totalW = 0;
@@ -250,6 +237,5 @@ int FontPrivate::width(const QString &text) const
 
     return totalW;
 }
-
 
 } // namespace gfx

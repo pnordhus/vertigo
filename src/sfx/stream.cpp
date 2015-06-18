@@ -16,18 +16,15 @@
  ***************************************************************************/
 
 #include "stream.h"
-#include <QVector>
+
 #include <al.h>
 
-
 namespace sfx {
-
 
 Stream::Stream()
 {
     alGenSources(1, &m_source);
 }
-
 
 Stream::~Stream()
 {
@@ -36,29 +33,25 @@ Stream::~Stream()
     alDeleteSources(1, &m_source);
 }
 
-
-void Stream::add(const QByteArray &data)
+void Stream::add(const std::vector<char> &data)
 {
     clearBuffers();
 
     ALuint buffer;
     alGenBuffers(1, &buffer);
-    alBufferData(buffer, AL_FORMAT_STEREO8, data, data.size(), 22050);
+    alBufferData(buffer, AL_FORMAT_STEREO8, data.data(), data.size(), 22050);
     alSourceQueueBuffers(m_source, 1, &buffer);
 }
-
 
 void Stream::play()
 {
     alSourcePlay(m_source);
 }
 
-
 void Stream::pause()
 {
     alSourcePause(m_source);
 }
-
 
 bool Stream::isPlaying() const
 {
@@ -67,32 +60,28 @@ bool Stream::isPlaying() const
     return (state == AL_PLAYING);
 }
 
-
-quint32 Stream::queued() const
+int Stream::queued() const
 {
     ALint v;
     alGetSourcei(m_source, AL_BUFFERS_QUEUED, &v);
     return v;
 }
 
-
-quint32 Stream::processed() const
+int Stream::processed() const
 {
     ALint v;
     alGetSourcei(m_source, AL_BUFFERS_PROCESSED, &v);
     return v;
 }
 
-
 void Stream::clearBuffers()
 {
-    const quint32 buffersProcessed = processed();
+    const int buffersProcessed = processed();
     if (buffersProcessed > 0) {
-        QVector<ALuint> bufs(buffersProcessed);
+        std::vector<ALuint> bufs(buffersProcessed);
         alSourceUnqueueBuffers(m_source, buffersProcessed, &bufs[0]);
         alDeleteBuffers(buffersProcessed, &bufs[0]);
     }
 }
-
 
 } // namespace sfx

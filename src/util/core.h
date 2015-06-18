@@ -1,5 +1,5 @@
 /***************************************************************************
- *  Copyright (C) 2010  Philipp Nordhus                                    *
+ *  Copyright (C) 2015  Philipp Nordhus                                    *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
  *  it under the terms of the GNU General Public License as published by   *
@@ -15,36 +15,18 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef UI_ARROW_H
-#define UI_ARROW_H
+#ifndef UTIL_CORE_H
+#define UTIL_CORE_H
 
-#include "button.h"
+namespace util {
 
-namespace ui {
-
-class Arrow
+struct no_copy
 {
-public:
-    Arrow(const QString &dir, const QPoint &pos, bool large, std::function<void(int)> &&funcClicked, Widget *parent);
-
-public:
-    void hide();
-    void show();
-    bool isVisible();
-    void setValue(int value);
-    void setText(const QString &text);
-
-private:
-    bool m_left;
-    bool m_top;
-    QPoint m_position;
-    int m_value;
-    bool m_large;
-    std::function<void(int)> m_funcClicked;
-    Label m_label;
-    Button m_button;
+    no_copy() = default;
+    no_copy(const no_copy&) = delete;
+    no_copy& operator = (const no_copy&) = delete;
 };
 
-} // namespace ui
+} // namespace util
 
-#endif // UI_ARROW_H
+#endif // UTIL_CORE_H
