@@ -18,6 +18,7 @@
 #include "collisionmanager.h"
 #include "object.h"
 
+#include <glm/geometric.hpp>
 
 namespace fight {
 
@@ -27,21 +28,20 @@ CollisionCache::CollisionCache()
 }
 
 
-void CollisionCache::addObject(Object *object, bool collision, const QVector3D &position, const QVector3D &normal)
+void CollisionCache::addObject(Object *object, bool collision, const glm::vec3 &position, const glm::vec3 &normal)
 {
-    CacheEntry entry;
+    m_entries.emplace_back();
+    CacheEntry &entry = m_entries.back();
     entry.object = object;
     entry.collision = collision;
     entry.position = position;
     entry.normal = normal;
-    m_entries << entry;
 }
 
 
-bool CollisionCache::testObject(Object *object, bool &collision, QVector3D &position, QVector3D &normal)
+bool CollisionCache::testObject(Object *object, bool &collision, glm::vec3 &position, glm::vec3 &normal)
 {
-    foreach (const CacheEntry &entry, m_entries)
-    {
+    for (const CacheEntry &entry :  m_entries)
         if (entry.object == object)
         {
             collision = entry.collision;
@@ -49,7 +49,6 @@ bool CollisionCache::testObject(Object *object, bool &collision, QVector3D &posi
             normal = entry.normal;
             return true;
         }
-    }
     return false;
 }
 
@@ -61,23 +60,23 @@ CollisionManager::CollisionManager()
 
 void CollisionManager::addObject(Object *object)
 {
-    m_objects << object;
+    m_objects.push_back(object);
 }
 
 
-Object* CollisionManager::testCollision(const QVector3D &start, const QVector3D &end, float radius, QVector3D &position, QVector3D &normal)
+Object* CollisionManager::testCollision(const glm::vec3 &start, const glm::vec3 &end, float radius, glm::vec3 &position, glm::vec3 &normal)
 {
-    QVector3D dir = end - start;
-    float distance = dir.length();
+    glm::vec3 dir = end - start;
+    float distance = glm::length(dir);
     dir /= distance;
 
     Object *collisionObject = NULL;
-    foreach (Object *object, m_objects)
+    for (Object *object : m_objects)
         if (object->isEnabled() && object->box().test(end, radius))
         {
             bool collision = false;
             float d;
-            QVector3D norm;
+            glm::vec3 norm;
 
             collision = object->intersect(start, dir, radius, d, norm);
 
@@ -95,27 +94,27 @@ Object* CollisionManager::testCollision(const QVector3D &start, const QVector3D 
 }
 
 
-Object* CollisionManager::testCollision(Object *cacheObject, const QVector3D &end, float radius, QVector3D &position, QVector3D &normal)
+Object* CollisionManager::testCollision(Object *cacheObject, const glm::vec3 &end, float radius, glm::vec3 &position, glm::vec3 &normal)
 {
-    QVector3D start = cacheObject->position();
-    QVector3D dir = end - start;
-    float distance = dir.length();
+    glm::vec3 start = cacheObject->position();
+    glm::vec3 dir = end - start;
+    float distance = glm::length(dir);
     dir /= distance;
 
     Object *collisionObject = NULL;
-    foreach (Object *object, m_objects)
+    for (Object *object : m_objects)
         if (object->isEnabled() && object->box().test(end, radius))
         {
             bool collision = false;
             float d;
-            QVector3D pos, norm;
+            glm::vec3 pos, norm;
 
             if (object->isStatic() && cacheObject->isStatic())
             {
                 if (cacheObject->collisionCache() == NULL)
                     cacheObject->setCollisionCache(new CollisionCache());
                 if (cacheObject->collisionCache()->testObject(object, collision, pos, norm))
-                    d = QVector3D::dotProduct(pos - start, dir);
+                    d = glm::dot(pos - start, dir);
                 else
                 {
                     collision = object->intersect(start, dir, radius, d, norm);

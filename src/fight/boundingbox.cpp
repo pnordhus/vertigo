@@ -35,27 +35,27 @@ BoundingBox::BoundingBox(const BoundingBox &box) :
 }
 
 
-BoundingBox::BoundingBox(const QVector3D &min, const QVector3D &max) :
+BoundingBox::BoundingBox(const glm::vec3 &min, const glm::vec3 &max) :
     m_min(min),
     m_max(max)
 {
 }
 
 
-void BoundingBox::add(const QVector3D &point)
+void BoundingBox::add(const glm::vec3 &point)
 {
-    if (m_min.x() > point.x())
-        m_min.setX(point.x());
-    if (m_min.y() > point.y())
-        m_min.setY(point.y());
-    if (m_min.z() > point.z())
-        m_min.setZ(point.z());
-    if (m_max.x() < point.x())
-        m_max.setX(point.x());
-    if (m_max.y() < point.y())
-        m_max.setY(point.y());
-    if (m_max.z() < point.z())
-        m_max.setZ(point.z());
+    if (m_min.x > point.x)
+        m_min.x = point.x;
+    if (m_min.y > point.y)
+        m_min.y = point.y;
+    if (m_min.z > point.z)
+        m_min.z = point.z;
+    if (m_max.x < point.x)
+        m_max.x = point.x;
+    if (m_max.y < point.y)
+        m_max.y = point.y;
+    if (m_max.z < point.z)
+        m_max.z = point.z;
 }
 
 
@@ -66,37 +66,37 @@ void BoundingBox::add(const BoundingBox &box)
 }
 
 
-bool BoundingBox::test(const QVector3D &center, float radius) const
+bool BoundingBox::test(const glm::vec3 &center, float radius) const
 {
-    if (center.x() + radius < m_min.x())
+    if (center.x + radius < m_min.x)
         return false;
-    if (center.y() + radius < m_min.y())
+    if (center.y + radius < m_min.y)
         return false;
-    if (center.z() + radius < m_min.z())
+    if (center.z + radius < m_min.z)
         return false;
-    if (center.x() - radius > m_max.x())
+    if (center.x - radius > m_max.x)
         return false;
-    if (center.y() - radius > m_max.y())
+    if (center.y - radius > m_max.y)
         return false;
-    if (center.z() - radius > m_max.z())
+    if (center.z - radius > m_max.z)
         return false;
     return true;
 }
 
 
-BoundingBox BoundingBox::transform(QMatrix4x4 m)
+BoundingBox BoundingBox::transform(const glm::mat4 &m) const
 {
     BoundingBox ret;
     for (int i = 0; i < 8; i++)
     {
-        QVector3D vertex = m_min;
+        glm::vec3 vertex = m_min;
         if (i & 1)
-            vertex.setX(m_max.x());
+            vertex.x = m_max.x;
         if (i & 2)
-            vertex.setY(m_max.y());
+            vertex.y = m_max.y;
         if (i & 4)
-            vertex.setZ(m_max.z());
-        vertex = m * vertex;
+            vertex.z = m_max.z;
+        vertex = glm::vec3(m * glm::vec4(vertex, 1));
         ret.add(vertex);
     }
     return ret;

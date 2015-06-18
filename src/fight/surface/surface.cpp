@@ -28,10 +28,16 @@
 namespace fight {
 
 
-Surface::Surface(const QString &name, int maxheightscale, int mapping) :
-    m_mapping(mapping),
-	m_tesselator(Level, this)
+Surface::Surface() :
+    m_tesselator(Level, this)
 {
+}
+
+
+void Surface::load(const QString &name, int maxheightscale, int mapping)
+{
+    m_mapping = mapping;
+
     txt::DesFile file(QString("vfx:surface/%1.des").arg(name));
     file.setSection("height");
     m_heightMap = gfx::Image::loadPCX(QString("vfx:surface/%2").arg(file.value("name").toString().replace("\\", "/")));
@@ -46,7 +52,7 @@ Surface::Surface(const QString &name, int maxheightscale, int mapping) :
         stream.setByteOrder(QDataStream::LittleEndian);
         stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
         stream >> sx >> sy >> sz;
-        m_scale = QVector3D(sx / 32.0f, sy / 32.0f, maxheightscale / sz);
+        m_scale = glm::vec3(sx / 32.0f, sy / 32.0f, maxheightscale / sz);
     }
 
     {
@@ -72,26 +78,20 @@ Surface::Surface(const QString &name, int maxheightscale, int mapping) :
     const QString tName = file.value("tname").toString();
     for (int i = 0; i <= 16; i++) {
         gfx::ColorTable colorTable(QString("vfx:texture/%1_%2.s16").arg(sName).arg(i, 3, 10, QChar('0')));
-        m_textures << gfx::Image::load(QString("vfx:texture/%1_%2.imb").arg(tName).arg(i, 3, 10, QChar('0')), colorTable);
+        m_textures.push_back(gfx::Image::load(QString("vfx:texture/%1_%2.imb").arg(tName).arg(i, 3, 10, QChar('0')), colorTable));
     }
-}
-
-
-Surface::~Surface()
-{
-    qDeleteAll(m_elements.values());
 }
 
 
 float Surface::heightAt(float x, float y)
 {
-    return m_tesselator.heightAt(QVector2D(x / m_scale.x(), y / m_scale.y())) * m_scale.z();
+    return m_tesselator.heightAt(glm::vec2(x / m_scale.x, y / m_scale.y)) * m_scale.z;
 }
 
 
-float Surface::heightAt(float x, float y, QVector3D &normal)
+float Surface::heightAt(float x, float y, glm::vec3 &normal)
 {
-    return m_tesselator.heightAt(QVector2D(x / m_scale.x(), y / m_scale.y()), normal) * m_scale.z();
+    return m_tesselator.heightAt(glm::vec2(x / m_scale.x, y / m_scale.y), normal) * m_scale.z;
 }
 
 
@@ -113,14 +113,14 @@ void Surface::setHeight(int x, int y, int refx, int refy, int offset)
 }
 
 
-bool Surface::testCollision(const QVector3D &start, const QVector3D &end, float radius, QVector3D &position, QVector3D &normal)
+bool Surface::testCollision(const glm::vec3 &start, const glm::vec3 &end, float radius, glm::vec3 &position, glm::vec3 &normal)
 {
-    int x0 = end.x() / m_scale.x() / 8;
-    int y0 = end.y() / m_scale.y() / 8;
-    Element *element = getElement(QPoint(x0*8, y0*8));
-    if (element->testCollision(end, radius))
+    int x0 = end.x / m_scale.x / 8;
+    int y0 = end.y / m_scale.y / 8;
+    Element &element = getElement(QPoint(x0*8, y0*8));
+    if (element.testCollision(end, radius))
     {
-        if (m_tesselator.intersect(QVector3D(start.x()/m_scale.x(), start.y()/m_scale.y(), start.z()/m_scale.z()), QVector3D(end.x()/m_scale.x(), end.y()/m_scale.y(), end.z()/m_scale.z()), radius/m_scale.z(), position, normal))
+        if (m_tesselator.intersect(start/m_scale, end/m_scale, radius/m_scale.z, position, normal))
         {
             position *= m_scale;
             return true;
@@ -136,30 +136,33 @@ void Surface::bindTexture(int textureId)
 }
 
 
-Element* Surface::getElement(QPoint pos)
+Element& Surface::getElement(QPoint pos)
 {
     int id = (pos.y() << 16) + pos.x();
-    if (m_elements.contains(id))
-        return m_elements[id];
-    Element *element = m_tesselator.tesselate(QRect(pos, QSize(8, 8)), Level, m_scale, m_textureMap, m_textureDir, m_mapping);
-    m_elements.insert(id, element);
+    auto it = m_elements.find(id);
+    if (it != m_elements.end())
+        return it->second;
+    Element &element = m_elements.emplace(std::piecewise_construct,
+        std::forward_as_tuple(id),
+        std::forward_as_tuple(this, QRect(pos, QSize(8, 8)))).first->second;
+    m_tesselator.tesselate(element, Level, m_scale, m_textureMap, m_textureDir, m_mapping);
     return element;
 }
 
 
-void Surface::draw(QVector3D position, QVector3D direction)
+void Surface::draw(const glm::vec3 &position, const glm::vec3 &direction)
 {
-    int x0 = position.x() / m_scale.x() / 8;
-    int y0 = position.y() / m_scale.y() / 8;
+    int x0 = position.x / m_scale.x / 8;
+    int y0 = position.y / m_scale.y / 8;
 
     for (int y = y0 - 2; y <= y0 + 2; y++)
         for (int x = x0 - 2; x <= x0 + 2; x++)
         {
-            Element *element = getElement(QPoint(x*8, y*8));
+            Element &element = getElement(QPoint(x*8, y*8));
             /*QVector3D dir = element->center() - position;
             dir.normalize();
             if (QVector3D::dotProduct(dir, direction) > 0)*/
-                element->draw();
+                element.draw();
         }
 }
 

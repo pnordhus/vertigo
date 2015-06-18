@@ -17,28 +17,32 @@
 
 #include "trash.h"
 #include "billboard.h"
+#include "../scenario.h"
 
+#include <glm/gtx/norm.hpp>
 
 namespace fight {
 
 Effects Trash::trashCollection[9] = {Trash_0, Trash_0, Trash_1, Trash_1, Trash_2, Trash_2, Trash_3, Trash_3, Trash_4};
 
-Trash::Trash(Scenario *scenario, Billboard *billboard, float angle) : 
-    Effect(scenario, billboard, angle, 1)
+Trash::Trash(Scenario *scenario, Billboard *billboard, const glm::vec3 &position) :
+    Effect(scenario, billboard, static_cast<float>(qrand()%360), 1)
 {
     m_type = TrashObject;
-}
+    m_scenario->collisionManager().addObject(this);
 
-
-void Trash::setPosition(const QVector3D &pos)
-{
+    glm::vec3 pos = position + glm::vec3(qrand()%50 - 25, qrand()%50 - 25, qrand()%25 - 25);
+    float height = m_scenario->surface().heightAt(pos.x, pos.y) + 2;
+    if (pos.z < height)
+        pos.z = height;
     Object::setPosition(pos);
+
     BoundingBox box = m_billboard->box();
     m_box = BoundingBox(pos + box.minPoint(), pos + box.maxPoint());
 }
 
 
-bool Trash::intersect(const QVector3D &start, const QVector3D &dir, float radius, float &distance, QVector3D &normal)
+bool Trash::intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal)
 {
     return m_billboard->intersect(start - m_position, dir, distance);
 }
@@ -46,7 +50,7 @@ bool Trash::intersect(const QVector3D &start, const QVector3D &dir, float radius
 
 void Trash::destroy()
 {
-    m_scenario->effectManager()->addEffect(Explosion_5, m_position, 0, m_box.dim().lengthSquared() > 15 ? 2 : 1);
+    m_scenario->effectManager().addEffect(Explosion_5, m_position, 0, glm::length2(m_box.dim()) > 15 ? 2 : 1);
     Object::destroy();
 }
 

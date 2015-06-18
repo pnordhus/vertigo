@@ -25,21 +25,16 @@
 namespace fight {
 
 
-class Turret;
-
-
 class TurretBase : public Object
 {
 public:
     TurretBase(Scenario *scenario, const QString &name);
-    ~TurretBase();
 
 public:
     void draw();
 
 private:
-    QVector3D m_turretPosition;
-    Turret *m_turret;
+    std::unique_ptr<Object> m_body;
 };
 
 

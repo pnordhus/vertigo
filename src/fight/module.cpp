@@ -16,16 +16,16 @@
  ***************************************************************************/
 
 #include "module.h"
-#include "vector.h"
 #include <QDataStream>
 #include <QFile>
 #include <QGLContext>
+#include <QVector3D>
 
 
 namespace fight {
 
 
-void ModulePrivate::load(gfx::TextureManager &texMan, const QString &name)
+Module::Module(gfx::TextureManager &texMan, const QString &name)
 {
     QFile file(name);
     file.open(QFile::ReadOnly);
@@ -34,9 +34,10 @@ void ModulePrivate::load(gfx::TextureManager &texMan, const QString &name)
     stream.setByteOrder(QDataStream::LittleEndian);
     stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 
+    unsigned int i, j;
     quint32 numFaces;
     quint32 numVertices;
-    QMap<QString, int> textures;
+    std::map<QString, Mesh*> meshes;
 
     stream.skipRawData(2);
     stream >> numFaces;
@@ -44,18 +45,19 @@ void ModulePrivate::load(gfx::TextureManager &texMan, const QString &name)
     stream >> numVertices;
     stream.skipRawData(4);
 
-    QVector<QVector3D> vertices;
+    std::vector<glm::vec3> vertices;
     vertices.reserve(numVertices);
 
-    for (unsigned int i = 0; i < numVertices; i++) {
+    for (i = 0; i < numVertices; i++) {
         quint32 index;
-        QVector3D v;
-        stream >> index >> v;
-        vertices << v;
+        QVector3D qv;
+        stream >> index >> qv;
+        glm::vec3 v = glm::vec3(qv.x(), qv.y(), qv.z());
+        vertices.push_back(v);
         m_box.add(v);
     }
 
-    for (unsigned int i = 0; i < numFaces; i++) {
+    for (i = 0; i < numFaces; i++) {
         quint32 faceNumber;
         quint32 type;
         quint32 numVertices;
@@ -75,10 +77,10 @@ void ModulePrivate::load(gfx::TextureManager &texMan, const QString &name)
             stream >> numVertices2;
             stream.skipRawData(4);
 
-            QVector<QVector2D> texCoords;
+            std::vector<glm::vec2> texCoords;
             texCoords.reserve(numVertices2 * 2);
 
-            for (unsigned int i = 0; i < numVertices2; i++) {
+            for (j = 0; j < numVertices2; j++) {
                 quint16 s;
                 quint16 t;
 
@@ -87,7 +89,7 @@ void ModulePrivate::load(gfx::TextureManager &texMan, const QString &name)
                 stream.skipRawData(2);
                 stream >> t;
 
-                texCoords << QVector2D(s / 255.0f, t / 255.0f);
+                texCoords.emplace_back(s / 255.0f, t / 255.0f);
             }
             quint32 nameLength;
             stream >> nameLength;
@@ -95,62 +97,66 @@ void ModulePrivate::load(gfx::TextureManager &texMan, const QString &name)
 
             const QString textureName = file.read(nameLength);
 
-            QVector<quint32> indices;
+            std::vector<quint32> indices;
             indices.reserve(3 * numVertices2);
-            for (unsigned int i = 0; i < 3 * numVertices2; i++) {
+            for (j = 0; j < 3 * numVertices2; j++) {
                 quint32 index;
                 stream >> index;
-                indices << index;
+                indices.push_back(index);
             }
 
-            int textureId;
-            if (textures.contains(textureName))
-                textureId = textures[textureName];
+            Mesh *mesh;
+            auto it = meshes.find(textureName);
+            if (it != meshes.end())
+                mesh = it->second;
             else
             {
-                textureId = m_textures.count();
-                textures.insert(textureName, textureId);
-                m_textures << texMan.getModule(textureName);
-                m_meshes << Mesh();
+                m_meshes.emplace_back();
+                mesh = &m_meshes.back();
+                meshes[textureName] = mesh;
+                mesh->texture = texMan.getModule(textureName);
             }
 
-            Mesh &mesh = m_meshes[textureId];
-            int i0 = mesh.vertices.count();
+            int i0 = mesh->vertices.size();
 
-            for (unsigned int j = 0; j < numVertices2; j++)
+            for (j = 0; j < numVertices2; j++)
             {
-                mesh.vertices << vertices[indices[3 * j]];
-                mesh.texCoords << texCoords[j];
+                mesh->vertices.push_back(vertices[indices[3 * j]]);
+                mesh->texCoords.push_back(texCoords[j]);
                 if (j > 1)
-                    mesh.indices << i0 << i0 + j - 1 << i0 + j;
+                {
+                    mesh->indices.push_back(i0);
+                    mesh->indices.push_back(i0 + j - 1);
+                    mesh->indices.push_back(i0 + j);
+                }
             }
         }
     }
 
-    foreach (const Mesh &mesh, m_meshes)
+    for (const Mesh &mesh : m_meshes)
         m_collisionMesh.addTriangles(mesh.vertices, mesh.indices);
 }
 
 
-void ModulePrivate::draw()
+void Module::draw()
 {
     glEnable(GL_TEXTURE_2D);
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     //glEnableClientState(GL_NORMAL_ARRAY);
 
-    for (int i = 0; i < m_textures.count(); i++)
+    for (Mesh &mesh : m_meshes)
     {
-        m_textures[i].bind();
-        glVertexPointer(3, GL_FLOAT, 0, m_meshes[i].vertices.data());
-        //glNormalPointer(GL_FLOAT, 0, m_meshes[i].normals.data());
-        glTexCoordPointer(2, GL_FLOAT, 0, m_meshes[i].texCoords.data());
-        glDrawElements(GL_TRIANGLES, m_meshes[i].indices.count(), GL_UNSIGNED_SHORT, m_meshes[i].indices.data());
+        mesh.texture.bind();
+        glVertexPointer(3, GL_FLOAT, 0, mesh.vertices.data());
+        //glNormalPointer(GL_FLOAT, 0, mesh.normals.data());
+        glTexCoordPointer(2, GL_FLOAT, 0, mesh.texCoords.data());
+        glDrawElements(GL_TRIANGLES, mesh.indices.size(), GL_UNSIGNED_SHORT, mesh.indices.data());
     }
 }
 
 
-bool ModulePrivate::intersect(const QVector3D &start, const QVector3D &dir, float radius, float &distance, QVector3D &normal)
+bool Module::intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal)
 {
     return m_collisionMesh.intersect(start, dir, radius, distance, normal);
 }

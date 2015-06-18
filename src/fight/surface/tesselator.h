@@ -19,13 +19,8 @@
 #define SURFACE_TESSELATOR_H
 
 
-#include <QList>
-#include <QVector2D>
-#include <QVector3D>
-
-#include <vector>
-#include <glm/vec3.hpp>
-#include <glm/vec2.hpp>
+#include "betaspline.h"
+#include <QRect>
 
 
 namespace fight {
@@ -40,21 +35,20 @@ class Tesselator
 {
 public:
     Tesselator(int MaxLevel, Surface *surface);
-    ~Tesselator();
 
 public:
-	float heightAt(const QVector2D &pos);
-	float heightAt(const QVector2D &pos, QVector3D &normal);
-    Element* tesselate(QRect rect, int level, QVector3D scale, QByteArray &textureMap, QByteArray &textureDir, int mapping);
-    bool intersect(const QVector3D &start, const QVector3D &end, float radius, QVector3D &position, QVector3D &normal);
+	float heightAt(const glm::vec2 &pos);
+    float heightAt(const glm::vec2 &pos, glm::vec3 &normal);
+    void tesselate(Element &element, int level, const glm::vec3 &scale, QByteArray &textureMap, QByteArray &textureDir, int mapping);
+    bool intersect(const glm::vec3 &start, const glm::vec3 &end, float radius, glm::vec3 &position, glm::vec3 &normal);
 
 private:
     void InitIndices(int MaxLevel);
-    void PrepareElementSubset(int level, QVector3D scale, int x, int y, int textureId, QVector2D t0, QVector2D tu, QVector2D tv, Element *element);
+    void PrepareElementSubset(Element &element, int level, const glm::vec3 &scale, int x, int y, int textureId, const glm::vec2 &t0, const glm::vec2 &tu, const glm::vec2 &tv);
 
 private:
 	std::vector<BetaSpline> m_splines;
-	quint16 *indices;
+    std::vector<quint16> indices;
 
     Surface *m_surface;
 };

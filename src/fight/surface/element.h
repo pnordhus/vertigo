@@ -20,12 +20,7 @@
 
 
 #include "gfx/texture.h"
-#include <QVector>
-#include <QMap>
-#include <QVector2D>
-#include <QVector3D>
-#include <QPoint>
-
+#include <map>
 #include <glm/vec3.hpp>
 #include <glm/vec2.hpp>
 
@@ -39,8 +34,7 @@ class Surface;
 class Element
 {
 public:
-    Element(Surface *surface, QRect rect);
-    ~Element();
+    Element(Surface *surface, const QRect &rect);
 
 public:
     int numVertices(int textureId);
@@ -48,18 +42,19 @@ public:
     void addTriangle(int textureId, quint16 a, quint16 b, quint16 c);
 
     void draw();
+    QRect rect() const { return m_rect; }
     float maxZ() const { return m_maxZ; }
     float minZ() const { return m_minZ; }
-    QVector3D center() const;
-    bool testCollision(const QVector3D &center, float radius);
+    glm::vec3 center() const;
+    bool testCollision(const glm::vec3 &center, float radius);
 
 private:
     struct ElementSubset
     {
-        QVector<QVector3D> vertices;
-        QVector<QVector3D> normals;
-        QVector<QVector2D> texCoords;
-        QVector<quint16> indices;
+        std::vector<glm::vec3> vertices;
+        std::vector<glm::vec3> normals;
+        std::vector<glm::vec2> texCoords;
+        std::vector<quint16> indices;
     };
 
 private:
@@ -67,9 +62,9 @@ private:
     QRect m_rect;
     float m_maxZ;
     float m_minZ;
-    float *m_heights;
+    std::vector<float> m_heights;
 
-    QMap<int, ElementSubset> m_subsets;
+    std::map<int, ElementSubset> m_subsets;
 };
 
 

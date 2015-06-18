@@ -19,13 +19,8 @@
 #define FIGHT_SURFACE_H
 
 
-#include "../vector.h"
-#include "gfx/texture.h"
+#include "element.h"
 #include "tesselator.h"
-#include <QVector>
-#include <QMap>
-#include <QVector2D>
-#include <QVector3D>
 
 
 namespace fight {
@@ -37,34 +32,34 @@ class Element;
 class Surface
 {
 public:
-    Surface(const QString &name, int maxheightscale, int mapping);
-    ~Surface();
+    Surface();
+    void load(const QString &name, int maxheightscale, int mapping);
 
 public:
-    void draw(QVector3D position, QVector3D direction);
+    void draw(const glm::vec3 &position, const glm::vec3 &direction);
     float heightAt(float x, float y);
-    float heightAt(float x, float y, QVector3D &normal);
-    QVector3D scale() const { return m_scale; }
+    float heightAt(float x, float y, glm::vec3 &normal);
+    const glm::vec3& scale() const { return m_scale; }
     float height(int x, int y) const;
     void bindTexture(int textureId);
     void setHeight(int x, int y, int refx, int refy, int offset);
-    bool testCollision(const QVector3D &start, const QVector3D &end, float radius, QVector3D &position, QVector3D &normal);
+    bool testCollision(const glm::vec3 &start, const glm::vec3 &end, float radius, glm::vec3 &position, glm::vec3 &normal);
 
 private:
-    Element* getElement(QPoint pos);
+    Element& getElement(QPoint pos);
 
 private:
-    QList<gfx::Texture> m_textures;
+    std::vector<gfx::Texture> m_textures;
+    std::map<int, Element> m_elements;
     QImage m_heightMap;
     QByteArray m_textureMap;
     QByteArray m_textureDir;
-    QVector3D m_scale;
+    glm::vec3 m_scale;
     int m_mapping;
 
 private:
     static const int Level = 3;
     Tesselator m_tesselator;
-    QMap<int, Element*> m_elements;
 };
 
 

@@ -31,12 +31,12 @@ public:
     Billboard(gfx::TextureManager &texMan, txt::DesFile &name, int index);
 
 public:
-    void draw(QVector3D position, float angle, float scale, int time, const QMatrix4x4 &cameraMatrixInverted);
+    void draw(const glm::vec3 &position, float angle, float scale, int time, const glm::mat4 &cameraMatrixInverted);
 
     BoundingBox box();
-    bool intersect(const QVector3D &start, const QVector3D &dir, float &distance);
+    bool intersect(const glm::vec3 &start, const glm::vec3 &dir, float &distance);
     
-    int duration() const { return m_stages.count()*m_displayTime; }
+    int duration() const { return m_stages.size()*m_displayTime; }
     float range() const { return m_range; }
     float velocity() const { return m_velocity; }
     float collisionRadius() const { return m_collisionRadius; }
@@ -47,13 +47,13 @@ private:
     struct Stage
     {
         gfx::Texture texture;
-        QVector2D texCoords[4];
-        QVector2D scale;
-        QVector2D offset;
+        glm::vec2 texCoords[4];
+        glm::vec2 scale;
+        glm::vec2 offset;
     };
 
     int m_displayTime;
-    QList<Stage> m_stages;
+    std::vector<Stage> m_stages;
     float m_scale;
 
     float m_range;

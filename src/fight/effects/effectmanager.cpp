@@ -16,11 +16,7 @@
  ***************************************************************************/
 
 #include "effectmanager.h"
-#include "billboard.h"
-#include "projectile.h"
-#include "trash.h"
-#include "../surface/surface.h"
-#include "../collisionmanager.h"
+#include "../scenario.h"
 
 
 namespace fight {
@@ -33,101 +29,60 @@ EffectManager::EffectManager(Scenario *scenario) :
     
     file.load("vfx:sobjects/explosio.des");
     for (int i = 0; i < 27; i++)
-    {
-        Billboard *billboard = new Billboard(m_scenario->textureManager(), file, i);
-        m_billboards.insert((Effects)(Explosion_0 + i), billboard);
-    }
+        m_billboards.emplace(std::piecewise_construct,
+            std::forward_as_tuple((Effects)(Explosion_0 + i)),
+            std::forward_as_tuple(m_scenario->textureManager(), file, i));
     file.load("vfx:sobjects/shoot.des");
     for (int i = 0; i < 9; i++)
-    {
-        Billboard *billboard = new Billboard(m_scenario->textureManager(), file, i);
-        m_billboards.insert((Effects)(Shoot_0 + i), billboard);
-    }
+        m_billboards.emplace(std::piecewise_construct,
+            std::forward_as_tuple((Effects)(Shoot_0 + i)),
+            std::forward_as_tuple(m_scenario->textureManager(), file, i));
     file.load("vfx:sobjects/debris.des");
     for (int i = 0; i < 23; i++)
-    {
-        Billboard *billboard = new Billboard(m_scenario->textureManager(), file, i);
-        m_billboards.insert((Effects)(Debris_0 + i), billboard);
-    }
+        m_billboards.emplace(std::piecewise_construct,
+            std::forward_as_tuple((Effects)(Debris_0 + i)),
+            std::forward_as_tuple(m_scenario->textureManager(), file, i));
     file.load("vfx:sobjects/trash.des");
     for (int i = 0; i < 5; i++)
-    {
-        Billboard *billboard = new Billboard(m_scenario->textureManager(), file, i);
-        m_billboards.insert((Effects)(Trash_0 + i), billboard);
-    }
+        m_billboards.emplace(std::piecewise_construct,
+            std::forward_as_tuple((Effects)(Trash_0 + i)),
+            std::forward_as_tuple(m_scenario->textureManager(), file, i));
     file.load("vfx:sobjects/bubble.des");
     for (int i = 0; i < 3; i++)
-    {
-        Billboard *billboard = new Billboard(m_scenario->textureManager(), file, i);
-        m_billboards.insert((Effects)(Bubble_0 + i), billboard);
-    }
+        m_billboards.emplace(std::piecewise_construct,
+            std::forward_as_tuple((Effects)(Bubble_0 + i)),
+            std::forward_as_tuple(m_scenario->textureManager(), file, i));
 }
 
 
-EffectManager::~EffectManager()
+Effect* EffectManager::addEffect(Effects effect, const glm::vec3 &position, float angle, float scale)
 {
-    qDeleteAll(m_effects);
-    qDeleteAll(m_billboards.values());
-}
-
-
-Effect* EffectManager::create(Effects effect, float angle, float scale)
-{
-    return new Effect(m_scenario, getBillboard(effect), angle, scale);
-}
-
-
-void EffectManager::addEffect(Effects effect, const QVector3D &position, float angle, float scale)
-{
-    Effect *object = create(effect, angle, scale);
+    Effect *object = new Effect(m_scenario, getBillboard(effect), angle, scale);
+    m_effects.emplace_back(object);
     object->setPosition(position);
-    m_effects << object;
+    return object;
 }
 
 
-void EffectManager::addProjectile(Effects effect, const QVector3D &position, const QVector3D &direction)
+Projectile* EffectManager::addProjectile(Effects projectile, const glm::vec3 &position, const glm::vec3 &direction)
 {
-    Projectile *object = new Projectile(m_scenario, getBillboard(effect));
+    Projectile *object = new Projectile(m_scenario, getBillboard(projectile));
+    m_effects.emplace_back(object);
     object->setPosition(position);
     object->setDirection(direction);
-    m_effects << object;
-}
-
-
-Trash *EffectManager::createTrash(Effects trash, const QVector3D &position)
-{
-    Trash *object = new Trash(m_scenario, getBillboard(trash), qrand()%360);
-    
-    QVector3D pos = position + QVector3D(qrand()%50 - 25, qrand()%50 - 25, qrand()%25 - 25);
-    float height = m_scenario->surface()->heightAt(pos.x(), pos.y()) + 2;
-    if (pos.z() < height)
-        pos.setZ(height);
-    object->setPosition(pos);
-
-    m_scenario->collisionManager()->addObject(object);
-
     return object;
 }
 
 
 void EffectManager::update()
 {
-    foreach (Effect *effect, m_effects)
-        effect->update();
-    for (int i = 0; i < m_effects.count(); i++)
-        if (!m_effects[i]->isEnabled())
-        {
-            delete m_effects[i];
-            m_effects.removeAt(i);
-            i--;
-            continue;
-        }
+    m_effects.remove_if([](const std::unique_ptr<Effect> &effect) { return effect->update(); });
 }
 
 
 void EffectManager::draw()
 {
-    foreach (Effect *effect, m_effects)
+    for (const auto &effect : m_effects)
         effect->draw();
 }
 

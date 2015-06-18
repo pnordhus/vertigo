@@ -16,9 +16,11 @@
  ***************************************************************************/
 
 #include "building.h"
+#include "scenario.h"
 #include "surface/surface.h"
 #include "collisionmanager.h"
 
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace fight {
 
@@ -31,12 +33,13 @@ Building::Building(Scenario *scenario, const QString &name, int size, float angl
     txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
 
     int i = 0;
-    QVector3D scale = scenario->surface()->scale();
+    glm::vec3 scale = scenario->surface().scale();
 
     while (file.sections().contains(QString("cluster%1").arg(i))) {
         file.setSection(QString("cluster%1").arg(i));
 
-        Cluster cluster;
+        m_clusters.emplace_back();
+        Cluster &cluster = m_clusters.back();
         cluster.module = scenario->moduleManager().get(file.value("base").toString());
 
         file.setSection(QString("size%1").arg(i));
@@ -45,8 +48,8 @@ Building::Building(Scenario *scenario, const QString &name, int size, float angl
         file.setSection(QString("position%1").arg(i));
         int offsetX = file.value("OffsetX").toInt();
         int offsetY = file.value("OffsetY").toInt();
-        cluster.offset.setX(offsetX);
-        cluster.offset.setY(offsetY);
+        cluster.offset.x = offsetX;
+        cluster.offset.y = offsetY;
         cluster.offset *= scale;
 
         int clusterX = x + offsetX;
@@ -54,20 +57,20 @@ Building::Building(Scenario *scenario, const QString &name, int size, float angl
 
         int heightRef = file.value("HeightReference").toInt();
         if (heightRef >= 1000)
-            cluster.offset.setZ(m_clusters[heightRef - 1000].offset.z() + 256*cluster.scale); // TODO: test moar
+            cluster.offset.z = m_clusters[heightRef - 1000].offset.z + 256*cluster.scale; // TODO: test moar
         else
         {
             if (file.value("SurfaceLifting").toString() == "p")
             {
                 if (heightRef == 0)
-                    scenario->surface()->setHeight(clusterX, clusterY, refx, refy, 0);
+                    scenario->surface().setHeight(clusterX, clusterY, refx, refy, 0);
                 else
                 {
                     qDebug("Untested: HeightReference = -1");
-                    scenario->surface()->setHeight(clusterX, clusterY, clusterX, clusterY, -4); // TODO: test
+                    scenario->surface().setHeight(clusterX, clusterY, clusterX, clusterY, -4); // TODO: test
                 }
             }
-            cluster.offset.setZ(scenario->surface()->heightAt((clusterX + 0.5f)*scale.x(), (clusterY + 0.5f)*scale.y()));
+            cluster.offset.z = scenario->surface().heightAt((clusterX + 0.5f)*scale.x, (clusterY + 0.5f)*scale.y);
         }
 
         switch (file.value("cardinal").toString().toLatin1()[0]) {
@@ -85,69 +88,61 @@ Building::Building(Scenario *scenario, const QString &name, int size, float angl
             break;
         }
 
-        m_clusters << cluster;
         i++;
     }
 
-    QMutableListIterator<Cluster> it(m_clusters);
-    while (it.hasNext()) 
+    for (Cluster &cluster : m_clusters)
     {
-        Cluster &cluster = it.next();
-
-        QMatrix4x4 m;
-        m.translate((x + 0.5f)*scale.x(), (y + 0.5f - size)*scale.y(), 0);
-        m.rotate(m_angle, 0, 0, 1);
-        m.translate(cluster.offset.x(), cluster.offset.y(), cluster.offset.z());
-        m.scale(cluster.scale);
-        m.rotate(cluster.angle, 0, 0, 1);
-        m_box.add(cluster.module.box().transform(m));
+        glm::mat4 m;
+        m = glm::translate(m, glm::vec3((x + 0.5f)*scale.x, (y + 0.5f - size)*scale.y, 0));
+        m = glm::rotate(m, glm::radians(m_angle), glm::vec3(0, 0, 1));
+        m = glm::translate(m, cluster.offset);
+        m = glm::scale(m, glm::vec3(cluster.scale));
+        m = glm::rotate(m, glm::radians(cluster.angle), glm::vec3(0, 0, 1));
+        m_box.add(cluster.module->box().transform(m));
         
         cluster.transform = m;
-        cluster.invTransform = m.inverted();
+        cluster.invTransform = glm::inverse(m);
     }
 
     m_type = BuildingObject;
-    scenario->collisionManager()->addObject(this);
+    scenario->collisionManager().addObject(this);
 }
 
 
 void Building::draw()
 {
     glPushMatrix();
-    glTranslatef(m_position.x(), m_position.y() - m_size * 16.0f, 0);
+    glTranslatef(m_position.x, m_position.y - m_size * 16.0f, 0);
     glRotatef(m_angle, 0, 0, 1);
 
-    QMutableListIterator<Cluster> it(m_clusters);
-    while (it.hasNext()) {
-        Cluster &cluster = it.next();
-
+    for (Cluster &cluster : m_clusters)
+    {
         glPushMatrix();
-        glTranslatef(cluster.offset.x(), cluster.offset.y(), cluster.offset.z());
+        glTranslatef(cluster.offset.x, cluster.offset.y, cluster.offset.z);
         glScalef(cluster.scale, cluster.scale, cluster.scale);
         glRotatef(cluster.angle, 0, 0, 1);
-        cluster.module.draw();
+        cluster.module->draw();
         glPopMatrix();
     }
     glPopMatrix();
 }
 
 
-bool Building::intersect(const QVector3D &start, const QVector3D &dir, float radius, float &distance, QVector3D &normal)
+bool Building::intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal)
 {
     bool collision = false;
-    QMutableListIterator<Cluster> it(m_clusters);
-    while (it.hasNext()) 
+    for (Cluster &cluster : m_clusters)
     {
-        Cluster &cluster = it.next();
         float d;
-        QVector3D norm;
-        if (cluster.module.intersect(cluster.invTransform * start, (cluster.invTransform * QVector4D(dir, 0)).toVector3D()*cluster.scale, radius/cluster.scale, d, norm))
+        glm::vec3 norm;
+        if (cluster.module->intersect(glm::vec3(cluster.invTransform * glm::vec4(start, 1)), glm::vec3(cluster.invTransform * glm::vec4(dir, 0))*cluster.scale, radius/cluster.scale, d, norm))
         {
             d *= cluster.scale;
             if (!collision || distance > d)
             {
                 distance = d;
-                normal = (cluster.transform * QVector4D(normal, 0)).toVector3D()/cluster.scale;
+                normal = glm::vec3(cluster.transform * glm::vec4(norm, 0))/cluster.scale;
                 collision = true;
             }
         }

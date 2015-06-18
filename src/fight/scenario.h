@@ -20,10 +20,11 @@
 
 
 #include <QTime>
-#include "txt/desfile.h"
-#include "game/renderer.h"
 #include "object.h"
-#include "condition.h"
+#include "game/renderer.h"
+#include "surface/surface.h"
+#include "effects/effectmanager.h"
+#include "conditionmanager.h"
 
 #include <functional>
 
@@ -32,24 +33,22 @@ namespace fight {
 
 class Object;
 class Surface;
-class EffectManager;
-class CollisionManager;
 
 
 class Scenario : public game::Renderer
 {
 public:
     Scenario(const QString &name, std::function<void()> &&funcSuccess);
-    ~Scenario();
 
 public:
-    const QVector3D& position() const { return m_position; }
-    const QMatrix4x4& cameraMatrixInverted() const { return m_cameraMatrixInverted; }
-    Surface *surface() const { return m_surface; }
+    const glm::vec3& position() const { return m_position; }
+    const glm::mat4& cameraMatrixInverted() const { return m_cameraMatrixInverted; }
+    Surface& surface() { return m_surface; }
     gfx::TextureManager& textureManager() { return m_textureManager; }
     ModuleManager& moduleManager() { return m_moduleManager; }
-    EffectManager* effectManager() { return m_effectManager; }
-    CollisionManager* collisionManager() { return m_collisionManager; }
+    EffectManager& effectManager() { return m_effectManager; }
+    CollisionManager& collisionManager() { return m_collisionManager; }
+    ConditionManager& conditionManager() { return m_conditionManager; }
 
 protected:
     void draw();
@@ -57,7 +56,7 @@ protected:
     void keyReleaseEvent(QKeyEvent *);
 
 private:
-    QVector3D getPosition() const;
+    glm::vec3 getPosition();
 
 private:
     enum Type
@@ -77,15 +76,18 @@ private:
         TypeActiveBuilding = 2062,
     };
 
-    Surface *m_surface;
-    QVector3D m_position;
+    glm::vec3 m_position;
     txt::DesFile m_file;
+
+    Surface m_surface;
     gfx::TextureManager m_textureManager;
     ModuleManager m_moduleManager;
-    EffectManager *m_effectManager;
-    CollisionManager *m_collisionManager;
-    QList<Object*> m_objects;
-    QList<Object*> m_lightSources;
+    EffectManager m_effectManager;
+    CollisionManager m_collisionManager;
+    ConditionManager m_conditionManager;
+
+    std::vector<std::unique_ptr<Object>> m_objects;
+    std::vector<Object*> m_lightSources;
 
     QTime m_time;
 
@@ -96,35 +98,10 @@ private:
     float m_forwards;
     float m_backwards;
 
-    QMatrix4x4 m_cameraMatrix;
-    QMatrix4x4 m_cameraMatrixInverted;
+    glm::mat4 m_cameraMatrix;
+    glm::mat4 m_cameraMatrixInverted;
 
-    struct ConditionEntry
-    {
-        Condition *condTrigger;
-        int cond1;
-        int dep1;
-        int ref1;
-        int op;
-        int cond2;
-        int dep2;
-        int ref2;
-        int del;
-        ConditionEvent *condSignal;
-        ConditionEvent *condAttacked;
-        ConditionEvent *condIdentified;
-        ConditionEvent *condParalyzed;
-        ConditionEvent *condFinished;
-        ConditionEvent *condBoarded;
-    };
-    ConditionAutopilot m_condAutopilot;
-    ConditionFailure m_condFailure;
-    QMap<int, Condition> m_condObjectives;
-    QList<ConditionSpace *> m_condSpaces;
     std::function<void()> m_funcSuccess;
-
-private:
-    void initCondition(const QMap<int, ConditionEntry> &entries, int cond, int dep, int ref, Condition *condDepend);
 };
 
 
