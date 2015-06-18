@@ -15,12 +15,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "chapter.h"
 #include "vertigo.h"
 
 #include "fight/scenario.h"
 
-#include <QApplication>
+#include <QCoreApplication>
 
 namespace game {
 
@@ -29,25 +28,19 @@ Vertigo::Vertigo() :
        [this](QString name) { startGame(name); },
        [this](QString name) { loadGame(name); },
        [this]() { m_window.close(); }
-    ),
-    m_intro(NULL),
-    m_chapter(NULL)
+    )
 {
 }
 
-Vertigo::~Vertigo()
+void Vertigo::start(const QString &scenarioName)
 {
-    delete m_chapter;
-    delete m_intro;
-}
+    std::unique_ptr<fight::Scenario> scenario;
 
-bool Vertigo::start(const QString &scenario)
-{
-    if (scenario.isEmpty()) {
+    if (scenarioName.isEmpty()) {
         m_window.setRenderer(&m_mainMenu);
     } else {
-        m_scenario = new fight::Scenario(scenario, [this]() { delete m_scenario; QApplication::quit(); });
-        m_window.setRenderer(m_scenario);
+        scenario.reset(new fight::Scenario(scenarioName, [this]() { m_window.close(); }));
+        m_window.setRenderer(scenario.get());
     }
 
     m_window.show();
@@ -55,17 +48,14 @@ bool Vertigo::start(const QString &scenario)
         qApp->processEvents();
         util::DeferredDeletable::clear();
     }
-
-    return true;
 }
 
 void Vertigo::createChapter()
 {
-    Q_ASSERT(m_chapter == NULL);
-    m_chapter = new Chapter(m_name,
+    m_chapter.reset(new Chapter(m_name,
         [this](Renderer *renderer) { m_window.setRenderer(renderer); },
         [this]() { endGame(); }
-    );
+    ));
 }
 
 void Vertigo::startGame(const QString &name)
@@ -79,11 +69,8 @@ void Vertigo::startGame(const QString &name)
     }
 
     m_name = name;
-
-    Q_ASSERT(m_intro == NULL);
-    m_intro = new Movie([this]() { introFinished(); });
-
-    m_window.setRenderer(m_intro);
+    m_intro.reset(new Movie([this]() { introFinished(); }));
+    m_window.setRenderer(m_intro.get());
     m_intro->play("gfx:mvi/film/d02.mvi");
 }
 
@@ -95,16 +82,14 @@ void Vertigo::loadGame(const QString &name)
 
 void Vertigo::endGame()
 {
-    m_chapter->deleteLater();
-    m_chapter = NULL;
+    m_chapter.release()->deleteLater();
     m_window.setRenderer(&m_mainMenu);
 }
 
 void Vertigo::introFinished()
 {
     m_window.setRenderer(NULL);
-    delete m_intro;
-    m_intro = NULL;
+    m_intro.release()->deleteLater();
 
     createChapter();
     m_chapter->loadChapter(1);

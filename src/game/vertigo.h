@@ -18,31 +18,23 @@
 #ifndef GAME_VERTIGO_H
 #define GAME_VERTIGO_H
 
+#include "chapter.h"
 #include "mainmenu.h"
+#include "movie.h"
 #include "window.h"
 
 #include "gfx/fontmanager.h"
 #include "sfx/soundsystem.h"
 
-namespace fight {
-
-class Scenario;
-
-}
-
 namespace game {
-
-class Chapter;
-class Movie;
 
 class Vertigo
 {
 public:
     Vertigo();
-    ~Vertigo();
 
 public:
-    bool start(const QString &scenario);
+    void start(const QString &scenarioName);
 
 private:
     void startGame(const QString &name);
@@ -57,10 +49,9 @@ private:
     sfx::SoundSystem m_soundSystem;
     gfx::FontManager m_fontManager;
     MainMenu m_mainMenu;
-    Movie *m_intro;
-    Chapter *m_chapter;
+    std::unique_ptr<Movie> m_intro;
+    std::unique_ptr<Chapter> m_chapter;
     QString m_name;
-    fight::Scenario *m_scenario;
 };
 
 } // namespace game
