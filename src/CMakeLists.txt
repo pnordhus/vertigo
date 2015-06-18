@@ -150,8 +150,11 @@ set(SOURCES
     ui/widget.h
 
     util/core.h
+    util/deferreddeletable.cpp
+    util/deferreddeletable.h
     util/error.cpp
     util/error.h
+    util/event.hpp
     util/file.cpp
     util/file.h
 )

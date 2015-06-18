@@ -18,6 +18,7 @@
 #ifndef GAME_RENDERER_H
 #define GAME_RENDERER_H
 
+#include "util/deferreddeletable.h"
 
 #include <QMatrix4x4>
 #include <QRect>
@@ -30,7 +31,7 @@ class QMouseEvent;
 namespace game {
 
 
-class Renderer : public QObject
+class Renderer : public util::DeferredDeletable
 {
 public:
     Renderer();

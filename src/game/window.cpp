@@ -79,6 +79,8 @@ void Window::paintGL()
         m_renderer->setRect(rect());
         m_renderer->draw();
     }
+
+    util::DeferredDeletable::clear();
 }
 
 void Window::keyPressEvent(QKeyEvent *event)

@@ -18,16 +18,16 @@
 #ifndef UI_WIDGET_H
 #define UI_WIDGET_H
 
+#include "util/deferreddeletable.h"
 
 #include <QList>
-#include <QObject>
 #include <QRectF>
 
 
 namespace ui {
 
 
-class Widget : public QObject
+class Widget : public util::DeferredDeletable
 {
 public:
     Widget(Widget *parent = NULL, bool visible = true);
