@@ -162,7 +162,7 @@ void Desktop::deactivate()
 void Desktop::draw()
 {
     m_miniMovie.update(m_background);
-    setupOrthographicMatrix(640, 480);
+    setupGL();
     m_lblBackground.doDraw();
     if (m_room)
         m_room->doDraw();

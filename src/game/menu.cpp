@@ -33,7 +33,7 @@ Menu::Menu() :
 
 void Menu::draw()
 {
-    setupOrthographicMatrix(640, 480);
+    setupGL();
 
     if (m_rootWidget)
         m_rootWidget->doDraw();

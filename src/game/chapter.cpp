@@ -66,6 +66,8 @@ Chapter::Chapter(const QString &name, std::function<void(Renderer*)> funcSetRend
     s.endGroup();
 
     m_tasksFile.load("dat:story/tasks.des");
+
+    m_HUD.eventSuccess() += [this]() { finishMission(); };
 }
 
 
@@ -218,6 +220,8 @@ void Chapter::load(const QString &filename, bool load)
                 items.push_back(file.value("software").toInt());
             m_boat->setItems(mounting.name, items);
         }
+
+        m_HUD.load(m_boat);
     }
 
     // the intro has always been played
@@ -430,8 +434,9 @@ void Chapter::startScenario()
 
     Q_ASSERT(m_mission);
     Q_ASSERT(m_scenario == NULL);
-    m_scenario = new fight::Scenario(m_mission->scenario(), [this]() { finishMission(); });
-    m_funcSetRenderer(m_scenario);
+    m_scenario = new fight::Scenario(m_mission->scenario());
+    m_HUD.start(m_scenario);
+    m_funcSetRenderer(&m_HUD);
 }
 
 
@@ -693,6 +698,7 @@ void Chapter::toggleMovieHarbour()
 void Chapter::upgradeBoat(int type)
 {
     m_boat->upgrade(type);
+    m_HUD.load(m_boat);
 }
 
 

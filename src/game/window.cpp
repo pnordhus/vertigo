@@ -57,12 +57,6 @@ void Window::setRenderer(Renderer *renderer)
     }
 }
 
-void Window::initializeGL()
-{
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-}
-
 void Window::resizeGL(int w, int h)
 {
     glViewport(0, 0, w, h);

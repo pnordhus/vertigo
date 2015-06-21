@@ -19,9 +19,9 @@
 #define FIGHT_SCENARIO_H
 
 
+#include <QDebug>
 #include <QTime>
 #include "object.h"
-#include "game/renderer.h"
 #include "surface/surface.h"
 #include "effects/effectmanager.h"
 #include "conditionmanager.h"
@@ -35,14 +35,16 @@ class Object;
 class Surface;
 
 
-class Scenario : public game::Renderer
+class Scenario : public QObject
 {
 public:
-    Scenario(const QString &name, std::function<void()> &&funcSuccess);
+    Scenario(const QString &name);
 
 public:
-    const glm::vec3& position() const { return m_position; }
+    const glm::mat4& cameraMatrix() const { return m_cameraMatrix; }
     const glm::mat4& cameraMatrixInverted() const { return m_cameraMatrixInverted; }
+    const glm::vec3& position() const { return m_position; }
+
     Surface& surface() { return m_surface; }
     gfx::TextureManager& textureManager() { return m_textureManager; }
     ModuleManager& moduleManager() { return m_moduleManager; }
@@ -50,7 +52,8 @@ public:
     CollisionManager& collisionManager() { return m_collisionManager; }
     ConditionManager& conditionManager() { return m_conditionManager; }
 
-protected:
+public:
+    void setRect(const QRectF &rect);
     void draw();
     void keyPressEvent(QKeyEvent *);
     void keyReleaseEvent(QKeyEvent *);
@@ -98,10 +101,10 @@ private:
     float m_forwards;
     float m_backwards;
 
+    glm::mat4 m_projectionMatrix;
+    glm::mat4 m_projectionMatrixInverted;
     glm::mat4 m_cameraMatrix;
     glm::mat4 m_cameraMatrixInverted;
-
-    std::function<void()> m_funcSuccess;
 };
 
 

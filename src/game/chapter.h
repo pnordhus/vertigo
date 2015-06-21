@@ -27,6 +27,7 @@
 #include "movie.h"
 #include "task.h"
 #include "boat.h"
+#include "hud/hud.h"
 
 
 namespace fight { class Scenario; }
@@ -140,6 +141,7 @@ private:
     bool m_movieHarbour;
     Mission *m_mission;
     fight::Scenario *m_scenario;
+    hud::HUD m_HUD;
     txt::DesFile m_tasksFile;
     bool m_save;
     Boat *m_boat;

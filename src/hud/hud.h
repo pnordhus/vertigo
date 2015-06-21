@@ -15,46 +15,51 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GAME_MOVIE_H
-#define GAME_MOVIE_H
+#ifndef HUD_HUD_H
+#define HUD_HUD_H
 
 
-#include "renderer.h"
-#include "sfx/stream.h"
-#include "gfx/texture.h"
-#include "gfx/video.h"
-
-#include <functional>
-
-namespace game {
+#include "game/renderer.h"
+#include "util/event.hpp"
 
 
-class Movie : public Renderer
+namespace fight { class Scenario; }
+namespace game { class Boat; }
+
+
+namespace hud {
+
+
+class HUD : public game::Renderer
 {
 public:
-    Movie(std::function<void()> &&funcFinished);
+    HUD();
 
 public:
-    void play(const QString &filename);
-    void setRect(const QRect &rect);
+    util::event<>& eventSuccess() { return m_eventSuccess; }
+    void load(game::Boat *boat);
+    bool wide() const { return m_wide; }
+    QRectF rectHUD() const { return m_rectHUD; }
 
-private:
-    void activate();
-    void deactivate();
+    void start(fight::Scenario *scenario);
+
+protected:
+    void setRect(const QRect &rect);
     void draw();
     void keyPressEvent(QKeyEvent *);
-    void mousePressEvent(QMouseEvent *);
+    void keyReleaseEvent(QKeyEvent *);
 
 private:
-    gfx::Video m_video;
-    gfx::Texture m_texture;
-    sfx::Stream m_stream;
-    bool m_pause;
-    std::function<void()> m_funcFinished;
+    util::event<> m_eventSuccess;
+    game::Boat *m_boat;
+    bool m_wide;
+    QRectF m_rectHUD;
+
+    fight::Scenario *m_scenario;
 };
 
 
-} // namespace game
+} // namespace hud
 
 
-#endif // GAME_MOVIE_H
+#endif // HUD_HUD_H

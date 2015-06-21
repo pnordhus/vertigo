@@ -17,6 +17,10 @@
 
 #include "renderer.h"
 #include <QGLContext>
+#include <glm/vec4.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/matrix.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 
 namespace game {
@@ -45,12 +49,6 @@ void Renderer::setWindow(QWidget *window)
 }
 
 
-void Renderer::setRect(const QRect &rect)
-{
-    m_rect = rect;
-}
-
-
 void Renderer::showCursor()
 {
     m_cursorVisible = true;
@@ -60,6 +58,14 @@ void Renderer::showCursor()
 void Renderer::hideCursor()
 {
     m_cursorVisible = false;
+}
+
+
+void Renderer::setRect(const QRect &rect)
+{
+    m_rect = rect;
+
+    setupOrthographicMatrix(640, 480);
 }
 
 
@@ -74,11 +80,23 @@ void Renderer::setupOrthographicMatrix(float w, float h)
     if (ratioW < ratioH) {
         scale = ratioW;
         top = ((height() / scale) - h) / 2;
-    } else {
+    }
+    else {
         scale = ratioH;
         left = ((width() / scale) - w) / 2;
     }
 
+    m_rectOrtho = QRectF(-left, -top, w + 2*left, h + 2*top);
+
+    m_projectionMatrix = glm::ortho(m_rectOrtho.left(), m_rectOrtho.right(), m_rectOrtho.bottom(), m_rectOrtho.top());
+    m_projectionMatrixInverted = glm::inverse(m_projectionMatrix);
+}
+
+
+void Renderer::setupGL()
+{
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glDisable(GL_DEPTH_TEST);
@@ -88,11 +106,7 @@ void Renderer::setupOrthographicMatrix(float w, float h)
     glFrontFace(GL_CCW);
 
     glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(-left, w + left, h + top, -top, -1, 1);
-
-    getMatrix(GL_PROJECTION_MATRIX, m_projection.data());
-    m_projection.optimize();
+    glLoadMatrixf(glm::value_ptr(m_projectionMatrix));
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -101,10 +115,8 @@ void Renderer::setupOrthographicMatrix(float w, float h)
 
 QPointF Renderer::screenToImage(const QPointF &pos)
 {
-    QPointF p;
-    p.setX(pos.x() / width() * 2.0f - 1.0f);
-    p.setY(1.0f - pos.y() / height() * 2.0f);
-    return projection().inverted() * p;
+    glm::vec4 p = m_projectionMatrixInverted * glm::vec4(pos.x() / width() * 2.0f - 1.0f, 1.0f - pos.y() / height() * 2.0f, 0, 1);
+    return QPointF(p.x, p.y);
 }
 
 
