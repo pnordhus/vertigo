@@ -151,15 +151,15 @@ Depot::Depot(std::function<void()> &&funcClose) :
     m_itemList2 = new ui::ItemList([this](int n) { itemListClicked2(n); }, m_backgroundLabel, false);
     m_itemList2->setPosition(8, 293);
 
-    for (int i = 0; i < m_boat->mountings().count(); i++)
+    for (int i = 0; i < m_boat->mountings().size(); i++)
     {
-        Boat::Mounting *mounting = m_boat->mountings().at(i);
+        const Boat::Mounting &mounting = m_boat->mountings()[i];
         ui::Arrow &arrow = m_mountingArrows.emplace(
             std::piecewise_construct,
             std::forward_as_tuple(i),
-            std::forward_as_tuple(mounting->dir, mounting->pos, true, [this](int n) { loadMounting(n); }, m_backgroundLabel)
+            std::forward_as_tuple(mounting.dir, mounting.pos, true, [this](int n) { loadMounting(n); }, m_backgroundLabel)
         ).first->second;
-        arrow.setText(mounting->name);
+        arrow.setText(mounting.name);
         arrow.setValue(i);
         arrow.hide();
     }
@@ -217,7 +217,7 @@ void Depot::loadMounting(int index)
 
         m_loadingState = List2;
         m_loadingItem = 0;
-        m_list2 = m_boat->getItems(m_boat->mountings().at(m_mounting)->name);
+        m_list2 = m_boat->getItems(m_boat->mountings()[m_mounting].name);
         m_selectedList = 2;
         m_selectedItem = -1;
     }
@@ -293,7 +293,7 @@ void Depot::updateInfo()
 
     int price = Items::getDepotPrice(item->model);
     if (m_selectedList == 2) {
-        if (m_boat->canSell(item->model, m_boat->mountings().at(m_mounting)->name)) {
+        if (m_boat->canSell(item->model, m_boat->mountings()[m_mounting].name)) {
             m_lblItemPrice->setText(txt::StringTable::get(txt::Depot_Bid) + QString("%1").arg(price));
         } else {
             m_lblItemPrice->setText(txt::StringTable::get(txt::Depot_Value) + QString("%1").arg(price));
@@ -302,7 +302,7 @@ void Depot::updateInfo()
     if (m_selectedList == 1)
     {
         int oldModel;
-        m_boat->canBuy(item->model, m_boat->mountings().at(m_mounting)->name, &oldModel);
+        m_boat->canBuy(item->model, m_boat->mountings()[m_mounting].name, &oldModel);
         if (oldModel > 0)
         {
             int oldPrice = Items::getDepotPrice(oldModel);
@@ -348,7 +348,7 @@ void Depot::updateButtons()
         else
             m_btnBuy->disable();
 
-        if (m_selectedList == 2 && m_boat->canSell(m_list2.at(m_selectedItem), m_boat->mountings().at(m_mounting)->name))
+        if (m_selectedList == 2 && m_boat->canSell(m_list2.at(m_selectedItem), m_boat->mountings()[m_mounting].name))
             m_btnSell->enable();
         else
             m_btnSell->disable();
@@ -358,7 +358,7 @@ void Depot::updateButtons()
 
 void Depot::buy()
 {
-    const QString &mounting = m_boat->mountings().at(m_mounting)->name;
+    const QString &mounting = m_boat->mountings()[m_mounting].name;
     if (m_selectedList != 1)
         return;
     Items::Item *item = Items::get(m_list1.at(m_selectedItem));
@@ -393,8 +393,8 @@ void Depot::buy()
 
 void Depot::sell()
 {
-    const QString &mounting = m_boat->mountings().at(m_mounting)->name;
-    if (m_selectedList != 2 || m_selectedItem >= m_list2.count())
+    const QString &mounting = m_boat->mountings()[m_mounting].name;
+    if (m_selectedList != 2 || m_selectedItem >= m_list2.size())
         return;
     Items::Item *item = Items::get(m_list2.at(m_selectedItem));
     if (!m_boat->canSell(item->model, mounting))
@@ -412,8 +412,8 @@ void Depot::sell()
     m_itemList2->clear();
     foreach (int model, m_list2)
         m_itemList2->addItem(Items::get(model)->icon);
-    if (m_selectedItem >= m_list2.count())
-        m_selectedItem = m_list2.count() - 1;
+    if (m_selectedItem >= m_list2.size())
+        m_selectedItem = m_list2.size() - 1;
     m_itemList2->selectItem(m_selectedItem);
 
     updateInfo();
@@ -488,10 +488,10 @@ void Depot::draw()
         {
             int i;
             int j = 0;
-            for (i = 0; i < m_boat->mountings().count(); i++)
+            for (i = 0; i < m_boat->mountings().size(); i++)
             {
-                Boat::Mounting *mounting = m_boat->mountings().at(i);
-                if (mounting->side + 1 == m_side)
+                const Boat::Mounting &mounting = m_boat->mountings()[i];
+                if (mounting.side + 1 == m_side)
                 {
                     if (m_loadingItem == 0)
                         m_mounting = i;
@@ -504,18 +504,18 @@ void Depot::draw()
                     j++;
                 }
             }
-            if (i >= m_boat->mountings().count())
+            if (i >= m_boat->mountings().size())
             {
                 m_loadingState = List2;
                 m_loadingItem = 0;
-                m_list2 = m_boat->getItems(m_boat->mountings().at(m_mounting)->name);
+                m_list2 = m_boat->getItems(m_boat->mountings()[m_mounting].name);
                 m_selectedList = 2;
                 m_selectedItem = -1;
             }
         }
         if (m_loadingState == List2)
         {
-            if (m_loadingItem < m_list2.count())
+            if (m_loadingItem < m_list2.size())
             {
                 int model = m_list2.at(m_loadingItem);
                 m_itemList2->addItem(Items::get(model)->icon);
@@ -531,16 +531,16 @@ void Depot::draw()
             {
                 m_loadingState = List1;
                 m_loadingItem = -1;
-                m_list1 = Items::getDepotItems(m_boat->mountings().at(m_mounting)->name);
+                m_list1 = Items::getDepotItems(m_boat->mountings()[m_mounting].name);
             }
         }
         if (m_loadingState == List1)
         {
             if (m_loadingItem < 0)
                 m_loadingItem++;
-            else if (m_loadingItem < m_list1.count())
+            else if (m_loadingItem < m_list1.size())
             {
-                while (m_loadingItem < m_list1.count())
+                while (m_loadingItem < m_list1.size())
                 {
                     int model = m_list1.at(m_loadingItem);
                     bool compatible = m_boat->isCompatible(model);

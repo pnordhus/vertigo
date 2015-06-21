@@ -22,6 +22,8 @@
 #include <QString>
 #include <QPoint>
 #include <QList>
+#include <vector>
+#include <set>
 
 
 namespace game {
@@ -31,7 +33,6 @@ class Boat
 {
 public:
     Boat(int type);
-    ~Boat();
 
 public:
     struct Mounting
@@ -50,17 +51,19 @@ public:
     const QString& flipMovie1() const { return m_flipMovie1; }
     const QString& flipMovie2() const { return m_flipMovie2; }
 
-    const QList<Mounting*>& mountings() const { return m_mountings; }
+    const std::vector<Mounting>& mountings() const { return m_mountings; }
 
-    QList<int> getItems(const QString& mounting);
-    void setItems(const QString& mounting, const QList<int> &items);
+    std::vector<int> getItems(const QString& mounting);
+    void setItems(const QString& mounting, const std::vector<int> &items);
     bool canBuy(int model, const QString& mounting, int *oldModel);
     bool canSell(int model, const QString& mounting);
     bool isCompatible(int model);
     void buy(int model, const QString& mounting);
     void sell(int model, int index, const QString& mounting);
 
-    const QList<int>& torpedoes() const { return m_torpedoes; }
+    void upgrade(int type);
+
+    const std::vector<int>& torpedoes() const { return m_torpedoes; }
     int magazine() const { return m_magazine; }
     int gun() const { return m_gun; }
     int engine() const { return m_engine; }
@@ -73,10 +76,11 @@ public:
     int tur1soft() const { return m_tur1soft; }
     int tur2() const { return m_tur2; }
     int tur2soft() const { return m_tur2soft; }
-    const QList<int>& buzzers() const { return m_buzzers; }
+    const std::vector<int>& buzzers() const { return m_buzzers; }
     int fixer() const { return m_fixer; }
 
 private:
+    void load();
     void addMounting(const QString &name, int side, int type, int x, int y, const QString &dir);
     int getCapacity(int magazine);
 
@@ -87,11 +91,11 @@ private:
     QString m_flipMovie1;
     QString m_flipMovie2;
 
-    QList<Mounting*> m_mountings;
-    QList<int> m_compatibility;
+    std::vector<Mounting> m_mountings;
+    std::set<int> m_compatibility;
     int m_maxBuzzers;
 
-    QList<int> m_torpedoes;
+    std::vector<int> m_torpedoes;
     int m_magazine;
     int m_gun;
     int m_engine;
@@ -104,7 +108,7 @@ private:
     int m_tur1soft;
     int m_tur2;
     int m_tur2soft;
-    QList<int> m_buzzers;
+    std::vector<int> m_buzzers;
     int m_fixer;
 };
 

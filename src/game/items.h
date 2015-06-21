@@ -23,7 +23,6 @@
 #include "gfx/image.h"
 #include <QString>
 #include <QStringList>
-#include <QMap>
 
 
 namespace game {
@@ -36,7 +35,6 @@ public:
 
 public:
     Items();
-    ~Items();
 
 public:
     struct Item
@@ -53,15 +51,15 @@ public:
 
 public:
     static Item* get(int model);
-    static QList<int> getDepotItems(const QString &mounting);
+    static std::vector<int> getDepotItems(const QString &mounting);
     static int getDepotPrice(int model);
 
 private:
     void addItem(int model, Type type, const QString &name, const QString &imgname, const QString &txtname);
-    static void insertType(Type type, QList<int> &list);
+    static void insertType(Type type, std::vector<int> &list);
 
 private:
-    QMap<int, Item*> m_items;
+    std::map<int, Item> m_items;
 };
 
 

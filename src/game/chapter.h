@@ -106,6 +106,7 @@ private:
     void disableStation(int station);
     void addMission(const QString &mission, int station);
     void replaceApproachMovie(int station, const QString &movie);
+    void upgradeBoat(int type);
     void gameOver();
     void startScenario();
     void finishMission();
