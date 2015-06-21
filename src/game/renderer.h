@@ -65,7 +65,7 @@ protected:
     void showCursor();
     void hideCursor();
     void setupOrthographicMatrix(float w, float h);
-    void setupGL();
+    void setupGL(bool clear = true);
     QWidget* window() const { return m_window; }
 
 protected:

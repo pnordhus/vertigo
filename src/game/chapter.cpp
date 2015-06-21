@@ -189,38 +189,7 @@ void Chapter::load(const QString &filename, bool load)
     if (file.contains("type"))
     {
         delete m_boat;
-        m_boat = new Boat(file.value("type").toInt());
-
-        for (int i = 0; i < m_boat->mountings().size(); i++)
-        {
-            const Boat::Mounting &mounting = m_boat->mountings()[i];
-            file.setSection(QString("ShipMounting%1").arg(i));
-            std::vector<int> items;
-            if (file.contains("armor"))
-                items.push_back(file.value("armor").toInt());
-            if (file.contains("nrs"))
-                items.push_back(5126);
-            if (file.contains("sensor"))
-                items.push_back(file.value("sensor").toInt());
-            if (file.contains("fixer"))
-                items.push_back(9218);
-            for (int buzzer = 0; file.contains(QString("buzzer%1").arg(buzzer)); buzzer++)
-                items.push_back(9217);
-            if (file.contains("engine"))
-                items.push_back(file.value("engine").toInt());
-            if (file.contains("booster"))
-                items.push_back(4100);
-            if (file.contains("silator"))
-                items.push_back(4101);
-            if (file.contains("model"))
-                items.push_back(file.value("model").toInt());
-            for (int torpedo = 0; file.contains(QString("torpedo%1").arg(torpedo)); torpedo++)
-                items.push_back(file.value(QString("torpedo%1").arg(torpedo)).toInt());
-            if (file.contains("software"))
-                items.push_back(file.value("software").toInt());
-            m_boat->setItems(mounting.name, items);
-        }
-
+        m_boat = new Boat(file);
         m_HUD.load(m_boat);
     }
 

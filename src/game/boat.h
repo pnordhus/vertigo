@@ -21,9 +21,9 @@
 
 #include <QString>
 #include <QPoint>
-#include <QList>
 #include <vector>
 #include <set>
+#include "txt/desfile.h"
 
 
 namespace game {
@@ -32,7 +32,7 @@ namespace game {
 class Boat
 {
 public:
-    Boat(int type);
+    Boat(txt::DesFile &file);
 
 public:
     struct Mounting
@@ -54,7 +54,6 @@ public:
     const std::vector<Mounting>& mountings() const { return m_mountings; }
 
     std::vector<int> getItems(const QString& mounting);
-    void setItems(const QString& mounting, const std::vector<int> &items);
     bool canBuy(int model, const QString& mounting, int *oldModel);
     bool canSell(int model, const QString& mounting);
     bool isCompatible(int model);

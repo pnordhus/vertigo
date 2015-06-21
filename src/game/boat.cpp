@@ -17,14 +17,12 @@
 
 #include "boat.h"
 #include "items.h"
-#include "txt/desfile.h"
 
 
 namespace game {
 
 
-Boat::Boat(int type) : 
-    m_type(type),
+Boat::Boat(txt::DesFile &file) : 
     m_nrskin(0),
     m_fixer(0),
     m_booster(0),
@@ -34,7 +32,37 @@ Boat::Boat(int type) :
     m_tur2(0),
     m_tur2soft(0)
 {
+    file.setSection("Ship");
+    m_type = file.value("type").toInt();
     load();
+
+    for (int i = 0; i < m_mountings.size(); i++)
+    {
+        const Mounting &mounting = m_mountings[i];
+        file.setSection(QString("ShipMounting%1").arg(i));
+        if (file.contains("armor"))
+            buy(file.value("armor").toInt(), mounting.name);
+        if (file.contains("nrs"))
+            buy(5126, mounting.name);
+        if (file.contains("sensor"))
+            buy(file.value("sensor").toInt(), mounting.name);
+        if (file.contains("fixer"))
+            buy(9218, mounting.name);
+        for (int buzzer = 0; file.contains(QString("buzzer%1").arg(buzzer)); buzzer++)
+            buy(9217, mounting.name);
+        if (file.contains("engine"))
+            buy(file.value("engine").toInt(), mounting.name);
+        if (file.contains("booster"))
+            buy(4100, mounting.name);
+        if (file.contains("silator"))
+            buy(4101, mounting.name);
+        if (file.contains("model"))
+            buy(file.value("model").toInt(), mounting.name);
+        for (int torpedo = 0; file.contains(QString("torpedo%1").arg(torpedo)); torpedo++)
+            buy(file.value(QString("torpedo%1").arg(torpedo)).toInt(), mounting.name);
+        if (file.contains("software"))
+            buy(file.value("software").toInt(), mounting.name);
+    }
 }
 
 
@@ -162,13 +190,6 @@ std::vector<int> Boat::getItems(const QString& mounting)
             list.push_back(m_tur2soft);
     }
     return list;
-}
-
-
-void Boat::setItems(const QString& mounting, const std::vector<int> &items)
-{
-    for (int model : items)
-        buy(model, mounting);
 }
 
 

@@ -21,6 +21,7 @@
 
 #include "game/renderer.h"
 #include "util/event.hpp"
+#include "ui/label.h"
 
 
 namespace fight { class Scenario; }
@@ -40,7 +41,6 @@ public:
     void load(game::Boat *boat);
     bool wide() const { return m_wide; }
     QRectF rectHUD() const { return m_rectHUD; }
-
     void start(fight::Scenario *scenario);
 
 protected:
@@ -54,8 +54,10 @@ private:
     game::Boat *m_boat;
     bool m_wide;
     QRectF m_rectHUD;
-
     fight::Scenario *m_scenario;
+
+    ui::Label m_cockpit;
+
 };
 
 

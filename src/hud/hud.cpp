@@ -16,9 +16,10 @@
  ***************************************************************************/
 
 #include "hud.h"
+#include <QKeyEvent>
 #include "fight/scenario.h"
 #include "game/boat.h"
-#include <QKeyEvent>
+#include "gfx/image.h"
 
 
 namespace hud {
@@ -34,6 +35,7 @@ void HUD::load(game::Boat *boat)
 {
     m_boat = boat;
     m_wide = false;
+    m_cockpit.setTexture(gfx::Image::load(QString("vfx:cockpit/%1/cockpit.r16").arg(boat->cockpit()), 640, 480, true));
 }
 
 
@@ -65,6 +67,10 @@ void HUD::draw()
         m_scenario->draw();
     if (m_rectHUD.top() > 0 || m_rectHUD.left() > 0)
         glViewport(0, 0, rect().width(), rect().height());
+
+    setupGL(false);
+
+    m_cockpit.doDraw();
 }
 
 

@@ -21,6 +21,7 @@
 
 #include <QDebug>
 #include <QTime>
+#include "util/deferreddeletable.h"
 #include "object.h"
 #include "surface/surface.h"
 #include "effects/effectmanager.h"
@@ -35,7 +36,7 @@ class Object;
 class Surface;
 
 
-class Scenario : public QObject
+class Scenario : public util::DeferredDeletable
 {
 public:
     Scenario(const QString &name);
