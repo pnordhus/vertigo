@@ -57,8 +57,6 @@ int main(int argc, char *argv[])
     }
 
     game::Vertigo vertigo;
-    if (!vertigo.start(scenario))
-        return 1;
-
-    return app.exec();
+    vertigo.start(scenario);
+    return 0;
 }

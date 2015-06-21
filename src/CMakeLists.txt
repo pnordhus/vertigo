@@ -38,8 +38,6 @@ set(SOURCES
     fight/turret.h
     fight/turretbase.cpp
     fight/turretbase.h
-    fight/vector.cpp
-    fight/vector.h
 
     fight/effects/billboard.cpp
     fight/effects/billboard.h
@@ -152,8 +150,11 @@ set(SOURCES
     ui/widget.h
 
     util/core.h
+    util/deferreddeletable.cpp
+    util/deferreddeletable.h
     util/error.cpp
     util/error.h
+    util/event.hpp
     util/file.cpp
     util/file.h
 )

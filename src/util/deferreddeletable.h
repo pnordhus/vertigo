@@ -1,5 +1,5 @@
 /***************************************************************************
- *  Copyright (C) 2010  Philipp Nordhus                                    *
+ *  Copyright (C) 2015  Philipp Nordhus                                    *
  *                                                                         *
  *  This program is free software: you can redistribute it and/or modify   *
  *  it under the terms of the GNU General Public License as published by   *
@@ -15,45 +15,28 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GAME_VERTIGO_H
-#define GAME_VERTIGO_H
+#ifndef UTIL_DEFERREDDELETABLE_H
+#define UTIL_DEFERREDDELETABLE_H
 
-#include "chapter.h"
-#include "mainmenu.h"
-#include "movie.h"
-#include "window.h"
+#include "core.h"
 
-#include "gfx/fontmanager.h"
-#include "sfx/soundsystem.h"
+#include <memory>
+#include <vector>
 
-namespace game {
+namespace util {
 
-class Vertigo
+class DeferredDeletable : no_copy
 {
 public:
-    Vertigo();
-
-public:
-    void start(const QString &scenarioName);
-
-private:
-    void startGame(const QString &name);
-    void loadGame(const QString &name);
-    void endGame();
-    void introFinished();
-    void createMainMenu(bool skipToTitle);
-    void createChapter();
+    virtual ~DeferredDeletable() {}
+    void deleteLater();
+    static void clear();
 
 private:
-    Window m_window;
-    sfx::SoundSystem m_soundSystem;
-    gfx::FontManager m_fontManager;
-    MainMenu m_mainMenu;
-    std::unique_ptr<Movie> m_intro;
-    std::unique_ptr<Chapter> m_chapter;
-    QString m_name;
+    static std::vector<std::unique_ptr<DeferredDeletable>> m_deletePool;
 };
 
-} // namespace game
+} // namespace util
 
-#endif // GAME_VERTIGO_H
+#endif // UTIL_DEFERREDDELETABLE_H
+

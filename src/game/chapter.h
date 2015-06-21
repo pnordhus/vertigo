@@ -36,7 +36,7 @@ namespace fight { class Scenario; }
 namespace game {
 
 
-class Chapter : public QObject
+class Chapter : public util::DeferredDeletable
 {
 public:
     struct SavedGame
