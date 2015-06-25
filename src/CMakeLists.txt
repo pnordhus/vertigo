@@ -122,6 +122,9 @@ set(SOURCES
     gfx/video.cpp
     gfx/video.h
 
+    hud/hud.cpp
+    hud/hud.h
+
     sfx/sound.cpp
     sfx/sound.h
     sfx/soundsystem.cpp
