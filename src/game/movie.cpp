@@ -58,6 +58,14 @@ void Movie::play(const QString &filename)
 }
 
 
+void Movie::setRect(const QRect &rect)
+{
+    Renderer::setRect(rect);
+
+    setupOrthographicMatrix(m_texture.width(), m_texture.height());
+}
+
+
 void Movie::draw()
 {
     if (m_video.atEnd() && !m_stream.isPlaying()) {
@@ -78,7 +86,7 @@ void Movie::draw()
                 m_texture.update(0, 2, image);
         }
 
-        setupOrthographicMatrix(m_texture.width(), m_texture.height());
+        setupGL();
         m_texture.draw();
     }
 }

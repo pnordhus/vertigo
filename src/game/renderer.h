@@ -20,8 +20,9 @@
 
 #include "util/deferreddeletable.h"
 
-#include <QMatrix4x4>
+#include <QDebug>
 #include <QRect>
+#include <glm/mat4x4.hpp>
 
 
 class QKeyEvent;
@@ -44,11 +45,13 @@ public:
 public:
     void setWindow(QWidget *window);
     virtual bool isCursorVisible() const { return m_cursorVisible; }
-    void setRect(const QRect &rect);
+    virtual void setRect(const QRect &rect);
     QRect rect() const { return m_rect; }
     int width() const { return m_rect.width(); }
     int height() const { return m_rect.height(); }
-    QMatrix4x4 projection() const { return m_projection; }
+    const glm::mat4& projectionMatrix() const { return m_projectionMatrix; }
+    const glm::mat4& projectionMatrixInverted() const { return m_projectionMatrixInverted; }
+    QRectF rectOrtho() const { return m_rectOrtho; }
     QPointF screenToImage(const QPointF &pos);
 
 public:
@@ -62,12 +65,17 @@ protected:
     void showCursor();
     void hideCursor();
     void setupOrthographicMatrix(float w, float h);
+    void setupGL(bool clear = true);
     QWidget* window() const { return m_window; }
+
+protected:
+    glm::mat4 m_projectionMatrix;
+    glm::mat4 m_projectionMatrixInverted;
 
 private:
     bool m_cursorVisible;
     QRect m_rect;
-    QMatrix4x4 m_projection;
+    QRectF m_rectOrtho;
     QWidget *m_window;
 };
 

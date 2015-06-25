@@ -89,8 +89,8 @@ private:
     int m_side;
     int m_mounting;
     std::map<int, ui::Arrow> m_mountingArrows;
-    QList<int> m_list1;
-    QList<int> m_list2;
+    std::vector<int> m_list1;
+    std::vector<int> m_list2;
     int m_selectedList;
     int m_selectedItem;
 

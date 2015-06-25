@@ -36,6 +36,7 @@ public:
 
 public:
     void play(const QString &filename);
+    void setRect(const QRect &rect);
 
 private:
     void activate();

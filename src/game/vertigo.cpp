@@ -17,7 +17,10 @@
 
 #include "vertigo.h"
 
+#include "hud/hud.h"
+#include "game/boat.h"
 #include "fight/scenario.h"
+#include "txt/desfile.h"
 
 #include <QCoreApplication>
 
@@ -34,13 +37,20 @@ Vertigo::Vertigo() :
 
 void Vertigo::start(const QString &scenarioName)
 {
+    std::unique_ptr<hud::HUD> hud;
+    std::unique_ptr<game::Boat> boat;
     std::unique_ptr<fight::Scenario> scenario;
 
     if (scenarioName.isEmpty()) {
         m_window.setRenderer(&m_mainMenu);
     } else {
-        scenario.reset(new fight::Scenario(scenarioName, [this]() { m_window.close(); }));
-        m_window.setRenderer(scenario.get());
+        hud.reset(new hud::HUD());
+        hud->eventSuccess() += [this]() { m_window.close(); };
+        boat.reset(new game::Boat(txt::DesFile("dat:story/ch1.des")));
+        hud->load(boat.get());
+        scenario.reset(new fight::Scenario(scenarioName));
+        hud->start(scenario.get());
+        m_window.setRenderer(hud.get());
     }
 
     m_window.show();

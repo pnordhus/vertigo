@@ -36,7 +36,7 @@
 namespace fight {
 
 
-Scenario::Scenario(const QString &name, std::function<void()> &&funcSuccess) :
+Scenario::Scenario(const QString &name) :
     m_moduleManager(m_textureManager),
     m_effectManager(this),
     m_conditionManager(this),
@@ -45,12 +45,10 @@ Scenario::Scenario(const QString &name, std::function<void()> &&funcSuccess) :
     m_up(0.0f),
     m_down(0.0f),
     m_forwards(0.0f),
-    m_backwards(0.0f),
-    m_funcSuccess(std::move(funcSuccess))
+    m_backwards(0.0f)
 {
     qsrand(name.right(4).toInt());
 
-    hideCursor();
     m_file.load(QString("vfx:scenario/%1.des").arg(name));
 
     m_file.setSection("surface");
@@ -288,6 +286,13 @@ Scenario::Scenario(const QString &name, std::function<void()> &&funcSuccess) :
 }
 
 
+void Scenario::setRect(const QRectF &rect)
+{
+    m_projectionMatrix = glm::perspective(glm::radians(60.0f), float(rect.width() / rect.height()), 0.1f, 10000.0f);
+    m_projectionMatrixInverted = glm::inverse(m_projectionMatrix);
+}
+
+
 void Scenario::draw()
 {
     const float angleY = (m_right - m_left) * 2.0f;
@@ -336,7 +341,7 @@ void Scenario::draw()
     glEnable(GL_DEPTH_TEST);
 
     glMatrixMode(GL_PROJECTION);
-    glLoadMatrixf(glm::value_ptr(glm::perspective(glm::radians(60.0f), float(rect().width()) / rect().height(), 0.1f, 10000.0f)));
+    glLoadMatrixf(glm::value_ptr(m_projectionMatrix));
 
     glMatrixMode(GL_MODELVIEW);
     glLoadMatrixf(glm::value_ptr(m_cameraMatrix));
@@ -407,9 +412,6 @@ void Scenario::draw()
 
 void Scenario::keyPressEvent(QKeyEvent *e)
 {
-    if (e->key() == Qt::Key_Escape)
-        m_funcSuccess();
-
     if (e->key() == Qt::Key_Left)
         m_left = 1.0f;
     if (e->key() == Qt::Key_Right)

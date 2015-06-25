@@ -20,7 +20,7 @@
 
 
 #include <QString>
-#include <QMap>
+#include <map>
 
 
 namespace game {
@@ -39,14 +39,14 @@ public:
     int index() const { return m_index; }
     const QString& shortName() const { return m_shortName; }
     const QString& name() const { return m_name; }
-    const QMap<int, float>& depotPrices() const { return m_depotPrices; }
+    const std::map<int, float>& depotPrices() const { return m_depotPrices; }
 
 private:
     int m_index;
     QString m_shortName;
     QString m_name;
     bool m_enabled;
-    QMap<int, float> m_depotPrices;
+    std::map<int, float> m_depotPrices;
 };
 
 

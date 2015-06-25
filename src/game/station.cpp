@@ -47,7 +47,7 @@ Station::Station(int index, const QString &name) :
         str.truncate(str.indexOf(' '));
         int model = str.toInt();
         if (model != 99999)
-            m_depotPrices.insert(model, file.value(QString("Entry%1Cost").arg(entry)).toFloat());
+            m_depotPrices[model] = file.value(QString("Entry%1Cost").arg(entry)).toFloat();
     }
 
 }

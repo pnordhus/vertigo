@@ -123,6 +123,9 @@ Dialog::Dialog(int chapter, int id, ui::Widget *parent,
             message.type = Message::ReplaceApproachMovie;
             message.value = file.value("Station").toInt();
             message.name = file.value("Name").toString();
+        } else if (type == "boat") {
+            message.type = Message::Boat;
+            message.value = file.value("Boat").toInt();
         } else if (type == "endgame") {
             message.type = Message::GameOver;
         }
@@ -210,6 +213,10 @@ void Dialog::select()
 
                 case Message::ReplaceApproachMovie:
                     m_funcReplaceApproachMovie(message.value, message.name + ".mvi");
+                    break;
+
+                case Message::Boat:
+                    // 2048 + message.value
                     break;
 
                 case Message::GameOver:

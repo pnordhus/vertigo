@@ -15,55 +15,53 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef GAME_ITEMS_H
-#define GAME_ITEMS_H
+#ifndef HUD_HUD_H
+#define HUD_HUD_H
 
 
-#include "station.h"
-#include "gfx/image.h"
-#include <QString>
-#include <QStringList>
+#include "game/renderer.h"
+#include "util/event.hpp"
+#include "ui/label.h"
 
 
-namespace game {
+namespace fight { class Scenario; }
+namespace game { class Boat; }
 
 
-class Items
+namespace hud {
+
+
+class HUD : public game::Renderer
 {
 public:
-    enum Type { Torpedo, Magazine, Gun, Engine, Booster, Silator, Armor, NRSkin, Sensor, Software, Buzzer, Fixer };
+    HUD();
 
 public:
-    Items();
+    util::event<>& eventSuccess() { return m_eventSuccess; }
+    void load(game::Boat *boat);
+    bool wide() const { return m_wide; }
+    QRectF rectHUD() const { return m_rectHUD; }
+    void start(fight::Scenario *scenario);
 
-public:
-    struct Item
-    {
-        int model;
-        Type type;
-        int cost;
-        QString longname;
-        QString imgname;
-        QStringList text;
-        gfx::Image icon;
-    };
-
-
-public:
-    static Item* get(int model);
-    static std::vector<int> getDepotItems(const QString &mounting);
-    static int getDepotPrice(int model);
+protected:
+    void setRect(const QRect &rect);
+    void draw();
+    void keyPressEvent(QKeyEvent *);
+    void keyReleaseEvent(QKeyEvent *);
 
 private:
-    void addItem(int model, Type type, const QString &name, const QString &imgname, const QString &txtname);
-    static void insertType(Type type, std::vector<int> &list);
+    util::event<> m_eventSuccess;
+    game::Boat *m_boat;
+    bool m_wide;
+    QRectF m_rectHUD;
+    fight::Scenario *m_scenario;
 
-private:
-    std::map<int, Item> m_items;
+    ui::Label m_cockpit;
+
 };
 
 
-} // namespace game
+} // namespace hud
 
 
-#endif // GAME_ITEMS_H
+#endif // HUD_HUD_H

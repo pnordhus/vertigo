@@ -62,6 +62,7 @@ private:
             AddMissionStation,
             AddMissionArea,
             ReplaceApproachMovie,
+            Boat,
             GameOver
         };
 

@@ -103,26 +103,20 @@ Items::Items()
     {
         QString str = file.value(QString("C%1").arg(c)).toString();
         str.truncate(str.indexOf(' '));
-        Item *item = m_items.value(str.toInt());
-        if (item)
-            item->cost = file.value(QString("C%1C").arg(c)).toInt();
+        auto it = m_items.find(str.toInt());
+        if (it != m_items.end())
+            it->second.cost = file.value(QString("C%1C").arg(c)).toInt();
     }
-}
-
-
-Items::~Items()
-{
-    qDeleteAll(m_items);
 }
 
 
 void Items::addItem(int model, Type type, const QString &name, const QString &imgname, const QString &txtname)
 {
-    Item *item = new Item;
-    item->model = model;
-    item->type = type;
-    item->longname = name;
-    item->imgname = imgname;
+    Item &item = m_items[model];
+    item.model = model;
+    item.type = type;
+    item.longname = name;
+    item.imgname = imgname;
 
     gfx::ColorTable colorTable;
     if (type == Torpedo || type == Magazine)
@@ -131,16 +125,15 @@ void Items::addItem(int model, Type type, const QString &name, const QString &im
         colorTable.loadFromFile("gfx:pal/depot/gun.pal");
     else
         colorTable.loadFromFile("gfx:pal/depot/specs.pal");
-    item->icon = gfx::Image::load(QString("gfx:img/icon/%1.img").arg(imgname), colorTable);
+    item.icon = gfx::Image::load(QString("gfx:img/icon/%1.img").arg(imgname), colorTable);
 
     QFile file("txt:thing/" + txtname);
     if (file.open(QFile::ReadOnly))
     {
         while (!file.atEnd())
-            item->text.append(trimEnd(file.readLine()));
+            item.text.append(trimEnd(file.readLine()));
     }
 
-    m_items.insert(model, item);
 }
 
 
@@ -148,24 +141,24 @@ Items::Item* Items::get(int model)
 {
     if (items == NULL)
         items = new Items();
-    return items->m_items.value(model);
+    return &items->m_items.at(model);
 }
 
 
-void Items::insertType(Type type, QList<int> &list)
+void Items::insertType(Type type, std::vector<int> &list)
 {
     Station station = Chapter::get()->stations().value(Chapter::get()->currentStation());
-    foreach (Item *item, items->m_items.values())
-        if (item->type == type && station.depotPrices().contains(item->model))
-            list << item->model;
+    for (const auto &pair : items->m_items)
+        if (pair.second.type == type && station.depotPrices().find(pair.second.model) != station.depotPrices().end())
+            list.push_back(pair.second.model);
 }
 
 
-QList<int> Items::getDepotItems(const QString &mounting)
+std::vector<int> Items::getDepotItems(const QString &mounting)
 {
     if (items == NULL)
         items = new Items();
-    QList<int> list;
+    std::vector<int> list;
     if (mounting == "DEFE")
     {
         insertType(Armor, list);
@@ -203,7 +196,7 @@ int Items::getDepotPrice(int model)
     if (items == NULL)
         items = new Items();
     Station station = Chapter::get()->stations().value(Chapter::get()->currentStation());
-    return (int)(0.9*items->m_items.value(model)->cost*station.depotPrices().value(model));
+    return (int)(0.9*items->m_items.at(model).cost*station.depotPrices().at(model));
 }
 
 

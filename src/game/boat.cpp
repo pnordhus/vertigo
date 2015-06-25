@@ -17,14 +17,12 @@
 
 #include "boat.h"
 #include "items.h"
-#include "txt/desfile.h"
 
 
 namespace game {
 
 
-Boat::Boat(int type) : 
-    m_type(type),
+Boat::Boat(txt::DesFile &file) : 
     m_nrskin(0),
     m_fixer(0),
     m_booster(0),
@@ -34,9 +32,45 @@ Boat::Boat(int type) :
     m_tur2(0),
     m_tur2soft(0)
 {
+    file.setSection("Ship");
+    m_type = file.value("type").toInt();
+    load();
+
+    for (int i = 0; i < m_mountings.size(); i++)
+    {
+        const Mounting &mounting = m_mountings[i];
+        file.setSection(QString("ShipMounting%1").arg(i));
+        if (file.contains("armor"))
+            buy(file.value("armor").toInt(), mounting.name);
+        if (file.contains("nrs"))
+            buy(5126, mounting.name);
+        if (file.contains("sensor"))
+            buy(file.value("sensor").toInt(), mounting.name);
+        if (file.contains("fixer"))
+            buy(9218, mounting.name);
+        for (int buzzer = 0; file.contains(QString("buzzer%1").arg(buzzer)); buzzer++)
+            buy(9217, mounting.name);
+        if (file.contains("engine"))
+            buy(file.value("engine").toInt(), mounting.name);
+        if (file.contains("booster"))
+            buy(4100, mounting.name);
+        if (file.contains("silator"))
+            buy(4101, mounting.name);
+        if (file.contains("model"))
+            buy(file.value("model").toInt(), mounting.name);
+        for (int torpedo = 0; file.contains(QString("torpedo%1").arg(torpedo)); torpedo++)
+            buy(file.value(QString("torpedo%1").arg(torpedo)).toInt(), mounting.name);
+        if (file.contains("software"))
+            buy(file.value("software").toInt(), mounting.name);
+    }
+}
+
+
+void Boat::load()
+{
     txt::DesFile file;
 
-    if (type == 2049)
+    if (m_type == 2049)
     {
         file.load("vfx:sobjects/hiob.des");
         m_flipMovie1 = "hiob1.mvi";
@@ -61,25 +95,31 @@ Boat::Boat(int type) :
         str.truncate(str.indexOf(' '));
         int model = str.toInt();
         if (model != 99999)
-            m_compatibility << model;
+            m_compatibility.insert(model);
     }
 }
 
-Boat::~Boat()
-{
-    qDeleteAll(m_mountings);
-}
 
 void Boat::addMounting(const QString &name, int side, int type, int x, int y, const QString &dir)
 {
-    Mounting *mounting = new Mounting();
-    mounting->name = name;
-    mounting->side = side;
-    mounting->type = type;
-    mounting->pos = QPoint(x, y);
-    mounting->dir = dir;
-    m_mountings << mounting;
+    m_mountings.emplace_back();
+    Mounting &mounting = m_mountings.back();
+    mounting.name = name;
+    mounting.side = side;
+    mounting.type = type;
+    mounting.pos = QPoint(x, y);
+    mounting.dir = dir;
 }
+
+
+void Boat::upgrade(int type)
+{
+    m_type = type;
+    m_mountings.clear();
+    m_compatibility.clear();
+    load();
+}
+
 
 int Boat::getCapacity(int magazine)
 {
@@ -103,60 +143,53 @@ int Boat::getCapacity(int magazine)
 }
 
 
-QList<int> Boat::getItems(const QString& mounting)
+std::vector<int> Boat::getItems(const QString& mounting)
 {
-    QList<int> list;
+    std::vector<int> list;
     if (mounting == "DEFE")
     {
-        list << m_armor;
+        list.push_back(m_armor);
         if (m_nrskin)
-            list << m_nrskin;
-        list << m_sensor;
+            list.push_back(m_nrskin);
+        list.push_back(m_sensor);
         if (m_fixer)
-            list << m_fixer;
+            list.push_back(m_fixer);
         foreach (int buzz, m_buzzers)
-            list << buzz;
+            list.push_back(buzz);
     }
     if (mounting == "GENE")
     {
-        list << m_engine;
+        list.push_back(m_engine);
         if (m_booster)
-            list << m_booster;
+            list.push_back(m_booster);
         if (m_silator)
-            list << m_silator;
+            list.push_back(m_silator);
     }
     if (mounting == "GUN")
     {
-        list << m_gun;
+        list.push_back(m_gun);
     }
     if (mounting == "TORP")
     {
-        list << m_magazine;
+        list.push_back(m_magazine);
         foreach (int torp, m_torpedoes)
-            list << torp;
+            list.push_back(torp);
     }
     if (mounting == "TUR1")
     {
         if (m_tur1)
-            list << m_tur1;
+            list.push_back(m_tur1);
         if (m_tur1soft)
-            list << m_tur1soft;
+            list.push_back(m_tur1soft);
     }
     if (mounting == "TUR2")
     {
         if (m_tur2)
-            list << m_tur2;
+            list.push_back(m_tur2);
         if (m_tur2soft)
-            list << m_tur2soft;
+            list.push_back(m_tur2soft);
     }
     return list;
-}
-
-
-void Boat::setItems(const QString& mounting, const QList<int> &items)
-{
-    foreach (int model, items)
-        buy(model, mounting);
 }
 
 
@@ -172,7 +205,7 @@ bool Boat::canBuy(int model, const QString& mounting, int *oldModel)
             *oldModel = m_nrskin;
         if (item->type == Items::Sensor)
             *oldModel = m_sensor;
-        if (item->type == Items::Buzzer && m_buzzers.count() < m_maxBuzzers)
+        if (item->type == Items::Buzzer && m_buzzers.size() < m_maxBuzzers)
             return true;
         if (item->type == Items::Fixer)
             *oldModel = m_fixer;
@@ -196,12 +229,12 @@ bool Boat::canBuy(int model, const QString& mounting, int *oldModel)
         if (item->type == Items::Magazine)
         {
             *oldModel = m_magazine;
-            if (getCapacity(model) < m_torpedoes.count())
+            if (getCapacity(model) < m_torpedoes.size())
                 return false;
         }
         if (item->type == Items::Torpedo)
         {
-            if (m_torpedoes.count() < getCapacity(m_magazine))
+            if (m_torpedoes.size() < getCapacity(m_magazine))
                 return true;
         }
     }
@@ -274,7 +307,7 @@ bool Boat::canSell(int model, const QString& mounting)
 
 bool Boat::isCompatible(int model)
 {
-    return m_compatibility.indexOf(model) >= 0;
+    return m_compatibility.find(model) != m_compatibility.end();
 }
 
 
@@ -291,7 +324,7 @@ void Boat::buy(int model, const QString& mounting)
         if (item->type == Items::Sensor)
             m_sensor = model;
         if (item->type == Items::Buzzer)
-            m_buzzers << model;
+            m_buzzers.push_back(model);
         if (item->type == Items::Fixer)
             m_fixer = model;
     }
@@ -314,7 +347,7 @@ void Boat::buy(int model, const QString& mounting)
         if (item->type == Items::Magazine)
             m_magazine = model;
         if (item->type == Items::Torpedo)
-            m_torpedoes << model;
+            m_torpedoes.push_back(model);
     }
     if (mounting == "TUR1")
     {
@@ -341,7 +374,7 @@ void Boat::sell(int model, int index, const QString& mounting)
         if (item->type == Items::NRSkin)
             m_nrskin = 0;
         if (item->type == Items::Buzzer)
-            m_buzzers.removeAt(index);
+            m_buzzers.erase(m_buzzers.begin() + index);
         if (item->type == Items::Fixer)
             m_fixer = 0;
     }
@@ -358,7 +391,7 @@ void Boat::sell(int model, int index, const QString& mounting)
     if (mounting == "TORP")
     {
         if (item->type == Items::Torpedo)
-            m_torpedoes.removeAt(index);
+            m_torpedoes.erase(m_torpedoes.begin() + index);
     }
     if (mounting == "TUR1")
     {
