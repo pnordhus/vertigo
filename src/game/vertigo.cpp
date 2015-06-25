@@ -46,7 +46,8 @@ void Vertigo::start(const QString &scenarioName)
     } else {
         hud.reset(new hud::HUD());
         hud->eventSuccess() += [this]() { m_window.close(); };
-        boat.reset(new game::Boat(txt::DesFile("dat:story/ch1.des")));
+        txt::DesFile desfile("dat:story/ch1.des");
+        boat.reset(new game::Boat(desfile));
         hud->load(boat.get());
         scenario.reset(new fight::Scenario(scenarioName));
         hud->start(scenario.get());
