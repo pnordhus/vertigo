@@ -214,8 +214,8 @@ bool Tesselator::intersect(const glm::vec3 &start, const glm::vec3 &end, float r
 
 void Tesselator::tesselate(Element &element, int level, const glm::vec3 &scale, QByteArray &textureMap, QByteArray &textureDir, int mapping)
 {
-    for (int y = element.rect().y(); y <= element.rect().bottom(); y++) {
-        for (int x = element.rect().x(); x <= element.rect().right(); x++) {
+    for (int y = element.rect().top(); y <= element.rect().bottom(); y++) {
+        for (int x = element.rect().left(); x <= element.rect().right(); x++) {
             const int x1 = ((y & 0xff) << 8) + (x & 0xff);
 
             const quint8 m = textureMap[x1];

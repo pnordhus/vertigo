@@ -117,7 +117,7 @@ bool Surface::testCollision(const glm::vec3 &start, const glm::vec3 &end, float 
 {
     int x0 = end.x / m_scale.x / 8;
     int y0 = end.y / m_scale.y / 8;
-    Element &element = getElement(QPoint(x0*8, y0*8));
+    Element &element = getElement(x0*8, y0*8);
     if (element.testCollision(end, radius))
     {
         if (m_tesselator.intersect(start/m_scale, end/m_scale, radius/m_scale.z, position, normal))
@@ -136,15 +136,15 @@ void Surface::bindTexture(int textureId)
 }
 
 
-Element& Surface::getElement(QPoint pos)
+Element& Surface::getElement(int x, int y)
 {
-    int id = (pos.y() << 16) + pos.x();
+    int id = (y << 16) + x;
     auto it = m_elements.find(id);
     if (it != m_elements.end())
         return it->second;
     Element &element = m_elements.emplace(std::piecewise_construct,
         std::forward_as_tuple(id),
-        std::forward_as_tuple(this, QRect(pos, QSize(8, 8)))).first->second;
+        std::forward_as_tuple(this, util::Rect(x, y, 8, 8))).first->second;
     m_tesselator.tesselate(element, Level, m_scale, m_textureMap, m_textureDir, m_mapping);
     return element;
 }
@@ -158,7 +158,7 @@ void Surface::draw(const glm::vec3 &position, const glm::vec3 &direction)
     for (int y = y0 - 2; y <= y0 + 2; y++)
         for (int x = x0 - 2; x <= x0 + 2; x++)
         {
-            Element &element = getElement(QPoint(x*8, y*8));
+            Element &element = getElement(x*8, y*8);
             /*QVector3D dir = element->center() - position;
             dir.normalize();
             if (QVector3D::dotProduct(dir, direction) > 0)*/

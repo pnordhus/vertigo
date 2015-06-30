@@ -20,6 +20,7 @@
 
 
 #include "gfx/texture.h"
+#include "util/rect.hpp"
 #include <map>
 #include <glm/vec3.hpp>
 #include <glm/vec2.hpp>
@@ -34,7 +35,7 @@ class Surface;
 class Element
 {
 public:
-    Element(Surface *surface, const QRect &rect);
+    Element(Surface *surface, const util::Rect &rect);
 
 public:
     int numVertices(int textureId);
@@ -42,7 +43,7 @@ public:
     void addTriangle(int textureId, quint16 a, quint16 b, quint16 c);
 
     void draw();
-    QRect rect() const { return m_rect; }
+    util::Rect rect() const { return m_rect; }
     float maxZ() const { return m_maxZ; }
     float minZ() const { return m_minZ; }
     glm::vec3 center() const;
@@ -59,7 +60,7 @@ private:
 
 private:
     Surface *m_surface;
-    QRect m_rect;
+    util::Rect m_rect;
     float m_maxZ;
     float m_minZ;
     std::vector<float> m_heights;

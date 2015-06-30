@@ -29,7 +29,7 @@ CollisionMesh::CollisionMesh()
 }
 
 
-void CollisionMesh::addTriangles(const std::vector<glm::vec3> &vertices, const std::vector<quint16> &indices)
+void CollisionMesh::addTriangles(const std::vector<glm::vec3> &vertices, const std::vector<unsigned short> &indices)
 {
     for (int i = 0; i < indices.size(); i += 3)
     {
@@ -66,7 +66,7 @@ bool CollisionMesh::intersect(const glm::vec3 &start, const glm::vec3 &dir, floa
 
     distance = 1e10f;
 
-    foreach (const Triangle &tri, m_triangles)
+    for (const Triangle &tri : m_triangles)
     {
         float cos = glm::dot(dir4D, tri.plane);
         if (cos > -1e-5f)
