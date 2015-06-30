@@ -41,9 +41,9 @@ void Projectile::setDirection(const glm::vec3 &direction)
 }
 
 
-bool Projectile::update()
+bool Projectile::update(float elapsedTime)
 {
-    m_elapsedTime = m_time.elapsed();
+    m_elapsedTime += elapsedTime;
     if (m_elapsedTime == 0)
         return false;
     if (m_elapsedTime*m_billboard->velocity()/1000 > m_billboard->range())

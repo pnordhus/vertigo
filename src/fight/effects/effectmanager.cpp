@@ -74,9 +74,9 @@ Projectile* EffectManager::addProjectile(Effects projectile, const glm::vec3 &po
 }
 
 
-void EffectManager::update()
+void EffectManager::update(float elapsedTime)
 {
-    m_effects.remove_if([](const std::unique_ptr<Effect> &effect) { return effect->update(); });
+    m_effects.remove_if([elapsedTime](const std::unique_ptr<Effect> &effect) { return effect->update(elapsedTime); });
 }
 
 

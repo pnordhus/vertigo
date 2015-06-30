@@ -20,6 +20,7 @@
 #include "fight/scenario.h"
 #include "game/boat.h"
 #include "gfx/image.h"
+#include "SDL.h"
 
 
 namespace hud {
@@ -43,6 +44,7 @@ void HUD::start(fight::Scenario *scenario)
 {
     m_scenario = scenario;
     hideCursor();
+    m_lastTicks = SDL_GetTicks();
 }
 
 
@@ -61,6 +63,11 @@ void HUD::setRect(const QRect &rect)
 
 void HUD::draw()
 {
+    int ticks = SDL_GetTicks();
+    float elapsedTime = ticks - m_lastTicks;
+    m_lastTicks = ticks;
+    m_scenario->update(elapsedTime);
+
     if (m_rectHUD.top() > 0 || m_rectHUD.left() > 0)
         glViewport(m_rectHUD.left(), m_rectHUD.top(), m_rectHUD.width(), m_rectHUD.height());
     if (m_scenario)

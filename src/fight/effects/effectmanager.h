@@ -41,7 +41,7 @@ public:
     Effect* addEffect(Effects effect, const glm::vec3 &position, float angle = 0, float scale = 1);
     Projectile* addProjectile(Effects projectile, const glm::vec3 &position, const glm::vec3 &direction);
 
-    void update();
+    void update(float elapsedTime);
     void draw();
 
 private:

@@ -59,7 +59,7 @@ public:
     ConditionSpace* addCondSpace(int x, int y, int dimx, int dimy, int minz, int maxz);
     void testSpace(float x, float y, float height);
     void delayComplete(Condition *cond, int delay);
-    void update();
+    void update(float elapsedTime);
 
 private:
     Scenario *m_scenario;
@@ -74,7 +74,7 @@ private:
     struct DelayCompleteEntry
     {
         Condition *cond;
-        QTime completeTime;
+        float completeTime;
     };
 
     std::list<DelayCompleteEntry> m_delayEntries;

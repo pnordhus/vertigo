@@ -55,15 +55,14 @@ void ConditionManager::delayComplete(Condition *cond, int delay)
 {
     m_delayEntries.emplace_back();
     m_delayEntries.back().cond = cond;
-    m_delayEntries.back().completeTime = QTime::currentTime().addSecs(delay);
+    m_delayEntries.back().completeTime = m_scenario->time() + delay*1000;
 }
 
 
-void ConditionManager::update()
+void ConditionManager::update(float elapsedTime)
 {
-    QTime time = QTime::currentTime();
-    m_delayEntries.remove_if([&time](const DelayCompleteEntry &delayEntry) {
-        if (delayEntry.completeTime <= time)
+    m_delayEntries.remove_if([this](const DelayCompleteEntry &delayEntry) {
+        if (delayEntry.completeTime <= m_scenario->time())
         {
             delayEntry.cond->complete();
             return true;

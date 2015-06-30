@@ -40,6 +40,7 @@ Scenario::Scenario(const QString &name) :
     m_moduleManager(m_textureManager),
     m_effectManager(this),
     m_conditionManager(this),
+    m_time(0),
     m_left(0.0f),
     m_right(0.0f),
     m_up(0.0f),
@@ -281,7 +282,6 @@ Scenario::Scenario(const QString &name) :
     m_cameraMatrix = glm::rotate(m_cameraMatrix, glm::radians(initialDir), glm::vec3(0, 1, 0));
     m_cameraMatrix = glm::rotate(m_cameraMatrix, glm::radians(-90.0f), glm::vec3(1, 0, 0));
 
-    m_time.restart();
     qsrand(QTime::currentTime().second() * 1000 + QTime::currentTime().msec());
 }
 
@@ -293,8 +293,10 @@ void Scenario::setRect(const QRectF &rect)
 }
 
 
-void Scenario::draw()
+void Scenario::update(float elapsedTime)
 {
+    m_time += elapsedTime;
+
     const float angleY = (m_right - m_left) * 2.0f;
     const float angleX = (m_up - m_down) * 2.0f;
 
@@ -320,18 +322,21 @@ void Scenario::draw()
         }
     }
 
-    m_conditionManager.update();
+    m_conditionManager.update(elapsedTime);
 
     float height = m_surface.heightAt(m_position.x, m_position.y);
     m_conditionManager.testSpace(m_position.x, m_position.y, m_position.z - height);
 
     for (const auto &object : m_objects)
         if (object->isEnabled())
-            object->update();
+            object->update(elapsedTime);
 
-    m_effectManager.update();
+    m_effectManager.update(elapsedTime);
+}
 
 
+void Scenario::draw()
+{
     glEnable(GL_CULL_FACE);
     glFrontFace(GL_CW);
 
@@ -381,7 +386,7 @@ void Scenario::draw()
         glLightfv(GL_LIGHT1, GL_DIFFUSE, light_diffuse);
         
         glLightfv(GL_LIGHT1, GL_POSITION, glm::value_ptr(object->position()));
-        glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, glm::value_ptr(glm::vec3(glm::cos(0.005f*m_time.elapsed()), glm::sin(0.005f*m_time.elapsed()), 0.0f)));
+        glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, glm::value_ptr(glm::vec3(glm::cos(0.005f*m_time), glm::sin(0.005f*m_time), 0.0f)));
 
         glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 90.0);
         glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, 0.1);
@@ -399,7 +404,7 @@ void Scenario::draw()
     glFogf(GL_FOG_START, 100.0);
     glFogf(GL_FOG_END, 200.0);
 
-    dir = -glm::vec3(glm::row(m_cameraMatrix, 2));
+    glm::vec3 dir = -glm::vec3(glm::row(m_cameraMatrix, 2));
     m_surface.draw(m_position, dir);
 
     for (const auto &object : m_objects)

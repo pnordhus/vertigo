@@ -55,6 +55,7 @@ private:
     bool m_wide;
     QRectF m_rectHUD;
     fight::Scenario *m_scenario;
+    int m_lastTicks;
 
     ui::Label m_cockpit;
 

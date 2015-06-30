@@ -45,6 +45,7 @@ public:
     const glm::mat4& cameraMatrix() const { return m_cameraMatrix; }
     const glm::mat4& cameraMatrixInverted() const { return m_cameraMatrixInverted; }
     const glm::vec3& position() const { return m_position; }
+    const float time() const { return m_time; }
 
     Surface& surface() { return m_surface; }
     gfx::TextureManager& textureManager() { return m_textureManager; }
@@ -55,6 +56,7 @@ public:
 
 public:
     void setRect(const QRectF &rect);
+    void update(float elapsedTime);
     void draw();
     void keyPressEvent(QKeyEvent *);
     void keyReleaseEvent(QKeyEvent *);
@@ -93,7 +95,7 @@ private:
     std::vector<std::unique_ptr<Object>> m_objects;
     std::vector<Object*> m_lightSources;
 
-    QTime m_time;
+    float m_time;
 
     float m_left;
     float m_right;

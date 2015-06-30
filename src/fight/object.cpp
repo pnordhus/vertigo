@@ -78,7 +78,7 @@ void Object::setPosition(const glm::vec3 &pos)
 }
 
 
-bool Object::update()
+bool Object::update(float elapsedTime)
 {
     return false;
 }

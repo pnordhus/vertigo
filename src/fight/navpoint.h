@@ -31,14 +31,14 @@ public:
     NavPoint(Scenario *scenario, int num);
 
 public:
-    void draw();
+    bool update(float elapsedTime);
 
 private:
     int m_num;
     Module *m_state0;
     Module *m_state1;
     int m_state;
-    QTime m_time;
+    float m_time;
 };
 
 
