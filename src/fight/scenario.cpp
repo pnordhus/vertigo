@@ -31,6 +31,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/matrix_access.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/transform.hpp>
 
 
 namespace fight {
@@ -286,9 +287,9 @@ Scenario::Scenario(const QString &name) :
 }
 
 
-void Scenario::setRect(const QRectF &rect)
+void Scenario::setRect(const util::RectF &rect, const glm::vec2 &center)
 {
-    m_projectionMatrix = glm::perspective(glm::radians(60.0f), float(rect.width() / rect.height()), 0.1f, 10000.0f);
+    m_projectionMatrix = glm::translate(glm::vec3(center, 0)) * glm::perspective(glm::radians(60.0f), float(rect.width / rect.height), 0.1f, 10000.0f);
     m_projectionMatrixInverted = glm::inverse(m_projectionMatrix);
 }
 

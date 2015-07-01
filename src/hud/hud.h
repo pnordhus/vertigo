@@ -20,6 +20,7 @@
 
 
 #include "game/renderer.h"
+#include "util/rect.hpp"
 #include "util/event.hpp"
 #include "ui/label.h"
 
@@ -38,9 +39,12 @@ public:
 
 public:
     util::event<>& eventSuccess() { return m_eventSuccess; }
-    void load(game::Boat *boat);
     bool wide() const { return m_wide; }
-    QRectF rectHUD() const { return m_rectHUD; }
+    util::RectF rectHUD() const { return m_rectHUD; }
+    game::Boat* boat() const { return m_boat; }
+    fight::Scenario* scenario() const { return m_scenario; }
+
+    void load(game::Boat *boat);
     void start(fight::Scenario *scenario);
 
 protected:
@@ -53,12 +57,13 @@ private:
     util::event<> m_eventSuccess;
     game::Boat *m_boat;
     bool m_wide;
-    QRectF m_rectHUD;
+    util::RectF m_rectHUD;
+    glm::ivec2 m_center;
     fight::Scenario *m_scenario;
     int m_lastTicks;
 
     ui::Label m_cockpit;
-
+    std::vector<std::unique_ptr<ui::Widget>> m_children;
 };
 
 

@@ -21,6 +21,7 @@
 
 #include <QDebug>
 #include <QTime>
+#include "util/rect.hpp"
 #include "util/deferreddeletable.h"
 #include "object.h"
 #include "surface/surface.h"
@@ -55,7 +56,7 @@ public:
     ConditionManager& conditionManager() { return m_conditionManager; }
 
 public:
-    void setRect(const QRectF &rect);
+    void setRect(const util::RectF &rect, const glm::vec2 &center);
     void update(float elapsedTime);
     void draw();
     void keyPressEvent(QKeyEvent *);

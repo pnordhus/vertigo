@@ -17,10 +17,13 @@
 
 #include "hud.h"
 #include <QKeyEvent>
+#include "SDL.h"
 #include "fight/scenario.h"
 #include "game/boat.h"
 #include "gfx/image.h"
-#include "SDL.h"
+#include "gfx/colortable.h"
+#include "txt/desfile.h"
+
 
 
 namespace hud {
@@ -35,8 +38,24 @@ HUD::HUD()
 void HUD::load(game::Boat *boat)
 {
     m_boat = boat;
+    for (const auto &child : m_children)
+        child->setParentWidget(nullptr);
+    m_children.clear();
+
     m_wide = false;
     m_cockpit.setTexture(gfx::Image::load(QString("vfx:cockpit/%1/cockpit.r16").arg(boat->cockpit()), 640, 480, true));
+
+    const gfx::ColorTable colorTable("gfx:pal/gui/border.pal");
+    txt::DesFile file(QString("vfx:cockpit/%1.des").arg(boat->cockpit()));
+    ui::Widget *root = &m_cockpit;
+
+    file.setSection("front");
+    m_center = glm::ivec2(file.value("VFX_StartX").toInt() + file.value("VFX_FlightX").toInt(), file.value("VFX_StartY").toInt() + file.value("VFX_FlightY").toInt());
+    ui::Label *lblTarget = new ui::Label(root);
+    lblTarget->setTexture(gfx::Image::load("gfx:img/cockpit/hudtarg.img", colorTable));
+    lblTarget->setPosition(m_center.x - lblTarget->texture().width()/2, m_center.y - lblTarget->texture().height()/2);
+    m_children.emplace_back(lblTarget);
+
 }
 
 
@@ -53,11 +72,11 @@ void HUD::setRect(const QRect &rect)
     Renderer::setRect(rect);
 
     if (m_wide)
-        m_rectHUD = QRect(rect.x(), rect.y() - rectOrtho().y()/rectOrtho().height()*rect.height(), rect.width(), rect.height()*480/rectOrtho().height());
+        m_rectHUD = util::RectF(rect.x(), rect.y() - rectOrtho().y()/rectOrtho().height()*rect.height(), rect.width(), rect.height()*480/rectOrtho().height());
     else
-        m_rectHUD = QRect(rect.x() - rectOrtho().x()/rectOrtho().width()*rect.width(), rect.y() - rectOrtho().y()/rectOrtho().height()*rect.height(), rect.width()*640/rectOrtho().width(), rect.height()*480/rectOrtho().height());
+        m_rectHUD = util::RectF(rect.x() - rectOrtho().x()/rectOrtho().width()*rect.width(), rect.y() - rectOrtho().y()/rectOrtho().height()*rect.height(), rect.width()*640/rectOrtho().width(), rect.height()*480/rectOrtho().height());
     if (m_scenario)
-        m_scenario->setRect(m_rectHUD);
+        m_scenario->setRect(m_rectHUD, glm::vec2(m_projectionMatrix * glm::vec4(m_center, 0, 1)));
 }
 
 
@@ -68,11 +87,11 @@ void HUD::draw()
     m_lastTicks = ticks;
     m_scenario->update(elapsedTime);
 
-    if (m_rectHUD.top() > 0 || m_rectHUD.left() > 0)
-        glViewport(m_rectHUD.left(), m_rectHUD.top(), m_rectHUD.width(), m_rectHUD.height());
+    if (m_rectHUD.x > 0 || m_rectHUD.y > 0)
+        glViewport(m_rectHUD.x, m_rectHUD.y, m_rectHUD.width, m_rectHUD.height);
     if (m_scenario)
         m_scenario->draw();
-    if (m_rectHUD.top() > 0 || m_rectHUD.left() > 0)
+    if (m_rectHUD.x > 0 || m_rectHUD.y > 0)
         glViewport(0, 0, rect().width(), rect().height());
 
     setupGL(false);

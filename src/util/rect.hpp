@@ -54,8 +54,8 @@ template<typename T>
 class RectangleExclusive : public Rectangle<T>
 {
 public:
-    //using Rectangle<int>::Rectangle<int>;
-    RectangleExclusive() { };
+    //using Rectangle<T>::Rectangle<T>;
+    RectangleExclusive() : Rectangle<T>() { };
     RectangleExclusive(T x, T y, T width, T height) : Rectangle<T>(x, y, width, height) { };
     RectangleExclusive(const glm::tvec2<T> &pos, const glm::tvec2<T> &size) : Rectangle<T>(pos, size) { };
 
@@ -70,8 +70,8 @@ template<typename T>
 class RectangleInclusive : public Rectangle<T>
 {
 public:
-    //using Rectangle<int>::Rectangle<int>;
-    RectangleInclusive() { };
+    //using Rectangle<T>::Rectangle<T>;
+    RectangleInclusive() : Rectangle<T>() { };
     RectangleInclusive(T x, T y, T width, T height) : Rectangle<T>(x, y, width, height) { };
     RectangleInclusive(const glm::tvec2<T> &pos, const glm::tvec2<T> &size) : Rectangle<T>(pos, size) { };
 
