@@ -15,66 +15,32 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef HUD_HUD_H
-#define HUD_HUD_H
-
-
-#include "game/renderer.h"
-#include "util/rect.hpp"
-#include "util/event.hpp"
-#include "ui/label.h"
-#include "txt/desfile.h"
-#include "gfx/image.h"
-
-
-namespace fight { class Scenario; }
-namespace game { class Boat; }
+#include "heading.h"
+#include "hud.h"
+#include "fight/scenario.h"
+#include <glm/trigonometric.hpp>
 
 
 namespace hud {
 
 
-class HUD : public game::Renderer
+Heading::Heading(HUD *hud, util::Rect rect) :
+    ui::Widget(hud->widget()),
+    m_hud(hud),
+    m_rect(rect),
+    m_head(hud->getImage("hudhead"), false),
+    m_point(hud->getImage("hudpoi4"), false)
 {
-public:
-    HUD();
+}
 
-public:
-    util::event<>& eventSuccess() { return m_eventSuccess; }
-    bool wide() const { return m_wide; }
-    util::RectF rectHUD() const { return m_rectHUD; }
-    game::Boat* boat() const { return m_boat; }
-    fight::Scenario* scenario() const { return m_scenario; }
-    ui::Widget* widget() { return &m_cockpit; }
-    gfx::Image getImage(const QString &name);
 
-    void load(game::Boat *boat);
-    void start(fight::Scenario *scenario);
-
-protected:
-    void setRect(const QRect &rect);
-    void draw();
-    void keyPressEvent(QKeyEvent *);
-    void keyReleaseEvent(QKeyEvent *);
-
-private:
-    util::Rect readRect(const txt::DesFile &file);
-
-private:
-    util::event<> m_eventSuccess;
-    game::Boat *m_boat;
-    bool m_wide;
-    util::RectF m_rectHUD;
-    glm::ivec2 m_center;
-    fight::Scenario *m_scenario;
-    int m_lastTicks;
-
-    ui::Label m_cockpit;
-    std::vector<std::unique_ptr<ui::Widget>> m_children;
-};
-
+void Heading::draw()
+{
+    int offset = 360 + static_cast<int>(glm::degrees(m_hud->scenario()->yaw())*2);
+    //if (offset < 0)
+    //    offset += 720;
+    m_head.draw(m_rect.x, m_rect.y, QRectF(offset, 0, m_rect.width, m_head.height()));
+    m_point.draw(m_rect.x + m_rect.width/2 - (m_point.width() + 1)/2, m_rect.y + m_head.height() + 1);
+}
 
 } // namespace hud
-
-
-#endif // HUD_HUD_H

@@ -46,6 +46,7 @@ public:
     const glm::mat4& cameraMatrix() const { return m_cameraMatrix; }
     const glm::mat4& cameraMatrixInverted() const { return m_cameraMatrixInverted; }
     const glm::vec3& position() const { return m_position; }
+    const float yaw() const { return m_yaw; }
     const float time() const { return m_time; }
 
     Surface& surface() { return m_surface; }
@@ -84,6 +85,8 @@ private:
     };
 
     glm::vec3 m_position;
+    float m_yaw;
+
     txt::DesFile m_file;
 
     Surface m_surface;

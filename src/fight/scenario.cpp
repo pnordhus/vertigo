@@ -298,8 +298,8 @@ void Scenario::update(float elapsedTime)
 {
     m_time += elapsedTime;
 
-    const float angleY = (m_right - m_left) * 2.0f;
-    const float angleX = (m_up - m_down) * 2.0f;
+    const float angleY = (m_right - m_left) * elapsedTime * 0.09f;
+    const float angleX = (m_up - m_down) * elapsedTime * 0.09f;
 
     m_cameraMatrix = glm::rotate(m_cameraMatrix, glm::radians(angleX), glm::vec3(glm::row(m_cameraMatrix, 0)));
     m_cameraMatrix = glm::rotate(m_cameraMatrix, glm::radians(angleY), glm::vec3(0, 0, 1));
@@ -307,7 +307,8 @@ void Scenario::update(float elapsedTime)
 
     glm::vec3 prevPos = m_position;
     glm::vec3 dir = glm::vec3(glm::row(m_cameraMatrix, 2));
-    m_position += dir * (m_backwards - m_forwards) * 5.0f;
+    m_position += dir * (m_backwards - m_forwards) * elapsedTime * 0.2f;
+    m_yaw = glm::atan(dir.x, dir.y);
 
     if (m_position != prevPos)
     {

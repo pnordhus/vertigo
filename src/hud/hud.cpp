@@ -22,8 +22,8 @@
 #include "game/boat.h"
 #include "gfx/image.h"
 #include "gfx/colortable.h"
-#include "txt/desfile.h"
 
+#include "heading.h"
 
 
 namespace hud {
@@ -32,6 +32,19 @@ namespace hud {
 HUD::HUD()
 {
 
+}
+
+
+util::Rect HUD::readRect(const txt::DesFile &file)
+{
+    return util::Rect(file.value("X1").toInt(), file.value("Y1").toInt(), file.value("Width").toInt(), file.value("Height").toInt());
+}
+
+
+gfx::Image HUD::getImage(const QString &name)
+{
+    const gfx::ColorTable colorTable("gfx:pal/gui/border.pal");
+    return gfx::Image::load(QString("gfx:img/cockpit/%1.img").arg(name), colorTable);
 }
 
 
@@ -45,17 +58,18 @@ void HUD::load(game::Boat *boat)
     m_wide = false;
     m_cockpit.setTexture(gfx::Image::load(QString("vfx:cockpit/%1/cockpit.r16").arg(boat->cockpit()), 640, 480, true));
 
-    const gfx::ColorTable colorTable("gfx:pal/gui/border.pal");
     txt::DesFile file(QString("vfx:cockpit/%1.des").arg(boat->cockpit()));
-    ui::Widget *root = &m_cockpit;
 
     file.setSection("front");
     m_center = glm::ivec2(file.value("VFX_StartX").toInt() + file.value("VFX_FlightX").toInt(), file.value("VFX_StartY").toInt() + file.value("VFX_FlightY").toInt());
-    ui::Label *lblTarget = new ui::Label(root);
-    lblTarget->setTexture(gfx::Image::load("gfx:img/cockpit/hudtarg.img", colorTable));
-    lblTarget->setPosition(m_center.x - lblTarget->texture().width()/2, m_center.y - lblTarget->texture().height()/2);
+    ui::Label *lblTarget = new ui::Label(widget());
+    lblTarget->setTexture(getImage("hudtarg"));
+    lblTarget->setPosition(m_center.x - (lblTarget->texture().width() + 1)/2, m_center.y - (lblTarget->texture().height() + 1)/2);
     m_children.emplace_back(lblTarget);
 
+    file.setSection("hudheading");
+    Heading *heading = new Heading(this, readRect(file));
+    m_children.emplace_back(heading);
 }
 
 
@@ -95,6 +109,7 @@ void HUD::draw()
         glViewport(0, 0, rect().width(), rect().height());
 
     setupGL(false);
+
 
     m_cockpit.doDraw();
 }
