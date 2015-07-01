@@ -83,34 +83,34 @@ void TexturePrivate::clear()
 // OpenGL 1.2
 #define GL_CLAMP_TO_EDGE 0x812F
 
-void TexturePrivate::setFilter()
+void TexturePrivate::setFilter(bool smooth)
 {
     bind();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, smooth ? GL_LINEAR : GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 }
 
 
-void TexturePrivate::fromImage(const QImage &image)
+void TexturePrivate::fromImage(const QImage &image, bool smooth)
 {
     Texture::Format format = Texture::RGB;
     if (image.format() != QImage::Format_RGB888)
         format = Texture::RGBA;
 
-    createEmpty(image.width(), image.height(), format);
+    createEmpty(image.width(), image.height(), format, smooth);
     update(0, 0, image);
 }
 
 
-void TexturePrivate::createEmpty(int w, int h, Texture::Format format)
+void TexturePrivate::createEmpty(int w, int h, Texture::Format format, bool smooth)
 {
     clear();
 
     glGenTextures(1, &m_texture);
     bind();
-    setFilter();
+    setFilter(smooth);
 
     m_format = format;
     m_width = w;
