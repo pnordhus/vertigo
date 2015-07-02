@@ -52,7 +52,9 @@ void Surface::load(const QString &name, int maxheightscale, int mapping)
         stream.setByteOrder(QDataStream::LittleEndian);
         stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
         stream >> sx >> sy >> sz;
-        m_scale = glm::vec3(sx / 32.0f, sy / 32.0f, maxheightscale / sz);
+        if (sz < maxheightscale)
+            sz = maxheightscale;
+        m_scale = glm::vec3(sx / 32.0f, sy / 32.0f, sz / 32.0f);
     }
 
     {
