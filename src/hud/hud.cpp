@@ -24,6 +24,7 @@
 #include "gfx/colortable.h"
 
 #include "heading.h"
+#include "beta.h"
 
 
 namespace hud {
@@ -70,6 +71,10 @@ void HUD::load(game::Boat *boat)
     file.setSection("hudheading");
     Heading *heading = new Heading(this, readRect(file));
     m_children.emplace_back(heading);
+
+    file.setSection("hudbeta");
+    Beta *beta = new Beta(this, readRect(file));
+    m_children.emplace_back(beta);
 }
 
 

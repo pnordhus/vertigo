@@ -15,30 +15,38 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "heading.h"
-#include "hud.h"
-#include "fight/scenario.h"
-#include <glm/trigonometric.hpp>
+#ifndef HUD_BETA_H
+#define HUD_BETA_H
+
+
+#include "util/rect.hpp"
+#include "ui/widget.h"
+#include "gfx/texture.h"
 
 
 namespace hud {
 
 
-Heading::Heading(HUD *hud, util::Rect rect) :
-    ui::Widget(hud->widget()),
-    m_hud(hud),
-    m_rect(rect),
-    m_head(hud->getImage("hudhead"), false),
-    m_point(hud->getImage("hudpoi4"), false)
-{
-}
+class HUD;
 
 
-void Heading::draw()
+class Beta : public ui::Widget
 {
-    int offset = 360 + static_cast<int>(glm::degrees(m_hud->scenario()->yaw())*2);
-    m_head.draw(m_rect.x, m_rect.y, QRectF(offset, 0, m_rect.width, m_head.height()));
-    m_point.draw(m_rect.x + m_rect.width/2 - (m_point.width() + 1)/2, m_rect.y + m_head.height() + 1);
-}
+public:
+    Beta(HUD *hud, util::Rect rect);
+
+protected:
+    void draw();
+
+private:
+    HUD *m_hud;
+    util::Rect m_rect;
+    gfx::Texture m_beta;
+    gfx::Texture m_point;
+};
+
 
 } // namespace hud
+
+
+#endif // HUD_BETA_H

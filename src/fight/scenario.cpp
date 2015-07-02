@@ -47,13 +47,15 @@ Scenario::Scenario(const QString &name) :
     m_up(0.0f),
     m_down(0.0f),
     m_forwards(0.0f),
-    m_backwards(0.0f)
+    m_backwards(0.0f),
+    m_inverseUpDown(1.0f)
 {
     qsrand(name.right(4).toInt());
 
     m_file.load(QString("vfx:scenario/%1.des").arg(name));
 
     m_file.setSection("surface");
+    m_depth = m_file.value("depth").toInt();
     m_surface.load(m_file.value("name").toString().toLower(), m_file.value("maxheightscale").toInt(), m_file.value("patchcomb").toInt());
 
     std::map<int, QString> types;
@@ -299,7 +301,7 @@ void Scenario::update(float elapsedTime)
     m_time += elapsedTime;
 
     const float angleY = (m_right - m_left) * elapsedTime * 0.09f;
-    const float angleX = (m_up - m_down) * elapsedTime * 0.09f;
+    const float angleX = (m_up - m_down) * m_inverseUpDown * elapsedTime * 0.09f;
 
     m_cameraMatrix = glm::rotate(m_cameraMatrix, glm::radians(angleX), glm::vec3(glm::row(m_cameraMatrix, 0)));
     m_cameraMatrix = glm::rotate(m_cameraMatrix, glm::radians(angleY), glm::vec3(0, 0, 1));
@@ -309,12 +311,22 @@ void Scenario::update(float elapsedTime)
     glm::vec3 dir = glm::vec3(glm::row(m_cameraMatrix, 2));
     m_position += dir * (m_backwards - m_forwards) * elapsedTime * 0.2f;
     m_yaw = glm::atan(dir.x, dir.y);
+    m_pitch = dir.z < -1.0f ? -glm::half_pi<float>() : dir.z > 1.0f ? glm::half_pi<float>() : glm::asin(dir.z);
+
+    glm::vec3 up = glm::vec3(glm::row(m_cameraMatrix, 1));
+    if (up.z < 0)
+    {
+        m_cameraMatrix = glm::rotate(m_cameraMatrix, glm::pi<float>(), dir);
+        m_inverseUpDown = -1.0f;
+    }
 
     if (m_position != prevPos)
     {
         glm::vec3 pos, normal;
         if (m_surface.testCollision(prevPos, m_position, 1.5f, pos, normal))
             m_position = pos;
+        float height = m_surface.heightAt(m_position.x, m_position.y);
+        qDebug() << height << m_position.z;
         Object *collision = m_collisionManager.testCollision(prevPos, m_position, 1.5f, pos, normal);
         if (collision)
         {
@@ -424,9 +436,15 @@ void Scenario::keyPressEvent(QKeyEvent *e)
     if (e->key() == Qt::Key_Right)
         m_right = 1.0f;
     if (e->key() == Qt::Key_Up)
+    {
         m_up = 1.0f;
+        m_inverseUpDown = 1.0f;
+    }
     if (e->key() == Qt::Key_Down)
+    {
         m_down = 1.0f;
+        m_inverseUpDown = 1.0f;
+    }
     if (e->key() == Qt::Key_A)
         m_forwards = 1.0f;
     if (e->key() == Qt::Key_Z || e->key() == Qt::Key_Y)

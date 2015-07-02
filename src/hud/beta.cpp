@@ -15,7 +15,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "heading.h"
+#include "beta.h"
 #include "hud.h"
 #include "fight/scenario.h"
 #include <glm/trigonometric.hpp>
@@ -24,21 +24,23 @@
 namespace hud {
 
 
-Heading::Heading(HUD *hud, util::Rect rect) :
+Beta::Beta(HUD *hud, util::Rect rect) :
     ui::Widget(hud->widget()),
     m_hud(hud),
     m_rect(rect),
-    m_head(hud->getImage("hudhead"), false),
-    m_point(hud->getImage("hudpoi4"), false)
+    m_beta(hud->getImage("hudbeta"), false),
+    m_point(hud->getImage("hudpoi3"), false)
 {
 }
 
 
-void Heading::draw()
+void Beta::draw()
 {
-    int offset = 360 + static_cast<int>(glm::degrees(m_hud->scenario()->yaw())*2);
-    m_head.draw(m_rect.x, m_rect.y, QRectF(offset, 0, m_rect.width, m_head.height()));
-    m_point.draw(m_rect.x + m_rect.width/2 - (m_point.width() + 1)/2, m_rect.y + m_head.height() + 1);
+    int offset = 360 + static_cast<int>(glm::degrees(m_hud->scenario()->pitch())*4);
+    //if (offset < 0)
+    //    offset += 720;
+    m_beta.draw(m_rect.x + m_point.width() + 1, m_rect.y, QRectF(0, offset, m_beta.width(), m_rect.height));
+    m_point.draw(m_rect.x, m_rect.y + m_rect.height/2 - (m_point.height() + 1)/2);
 }
 
 } // namespace hud

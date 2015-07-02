@@ -47,6 +47,9 @@ public:
     const glm::mat4& cameraMatrixInverted() const { return m_cameraMatrixInverted; }
     const glm::vec3& position() const { return m_position; }
     const float yaw() const { return m_yaw; }
+    const float pitch() const { return m_pitch; }
+    const float height() const { return m_height; }
+    const float depth() const { return m_depth - m_position.z; }
     const float time() const { return m_time; }
 
     Surface& surface() { return m_surface; }
@@ -86,8 +89,11 @@ private:
 
     glm::vec3 m_position;
     float m_yaw;
+    float m_pitch;
+    float m_height;
 
     txt::DesFile m_file;
+    int m_depth;
 
     Surface m_surface;
     gfx::TextureManager m_textureManager;
@@ -107,6 +113,7 @@ private:
     float m_down;
     float m_forwards;
     float m_backwards;
+    float m_inverseUpDown;
 
     glm::mat4 m_projectionMatrix;
     glm::mat4 m_projectionMatrixInverted;

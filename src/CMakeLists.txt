@@ -126,6 +126,8 @@ set(SOURCES
     hud/hud.h
     hud/heading.cpp
     hud/heading.h
+    hud/beta.cpp
+    hud/beta.h
 
     sfx/sound.cpp
     sfx/sound.h
