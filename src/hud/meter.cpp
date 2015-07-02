@@ -15,30 +15,46 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "beta.h"
+#include "meter.h"
 #include "hud.h"
 #include "fight/scenario.h"
-#include <glm/trigonometric.hpp>
+#include <glm/common.hpp>
 
 
 namespace hud {
 
 
-Beta::Beta(HUD *hud, util::Rect rect) :
+Meter::Meter(HUD *hud, util::Rect rect, glm::ivec2 barPos, int barHeight, bool k) :
     ui::Widget(hud->widget()),
     m_hud(hud),
     m_rect(rect),
-    m_beta(hud->getImage("hudbeta"), false),
-    m_point(hud->getImage("hudpoi3"), false)
+    m_barPos(barPos),
+    m_barHeight(barHeight),
+    m_k(k),
+    m_meter(hud->getImage(k ? "hudkmet" : "hudmet"), k ? true : false),
+    m_point(hud->getImage("hudpoi1"), k ? true : false),
+    m_pointRed(hud->getImage("hudpoi2"), false)
 {
 }
 
 
-void Beta::draw()
+void Meter::draw()
 {
-    int offset = 360 + static_cast<int>(glm::degrees(m_hud->scenario()->pitch())*4);
-    m_beta.draw(m_rect.x + m_point.width() + 1, m_rect.y, QRectF(0, offset, m_beta.width(), m_rect.height));
-    m_point.draw(m_rect.x, m_rect.y + m_rect.height/2 - (m_point.height() + 1)/2);
+    m_meter.draw(m_rect.x, m_rect.y);
+    float depth = m_hud->scenario()->depth();
+    if (m_k)
+        m_point.draw(m_rect.x + m_barPos.x, m_rect.y + m_barPos.y + static_cast<int>(depth/1000*m_barHeight/12) - (m_point.height() + 1)/2);
+    else
+    {
+        float height = m_hud->scenario()->height();
+        if (height < 50)
+        {
+            height = glm::mod<float>(depth + height, 100);
+            m_pointRed.draw(m_rect.x + m_barPos.x, m_rect.y + m_barPos.y + static_cast<int>(height*m_barHeight/100) - (m_pointRed.height() + 1)/2);
+        }
+        depth = glm::mod<float>(depth, 100);
+        m_point.draw(m_rect.x + m_barPos.x, m_rect.y + m_barPos.y + static_cast<int>(depth*m_barHeight/100) - (m_point.height() + 1)/2);
+    }
 }
 
 } // namespace hud

@@ -170,6 +170,7 @@ Scenario::Scenario(const QString &name) :
             m_position = getPosition();
             initialDir = 45.0f * m_file.value("card").toInt();
             //m_position.setZ(m_position.z() + 20.0f);
+            m_height = m_position.z - m_surface.heightAt(m_position.x, m_position.y);
 
             {
                 for (int i = 0; i < 27; i++)
@@ -325,8 +326,8 @@ void Scenario::update(float elapsedTime)
         glm::vec3 pos, normal;
         if (m_surface.testCollision(prevPos, m_position, 1.5f, pos, normal))
             m_position = pos;
-        float height = m_surface.heightAt(m_position.x, m_position.y);
-        qDebug() << height << m_position.z;
+        m_height = m_position.z - m_surface.heightAt(m_position.x, m_position.y);
+
         Object *collision = m_collisionManager.testCollision(prevPos, m_position, 1.5f, pos, normal);
         if (collision)
         {
@@ -491,7 +492,6 @@ glm::vec3 Scenario::getPosition()
     pos.z = m_file.value("pz").toInt() + m_file.value("hei").toInt();
 
     pos *= m_surface.scale();
-    m_surface.heightAt(pos.x, pos.y);
     pos.z += m_surface.heightAt(pos.x, pos.y);
 
     return pos;

@@ -128,6 +128,8 @@ set(SOURCES
     hud/heading.h
     hud/beta.cpp
     hud/beta.h
+    hud/meter.cpp
+    hud/meter.h
 
     sfx/sound.cpp
     sfx/sound.h

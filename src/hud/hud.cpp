@@ -25,6 +25,7 @@
 
 #include "heading.h"
 #include "beta.h"
+#include "meter.h"
 
 
 namespace hud {
@@ -75,6 +76,14 @@ void HUD::load(game::Boat *boat)
     file.setSection("hudbeta");
     Beta *beta = new Beta(this, readRect(file));
     m_children.emplace_back(beta);
+
+    file.setSection("hudmeter");
+    Meter *meter = new Meter(this, readRect(file), glm::ivec2(file.value("BarX1").toInt(), file.value("BarY1").toInt()), file.value("BarHeight").toInt(), false);
+    m_children.emplace_back(meter);
+
+    file.setSection("hudkmeter");
+    Meter *kmeter = new Meter(this, readRect(file), glm::ivec2(file.value("BarX1").toInt(), file.value("BarY1").toInt()), file.value("BarHeight").toInt(), true);
+    m_children.emplace_back(kmeter);
 }
 
 

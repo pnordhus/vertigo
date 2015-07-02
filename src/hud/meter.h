@@ -15,30 +15,42 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "beta.h"
-#include "hud.h"
-#include "fight/scenario.h"
-#include <glm/trigonometric.hpp>
+#ifndef HUD_METER_H
+#define HUD_METER_H
+
+
+#include "util/rect.hpp"
+#include "ui/widget.h"
+#include "gfx/texture.h"
 
 
 namespace hud {
 
 
-Beta::Beta(HUD *hud, util::Rect rect) :
-    ui::Widget(hud->widget()),
-    m_hud(hud),
-    m_rect(rect),
-    m_beta(hud->getImage("hudbeta"), false),
-    m_point(hud->getImage("hudpoi3"), false)
-{
-}
+class HUD;
 
 
-void Beta::draw()
+class Meter : public ui::Widget
 {
-    int offset = 360 + static_cast<int>(glm::degrees(m_hud->scenario()->pitch())*4);
-    m_beta.draw(m_rect.x + m_point.width() + 1, m_rect.y, QRectF(0, offset, m_beta.width(), m_rect.height));
-    m_point.draw(m_rect.x, m_rect.y + m_rect.height/2 - (m_point.height() + 1)/2);
-}
+public:
+    Meter(HUD *hud, util::Rect rect, glm::ivec2 barPos, int barHeight, bool k);
+
+protected:
+    void draw();
+
+private:
+    HUD *m_hud;
+    util::Rect m_rect;
+    glm::ivec2 m_barPos;
+    int m_barHeight;
+    bool m_k;
+    gfx::Texture m_meter;
+    gfx::Texture m_point;
+    gfx::Texture m_pointRed;
+};
+
 
 } // namespace hud
+
+
+#endif // HUD_METER_H
