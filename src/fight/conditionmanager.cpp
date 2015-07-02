@@ -180,6 +180,11 @@ void ConditionManager::buildDependencies()
 
         if (entry.cond1 == 0 && entry.cond2 != 0)
             qDebug() << "Abnormal condition" << pair.first;
+        if (entry.condTrigger == nullptr)
+        {
+            qDebug() << "Undefined object";
+            continue;
+        }
         if (entry.cond1 == 0)
         {
             if (entry.del != 0)
@@ -206,7 +211,10 @@ void ConditionManager::initCondition(int cond, int dep, int ref, Condition *cond
             qDebug() << "Unhandled condition dep" << cond << dep;
         if (condEntries.find(ref) == condEntries.end())
             qDebug() << "Condition reference not found" << ref;
-        condEntries[ref].condSignal->addDependency(condDepend, cond == 1);
+        if (condEntries[ref].condSignal == nullptr)
+            qDebug() << "Undefined object";
+        else
+            condEntries[ref].condSignal->addDependency(condDepend, cond == 1);
     }
     if (cond == 2 || cond == 40)
     {
@@ -214,7 +222,10 @@ void ConditionManager::initCondition(int cond, int dep, int ref, Condition *cond
             qDebug() << "Unhandled condition dep" << cond << dep;
         if (condEntries.find(ref) == condEntries.end())
             qDebug() << "Condition reference not found" << ref;
-        condEntries[ref].condAttacked->addDependency(condDepend, cond == 2);
+        if (condEntries[ref].condAttacked == nullptr)
+            qDebug() << "Undefined object";
+        else
+            condEntries[ref].condAttacked->addDependency(condDepend, cond == 2);
     }
     if (cond == 3 || cond == 41)
     {
@@ -222,7 +233,10 @@ void ConditionManager::initCondition(int cond, int dep, int ref, Condition *cond
             qDebug() << "Unhandled condition dep" << cond << dep;
         if (condEntries.find(ref) == condEntries.end())
             qDebug() << "Condition reference not found" << ref;
-        condEntries[ref].condIdentified->addDependency(condDepend, cond == 3);
+        if (condEntries[ref].condIdentified == nullptr)
+            qDebug() << "Undefined object";
+        else
+            condEntries[ref].condIdentified->addDependency(condDepend, cond == 3);
     }
     if (cond == 4)
     {
@@ -242,14 +256,15 @@ void ConditionManager::initCondition(int cond, int dep, int ref, Condition *cond
     }
     if (cond >= 6 && cond <= 37)
     {
-        int objective = cond - 6;
-        if (m_condObjectives.find(objective) == m_condObjectives.end())
-            qDebug() << "Objective not found" << cond;
         if (dep != 0)
             qDebug() << "Unhandled condition dep" << cond << dep;
         if (ref != -1)
             qDebug() << "Unexpected reference" << cond << ref;
-        m_condObjectives.at(objective).addDependency(condDepend);
+        int objective = cond - 6;
+        if (m_condObjectives.find(objective) == m_condObjectives.end())
+            qDebug() << "Objective not found" << cond;
+        else
+            m_condObjectives.at(objective).addDependency(condDepend);
     }
     if (cond == 38)
     {
@@ -257,7 +272,10 @@ void ConditionManager::initCondition(int cond, int dep, int ref, Condition *cond
             qDebug() << "Unhandled condition dep" << cond << dep;
         if (condEntries.find(ref) == condEntries.end())
             qDebug() << "Condition reference not found" << ref;
-        condEntries[ref].condParalyzed->addDependency(condDepend);
+        if (condEntries[ref].condParalyzed == nullptr)
+            qDebug() << "Undefined object";
+        else
+           condEntries[ref].condParalyzed->addDependency(condDepend);
     }
     if (cond == 43 || cond == 44)
     {
@@ -265,7 +283,10 @@ void ConditionManager::initCondition(int cond, int dep, int ref, Condition *cond
             qDebug() << "Unhandled condition dep" << cond << dep;
         if (condEntries.find(ref) == condEntries.end())
             qDebug() << "Condition reference not found" << ref;
-        condEntries[ref].condFinished->addDependency(condDepend, cond == 43);
+        if (condEntries[ref].condFinished == nullptr)
+            qDebug() << "Undefined object";
+        else
+            condEntries[ref].condFinished->addDependency(condDepend, cond == 43);
     }
     if (cond == 45 || cond == 46)
     {
@@ -273,7 +294,10 @@ void ConditionManager::initCondition(int cond, int dep, int ref, Condition *cond
             qDebug() << "Unhandled condition dep" << cond << dep;
         if (condEntries.find(ref) == condEntries.end())
             qDebug() << "Condition reference not found" << ref;
-        condEntries[ref].condBoarded->addDependency(condDepend, cond == 45);
+        if (condEntries[ref].condBoarded == nullptr)
+            qDebug() << "Undefined object";
+        else
+            condEntries[ref].condBoarded->addDependency(condDepend, cond == 45);
     }
 }
 
