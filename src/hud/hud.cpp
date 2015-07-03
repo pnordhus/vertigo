@@ -21,17 +21,22 @@
 #include "fight/scenario.h"
 #include "game/boat.h"
 #include "gfx/image.h"
-#include "gfx/colortable.h"
+#include <glm/gtx/transform.hpp>
 
 #include "heading.h"
 #include "beta.h"
 #include "meter.h"
+#include "digiblock.h"
 
 
 namespace hud {
 
 
-HUD::HUD()
+HUD::HUD() :
+    m_colorTable("gfx:pal/gui/border.pal"),
+    m_fontGreen("gfx:fnt/cpit1ahc.fnt", m_colorTable, true, false),
+    m_fontRed("gfx:fnt/cpit1bhc.fnt", m_colorTable, true, false),
+    m_fontYellow("gfx:fnt/cpit1chc.fnt", m_colorTable, true, false)
 {
 
 }
@@ -45,8 +50,7 @@ util::Rect HUD::readRect(const txt::DesFile &file)
 
 gfx::Image HUD::getImage(const QString &name)
 {
-    const gfx::ColorTable colorTable("gfx:pal/gui/border.pal");
-    return gfx::Image::load(QString("gfx:img/cockpit/%1.img").arg(name), colorTable);
+    return gfx::Image::load(QString("gfx:img/cockpit/%1.img").arg(name), m_colorTable);
 }
 
 
@@ -84,6 +88,10 @@ void HUD::load(game::Boat *boat)
     file.setSection("hudkmeter");
     Meter *kmeter = new Meter(this, readRect(file), glm::ivec2(file.value("BarX1").toInt(), file.value("BarY1").toInt()), file.value("BarHeight").toInt(), true);
     m_children.emplace_back(kmeter);
+
+    file.setSection("huddigiblock1");
+    DigiBlock *digiBlock = new DigiBlock(this, readRect(file));
+    m_children.emplace_back(digiBlock);
 }
 
 
@@ -92,6 +100,7 @@ void HUD::start(fight::Scenario *scenario)
     m_scenario = scenario;
     hideCursor();
     m_lastTicks = SDL_GetTicks();
+    m_scenario->setBoat(m_boat);
 }
 
 
@@ -105,6 +114,7 @@ void HUD::setRect(const QRect &rect)
         m_rectHUD = util::RectF(rect.x() - rectOrtho().x()/rectOrtho().width()*rect.width(), rect.y() - rectOrtho().y()/rectOrtho().height()*rect.height(), rect.width()*640/rectOrtho().width(), rect.height()*480/rectOrtho().height());
     if (m_scenario)
         m_scenario->setRect(m_rectHUD, glm::vec2(m_projectionMatrix * glm::vec4(m_center, 0, 1)));
+    m_projectionMatrix = glm::translate(glm::vec3(0.5f/rect.width(), 0.5f/rect.height(), 0)) * m_projectionMatrix;
 }
 
 
@@ -126,6 +136,7 @@ void HUD::draw()
 
 
     m_cockpit.doDraw();
+    m_rootWidget.doDraw();
 }
 
 

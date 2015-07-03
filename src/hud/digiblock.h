@@ -15,44 +15,37 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "trash.h"
-#include "billboard.h"
-#include "../scenario.h"
+#ifndef HUD_DIGIBLOCK_H
+#define HUD_DIGIBLOCK_H
 
-#include <glm/gtx/norm.hpp>
 
-namespace fight {
+#include "util/rect.hpp"
+#include "ui/widget.h"
+#include "ui/label.h"
 
-Effects Trash::trashCollection[9] = {Trash_0, Trash_0, Trash_1, Trash_1, Trash_2, Trash_2, Trash_3, Trash_3, Trash_4};
 
-Trash::Trash(Scenario *scenario, Billboard *billboard, const glm::vec3 &position) :
-    Effect(scenario, billboard, static_cast<float>(qrand()%360), 1)
+namespace hud {
+
+
+class HUD;
+
+
+class DigiBlock : public ui::Widget
 {
-    m_type = TrashObject;
-    m_scenario->collisionManager().addObject(this);
+public:
+    DigiBlock(HUD *hud, util::Rect rect);
 
-    glm::vec3 pos = position + glm::vec3(qrand()%50 - 25, qrand()%50 - 25, qrand()%25 - 25);
-    float height = m_scenario->surface().heightAt(pos.x, pos.y) + 5;
-    if (pos.z < height)
-        pos.z = height;
-    Object::setPosition(pos);
+protected:
+    void draw();
 
-    BoundingBox box = m_billboard->box();
-    m_box = BoundingBox(pos + box.minPoint(), pos + box.maxPoint());
-}
-
-
-bool Trash::intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal)
-{
-    return m_billboard->intersect(start - m_position, dir, distance);
-}
+private:
+    HUD *m_hud;
+    util::Rect m_rect;
+    std::vector<std::unique_ptr<ui::Label>> m_children;
+};
 
 
-void Trash::destroy()
-{
-    m_scenario->effectManager().addEffect(Explosion_5, m_position, 0, glm::length2(m_box.dim()) > 15 ? 2 : 1);
-    Object::destroy();
-}
+} // namespace hud
 
 
-} // namespace fight
+#endif // HUD_DIGIBLOCK_H

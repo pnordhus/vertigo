@@ -24,6 +24,7 @@
 #include "util/event.hpp"
 #include "ui/label.h"
 #include "txt/desfile.h"
+#include "gfx/colortable.h"
 #include "gfx/image.h"
 
 
@@ -45,8 +46,11 @@ public:
     util::RectF rectHUD() const { return m_rectHUD; }
     game::Boat* boat() const { return m_boat; }
     fight::Scenario* scenario() const { return m_scenario; }
-    ui::Widget* widget() { return &m_cockpit; }
+    ui::Widget* widget() { return &m_rootWidget; }
     gfx::Image getImage(const QString &name);
+    gfx::Font& fontGreen() { return m_fontGreen; }
+    gfx::Font& fontRed() { return m_fontRed; }
+    gfx::Font& fontYellow() { return m_fontYellow; }
 
     void load(game::Boat *boat);
     void start(fight::Scenario *scenario);
@@ -69,7 +73,13 @@ private:
     fight::Scenario *m_scenario;
     int m_lastTicks;
 
+    const gfx::ColorTable m_colorTable;
+    gfx::Font m_fontGreen;
+    gfx::Font m_fontRed;
+    gfx::Font m_fontYellow;
+
     ui::Label m_cockpit;
+    ui::Label m_rootWidget;
     std::vector<std::unique_ptr<ui::Widget>> m_children;
 };
 

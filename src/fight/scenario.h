@@ -30,6 +30,10 @@
 
 #include <functional>
 
+
+namespace game { class Boat; }
+
+
 namespace fight {
 
 
@@ -50,7 +54,10 @@ public:
     const float pitch() const { return m_pitch; }
     const float height() const { return m_height; }
     const float depth() const { return m_depth - m_position.z; }
+    const float speed() const { return m_speed; }
+    const int noise() const { return m_noise; }
     const float time() const { return m_time; }
+    const int buzzers() const { return m_buzzers; }
 
     Surface& surface() { return m_surface; }
     gfx::TextureManager& textureManager() { return m_textureManager; }
@@ -60,6 +67,7 @@ public:
     ConditionManager& conditionManager() { return m_conditionManager; }
 
 public:
+    void setBoat(const game::Boat *boat);
     void setRect(const util::RectF &rect, const glm::vec2 &center);
     void update(float elapsedTime);
     void draw();
@@ -91,6 +99,9 @@ private:
     float m_yaw;
     float m_pitch;
     float m_height;
+    float m_speed;
+    int m_noise;
+    int m_buzzers;
 
     txt::DesFile m_file;
     int m_depth;

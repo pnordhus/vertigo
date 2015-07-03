@@ -46,14 +46,14 @@ void Meter::draw()
         m_point.draw(m_rect.x + m_barPos.x, m_rect.y + m_barPos.y + static_cast<int>(depth/1000*m_barHeight/12) - (m_point.height() + 1)/2);
     else
     {
+        depth = glm::mod<float>(depth, 100);
+        m_point.draw(m_rect.x + m_barPos.x, m_rect.y + m_barPos.y + static_cast<int>(depth*m_barHeight/100) - (m_point.height() + 1)/2);
         float height = m_hud->scenario()->height();
         if (height < 50)
         {
             height = glm::mod<float>(depth + height, 100);
             m_pointRed.draw(m_rect.x + m_barPos.x, m_rect.y + m_barPos.y + static_cast<int>(height*m_barHeight/100) - (m_pointRed.height() + 1)/2);
         }
-        depth = glm::mod<float>(depth, 100);
-        m_point.draw(m_rect.x + m_barPos.x, m_rect.y + m_barPos.y + static_cast<int>(depth*m_barHeight/100) - (m_point.height() + 1)/2);
     }
 }
 

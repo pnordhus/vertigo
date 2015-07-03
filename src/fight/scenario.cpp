@@ -26,6 +26,7 @@
 #include "turretbase.h"
 #include "navpoint.h"
 #include "conditionmanager.h"
+#include "game/boat.h"
 #include <QGLContext>
 #include <QKeyEvent>
 #include <glm/gtc/matrix_transform.hpp>
@@ -41,6 +42,8 @@ Scenario::Scenario(const QString &name) :
     m_moduleManager(m_textureManager),
     m_effectManager(this),
     m_conditionManager(this),
+    m_speed(0),
+    m_noise(0),
     m_time(0),
     m_left(0.0f),
     m_right(0.0f),
@@ -290,6 +293,12 @@ Scenario::Scenario(const QString &name) :
 }
 
 
+void Scenario::setBoat(const game::Boat *boat)
+{
+    m_buzzers = boat->buzzers().size();
+}
+
+
 void Scenario::setRect(const util::RectF &rect, const glm::vec2 &center)
 {
     m_projectionMatrix = glm::translate(glm::vec3(center, 0)) * glm::perspective(glm::radians(60.0f), float(rect.width / rect.height), 0.1f, 10000.0f);
@@ -313,6 +322,7 @@ void Scenario::update(float elapsedTime)
     m_position += dir * (m_backwards - m_forwards) * elapsedTime * 0.2f;
     m_yaw = glm::atan(dir.x, dir.y);
     m_pitch = dir.z < -1.0f ? -glm::half_pi<float>() : dir.z > 1.0f ? glm::half_pi<float>() : glm::asin(dir.z);
+    m_speed = (m_forwards - m_backwards) * 0.2f * 3600.0f;
 
     glm::vec3 up = glm::vec3(glm::row(m_cameraMatrix, 1));
     if (up.z < 0)
