@@ -33,7 +33,6 @@ DigiBlock::DigiBlock(HUD *hud, util::Rect rect) :
     for (int i = 0; i < 7; i++)
     {
         ui::Label *lbl = new ui::Label(this);
-        lbl->setPosition(rect.x, rect.y + 8*i);
         m_children.emplace_back(lbl);
     }
 }
@@ -41,6 +40,10 @@ DigiBlock::DigiBlock(HUD *hud, util::Rect rect) :
 
 void DigiBlock::draw()
 {
+    glm::ivec2 p = m_hud->project(m_rect.pos());
+    for (int i = 0; i < 7; i++)
+        m_children[i]->setPosition(p.x, p.y + 8*i);
+
     int depth = static_cast<int>(glm::round(m_hud->scenario()->depth()));
     m_children[0]->setFont(depth > 100 ? m_hud->fontGreen() : m_hud->fontRed());
     m_children[0]->setText(QString("%1M").arg(depth));
@@ -50,11 +53,11 @@ void DigiBlock::draw()
     m_children[1]->setText(QString("%1M").arg(height));
     
     int speed = static_cast<int>(glm::round(m_hud->scenario()->speed()));
-    m_children[2]->setFont(m_hud->fontGreen());
+    m_children[2]->setFont(speed >= 0 ? m_hud->fontGreen() : m_hud->fontRed());
     m_children[2]->setText(QString("%1KM/H").arg(speed));
     
     int noise = 1 + static_cast<int>(glm::round(m_hud->scenario()->noise()));
-    m_children[3]->setFont(noise < 3 ? m_hud->fontGreen() : m_hud->fontRed());
+    m_children[3]->setFont(noise == 1 ? m_hud->fontGreen() : m_hud->fontRed());
     m_children[3]->setText(QString("NL %1").arg(noise));
 
     int time = static_cast<int>(m_hud->scenario()->time()/1000);
@@ -77,8 +80,9 @@ void DigiBlock::draw()
     m_children[5]->setFont(m_hud->fontGreen());
     m_children[5]->setText(nav == 0 ? QString("NAV NONE") : QString("NAV %1").arg('A' + nav));
 
-    m_children[6]->setFont(m_hud->fontGreen());
-    m_children[6]->setText(QString("BUZ %1").arg(m_hud->scenario()->buzzers()));
+    int buzzers = m_hud->scenario()->buzzers();
+    m_children[6]->setFont(buzzers > 0 ? m_hud->fontGreen() : m_hud->fontRed());
+    m_children[6]->setText(QString("BUZ %1").arg(buzzers));
 }
 
 } // namespace hud

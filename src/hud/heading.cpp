@@ -37,8 +37,9 @@ Heading::Heading(HUD *hud, util::Rect rect) :
 void Heading::draw()
 {
     int offset = 360 + static_cast<int>(glm::degrees(m_hud->scenario()->yaw())*2);
-    m_head.draw(m_rect.x, m_rect.y, QRectF(offset, 0, m_rect.width, m_head.height()));
-    m_point.draw(m_rect.x + m_rect.width/2 - (m_point.width() + 1)/2, m_rect.y + m_head.height() + 1);
+    util::Rect rect = m_hud->projectCenter(m_rect);
+    m_head.draw(rect.x, rect.y, QRectF(offset, 0, m_rect.width, m_head.height()));
+    m_point.draw(rect.x + rect.width/2 - (m_point.width() + 1)/2, rect.y + m_head.height() + 1);
 }
 
 } // namespace hud

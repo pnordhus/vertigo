@@ -22,7 +22,9 @@
 #include "game/boat.h"
 #include "gfx/image.h"
 #include <glm/gtx/transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
+#include "crosshair.h"
 #include "heading.h"
 #include "beta.h"
 #include "meter.h"
@@ -68,10 +70,8 @@ void HUD::load(game::Boat *boat)
 
     file.setSection("front");
     m_center = glm::ivec2(file.value("VFX_StartX").toInt() + file.value("VFX_FlightX").toInt(), file.value("VFX_StartY").toInt() + file.value("VFX_FlightY").toInt());
-    ui::Label *lblTarget = new ui::Label(widget());
-    lblTarget->setTexture(getImage("hudtarg"));
-    lblTarget->setPosition(m_center.x - (lblTarget->texture().width() + 1)/2, m_center.y - (lblTarget->texture().height() + 1)/2);
-    m_children.emplace_back(lblTarget);
+    Crosshair *crosshair = new Crosshair(this, m_center);
+    m_children.emplace_back(crosshair);
 
     file.setSection("hudheading");
     Heading *heading = new Heading(this, readRect(file));
@@ -106,6 +106,8 @@ void HUD::start(fight::Scenario *scenario)
 
 void HUD::setRect(const QRect &rect)
 {
+    if (this->rect().width() == rect.width() && this->rect().height() == rect.height())
+        return;
     Renderer::setRect(rect);
 
     if (m_wide)
@@ -114,7 +116,28 @@ void HUD::setRect(const QRect &rect)
         m_rectHUD = util::RectF(rect.x() - rectOrtho().x()/rectOrtho().width()*rect.width(), rect.y() - rectOrtho().y()/rectOrtho().height()*rect.height(), rect.width()*640/rectOrtho().width(), rect.height()*480/rectOrtho().height());
     if (m_scenario)
         m_scenario->setRect(m_rectHUD, glm::vec2(m_projectionMatrix * glm::vec4(m_center, 0, 1)));
-    m_projectionMatrix = glm::translate(glm::vec3(0.5f/rect.width(), 0.5f/rect.height(), 0)) * m_projectionMatrix;
+
+    int w = 640;
+    int h = 480;
+    while (w + 640 <= rect.width() && h + 480 <= rect.height())
+    {
+        w += 640;
+        h += 480;
+    }
+    m_hudProjectionMatrix = glm::ortho(0.0f, rect.width()*640.0f/w, rect.height()*480.0f/h, 0.0f);
+    m_hudProjectionMatrixInverted = glm::inverse(m_hudProjectionMatrix);
+}
+
+
+glm::ivec2 HUD::project(const glm::ivec2 &point)
+{
+    return glm::ivec2(glm::round(m_hudProjectionMatrixInverted * (m_projectionMatrix * glm::vec4(point, 0, 1))));
+}
+
+
+util::Rect HUD::projectCenter(const util::Rect &rect)
+{
+    return util::Rect(project(rect.center()) - glm::ivec2(rect.width/2, rect.height/2), rect.size());
 }
 
 
@@ -136,6 +159,9 @@ void HUD::draw()
 
 
     m_cockpit.doDraw();
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadMatrixf(glm::value_ptr(m_hudProjectionMatrix));
     m_rootWidget.doDraw();
 }
 

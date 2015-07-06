@@ -15,31 +15,26 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "beta.h"
+#include "crosshair.h"
 #include "hud.h"
-#include "fight/scenario.h"
-#include <glm/trigonometric.hpp>
 
 
 namespace hud {
 
 
-Beta::Beta(HUD *hud, util::Rect rect) :
+Crosshair::Crosshair(HUD *hud, glm::ivec2 center) :
     ui::Widget(hud->widget()),
     m_hud(hud),
-    m_rect(rect),
-    m_beta(hud->getImage("hudbeta"), false),
-    m_point(hud->getImage("hudpoi3"), false)
+    m_center(center),
+    m_targ(hud->getImage("hudtarg"), false)
 {
 }
 
 
-void Beta::draw()
+void Crosshair::draw()
 {
-    int offset = 360 + static_cast<int>(glm::degrees(m_hud->scenario()->pitch())*4);
-    util::Rect rect = m_hud->projectCenter(m_rect);
-    m_beta.draw(rect.x + m_point.width() + 1, rect.y, QRectF(0, offset, m_beta.width(), m_rect.height));
-    m_point.draw(rect.x, rect.y + rect.height/2 - (m_point.height() + 1)/2);
+    glm::ivec2 p = m_hud->project(m_center);
+    m_targ.draw(p.x - (m_targ.width() + 1)/2, p.y - (m_targ.height() + 1)/2);
 }
 
 

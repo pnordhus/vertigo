@@ -124,6 +124,8 @@ set(SOURCES
 
     hud/hud.cpp
     hud/hud.h
+    hud/crosshair.cpp
+    hud/crosshair.h
     hud/heading.cpp
     hud/heading.h
     hud/beta.cpp

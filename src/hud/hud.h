@@ -54,6 +54,8 @@ public:
 
     void load(game::Boat *boat);
     void start(fight::Scenario *scenario);
+    glm::ivec2 project(const glm::ivec2 &point);
+    util::Rect projectCenter(const util::Rect &rect);
 
 protected:
     void setRect(const QRect &rect);
@@ -67,11 +69,14 @@ private:
 private:
     util::event<> m_eventSuccess;
     game::Boat *m_boat;
+    fight::Scenario *m_scenario;
+    int m_lastTicks;
+
     bool m_wide;
     util::RectF m_rectHUD;
     glm::ivec2 m_center;
-    fight::Scenario *m_scenario;
-    int m_lastTicks;
+    glm::mat4 m_hudProjectionMatrix;
+    glm::mat4 m_hudProjectionMatrixInverted;
 
     const gfx::ColorTable m_colorTable;
     gfx::Font m_fontGreen;
