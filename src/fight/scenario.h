@@ -65,6 +65,7 @@ public:
     EffectManager& effectManager() { return m_effectManager; }
     CollisionManager& collisionManager() { return m_collisionManager; }
     ConditionManager& conditionManager() { return m_conditionManager; }
+    std::vector<ConditionRadio*>& radio() { return m_radio; }
 
 public:
     void setBoat(const game::Boat *boat);
@@ -112,6 +113,7 @@ private:
     EffectManager m_effectManager;
     CollisionManager m_collisionManager;
     ConditionManager m_conditionManager;
+    std::vector<ConditionRadio*> m_radio;
 
     std::vector<std::unique_ptr<Object>> m_objects;
     std::vector<Object*> m_lightSources;

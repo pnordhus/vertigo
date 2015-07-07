@@ -56,6 +56,7 @@ public:
     void buildDependencies();
 
     Condition* addCondition(int limit = 0);
+    ConditionRadio* addCondRadio(const glm::vec3 &pos, const QString &text);
     ConditionSpace* addCondSpace(int x, int y, int dimx, int dimy, int minz, int maxz);
     void testSpace(float x, float y, float height);
     void delayComplete(Condition *cond, int delay);
@@ -65,6 +66,7 @@ private:
     Scenario *m_scenario;
     std::map<int, ConditionEntry> condEntries;
     std::list<Condition> m_conditions;
+    std::list<ConditionRadio> m_condRadio;
     std::list<ConditionSpace> m_condSpaces;
 
     ConditionAutopilot m_condAutopilot;

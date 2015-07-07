@@ -37,6 +37,13 @@ Condition* ConditionManager::addCondition(int limit)
 }
 
 
+ConditionRadio* ConditionManager::addCondRadio(const glm::vec3 &pos, const QString &text)
+{
+    m_condRadio.emplace_back(m_scenario, pos, text);
+    return &m_condRadio.back();
+}
+
+
 ConditionSpace* ConditionManager::addCondSpace(int x, int y, int dimx, int dimy, int minz, int maxz)
 {
     m_condSpaces.emplace_back(m_scenario, x, y, dimx, dimy, minz, maxz);

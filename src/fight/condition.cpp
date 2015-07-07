@@ -156,4 +156,22 @@ void ConditionSpace::test(float x, float y, float height)
 }
 
 
+ConditionRadio::ConditionRadio(Scenario *scenario, const glm::vec3 &pos, const QString &text) :
+    Condition(scenario, 0),
+    m_pos(pos),
+    m_text(text)
+{
+}
+
+
+void ConditionRadio::complete()
+{
+    Condition::complete();
+    m_time = m_scenario->time();
+    if (m_scenario->radio().size() > 0 && m_time < m_scenario->radio().back()->time() + 5000.0f)
+        m_time = m_scenario->radio().back()->time() + 5000.0f;
+    m_scenario->radio().push_back(this);
+}
+
+
 } // namespace fight

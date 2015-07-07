@@ -283,6 +283,36 @@ Scenario::Scenario(const QString &name) :
         }
     }
 
+    foreach (const QString &section, m_file.sections().filter(QRegExp("^radio\\d*"))) {
+        m_file.setSection(section);
+
+        const int id = m_file.value("id").toInt();
+        ConditionManager::ConditionEntry &entry = m_conditionManager.addEntry(id);
+        entry.cond1 = m_file.value("bccond1").toInt();
+        entry.dep1 = m_file.value("bcdep1").toInt();
+        entry.ref1 = m_file.value("bcref1").toInt();
+        entry.op = m_file.value("bcop").toInt();
+        entry.cond2 = m_file.value("bccond2").toInt();
+        entry.dep2 = m_file.value("bcdep2").toInt();
+        entry.ref2 = m_file.value("bcref2").toInt();
+        entry.del = m_file.value("bcdel").toInt();
+
+        const int type = m_file.value("typ").toInt();
+        if (type != 5120)
+            qDebug() << "Unhandled radio type " << type;
+
+        ConditionRadio *radio = m_conditionManager.addCondRadio(getPosition(), m_file.valueText("rtxt"));
+        if (entry.cond1 == 0 && entry.del == 0)
+            radio->complete();
+        entry.condTrigger = radio;
+        entry.condSignal = nullptr;
+        entry.condAttacked = nullptr;
+        entry.condIdentified = nullptr;
+        entry.condParalyzed = nullptr;
+        entry.condFinished = nullptr;
+        entry.condBoarded = nullptr;
+    }
+
     m_conditionManager.buildDependencies();
 
 
