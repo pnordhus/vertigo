@@ -134,6 +134,8 @@ set(SOURCES
     hud/meter.h
     hud/digiblock.cpp
     hud/digiblock.h
+    hud/radiomessage.cpp
+    hud/radiomessage.h
 
     sfx/sound.cpp
     sfx/sound.h

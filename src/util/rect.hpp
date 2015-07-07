@@ -59,6 +59,8 @@ public:
     RectangleExclusive(T x, T y, T width, T height) : Rectangle<T>(x, y, width, height) { };
     RectangleExclusive(const glm::tvec2<T> &pos, const glm::tvec2<T> &size) : Rectangle<T>(pos, size) { };
 
+    RectangleExclusive(const Rectangle<T> &base) : Rectangle<T>(base) { };
+
 public:
 
     T right() const { return x + width - 1; }
@@ -74,6 +76,8 @@ public:
     RectangleInclusive() : Rectangle<T>() { };
     RectangleInclusive(T x, T y, T width, T height) : Rectangle<T>(x, y, width, height) { };
     RectangleInclusive(const glm::tvec2<T> &pos, const glm::tvec2<T> &size) : Rectangle<T>(pos, size) { };
+
+    RectangleInclusive(const Rectangle<T> &base) : Rectangle<T>(base) { };
 
 public:
 

@@ -29,6 +29,7 @@
 #include "beta.h"
 #include "meter.h"
 #include "digiblock.h"
+#include "radiomessage.h"
 
 
 namespace hud {
@@ -92,6 +93,10 @@ void HUD::load(game::Boat *boat)
     file.setSection("huddigiblock1");
     DigiBlock *digiBlock = new DigiBlock(this, readRect(file));
     m_children.emplace_back(digiBlock);
+
+    file.setSection("radiomessage");
+    RadioMessage *radioMessage = new RadioMessage(this, util::Rect(file.value("X").toInt(), file.value("Y").toInt(), 640 - file.value("X").toInt()*2, 12));
+    m_children.emplace_back(radioMessage);
 }
 
 
