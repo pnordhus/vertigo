@@ -18,6 +18,7 @@
 #include "radiomessage.h"
 #include "hud.h"
 #include "fight/scenario.h"
+#include "sfx/samplemap.h"
 
 
 namespace hud {
@@ -27,7 +28,7 @@ RadioMessage::RadioMessage(HUD *hud, util::Rect rect) :
     ui::Widget(hud->widget()),
     m_hud(hud),
     m_rect(rect),
-    m_lblText(this),
+    m_lblText(this, false),
     m_edgeBL(hud->getImage("hudedgbl"), false),
     m_edgeBR(hud->getImage("hudedgbr"), false),
     m_edgeTL(hud->getImage("hudedgtl"), false),
@@ -44,10 +45,15 @@ void RadioMessage::draw()
     int i = m_hud->scenario()->radio().size() - 1;
     while (i >= 0 && m_hud->scenario()->radio()[i]->time() > m_hud->scenario()->time())
         i--;
-    if (i < 0 || m_hud->scenario()->radio()[i]->time() < m_hud->scenario()->time() - 5000.0f)
+    if (i < 0 || m_hud->scenario()->radio()[i]->time() < m_hud->scenario()->time() - 4500.0f)
     {
         m_lblText.setVisible(false);
         return;
+    }
+    if (!m_lblText.isVisible())
+    {
+        m_lblText.setVisible(true);
+        sfx::SampleMap::get(sfx::Sample::Radio).play();
     }
 
     util::RectangleInclusive<int> rect = m_hud->projectCenter(m_rect);
@@ -60,7 +66,6 @@ void RadioMessage::draw()
     m_lblText.setPosition(rect.x, rect.y + 2);
     m_lblText.setSize(rect.width, rect.height - 5);
     m_lblText.setText(m_hud->scenario()->radio()[i]->text());
-    m_lblText.setVisible(true);
 }
 
 

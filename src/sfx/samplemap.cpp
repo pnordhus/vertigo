@@ -15,47 +15,40 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef SFX_SOUND_H
-#define SFX_SOUND_H
-
-
-#include <QString>
+#include "samplemap.h"
+#include "txt/desfile.h"
 
 
 namespace sfx {
 
 
-class Sound
+std::vector<Sound> SampleMap::m_samples;
+
+
+void SampleMap::load()
 {
-public:
-    Sound();
-    Sound(Sound&& o);
-    Sound(const QString &file);
-    ~Sound();
+    if (m_samples.size() > 0)
+        return;
 
-public:
-    void stop();
-    void play();
-    void playLoop();
-    void pause();
-    void resume();
-    void load(const QString &file, int rate = 0);
-    void load(const QString &leftFile, const QString &rightFile);
-    void setVolume(float volume);
+    txt::DesFile fileDes("sfx:snd/smpmap.des");
+    fileDes.setSection("samplemap");
 
-private:
-    Q_DISABLE_COPY(Sound);
-    QByteArray loadFile(const QString &filename);
-    bool acquire();
+    for (int i = 0; i <= 83; i++)
+    {
+        m_samples.emplace_back();
+        QString nam = fileDes.value(QString("nam%1").arg(i)).toString().replace("\\", "/");
+        if (nam == "")
+            continue;
+        m_samples.back().load(QString("sfx:snd/%1.pcm").arg(nam), fileDes.value(QString("per%1").arg(i)).toInt());
+        m_samples.back().setVolume(fileDes.value(QString("vol%1").arg(i)).toInt()/255.0f);
+    }
+}
 
-private:
-    quint32 m_source;
-    quint32 m_buffer;
-    float m_volume;
-};
+
+void SampleMap::reset()
+{
+    m_samples.clear();
+}
 
 
 } // namespace sfx
-
-
-#endif // SFX_SOUND_H

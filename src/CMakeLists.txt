@@ -143,6 +143,8 @@ set(SOURCES
     sfx/soundsystem.h
     sfx/stream.cpp
     sfx/stream.h
+    sfx/samplemap.cpp
+    sfx/samplemap.h
 
     txt/desfile.cpp
     txt/desfile.h

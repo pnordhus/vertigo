@@ -27,6 +27,7 @@
 #include "navpoint.h"
 #include "conditionmanager.h"
 #include "game/boat.h"
+#include "sfx/samplemap.h"
 #include <QGLContext>
 #include <QKeyEvent>
 #include <glm/gtc/matrix_transform.hpp>
@@ -320,6 +321,8 @@ Scenario::Scenario(const QString &name) :
     m_cameraMatrix = glm::rotate(m_cameraMatrix, glm::radians(-90.0f), glm::vec3(1, 0, 0));
 
     qsrand(QTime::currentTime().second() * 1000 + QTime::currentTime().msec());
+
+    sfx::SampleMap::load();
 }
 
 
