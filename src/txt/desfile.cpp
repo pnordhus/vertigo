@@ -16,6 +16,7 @@
  ***************************************************************************/
 
 #include "desfile.h"
+#include "stringtable.h"
 #include <QDir>
 #include <QFile>
 #include <QStringList>
@@ -56,7 +57,7 @@ bool DesFile::load(const QString &filename)
     if (!file.open(QFile::ReadOnly))
         return false;
 
-    QRegExp regSection("\\[(.*)\\]");
+    QRegExp regSection("^\\s*\\[(.*)\\]");
     QRegExp regKey("(.*)=(.*)");
 
     while (!file.atEnd()) {
@@ -142,6 +143,14 @@ QVariant DesFile::value(const QString &key, const QVariant &defaultValue) const
 void DesFile::setValue(const QString &key, const QVariant &value)
 {
     m_section->insert(key.toLower(), value);
+}
+
+
+QString DesFile::valueText(const QString &key) const
+{
+    if (StringTable::language() == "English")
+        return value(key + "e").toString();
+    return value(key).toString();
 }
 
 
