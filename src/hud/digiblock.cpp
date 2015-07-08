@@ -18,6 +18,7 @@
 #include "digiblock.h"
 #include "hud.h"
 #include "fight/scenario.h"
+#include "fight/navpoint.h"
 #include <glm/common.hpp>
 #include <sstream>
 
@@ -78,7 +79,7 @@ void DigiBlock::draw()
 
     int nav = 0;
     m_children[5]->setFont(m_hud->fontGreen());
-    m_children[5]->setText(nav == 0 ? QString("NAV NONE") : QString("NAV %1").arg('A' + nav));
+    m_children[5]->setText(m_hud->navPoint() < 0 ? QString("NAV NONE") : QString("NAV %1").arg(static_cast<char>('A' + m_hud->scenario()->navPoints()[m_hud->navPoint()]->num())));
 
     int buzzers = m_hud->scenario()->buzzers();
     m_children[6]->setFont(buzzers > 0 ? m_hud->fontGreen() : m_hud->fontRed());

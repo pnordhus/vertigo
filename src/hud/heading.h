@@ -43,6 +43,7 @@ private:
     util::Rect m_rect;
     gfx::Texture m_head;
     gfx::Texture m_point;
+    gfx::Texture m_way;
 };
 
 

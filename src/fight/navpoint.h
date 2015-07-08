@@ -31,6 +31,9 @@ public:
     NavPoint(Scenario *scenario, int num);
 
 public:
+    int num() const { return m_num; }
+
+public:
     bool update(float elapsedTime);
 
 private:

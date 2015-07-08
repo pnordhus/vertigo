@@ -201,6 +201,7 @@ Scenario::Scenario(const QString &name) :
             {
                 object = new NavPoint(this, m_file.value("dtyp").toInt());
                 object->setPosition(getPosition() + glm::vec3(-0.5f*m_surface.scale().x, -0.5f*m_surface.scale().y, 12));
+                m_navPoints.push_back(static_cast<NavPoint*>(object));
             }
             break;
 
@@ -315,6 +316,8 @@ Scenario::Scenario(const QString &name) :
     }
 
     m_conditionManager.buildDependencies();
+
+    std::sort(m_navPoints.begin(), m_navPoints.end(), [](NavPoint *a, NavPoint *b) { return a->num() < b->num(); });
 
 
     m_cameraMatrix = glm::rotate(m_cameraMatrix, glm::radians(initialDir), glm::vec3(0, 1, 0));

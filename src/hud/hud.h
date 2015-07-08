@@ -42,10 +42,13 @@ public:
 
 public:
     util::event<>& eventSuccess() { return m_eventSuccess; }
-    bool wide() const { return m_wide; }
-    util::RectF rectHUD() const { return m_rectHUD; }
+
     game::Boat* boat() const { return m_boat; }
     fight::Scenario* scenario() const { return m_scenario; }
+    int navPoint() const { return m_navPoint; }
+
+    bool wide() const { return m_wide; }
+    util::RectF rectHUD() const { return m_rectHUD; }
     ui::Widget* widget() { return &m_rootWidget; }
     gfx::Image getImage(const QString &name);
     gfx::Font& fontGreen() { return m_fontGreen; }
@@ -68,9 +71,11 @@ private:
 
 private:
     util::event<> m_eventSuccess;
+
     game::Boat *m_boat;
     fight::Scenario *m_scenario;
     int m_lastTicks;
+    int m_navPoint;
 
     bool m_wide;
     util::RectF m_rectHUD;

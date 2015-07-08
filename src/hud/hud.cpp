@@ -19,6 +19,7 @@
 #include <QKeyEvent>
 #include "SDL.h"
 #include "fight/scenario.h"
+#include "fight/navpoint.h"
 #include "game/boat.h"
 #include "gfx/image.h"
 #include <glm/gtx/transform.hpp>
@@ -102,10 +103,11 @@ void HUD::load(game::Boat *boat)
 
 void HUD::start(fight::Scenario *scenario)
 {
-    m_scenario = scenario;
     hideCursor();
-    m_lastTicks = SDL_GetTicks();
+    m_scenario = scenario;
     m_scenario->setBoat(m_boat);
+    m_lastTicks = SDL_GetTicks();
+    m_navPoint = -1;
 }
 
 
@@ -175,6 +177,14 @@ void HUD::keyPressEvent(QKeyEvent *e)
 {
     if (e->key() == Qt::Key_Escape)
         m_eventSuccess();
+    if (e->key() == Qt::Key_N)
+    {
+        m_navPoint++;
+        while (m_navPoint < m_scenario->navPoints().size() && !m_scenario->navPoints()[m_navPoint]->isEnabled())
+            m_navPoint++;
+        if (m_navPoint >= m_scenario->navPoints().size())
+            m_navPoint = -1;
+    }
 
     if (m_scenario)
         m_scenario->keyPressEvent(e);

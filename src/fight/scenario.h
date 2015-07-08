@@ -39,6 +39,7 @@ namespace fight {
 
 class Object;
 class Surface;
+class NavPoint;
 
 
 class Scenario : public util::DeferredDeletable
@@ -47,6 +48,8 @@ public:
     Scenario(const QString &name);
 
 public:
+    const glm::mat4& projectionMatrix() const { return m_projectionMatrix; }
+    const glm::mat4& projectionMatrixInverted() const { return m_projectionMatrixInverted; }
     const glm::mat4& cameraMatrix() const { return m_cameraMatrix; }
     const glm::mat4& cameraMatrixInverted() const { return m_cameraMatrixInverted; }
     const glm::vec3& position() const { return m_position; }
@@ -66,6 +69,7 @@ public:
     CollisionManager& collisionManager() { return m_collisionManager; }
     ConditionManager& conditionManager() { return m_conditionManager; }
     std::vector<ConditionRadio*>& radio() { return m_radio; }
+    std::vector<NavPoint*>& navPoints() { return m_navPoints; }
 
 public:
     void setBoat(const game::Boat *boat);
@@ -117,6 +121,7 @@ private:
 
     std::vector<std::unique_ptr<Object>> m_objects;
     std::vector<Object*> m_lightSources;
+    std::vector<NavPoint*> m_navPoints;
 
     float m_time;
 
