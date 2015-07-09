@@ -108,7 +108,7 @@ enum Sample
     Sample77,
     Sample78,
     Sample79,
-    Sample80,
+    NavPoint,
     Sample81,
     Sample82,
     Sample83,

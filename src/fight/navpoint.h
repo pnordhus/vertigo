@@ -42,6 +42,7 @@ private:
     Module *m_state1;
     int m_state;
     float m_time;
+    bool m_reached;
 };
 
 
