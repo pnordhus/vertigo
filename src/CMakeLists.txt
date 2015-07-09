@@ -136,6 +136,10 @@ set(SOURCES
     hud/digiblock.h
     hud/radiomessage.cpp
     hud/radiomessage.h
+    hud/energybar.cpp
+    hud/energybar.h
+    hud/shield.cpp
+    hud/shield.h
 
     sfx/sound.cpp
     sfx/sound.h

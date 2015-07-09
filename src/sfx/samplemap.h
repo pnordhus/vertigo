@@ -26,7 +26,7 @@
 namespace sfx {
 
 
-enum Sample
+enum class Sample
 {
     Sample0,
     Sample1,
@@ -120,7 +120,7 @@ class SampleMap
 public:
     static void load();
     static void reset();
-    static Sound& get(Sample sample) { return m_samples[sample]; }
+    static Sound& get(Sample sample) { return m_samples[static_cast<int>(sample)]; }
 
 private:
     static std::vector<Sound> m_samples;

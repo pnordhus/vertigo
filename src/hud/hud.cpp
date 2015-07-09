@@ -31,6 +31,8 @@
 #include "meter.h"
 #include "digiblock.h"
 #include "radiomessage.h"
+#include "energybar.h"
+#include "shield.h"
 
 
 namespace hud {
@@ -98,6 +100,14 @@ void HUD::load(game::Boat *boat)
     file.setSection("radiomessage");
     RadioMessage *radioMessage = new RadioMessage(this, util::Rect(file.value("X").toInt(), file.value("Y").toInt(), 640 - file.value("X").toInt()*2, 12));
     m_children.emplace_back(radioMessage);
+
+    file.setSection("hudenergybar");
+    EnergyBar *energyBar = new EnergyBar(this, readRect(file));
+    m_children.emplace_back(energyBar);
+
+    file.setSection("hudshield");
+    Shield *shield = new Shield(this, readRect(file));
+    m_children.emplace_back(shield);
 }
 
 
