@@ -32,7 +32,7 @@ Trash::Trash(Scenario *scenario, Billboard *billboard, const glm::vec3 &position
     m_scenario->collisionManager().addObject(this);
 
     glm::vec3 pos = position + glm::vec3(qrand()%50 - 25, qrand()%50 - 25, qrand()%25 - 25);
-    float height = m_scenario->surface().heightAt(pos.x, pos.y) + 2;
+    float height = m_scenario->surface().heightAt(pos.x, pos.y) + 5;
     if (pos.z < height)
         pos.z = height;
     Object::setPosition(pos);

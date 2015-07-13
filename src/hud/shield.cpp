@@ -15,47 +15,40 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef SFX_SOUND_H
-#define SFX_SOUND_H
+#include "shield.h"
+#include "hud.h"
 
 
-#include <QString>
+namespace hud {
 
 
-namespace sfx {
-
-
-class Sound
+Shield::Shield(HUD *hud, util::Rect rect) :
+    ui::Widget(hud->widget()),
+    m_hud(hud),
+    m_rect(rect)
 {
-public:
-    Sound();
-    Sound(Sound&& o);
-    Sound(const QString &file);
-    ~Sound();
-
-public:
-    void stop();
-    void play();
-    void playLoop();
-    void pause();
-    void resume();
-    void load(const QString &file, int rate = 0);
-    void load(const QString &leftFile, const QString &rightFile);
-    void setVolume(float volume);
-
-private:
-    Q_DISABLE_COPY(Sound);
-    QByteArray loadFile(const QString &filename);
-    bool acquire();
-
-private:
-    quint32 m_source;
-    quint32 m_buffer;
-    float m_volume;
-};
+    for (int i = 1; i <= 9; i++)
+        m_shield.emplace_back(m_hud->getImage(QString("hudshie%1").arg(i)), true);
+}
 
 
-} // namespace sfx
+void Shield::draw()
+{
+    util::Rect rect = m_hud->projectCenter(m_rect);
+    m_shield[0].draw(rect.x + 3, rect.y + 3);
+
+    // FRONT
+    m_shield[2].draw(rect.x + 3, rect.y);
+
+    // BACK
+    m_shield[2].draw(rect.x + 3, rect.y + 14);
+
+    // LEFT
+    m_shield[1].draw(rect.x, rect.y + 3);
+
+    // RIGHT
+    m_shield[1].draw(rect.x + 14, rect.y + 3);
+}
 
 
-#endif // SFX_SOUND_H
+} // namespace hud

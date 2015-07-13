@@ -26,11 +26,15 @@
 #include "turretbase.h"
 #include "navpoint.h"
 #include "conditionmanager.h"
+#include "game/boat.h"
+#include "sfx/samplemap.h"
 #include <QGLContext>
 #include <QKeyEvent>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/matrix_access.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/transform.hpp>
+#include <algorithm>
 
 
 namespace fight {
@@ -40,18 +44,23 @@ Scenario::Scenario(const QString &name) :
     m_moduleManager(m_textureManager),
     m_effectManager(this),
     m_conditionManager(this),
+    m_speed(0),
+    m_noise(0),
+    m_time(0),
     m_left(0.0f),
     m_right(0.0f),
     m_up(0.0f),
     m_down(0.0f),
     m_forwards(0.0f),
-    m_backwards(0.0f)
+    m_backwards(0.0f),
+    m_inverseUpDown(1.0f)
 {
     qsrand(name.right(4).toInt());
 
     m_file.load(QString("vfx:scenario/%1.des").arg(name));
 
     m_file.setSection("surface");
+    m_depth = m_file.value("depth").toInt();
     m_surface.load(m_file.value("name").toString().toLower(), m_file.value("maxheightscale").toInt(), m_file.value("patchcomb").toInt());
 
     std::map<int, QString> types;
@@ -166,6 +175,7 @@ Scenario::Scenario(const QString &name) :
             m_position = getPosition();
             initialDir = 45.0f * m_file.value("card").toInt();
             //m_position.setZ(m_position.z() + 20.0f);
+            m_height = m_position.z - m_surface.heightAt(m_position.x, m_position.y);
 
             {
                 for (int i = 0; i < 27; i++)
@@ -192,6 +202,7 @@ Scenario::Scenario(const QString &name) :
             {
                 object = new NavPoint(this, m_file.value("dtyp").toInt());
                 object->setPosition(getPosition() + glm::vec3(-0.5f*m_surface.scale().x, -0.5f*m_surface.scale().y, 12));
+                m_navPoints.push_back(static_cast<NavPoint*>(object));
             }
             break;
 
@@ -275,28 +286,69 @@ Scenario::Scenario(const QString &name) :
         }
     }
 
+    foreach (const QString &section, m_file.sections().filter(QRegExp("^radio\\d*"))) {
+        m_file.setSection(section);
+
+        const int id = m_file.value("id").toInt();
+        ConditionManager::ConditionEntry &entry = m_conditionManager.addEntry(id);
+        entry.cond1 = m_file.value("bccond1").toInt();
+        entry.dep1 = m_file.value("bcdep1").toInt();
+        entry.ref1 = m_file.value("bcref1").toInt();
+        entry.op = m_file.value("bcop").toInt();
+        entry.cond2 = m_file.value("bccond2").toInt();
+        entry.dep2 = m_file.value("bcdep2").toInt();
+        entry.ref2 = m_file.value("bcref2").toInt();
+        entry.del = m_file.value("bcdel").toInt();
+
+        const int type = m_file.value("typ").toInt();
+        if (type != 5120)
+            qDebug() << "Unhandled radio type " << type;
+
+        ConditionRadio *radio = m_conditionManager.addCondRadio(getPosition(), m_file.valueText("rtxt"));
+        if (entry.cond1 == 0 && entry.del == 0)
+            radio->complete();
+        entry.condTrigger = radio;
+        entry.condSignal = nullptr;
+        entry.condAttacked = nullptr;
+        entry.condIdentified = nullptr;
+        entry.condParalyzed = nullptr;
+        entry.condFinished = nullptr;
+        entry.condBoarded = nullptr;
+    }
+
     m_conditionManager.buildDependencies();
+
+    std::sort(m_navPoints.begin(), m_navPoints.end(), [](NavPoint *a, NavPoint *b) { return a->num() < b->num(); });
 
 
     m_cameraMatrix = glm::rotate(m_cameraMatrix, glm::radians(initialDir), glm::vec3(0, 1, 0));
     m_cameraMatrix = glm::rotate(m_cameraMatrix, glm::radians(-90.0f), glm::vec3(1, 0, 0));
 
-    m_time.restart();
     qsrand(QTime::currentTime().second() * 1000 + QTime::currentTime().msec());
+
+    sfx::SampleMap::load();
 }
 
 
-void Scenario::setRect(const QRectF &rect)
+void Scenario::setBoat(const game::Boat *boat)
 {
-    m_projectionMatrix = glm::perspective(glm::radians(60.0f), float(rect.width() / rect.height()), 0.1f, 10000.0f);
+    m_buzzers = boat->buzzers().size();
+}
+
+
+void Scenario::setRect(const util::RectF &rect, const glm::vec2 &center)
+{
+    m_projectionMatrix = glm::translate(glm::vec3(center, 0)) * glm::perspective(glm::radians(60.0f), float(rect.width / rect.height), 0.1f, 10000.0f);
     m_projectionMatrixInverted = glm::inverse(m_projectionMatrix);
 }
 
 
-void Scenario::draw()
+void Scenario::update(float elapsedTime)
 {
-    const float angleY = (m_right - m_left) * 2.0f;
-    const float angleX = (m_up - m_down) * 2.0f;
+    m_time += elapsedTime;
+
+    const float angleY = (m_right - m_left) * elapsedTime * 0.09f;
+    const float angleX = (m_up - m_down) * m_inverseUpDown * elapsedTime * 0.09f;
 
     m_cameraMatrix = glm::rotate(m_cameraMatrix, glm::radians(angleX), glm::vec3(glm::row(m_cameraMatrix, 0)));
     m_cameraMatrix = glm::rotate(m_cameraMatrix, glm::radians(angleY), glm::vec3(0, 0, 1));
@@ -304,13 +356,25 @@ void Scenario::draw()
 
     glm::vec3 prevPos = m_position;
     glm::vec3 dir = glm::vec3(glm::row(m_cameraMatrix, 2));
-    m_position += dir * (m_backwards - m_forwards) * 5.0f;
+    m_position += dir * (m_backwards - m_forwards) * elapsedTime * 0.2f;
+    m_yaw = glm::atan(dir.x, dir.y);
+    m_pitch = dir.z < -1.0f ? -glm::half_pi<float>() : dir.z > 1.0f ? glm::half_pi<float>() : glm::asin(dir.z);
+    m_speed = (m_forwards - m_backwards) * 0.2f * 3600.0f;
+
+    glm::vec3 up = glm::vec3(glm::row(m_cameraMatrix, 1));
+    if (up.z < 0)
+    {
+        m_cameraMatrix = glm::rotate(m_cameraMatrix, glm::pi<float>(), dir);
+        m_inverseUpDown = -1.0f;
+    }
 
     if (m_position != prevPos)
     {
         glm::vec3 pos, normal;
         if (m_surface.testCollision(prevPos, m_position, 1.5f, pos, normal))
             m_position = pos;
+        m_height = m_position.z - m_surface.heightAt(m_position.x, m_position.y);
+
         Object *collision = m_collisionManager.testCollision(prevPos, m_position, 1.5f, pos, normal);
         if (collision)
         {
@@ -320,18 +384,21 @@ void Scenario::draw()
         }
     }
 
-    m_conditionManager.update();
+    m_conditionManager.update(elapsedTime);
 
     float height = m_surface.heightAt(m_position.x, m_position.y);
     m_conditionManager.testSpace(m_position.x, m_position.y, m_position.z - height);
 
     for (const auto &object : m_objects)
         if (object->isEnabled())
-            object->update();
+            object->update(elapsedTime);
 
-    m_effectManager.update();
+    m_effectManager.update(elapsedTime);
+}
 
 
+void Scenario::draw()
+{
     glEnable(GL_CULL_FACE);
     glFrontFace(GL_CW);
 
@@ -381,7 +448,7 @@ void Scenario::draw()
         glLightfv(GL_LIGHT1, GL_DIFFUSE, light_diffuse);
         
         glLightfv(GL_LIGHT1, GL_POSITION, glm::value_ptr(object->position()));
-        glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, glm::value_ptr(glm::vec3(glm::cos(0.005f*m_time.elapsed()), glm::sin(0.005f*m_time.elapsed()), 0.0f)));
+        glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, glm::value_ptr(glm::vec3(glm::cos(0.005f*m_time), glm::sin(0.005f*m_time), 0.0f)));
 
         glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 90.0);
         glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, 0.1);
@@ -399,7 +466,7 @@ void Scenario::draw()
     glFogf(GL_FOG_START, 100.0);
     glFogf(GL_FOG_END, 200.0);
 
-    dir = -glm::vec3(glm::row(m_cameraMatrix, 2));
+    glm::vec3 dir = -glm::vec3(glm::row(m_cameraMatrix, 2));
     m_surface.draw(m_position, dir);
 
     for (const auto &object : m_objects)
@@ -417,9 +484,15 @@ void Scenario::keyPressEvent(QKeyEvent *e)
     if (e->key() == Qt::Key_Right)
         m_right = 1.0f;
     if (e->key() == Qt::Key_Up)
+    {
         m_up = 1.0f;
+        m_inverseUpDown = 1.0f;
+    }
     if (e->key() == Qt::Key_Down)
+    {
         m_down = 1.0f;
+        m_inverseUpDown = 1.0f;
+    }
     if (e->key() == Qt::Key_A)
         m_forwards = 1.0f;
     if (e->key() == Qt::Key_Z || e->key() == Qt::Key_Y)
@@ -466,7 +539,6 @@ glm::vec3 Scenario::getPosition()
     pos.z = m_file.value("pz").toInt() + m_file.value("hei").toInt();
 
     pos *= m_surface.scale();
-    m_surface.heightAt(pos.x, pos.y);
     pos.z += m_surface.heightAt(pos.x, pos.y);
 
     return pos;

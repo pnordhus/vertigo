@@ -21,6 +21,7 @@
 
 #include <QDebug>
 #include <QTime>
+#include "util/rect.hpp"
 #include "util/deferreddeletable.h"
 #include "object.h"
 #include "surface/surface.h"
@@ -29,11 +30,16 @@
 
 #include <functional>
 
+
+namespace game { class Boat; }
+
+
 namespace fight {
 
 
 class Object;
 class Surface;
+class NavPoint;
 
 
 class Scenario : public util::DeferredDeletable
@@ -42,9 +48,19 @@ public:
     Scenario(const QString &name);
 
 public:
+    const glm::mat4& projectionMatrix() const { return m_projectionMatrix; }
+    const glm::mat4& projectionMatrixInverted() const { return m_projectionMatrixInverted; }
     const glm::mat4& cameraMatrix() const { return m_cameraMatrix; }
     const glm::mat4& cameraMatrixInverted() const { return m_cameraMatrixInverted; }
     const glm::vec3& position() const { return m_position; }
+    const float yaw() const { return m_yaw; }
+    const float pitch() const { return m_pitch; }
+    const float height() const { return m_height; }
+    const float depth() const { return m_depth - m_position.z; }
+    const float speed() const { return m_speed; }
+    const int noise() const { return m_noise; }
+    const float time() const { return m_time; }
+    const int buzzers() const { return m_buzzers; }
 
     Surface& surface() { return m_surface; }
     gfx::TextureManager& textureManager() { return m_textureManager; }
@@ -52,9 +68,13 @@ public:
     EffectManager& effectManager() { return m_effectManager; }
     CollisionManager& collisionManager() { return m_collisionManager; }
     ConditionManager& conditionManager() { return m_conditionManager; }
+    std::vector<ConditionRadio*>& radio() { return m_radio; }
+    std::vector<NavPoint*>& navPoints() { return m_navPoints; }
 
 public:
-    void setRect(const QRectF &rect);
+    void setBoat(const game::Boat *boat);
+    void setRect(const util::RectF &rect, const glm::vec2 &center);
+    void update(float elapsedTime);
     void draw();
     void keyPressEvent(QKeyEvent *);
     void keyReleaseEvent(QKeyEvent *);
@@ -81,7 +101,15 @@ private:
     };
 
     glm::vec3 m_position;
+    float m_yaw;
+    float m_pitch;
+    float m_height;
+    float m_speed;
+    int m_noise;
+    int m_buzzers;
+
     txt::DesFile m_file;
+    int m_depth;
 
     Surface m_surface;
     gfx::TextureManager m_textureManager;
@@ -89,11 +117,13 @@ private:
     EffectManager m_effectManager;
     CollisionManager m_collisionManager;
     ConditionManager m_conditionManager;
+    std::vector<ConditionRadio*> m_radio;
 
     std::vector<std::unique_ptr<Object>> m_objects;
     std::vector<Object*> m_lightSources;
+    std::vector<NavPoint*> m_navPoints;
 
-    QTime m_time;
+    float m_time;
 
     float m_left;
     float m_right;
@@ -101,6 +131,7 @@ private:
     float m_down;
     float m_forwards;
     float m_backwards;
+    float m_inverseUpDown;
 
     glm::mat4 m_projectionMatrix;
     glm::mat4 m_projectionMatrixInverted;

@@ -20,8 +20,12 @@
 
 
 #include "game/renderer.h"
+#include "util/rect.hpp"
 #include "util/event.hpp"
 #include "ui/label.h"
+#include "txt/desfile.h"
+#include "gfx/colortable.h"
+#include "gfx/image.h"
 
 
 namespace fight { class Scenario; }
@@ -38,10 +42,23 @@ public:
 
 public:
     util::event<>& eventSuccess() { return m_eventSuccess; }
-    void load(game::Boat *boat);
+
+    game::Boat* boat() const { return m_boat; }
+    fight::Scenario* scenario() const { return m_scenario; }
+    int navPoint() const { return m_navPoint; }
+
     bool wide() const { return m_wide; }
-    QRectF rectHUD() const { return m_rectHUD; }
+    util::RectF rectHUD() const { return m_rectHUD; }
+    ui::Widget* widget() { return &m_rootWidget; }
+    gfx::Image getImage(const QString &name);
+    gfx::Font& fontGreen() { return m_fontGreen; }
+    gfx::Font& fontRed() { return m_fontRed; }
+    gfx::Font& fontYellow() { return m_fontYellow; }
+
+    void load(game::Boat *boat);
     void start(fight::Scenario *scenario);
+    glm::ivec2 project(const glm::ivec2 &point);
+    util::Rect projectCenter(const util::Rect &rect);
 
 protected:
     void setRect(const QRect &rect);
@@ -50,14 +67,30 @@ protected:
     void keyReleaseEvent(QKeyEvent *);
 
 private:
+    util::Rect readRect(const txt::DesFile &file);
+
+private:
     util::event<> m_eventSuccess;
+
     game::Boat *m_boat;
-    bool m_wide;
-    QRectF m_rectHUD;
     fight::Scenario *m_scenario;
+    int m_lastTicks;
+    int m_navPoint;
+
+    bool m_wide;
+    util::RectF m_rectHUD;
+    glm::ivec2 m_center;
+    glm::mat4 m_hudProjectionMatrix;
+    glm::mat4 m_hudProjectionMatrixInverted;
+
+    const gfx::ColorTable m_colorTable;
+    gfx::Font m_fontGreen;
+    gfx::Font m_fontRed;
+    gfx::Font m_fontYellow;
 
     ui::Label m_cockpit;
-
+    ui::Label m_rootWidget;
+    std::vector<std::unique_ptr<ui::Widget>> m_children;
 };
 
 

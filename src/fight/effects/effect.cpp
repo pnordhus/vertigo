@@ -31,13 +31,12 @@ Effect::Effect(Scenario *scenario, Billboard *billboard, float angle, float scal
     m_elapsedTime(0),
     m_permanent(false)
 {
-    m_time.restart();
 }
 
 
-bool Effect::update()
+bool Effect::update(float elapsedTime)
 {
-    m_elapsedTime = m_time.elapsed();
+    m_elapsedTime += elapsedTime;
     if (!m_permanent && m_elapsedTime >= m_billboard->duration())
     {
         disable();

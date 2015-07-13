@@ -28,6 +28,9 @@ Movie::Movie(std::function<void()> &&funcFinished) :
     m_funcFinished(std::move(funcFinished))
 {
     hideCursor();
+
+    const gfx::ColorTable colorTable("gfx:pal/movie/moviepal.pal");
+    m_logo.setTexture(gfx::Image::load("gfx:img/movie/mvilogo.img", colorTable));
 }
 
 
@@ -88,6 +91,15 @@ void Movie::draw()
 
         setupGL();
         m_texture.draw();
+
+        int y = static_cast<int>((2 - rectOrtho().y())/rectOrtho().height()*height());
+        if (y >= 74)
+        {
+            m_logo.setPosition(0, (y - 74)/2);
+            setupOrthographicMatrix(190, height());
+            setupGL(false);
+            m_logo.doDraw();
+        }
     }
 }
 

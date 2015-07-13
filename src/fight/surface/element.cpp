@@ -23,12 +23,12 @@
 namespace fight {
 
 
-Element::Element(Surface *surface, const QRect &rect) :
+Element::Element(Surface *surface, const util::Rect &rect) :
     m_surface(surface),
     m_rect(rect),
     m_maxZ(-1e3),
     m_minZ(1e3),
-    m_heights(rect.width()*rect.height(), -1e3)
+    m_heights(rect.width*rect.height, -1e3)
 {
 }
 
@@ -50,22 +50,22 @@ void Element::addVertex(int textureId, const glm::vec3 &position, const glm::vec
         m_minZ = position.z;
 
     int ix, iy;
-    ix = position.x/m_surface->scale().x + 1e-3 - m_rect.x();
-    iy = position.y/m_surface->scale().y + 1e-3 - m_rect.y();
-    if (ix >= 0 && ix < m_rect.width() && iy >= 0 && iy < m_rect.height() && m_heights[iy*m_rect.width() + ix] < position.z)
-        m_heights[iy*m_rect.width() + ix] = position.z;
-    ix = position.x/m_surface->scale().x - 1e-3 - m_rect.x();
-    iy = position.y/m_surface->scale().y + 1e-3 - m_rect.y();
-    if (ix >= 0 && ix < m_rect.width() && iy >= 0 && iy < m_rect.height() && m_heights[iy*m_rect.width() + ix] < position.z)
-        m_heights[iy*m_rect.width() + ix] = position.z;
-    ix = position.x/m_surface->scale().x + 1e-3 - m_rect.x();
-    iy = position.y/m_surface->scale().y - 1e-3 - m_rect.y();
-    if (ix >= 0 && ix < m_rect.width() && iy >= 0 && iy < m_rect.height() && m_heights[iy*m_rect.width() + ix] < position.z)
-        m_heights[iy*m_rect.width() + ix] = position.z;
-    ix = position.x/m_surface->scale().x - 1e-3 - m_rect.x();
-    iy = position.y/m_surface->scale().y - 1e-3 - m_rect.y();
-    if (ix >= 0 && ix < m_rect.width() && iy >= 0 && iy < m_rect.height() && m_heights[iy*m_rect.width() + ix] < position.z)
-        m_heights[iy*m_rect.width() + ix] = position.z;
+    ix = position.x/m_surface->scale().x + 1e-3 - m_rect.x;
+    iy = position.y/m_surface->scale().y + 1e-3 - m_rect.y;
+    if (ix >= 0 && ix < m_rect.width && iy >= 0 && iy < m_rect.height && m_heights[iy*m_rect.width + ix] < position.z)
+        m_heights[iy*m_rect.width + ix] = position.z;
+    ix = position.x/m_surface->scale().x - 1e-3 - m_rect.x;
+    iy = position.y/m_surface->scale().y + 1e-3 - m_rect.y;
+    if (ix >= 0 && ix < m_rect.width && iy >= 0 && iy < m_rect.height && m_heights[iy*m_rect.width + ix] < position.z)
+        m_heights[iy*m_rect.width + ix] = position.z;
+    ix = position.x/m_surface->scale().x + 1e-3 - m_rect.x;
+    iy = position.y/m_surface->scale().y - 1e-3 - m_rect.y;
+    if (ix >= 0 && ix < m_rect.width && iy >= 0 && iy < m_rect.height && m_heights[iy*m_rect.width + ix] < position.z)
+        m_heights[iy*m_rect.width + ix] = position.z;
+    ix = position.x/m_surface->scale().x - 1e-3 - m_rect.x;
+    iy = position.y/m_surface->scale().y - 1e-3 - m_rect.y;
+    if (ix >= 0 && ix < m_rect.width && iy >= 0 && iy < m_rect.height && m_heights[iy*m_rect.width + ix] < position.z)
+        m_heights[iy*m_rect.width + ix] = position.z;
 }
 
 
@@ -79,16 +79,16 @@ void Element::addTriangle(int textureId, quint16 a, quint16 b, quint16 c)
 
 glm::vec3 Element::center() const
 {
-    return glm::vec3(m_rect.center().x() * m_surface->scale().x, m_rect.center().y() * m_surface->scale().y, m_minZ + (m_maxZ - m_minZ)/2);
+    return glm::vec3(m_rect.center().x * m_surface->scale().x, m_rect.center().y * m_surface->scale().y, m_minZ + (m_maxZ - m_minZ)/2);
 }
 
 
 bool Element::testCollision(const glm::vec3 &center, float radius)
 {
-    int ix = center.x/m_surface->scale().x - m_rect.x();
-    int iy = center.y/m_surface->scale().y - m_rect.y();
-    if (ix >= 0 && ix < m_rect.width() && iy >= 0 && iy < m_rect.height() &&
-        m_heights[iy*m_rect.width() + ix] > center.z - radius)
+    int ix = center.x/m_surface->scale().x - m_rect.x;
+    int iy = center.y/m_surface->scale().y - m_rect.y;
+    if (ix >= 0 && ix < m_rect.width && iy >= 0 && iy < m_rect.height &&
+        m_heights[iy*m_rect.width + ix] > center.z - radius)
         return true;
     return false;
 }

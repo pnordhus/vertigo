@@ -15,47 +15,28 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef SFX_SOUND_H
-#define SFX_SOUND_H
+#include "energybar.h"
+#include "hud.h"
 
 
-#include <QString>
+namespace hud {
 
 
-namespace sfx {
-
-
-class Sound
+EnergyBar::EnergyBar(HUD *hud, util::Rect rect) :
+    ui::Widget(hud->widget()),
+    m_hud(hud),
+    m_rect(rect),
+    m_energy(hud->getImage("hudenerg"), false)
 {
-public:
-    Sound();
-    Sound(Sound&& o);
-    Sound(const QString &file);
-    ~Sound();
-
-public:
-    void stop();
-    void play();
-    void playLoop();
-    void pause();
-    void resume();
-    void load(const QString &file, int rate = 0);
-    void load(const QString &leftFile, const QString &rightFile);
-    void setVolume(float volume);
-
-private:
-    Q_DISABLE_COPY(Sound);
-    QByteArray loadFile(const QString &filename);
-    bool acquire();
-
-private:
-    quint32 m_source;
-    quint32 m_buffer;
-    float m_volume;
-};
+}
 
 
-} // namespace sfx
+void EnergyBar::draw()
+{
+    int offset = 0;
+    util::Rect rect = m_hud->projectCenter(m_rect);
+    m_energy.draw(rect.x, rect.y + offset, QRectF(0, offset, m_energy.width(), m_energy.height() - offset));
+}
 
 
-#endif // SFX_SOUND_H
+} // namespace hud

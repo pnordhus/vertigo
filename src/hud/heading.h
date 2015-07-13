@@ -15,47 +15,39 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef SFX_SOUND_H
-#define SFX_SOUND_H
+#ifndef HUD_HEADING_H
+#define HUD_HEADING_H
 
 
-#include <QString>
+#include "util/rect.hpp"
+#include "ui/widget.h"
+#include "gfx/texture.h"
 
 
-namespace sfx {
+namespace hud {
 
 
-class Sound
+class HUD;
+
+
+class Heading : public ui::Widget
 {
 public:
-    Sound();
-    Sound(Sound&& o);
-    Sound(const QString &file);
-    ~Sound();
+    Heading(HUD *hud, util::Rect rect);
 
-public:
-    void stop();
-    void play();
-    void playLoop();
-    void pause();
-    void resume();
-    void load(const QString &file, int rate = 0);
-    void load(const QString &leftFile, const QString &rightFile);
-    void setVolume(float volume);
+protected:
+    void draw();
 
 private:
-    Q_DISABLE_COPY(Sound);
-    QByteArray loadFile(const QString &filename);
-    bool acquire();
-
-private:
-    quint32 m_source;
-    quint32 m_buffer;
-    float m_volume;
+    HUD *m_hud;
+    util::Rect m_rect;
+    gfx::Texture m_head;
+    gfx::Texture m_point;
+    gfx::Texture m_way;
 };
 
 
-} // namespace sfx
+} // namespace hud
 
 
-#endif // SFX_SOUND_H
+#endif // HUD_HEADING_H

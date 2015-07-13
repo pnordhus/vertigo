@@ -33,6 +33,15 @@ Sound::Sound() :
 }
 
 
+Sound::Sound(Sound&& o)
+{
+    m_source = o.m_source;
+    m_buffer = o.m_buffer;
+    m_volume = o.m_volume;
+    o.m_source = 0;
+    o.m_buffer = 0;
+}
+
 Sound::Sound(const QString &file) :
     m_source(0),
     m_buffer(0),

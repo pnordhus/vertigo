@@ -23,6 +23,7 @@
 #include "sfx/stream.h"
 #include "gfx/texture.h"
 #include "gfx/video.h"
+#include "ui/label.h"
 
 #include <functional>
 
@@ -46,6 +47,7 @@ private:
     void mousePressEvent(QMouseEvent *);
 
 private:
+    ui::Label m_logo;
     gfx::Video m_video;
     gfx::Texture m_texture;
     sfx::Stream m_stream;

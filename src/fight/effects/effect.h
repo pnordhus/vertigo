@@ -107,7 +107,7 @@ public:
     virtual ~Effect() { }
 
 public:
-    bool update();
+    bool update(float elapsedTime);
     void draw();
     void setPermanent(bool permanent);
 
@@ -115,7 +115,6 @@ protected:
     Billboard *m_billboard;
     float m_angle;
     float m_scale;
-    QTime m_time;
     int m_elapsedTime;
     bool m_permanent;
 };

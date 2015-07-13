@@ -17,17 +17,24 @@
 
 #include "desfile.h"
 #include "stringtable.h"
+#include <QFile>
 
 
 namespace txt {
 
 
+QString StringTable::m_language;
 QStringList StringTable::m_tableDesktop;
 QStringList StringTable::m_tableFight;
 
 
 bool StringTable::load()
 {
+    if (QFile::exists("txt:german.lan"))
+        m_language = "German";
+    if (QFile::exists("txt:english.lan"))
+        m_language = "English";
+
     DesFile fileDes("txt:deeptext.des");
     fileDes.setSection("Text");
 

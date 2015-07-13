@@ -38,6 +38,7 @@ public:
     bool contains(const QString &key) const;
     QVariant value(const QString &key, const QVariant &defaultValue = QVariant()) const;
     void setValue(const QString &key, const QVariant &value);
+    QString valueText(const QString &key) const;
     QStringList sections() const;
     QStringList keys() const;
 

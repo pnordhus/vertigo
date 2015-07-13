@@ -37,7 +37,7 @@ public:
 
 public:
     Texture();
-    Texture(const QImage &image);
+    Texture(const QImage &image, bool smooth = true);
 
 public:
     bool isValid() const;
@@ -45,9 +45,9 @@ public:
     int height() const;
     QSize size() const;
     void bind();
-    void fromImage(const QImage &image);
-    void createEmpty(int w, int h, Texture::Format format);
-    void createEmpty(const QSize &size, Texture::Format format);
+    void fromImage(const QImage &image, bool smooth = true);
+    void createEmpty(int w, int h, Texture::Format format, bool smooth = true);
+    void createEmpty(const QSize &size, Texture::Format format, bool smooth = true);
     void update(int x, int y, QImage image);
     QRectF draw();
     QRectF draw(float x, float y);
@@ -74,9 +74,9 @@ public:
     int width() const { return m_width; }
     int height() const { return m_height; }
     void bind();
-    void setFilter();
-    void fromImage(const QImage &image);
-    void createEmpty(int w, int h, Texture::Format format);
+    void setFilter(bool smooth);
+    void fromImage(const QImage &image, bool smooth);
+    void createEmpty(int w, int h, Texture::Format format, bool smooth);
     void update(int x, int y, QImage image);
     QRectF draw(const QRectF &rect, const QRectF &srcRect);
 
@@ -100,10 +100,10 @@ inline Texture::Texture() :
 }
 
 
-inline Texture::Texture(const QImage &image) :
+inline Texture::Texture(const QImage &image, bool smooth) :
     d(new TexturePrivate)
 {
-    d->fromImage(image);
+    d->fromImage(image, smooth);
 }
 
 
@@ -137,21 +137,21 @@ inline void Texture::bind()
 }
 
 
-inline void Texture::fromImage(const QImage &image)
+inline void Texture::fromImage(const QImage &image, bool smooth)
 {
-    d->fromImage(image);
+    d->fromImage(image, smooth);
 }
 
 
-inline void Texture::createEmpty(int w, int h, Texture::Format format)
+inline void Texture::createEmpty(int w, int h, Texture::Format format, bool smooth)
 {
-    d->createEmpty(w, h, format);
+    d->createEmpty(w, h, format, smooth);
 }
 
 
-inline void Texture::createEmpty(const QSize &size, Texture::Format format)
+inline void Texture::createEmpty(const QSize &size, Texture::Format format, bool smooth)
 {
-    d->createEmpty(size.width(), size.height(), format);
+    d->createEmpty(size.width(), size.height(), format, smooth);
 }
 
 

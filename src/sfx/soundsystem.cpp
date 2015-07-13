@@ -16,6 +16,7 @@
  ***************************************************************************/
 
 #include "soundsystem.h"
+#include "samplemap.h"
 #include <al.h>
 #include <alc.h>
 
@@ -62,6 +63,7 @@ SoundSystem::SoundSystem()
 SoundSystem::~SoundSystem()
 {
     qDeleteAll(m_standardSounds);
+    SampleMap::reset();
 
     Q_ASSERT(m_sources.isEmpty());
 

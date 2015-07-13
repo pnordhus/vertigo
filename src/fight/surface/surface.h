@@ -46,7 +46,7 @@ public:
     bool testCollision(const glm::vec3 &start, const glm::vec3 &end, float radius, glm::vec3 &position, glm::vec3 &normal);
 
 private:
-    Element& getElement(QPoint pos);
+    Element& getElement(int x, int y);
 
 private:
     std::vector<gfx::Texture> m_textures;

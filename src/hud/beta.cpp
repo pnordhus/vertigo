@@ -15,47 +15,32 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef SFX_SOUND_H
-#define SFX_SOUND_H
+#include "beta.h"
+#include "hud.h"
+#include "fight/scenario.h"
+#include <glm/trigonometric.hpp>
 
 
-#include <QString>
+namespace hud {
 
 
-namespace sfx {
-
-
-class Sound
+Beta::Beta(HUD *hud, util::Rect rect) :
+    ui::Widget(hud->widget()),
+    m_hud(hud),
+    m_rect(rect),
+    m_beta(hud->getImage("hudbeta"), false),
+    m_point(hud->getImage("hudpoi3"), false)
 {
-public:
-    Sound();
-    Sound(Sound&& o);
-    Sound(const QString &file);
-    ~Sound();
-
-public:
-    void stop();
-    void play();
-    void playLoop();
-    void pause();
-    void resume();
-    void load(const QString &file, int rate = 0);
-    void load(const QString &leftFile, const QString &rightFile);
-    void setVolume(float volume);
-
-private:
-    Q_DISABLE_COPY(Sound);
-    QByteArray loadFile(const QString &filename);
-    bool acquire();
-
-private:
-    quint32 m_source;
-    quint32 m_buffer;
-    float m_volume;
-};
+}
 
 
-} // namespace sfx
+void Beta::draw()
+{
+    int offset = 360 + static_cast<int>(glm::degrees(m_hud->scenario()->pitch())*4);
+    util::Rect rect = m_hud->projectCenter(m_rect);
+    m_beta.draw(rect.x + m_point.width() + 1, rect.y, QRectF(0, offset, m_beta.width(), m_rect.height));
+    m_point.draw(rect.x, rect.y + rect.height/2 - (m_point.height() + 1)/2);
+}
 
 
-#endif // SFX_SOUND_H
+} // namespace hud

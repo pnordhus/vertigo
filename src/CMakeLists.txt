@@ -124,6 +124,22 @@ set(SOURCES
 
     hud/hud.cpp
     hud/hud.h
+    hud/crosshair.cpp
+    hud/crosshair.h
+    hud/heading.cpp
+    hud/heading.h
+    hud/beta.cpp
+    hud/beta.h
+    hud/meter.cpp
+    hud/meter.h
+    hud/digiblock.cpp
+    hud/digiblock.h
+    hud/radiomessage.cpp
+    hud/radiomessage.h
+    hud/energybar.cpp
+    hud/energybar.h
+    hud/shield.cpp
+    hud/shield.h
 
     sfx/sound.cpp
     sfx/sound.h
@@ -131,6 +147,8 @@ set(SOURCES
     sfx/soundsystem.h
     sfx/stream.cpp
     sfx/stream.h
+    sfx/samplemap.cpp
+    sfx/samplemap.h
 
     txt/desfile.cpp
     txt/desfile.h

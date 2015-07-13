@@ -32,7 +32,7 @@ public:
     FontPrivate();
 
 public:
-    void load(const QString &filename, const QVector<QRgb> &colorTable, bool scale);
+    void load(const QString &filename, const QVector<QRgb> &colorTable, bool scale, bool smooth);
     QRect draw(const QString &text, int x, int y, int w, int h, bool alignHCenter = false, bool alignBottom = false);
     int height() const { return m_height; }
     int height(int w, const QStringList &strings) const;
@@ -71,12 +71,12 @@ public:
 public:
     Font();
     Font(Name name);
-    Font(const QString &filename, const QVector<QRgb> &colorTable, bool scale = false);
-    Font(const QString &filename, const QRgb &colorNormal, const QRgb &colorHighlight, bool scale = false);
+    Font(const QString &filename, const QVector<QRgb> &colorTable, bool scale = false, bool smooth = true);
+    Font(const QString &filename, const QRgb &colorNormal, const QRgb &colorHighlight, bool scale = false, bool smooth = true);
 
 public:
-    void load(const QString &filename, const QVector<QRgb> &colorTable, bool scale = false);
-    void load(const QString &filename, const QRgb &colorNormal, const QRgb &colorHighlight, bool scale = false);
+    void load(const QString &filename, const QVector<QRgb> &colorTable, bool scale = false, bool smooth = true);
+    void load(const QString &filename, const QRgb &colorNormal, const QRgb &colorHighlight, bool scale = false, bool smooth = true);
     QRect draw(const QString &text, int x, int y);
     QRect draw(const QString &text, const QPoint &pos);
     QRect draw(const QString &text, const QPoint &pos, const QSize &size, bool alignHCenter, bool alignBottom);
@@ -96,29 +96,29 @@ inline Font::Font() :
 }
 
 
-inline Font::Font(const QString &filename, const QVector<QRgb> &colorTable, bool scale) :
+inline Font::Font(const QString &filename, const QVector<QRgb> &colorTable, bool scale, bool smooth) :
     d(new FontPrivate)
 {
-    load(filename, colorTable, scale);
+    load(filename, colorTable, scale, smooth);
 }
 
 
-inline Font::Font(const QString &filename, const QRgb &colorNormal, const QRgb &colorHighlight, bool scale) :
+inline Font::Font(const QString &filename, const QRgb &colorNormal, const QRgb &colorHighlight, bool scale, bool smooth) :
     d(new FontPrivate)
 {
-    load(filename, colorNormal, colorHighlight, scale);
+    load(filename, colorNormal, colorHighlight, scale, smooth);
 }
 
 
-inline void Font::load(const QString &filename, const QVector<QRgb> &colorTable, bool scale)
+inline void Font::load(const QString &filename, const QVector<QRgb> &colorTable, bool scale, bool smooth)
 {
-    d->load(filename, colorTable, scale);
+    d->load(filename, colorTable, scale, smooth);
 }
 
 
-inline void Font::load(const QString &filename, const QRgb &colorNormal, const QRgb &colorHighlight, bool scale)
+inline void Font::load(const QString &filename, const QRgb &colorNormal, const QRgb &colorHighlight, bool scale, bool smooth)
 {
-    d->load(filename, QVector<QRgb>() << colorNormal << colorHighlight, scale);
+    d->load(filename, QVector<QRgb>() << colorNormal << colorHighlight, scale, smooth);
 }
 
 

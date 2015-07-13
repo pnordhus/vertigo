@@ -19,6 +19,10 @@
 #define CONDITION_H
 
 
+#include <glm/vec3.hpp>
+#include <QString>
+
+
 namespace fight {
 
 
@@ -123,6 +127,26 @@ private:
     int m_minz;
     int m_maxz;
     Condition m_condEnable;
+};
+
+
+class ConditionRadio : public Condition
+{
+public:
+    ConditionRadio(Scenario *scenario, const glm::vec3 &pos, const QString &text);
+
+public:
+    const glm::vec3& pos() const { return m_pos; }
+    const QString& text() const { return m_text; }
+    float time() const { return m_time; }
+
+public:
+    void complete();
+
+private:
+    glm::vec3 m_pos;
+    QString m_text;
+    float m_time;
 };
 
 

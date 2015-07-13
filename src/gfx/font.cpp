@@ -32,7 +32,7 @@ FontPrivate::FontPrivate() :
 
 }
 
-void FontPrivate::load(const QString &filename, const QVector<QRgb> &colorTable, bool scale)
+void FontPrivate::load(const QString &filename, const QVector<QRgb> &colorTable, bool scale, bool smooth)
 {
     util::File file(QString(filename).replace(":", "/").toUtf8().data());
 
@@ -48,12 +48,12 @@ void FontPrivate::load(const QString &filename, const QVector<QRgb> &colorTable,
     file.skipBytes(8);
 
     if (colorTable.size() == 2) {
-        m_texture.createEmpty(res, res, Texture::Alpha);
+        m_texture.createEmpty(res, res, Texture::Alpha, smooth);
         m_colorNormal = colorTable[0];
         m_colorHighlight = colorTable[1];
         m_alpha = true;
     } else {
-        m_texture.createEmpty(res, res, Texture::RGBA);
+        m_texture.createEmpty(res, res, Texture::RGBA, smooth);
         m_alpha = false;
     }
 

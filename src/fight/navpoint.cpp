@@ -17,6 +17,8 @@
 
 #include "navpoint.h"
 #include "scenario.h"
+#include "sfx/samplemap.h"
+#include <glm/geometric.hpp>
 
 
 namespace fight {
@@ -24,7 +26,9 @@ namespace fight {
 
 NavPoint::NavPoint(Scenario *scenario, int num) :
     Object(scenario),
-    m_num(num)
+    m_num(num),
+    m_time(0),
+    m_reached(false)
 {
     m_state0 = scenario->moduleManager().get("thumper2.mod");
     m_state1 = scenario->moduleManager().get("thumper1.mod");
@@ -32,13 +36,13 @@ NavPoint::NavPoint(Scenario *scenario, int num) :
 
     m_base = m_state0;
     m_state = 0;
-    m_time.restart();
 }
 
 
-void NavPoint::draw()
+bool NavPoint::update(float elapsedTime)
 {
-    if (m_time.elapsed() > 500)
+    m_time += elapsedTime;
+    while (m_time > 500.0f)
     {
         if (m_state == 0)
         {
@@ -50,9 +54,18 @@ void NavPoint::draw()
             m_state = 0;
             m_base = m_state0;
         }
-        m_time.restart();
+        m_time -= 500.0f;
     }
-    Object::draw();
+    if (m_enabled && !m_reached)
+    {
+        glm::vec3 d = m_scenario->position() - m_position;
+        if (glm::dot(d, d) < 400.0f)
+        {
+            sfx::SampleMap::get(sfx::Sample::NavPoint).play();
+            m_reached = true;
+        }
+    }
+    return false;
 }
 
 

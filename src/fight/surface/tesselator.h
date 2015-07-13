@@ -20,7 +20,7 @@
 
 
 #include "betaspline.h"
-#include <QRect>
+#include <QByteArray>
 
 
 namespace fight {

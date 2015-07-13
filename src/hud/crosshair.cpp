@@ -15,47 +15,27 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef SFX_SOUND_H
-#define SFX_SOUND_H
+#include "crosshair.h"
+#include "hud.h"
 
 
-#include <QString>
+namespace hud {
 
 
-namespace sfx {
-
-
-class Sound
+Crosshair::Crosshair(HUD *hud, glm::ivec2 center) :
+    ui::Widget(hud->widget()),
+    m_hud(hud),
+    m_center(center),
+    m_targ(hud->getImage("hudtarg"), false)
 {
-public:
-    Sound();
-    Sound(Sound&& o);
-    Sound(const QString &file);
-    ~Sound();
-
-public:
-    void stop();
-    void play();
-    void playLoop();
-    void pause();
-    void resume();
-    void load(const QString &file, int rate = 0);
-    void load(const QString &leftFile, const QString &rightFile);
-    void setVolume(float volume);
-
-private:
-    Q_DISABLE_COPY(Sound);
-    QByteArray loadFile(const QString &filename);
-    bool acquire();
-
-private:
-    quint32 m_source;
-    quint32 m_buffer;
-    float m_volume;
-};
+}
 
 
-} // namespace sfx
+void Crosshair::draw()
+{
+    glm::ivec2 p = m_hud->project(m_center);
+    m_targ.draw(p.x - (m_targ.width() + 1)/2, p.y - (m_targ.height() + 1)/2);
+}
 
 
-#endif // SFX_SOUND_H
+} // namespace hud

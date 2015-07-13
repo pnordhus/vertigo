@@ -59,6 +59,7 @@ void Window::setRenderer(Renderer *renderer)
 
 void Window::resizeGL(int w, int h)
 {
+    qDebug() << w << h;
     glViewport(0, 0, w, h);
 }
 
