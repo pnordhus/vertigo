@@ -63,8 +63,8 @@ public:
 
 public:
 
-    T right() const { return x + width - 1; }
-    T bottom() const { return y + height - 1; }
+    T right() const { return this->x + this->width - 1; }
+    T bottom() const { return this->y + this->height - 1; }
 };
 
 
@@ -81,8 +81,8 @@ public:
 
 public:
 
-    T right() const { return x + width; }
-    T bottom() const { return y + height; }
+    T right() const { return this->x + this->width; }
+    T bottom() const { return this->y + this->height; }
 };
 
 
