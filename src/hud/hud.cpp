@@ -33,6 +33,7 @@
 #include "radiomessage.h"
 #include "energybar.h"
 #include "shield.h"
+#include "activesonar.h"
 
 
 namespace hud {
@@ -108,6 +109,10 @@ void HUD::load(game::Boat *boat)
     file.setSection("hudshield");
     Shield *shield = new Shield(this, readRect(file));
     m_children.emplace_back(shield);
+
+    file.setSection("hudactivesonarphase");
+    ActiveSonar *activeSonar = new ActiveSonar(this, readRect(file));
+    m_children.emplace_back(activeSonar);
 }
 
 

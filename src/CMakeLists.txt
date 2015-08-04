@@ -38,6 +38,8 @@ set(SOURCES
     fight/turret.h
     fight/turretbase.cpp
     fight/turretbase.h
+    fight/sonar.cpp
+    fight/sonar.h
 
     fight/effects/billboard.cpp
     fight/effects/billboard.h
@@ -140,6 +142,8 @@ set(SOURCES
     hud/energybar.h
     hud/shield.cpp
     hud/shield.h
+    hud/activesonar.cpp
+    hud/activesonar.h
 
     sfx/sound.cpp
     sfx/sound.h

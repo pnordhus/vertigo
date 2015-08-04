@@ -93,7 +93,7 @@ Building::Building(Scenario *scenario, const QString &name, int size, float angl
 
     for (Cluster &cluster : m_clusters)
     {
-        glm::mat4 m;
+        glm::mat4 m(1);
         m = glm::translate(m, glm::vec3((x + 0.5f)*scale.x, (y + 0.5f - size)*scale.y, 0));
         m = glm::rotate(m, glm::radians(m_angle), glm::vec3(0, 0, 1));
         m = glm::translate(m, cluster.offset);

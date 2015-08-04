@@ -27,6 +27,7 @@
 #include "surface/surface.h"
 #include "effects/effectmanager.h"
 #include "conditionmanager.h"
+#include "sonar.h"
 
 #include <functional>
 
@@ -70,6 +71,7 @@ public:
     ConditionManager& conditionManager() { return m_conditionManager; }
     std::vector<ConditionRadio*>& radio() { return m_radio; }
     std::vector<NavPoint*>& navPoints() { return m_navPoints; }
+    Sonar& sonar() { return m_sonar; }
 
 public:
     void setBoat(const game::Boat *boat);
@@ -118,6 +120,7 @@ private:
     CollisionManager m_collisionManager;
     ConditionManager m_conditionManager;
     std::vector<ConditionRadio*> m_radio;
+    Sonar m_sonar;
 
     std::vector<std::unique_ptr<Object>> m_objects;
     std::vector<Object*> m_lightSources;

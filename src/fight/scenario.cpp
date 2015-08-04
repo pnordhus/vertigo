@@ -44,6 +44,7 @@ Scenario::Scenario(const QString &name) :
     m_moduleManager(m_textureManager),
     m_effectManager(this),
     m_conditionManager(this),
+    m_sonar(this),
     m_speed(0),
     m_noise(0),
     m_time(0),
@@ -321,6 +322,7 @@ Scenario::Scenario(const QString &name) :
     std::sort(m_navPoints.begin(), m_navPoints.end(), [](NavPoint *a, NavPoint *b) { return a->num() < b->num(); });
 
 
+    m_cameraMatrix = glm::mat4(1);
     m_cameraMatrix = glm::rotate(m_cameraMatrix, glm::radians(initialDir), glm::vec3(0, 1, 0));
     m_cameraMatrix = glm::rotate(m_cameraMatrix, glm::radians(-90.0f), glm::vec3(1, 0, 0));
 
@@ -333,6 +335,9 @@ Scenario::Scenario(const QString &name) :
 void Scenario::setBoat(const game::Boat *boat)
 {
     m_buzzers = boat->buzzers().size();
+
+    m_sonar.init(boat->sensor());
+    m_sonar.activate();
 }
 
 
@@ -394,6 +399,8 @@ void Scenario::update(float elapsedTime)
             object->update(elapsedTime);
 
     m_effectManager.update(elapsedTime);
+
+    m_sonar.update(elapsedTime);
 }
 
 
@@ -507,6 +514,9 @@ void Scenario::keyPressEvent(QKeyEvent *e)
         glm::vec3 dir = -glm::vec3(glm::row(m_cameraMatrix, 2));
         m_effectManager.addProjectile(Shoot_Vendetta, m_position, dir);
     }
+
+    if (e->key() == Qt::Key_R)
+        m_sonar.toggle();
 }
 
 

@@ -15,47 +15,38 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "meter.h"
-#include "hud.h"
-#include "fight/scenario.h"
-#include <glm/common.hpp>
+#ifndef HUD_ACTIVESONAR_H
+#define HUD_ACTIVESONAR_H
+
+
+#include "util/rect.hpp"
+#include "ui/widget.h"
+#include "gfx/texture.h"
 
 
 namespace hud {
 
 
-Meter::Meter(HUD *hud, util::Rect rect, glm::ivec2 barPos, int barHeight, bool k) :
-    ui::Widget(hud->widget()),
-    m_hud(hud),
-    m_rect(rect),
-    m_barPos(barPos),
-    m_barHeight(barHeight),
-    m_k(k),
-    m_meter(hud->getImage(k ? "hudkmet" : "hudmet"), false),
-    m_point(hud->getImage("hudpoi1"), false),
-    m_pointRed(hud->getImage("hudpoi2"), false)
-{
-}
+class HUD;
 
 
-void Meter::draw()
+class ActiveSonar : public ui::Widget
 {
-    util::Rect rect = m_hud->projectCenter(m_rect);
-    m_meter.draw(rect.x, rect.y);
-    float depth = m_hud->scenario()->depth();
-    if (m_k)
-        m_point.draw(rect.x + m_barPos.x, rect.y + m_barPos.y + static_cast<int>(depth/1000*m_barHeight/12) - (m_point.height() + 1)/2);
-    else
-    {
-        depth = glm::mod<float>(depth, 100);
-        m_point.draw(rect.x + m_barPos.x, rect.y + m_barPos.y + static_cast<int>(depth*m_barHeight/100) - (m_point.height() + 1)/2);
-        float height = m_hud->scenario()->height();
-        if (height < 50)
-        {
-            height = glm::mod<float>(depth + height, 100);
-            m_pointRed.draw(rect.x + m_barPos.x, rect.y + m_barPos.y + static_cast<int>(height*m_barHeight/100) - (m_pointRed.height() + 1)/2);
-        }
-    }
-}
+public:
+    ActiveSonar(HUD *hud, util::Rect rect);
+
+protected:
+    void draw();
+
+private:
+    HUD *m_hud;
+    util::Rect m_rect;
+    gfx::Texture m_actBo;
+    gfx::Texture m_actOu;
+};
+
 
 } // namespace hud
+
+
+#endif // HUD_ACTIVESONAR_H
