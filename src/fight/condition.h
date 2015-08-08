@@ -60,6 +60,7 @@ public:
 public:
     void setLimit(int limit);
     int limit() const { return m_limit; }
+    void tryComplete();
     void inc();
     void dec();
     void setDelay(int delay);

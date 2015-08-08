@@ -19,7 +19,7 @@
 #define SONAR_H
 
 
-#include "objects/object.h"
+#include "objects/activeobject.h"
 
 
 namespace fight {
@@ -37,12 +37,10 @@ public:
 public:
     struct SonarEntry
     {
-        Object* object;
-        float range;
-        bool friend;
-        bool passive;
-        bool noisy;
-        bool inRange;
+        ActiveObject *object;
+        glm::vec3 dir;
+        bool isFriend;
+        bool isPassive;
     };
 
 public:
@@ -57,10 +55,15 @@ public:
 private:
     Scenario *m_scenario;
     float m_delay;
+    float m_passiveRange;
+    float m_passiveRangeMult;
+    float m_activeRange;
+    float m_activeRangeMult;
+    bool m_iff;
 
     bool m_active;
     float m_activatingDelay;
-    std::list<SonarEntry> sonarEntries;
+    std::vector<SonarEntry> m_sonarEntries;
 };
 
 

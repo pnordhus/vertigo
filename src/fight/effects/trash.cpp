@@ -28,16 +28,17 @@ Effects Trash::trashCollection[9] = {Trash_0, Trash_0, Trash_1, Trash_1, Trash_2
 Trash::Trash(Scenario *scenario, Billboard *billboard, const glm::vec3 &position) :
     Effect(scenario, billboard, static_cast<float>(qrand()%360), 1)
 {
+    m_iff = 0;
+    m_noise = billboard->noiseLevel();
+
     m_scenario->collisionManager().addObject(this);
+    m_box = m_billboard->box();
 
     glm::vec3 pos = position + glm::vec3(qrand()%50 - 25, qrand()%50 - 25, qrand()%25 - 25);
     float height = m_scenario->surface().heightAt(pos.x, pos.y) + 5;
     if (pos.z < height)
         pos.z = height;
     Object::setPosition(pos);
-
-    BoundingBox box = m_billboard->box();
-    m_box = BoundingBox(pos + box.minPoint(), pos + box.maxPoint());
 }
 
 

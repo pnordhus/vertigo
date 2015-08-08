@@ -32,7 +32,7 @@ class ActiveObject : public Object
 {
 public:
     ActiveObject(Scenario *scenario);
-    ActiveObject(Scenario *scenario, txt::DesFile &file);
+    ActiveObject(Scenario *scenario, txt::DesFile &file, int iff, const QString &name, const QString &cargo);
 
 public:
     ConditionEvent* eventDestroy() { return &m_eventDestroy; }
@@ -41,6 +41,11 @@ public:
     ConditionEvent* eventParalyze() { return &m_eventParalyze; }
     ConditionEvent* eventFinish() { return &m_eventFinish; }
     ConditionEvent* eventBoard() { return &m_eventBoard; }
+
+    int iff() const { return m_iff; }
+    const QString& name() const { return m_name; }
+    const QString& cargo() const { return m_cargo; }
+    float noise() const { return m_noise; }
 
 public:
     virtual void destroy();
@@ -52,6 +57,11 @@ protected:
     ConditionEvent m_eventParalyze;
     ConditionEvent m_eventFinish;
     ConditionEvent m_eventBoard;
+
+    int m_iff;
+    QString m_name;
+    QString m_cargo;
+    float m_noise;
 };
 
 

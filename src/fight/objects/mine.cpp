@@ -22,8 +22,8 @@
 namespace fight {
 
 
-Mine::Mine(Scenario *scenario, txt::DesFile &file) :
-    SimpleObject(scenario, file)
+Mine::Mine(Scenario *scenario, txt::DesFile &file, int iff) :
+    SimpleObject(scenario, file, iff, nullptr, nullptr)
 {
 
 }

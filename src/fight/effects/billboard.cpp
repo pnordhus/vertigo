@@ -35,6 +35,12 @@ Billboard::Billboard(gfx::TextureManager &texMan, txt::DesFile &file, int index)
     file.setSection(QString("collision%1").arg(index));
     m_collisionRadius = file.value("radiusscale").toFloat();
 
+    file.setSection(QString("noise%1").arg(index));
+    m_noiseLevel = file.value("level").toFloat();
+
+    file.setSection(QString("defense%1").arg(index));
+    m_kineticShield = file.value("kineticshield").toInt();
+
     file.setSection(QString("offense%1").arg(index));
     m_kineticStrength = file.value("kineticstrength").toInt();
     m_shockStrength = file.value("shockstrength").toInt();

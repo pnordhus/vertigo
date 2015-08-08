@@ -39,9 +39,8 @@ void Condition::setLimit(int limit)
 }
 
 
-void Condition::inc()
+void Condition::tryComplete()
 {
-    m_current++;
     if (m_current == m_limit)
     {
         if (m_delay != 0)
@@ -49,6 +48,13 @@ void Condition::inc()
         else
             complete();
     }
+}
+
+
+void Condition::inc()
+{
+    m_current++;
+    tryComplete();
 }
 
 

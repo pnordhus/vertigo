@@ -28,11 +28,16 @@ ActiveObject::ActiveObject(Scenario *scenario) :
 }
 
 
-ActiveObject::ActiveObject(Scenario *scenario, txt::DesFile &file) :
-    Object(scenario, file)
+ActiveObject::ActiveObject(Scenario *scenario, txt::DesFile &file, int iff, const QString &name, const QString &cargo) :
+    Object(scenario, file),
+    m_iff(iff),
+    m_name(name),
+    m_cargo(cargo)
 {
+    file.setSection("noise");
+    m_noise = file.value("level").toFloat();
+
     file.setSection("defense");
-    //m_scale *= file.value("scale").toFloat();
 }
 
 

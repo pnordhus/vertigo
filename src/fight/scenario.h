@@ -72,8 +72,12 @@ public:
     CollisionManager& collisionManager() { return m_collisionManager; }
     ConditionManager& conditionManager() { return m_conditionManager; }
     std::vector<ConditionRadio*>& radio() { return m_radio; }
-    std::vector<NavPoint*>& navPoints() { return m_navPoints; }
     Sonar& sonar() { return m_sonar; }
+
+    std::vector<std::unique_ptr<Object>>::const_iterator begin() const { return m_objects.cbegin(); }
+    std::vector<std::unique_ptr<Object>>::const_iterator end() const { return m_objects.cend(); }
+    std::vector<NavPoint*>& navPoints() { return m_navPoints; }
+    bool isFriend(int iffX, int iffY) const { return m_attitudeMatrix[iffY][iffX] == 0; }
 
 public:
     void setBoat(const game::Boat *boat);
@@ -127,6 +131,8 @@ private:
     std::vector<std::unique_ptr<Object>> m_objects;
     std::vector<Object*> m_lightSources;
     std::vector<NavPoint*> m_navPoints;
+
+    char m_attitudeMatrix[9][9];
 
     float m_time;
 

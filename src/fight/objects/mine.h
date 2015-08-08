@@ -28,7 +28,7 @@ namespace fight {
 class Mine : public SimpleObject
 {
 public:
-    Mine(Scenario *scenario, txt::DesFile &file);
+    Mine(Scenario *scenario, txt::DesFile &file, int iff);
 };
 
 

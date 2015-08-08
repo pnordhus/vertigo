@@ -71,10 +71,12 @@ Scenario::Scenario(const QString &name) :
     types[ 5] = "guntow0";
     types[ 7] = "guntow2";
     types[ 8] = "bioscout";
+    types[ 9] = "honglong";
     types[16] = "anbombr1";
     types[10] = "russcout";
     types[12] = "atscout";
     types[27] = "mine0";
+    types[28] = "mine1";
     types[36] = "tortow0";
     types[39] = "anscout1";
     types[41] = "atbomber";
@@ -119,10 +121,20 @@ Scenario::Scenario(const QString &name) :
             objectDes.load(QString("vfx:sobjects/%1.des").arg(types[dType]));
         }
 
+        int iff = 0;
+        if (m_file.contains("iff"))
+            iff = m_file.value("iff").toInt();
+        QString name;
+        if (m_file.contains("inf"))
+            name = m_file.valueText("inf");
+        QString cargo;
+        if (m_file.contains("carg"))
+            cargo = m_file.valueText("carg");
+
         switch (type) {
         case TypeBoat:
             {
-                object = new SimpleObject(this, objectDes);
+                object = new SimpleObject(this, objectDes, iff, name, cargo);
                 glm::vec3 pos = getPosition();
                 pos.z += 20.0f;
                 object->setPosition(pos);
@@ -131,7 +143,7 @@ Scenario::Scenario(const QString &name) :
 
         case TypeBomber:
             {
-                object = new SimpleObject(this, objectDes);
+                object = new SimpleObject(this, objectDes, iff, name, cargo);
                 glm::vec3 pos = getPosition();
                 pos.z += 20.0f;
                 object->setPosition(pos);
@@ -141,7 +153,7 @@ Scenario::Scenario(const QString &name) :
         case TypeTower:
         case TypeTorpedoTower:
             {
-                object = new TurretBase(this, objectDes);
+                object = new TurretBase(this, objectDes, iff, name, cargo);
                 object->setPosition(getPosition());
             }
             break;
@@ -155,7 +167,8 @@ Scenario::Scenario(const QString &name) :
 
         case TypeMine:
             {
-                object = new Mine(this, objectDes);
+                // TODO: dis num
+                object = new Mine(this, objectDes, iff);
                 object->setPosition(getPosition());
             }
             break;
@@ -165,6 +178,7 @@ Scenario::Scenario(const QString &name) :
             initialDir = 45.0f * m_file.value("card").toInt();
             //m_position.setZ(m_position.z() + 20.0f);
             m_height = m_position.z - m_surface.heightAt(m_position.x, m_position.y);
+            entry.condTrigger = m_conditionManager.addCondition(0);
 
             {
                 for (int i = 0; i < 27; i++)
@@ -183,7 +197,7 @@ Scenario::Scenario(const QString &name) :
         case TypeCrawler:
             {
                 objectDes.load("vfx:sobjects/gvehicle.des");
-                object = new SimpleObject(this, objectDes);
+                object = new SimpleObject(this, objectDes, iff, name, cargo);
                 object->setPosition(getPosition());
             }
             break;
@@ -198,7 +212,7 @@ Scenario::Scenario(const QString &name) :
 
         case TypeActiveBuilding:
             {
-                object = new SimpleObject(this, objectDes, 16);
+                object = new SimpleObject(this, objectDes, iff, name, cargo, 16);
                 object->setPosition(getPosition());
             }
             break;
@@ -307,6 +321,11 @@ Scenario::Scenario(const QString &name) :
     m_conditionManager.buildDependencies();
 
     std::sort(m_navPoints.begin(), m_navPoints.end(), [](NavPoint *a, NavPoint *b) { return a->num() < b->num(); });
+
+    m_file.setSection("AttitudeMatrix");
+    for (int i = 0; i < 9; i++)
+        for (int j = 0; j < 9; j++)
+            m_attitudeMatrix[i][j] = m_file.value(QString("X%1Y%2").arg(j).arg(i)).toInt();
 
 
     m_cameraMatrix = glm::mat4(1);

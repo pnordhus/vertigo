@@ -41,6 +41,8 @@ public:
     float range() const { return m_range; }
     float velocity() const { return m_velocity; }
     float collisionRadius() const { return m_collisionRadius; }
+    float noiseLevel() const { return m_noiseLevel; }
+    int kineticShield() const { return m_kineticShield; }
     int kineticStrength() const { return m_kineticStrength; }
     int shockStrength() const { return m_shockStrength; }
 
@@ -60,6 +62,8 @@ private:
     float m_range;
     float m_velocity;
     float m_collisionRadius;
+    float m_noiseLevel;
+    int m_kineticShield;
     int m_kineticStrength;
     int m_shockStrength;
 };

@@ -28,7 +28,7 @@ namespace fight {
 class TurretBase : public SimpleObject
 {
 public:
-    TurretBase(Scenario *scenario, txt::DesFile &file);
+    TurretBase(Scenario *scenario, txt::DesFile &file, int iff, const QString &name, const QString &cargo);
 
 public:
     void draw();
