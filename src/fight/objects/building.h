@@ -15,35 +15,47 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef FIGHT_PROJECTILE_H
-#define FIGHT_PROJECTILE_H
+#ifndef FIGHT_BUILDING_H
+#define FIGHT_BUILDING_H
 
 
-#include "effect.h"
-#include "fight/collisionmanager.h"
+#include "object.h"
 
 
 namespace fight {
 
 
-class Projectile : public Effect
+class Surface;
+class Module;
+
+
+class Building : public Object
 {
 public:
-    Projectile(Scenario *scenario, Billboard *billboard);
+    Building(Scenario *scenario, txt::DesFile &file, int size, float angle, int x, int y, int refx, int refy);
 
 public:
-    void setPosition(const glm::vec3 &pos);
-    void setDirection(const glm::vec3 &direction);
-    bool update(float elapsedTime);
+    void draw();
+    bool intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal);
 
 private:
-    glm::vec3 m_originPos;
-    glm::vec3 m_direction;
-    CollisionCache m_collisionCache;
+    struct Cluster
+    {
+        Module *module;
+        glm::vec3 offset;
+        float scale;
+        float angle;
+        glm::mat4 transform;
+        glm::mat4 invTransform;
+    };
+
+    std::vector<Cluster> m_clusters;
+    int m_size;
+    float m_angle;
 };
 
 
 } // namespace fight
 
 
-#endif // FIGHT_PROJECTILE_H
+#endif // FIGHT_BUILDING_H

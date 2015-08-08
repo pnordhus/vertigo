@@ -19,7 +19,7 @@
 #define FIGHT_EFFECT_H
 
 
-#include "../object.h"
+#include "fight/objects/activeobject.h"
 
 
 namespace fight {
@@ -100,7 +100,7 @@ enum Effects
 class Billboard;
 
 
-class Effect : public Object
+class Effect : public ActiveObject
 {
 public:
     Effect(Scenario *scenario, Billboard *billboard, float angle, float scale);

@@ -15,7 +15,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "object.h"
+#include "objects/object.h"
 #include "conditionmanager.h"
 #include "scenario.h"
 #include <glm/common.hpp>

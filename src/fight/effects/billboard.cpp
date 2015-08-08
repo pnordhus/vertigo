@@ -16,7 +16,7 @@
  ***************************************************************************/
 
 #include "billboard.h"
-#include "../collisionmesh.h"
+#include "fight/collisionmesh.h"
 
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/norm.hpp>

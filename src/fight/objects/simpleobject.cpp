@@ -15,35 +15,46 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef FIGHT_PROJECTILE_H
-#define FIGHT_PROJECTILE_H
-
-
-#include "effect.h"
-#include "fight/collisionmanager.h"
+#include "simpleobject.h"
+#include "fight/scenario.h"
 
 
 namespace fight {
 
 
-class Projectile : public Effect
+SimpleObject::SimpleObject(Scenario *scenario, txt::DesFile &file, float scale) :
+    ActiveObject(scenario, file)
 {
-public:
-    Projectile(Scenario *scenario, Billboard *billboard);
+    file.setSection("cluster");
+    m_base = scenario->moduleManager().get(file.value("base").toString());
 
-public:
-    void setPosition(const glm::vec3 &pos);
-    void setDirection(const glm::vec3 &direction);
-    bool update(float elapsedTime);
+    file.setSection("size");
+    m_scale = file.value("scale").toFloat() * scale;
 
-private:
-    glm::vec3 m_originPos;
-    glm::vec3 m_direction;
-    CollisionCache m_collisionCache;
-};
+    m_box = m_base->box().scale(m_scale);
+    scenario->collisionManager().addObject(this);
+}
+
+
+void SimpleObject::draw()
+{
+    glPushMatrix();
+    glTranslatef(m_position.x, m_position.y, m_position.z);
+    glScalef(m_scale, m_scale, m_scale);
+    m_base->draw();
+    glPopMatrix();
+}
+
+
+bool SimpleObject::intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal)
+{
+    if (m_base->intersect((start - m_position)/m_scale, dir, radius/m_scale, distance, normal))
+    {
+        distance *= m_scale;
+        return true;
+    }
+    return false;
+}
 
 
 } // namespace fight
-
-
-#endif // FIGHT_PROJECTILE_H

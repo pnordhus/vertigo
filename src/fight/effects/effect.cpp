@@ -17,14 +17,14 @@
 
 #include "effect.h"
 #include "billboard.h"
-#include "../scenario.h"
+#include "fight/scenario.h"
 
 
 namespace fight {
 
 
 Effect::Effect(Scenario *scenario, Billboard *billboard, float angle, float scale) : 
-    Object(scenario),
+    ActiveObject(scenario),
     m_billboard(billboard),
     m_angle(angle),
     m_scale(scale),

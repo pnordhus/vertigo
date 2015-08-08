@@ -15,38 +15,42 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef FIGHT_NAVPOINT_H
-#define FIGHT_NAVPOINT_H
-
-
-#include "object.h"
+#include "turret.h"
+#include "turretbase.h"
 
 
 namespace fight {
 
 
-class NavPoint : public Object
+TurretBase::TurretBase(Scenario *scenario, txt::DesFile &file) :
+    SimpleObject(scenario, file)
 {
-public:
-    NavPoint(Scenario *scenario, int num);
+    file.setSection("gunturret");
+    if (file.contains("name"))
+    {
+        txt::DesFile gunDes(QString("vfx:sobjects/%1.des").arg(file.value("name").toString()));
+        m_body.reset(new Turret(scenario, gunDes)); // TODO: TurretGun
+        m_body->setPosition(glm::vec3(file.value("RelativePositionX").toFloat(), file.value("RelativePositionY").toFloat(), file.value("RelativePositionZ").toFloat()));
+    }
+    file.setSection("torpedoturret");
+    if (file.contains("name"))
+    {
+        txt::DesFile torpedoDes(QString("vfx:sobjects/%1.des").arg(file.value("name").toString()));
+        m_body.reset(new Turret(scenario, torpedoDes)); // TODO: TurretTorpedo
+        m_body->setPosition(glm::vec3(file.value("RelativePositionX").toFloat(), file.value("RelativePositionY").toFloat(), file.value("RelativePositionZ").toFloat()));
+    }
+}
 
-public:
-    int num() const { return m_num; }
 
-public:
-    bool update(float elapsedTime);
-
-private:
-    int m_num;
-    Module *m_state0;
-    Module *m_state1;
-    int m_state;
-    float m_time;
-    bool m_reached;
-};
+void TurretBase::draw()
+{
+    glPushMatrix();
+    glTranslatef(m_position.x, m_position.y, m_position.z);
+    glScalef(m_scale, m_scale, m_scale);
+    m_base->draw();
+    m_body->draw();
+    glPopMatrix();
+}
 
 
 } // namespace fight
-
-
-#endif // FIGHT_NAVPOINT_H

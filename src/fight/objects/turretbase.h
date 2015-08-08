@@ -15,46 +15,30 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef FIGHT_BUILDING_H
-#define FIGHT_BUILDING_H
+#ifndef FIGHT_TURRETBASE_H
+#define FIGHT_TURRETBASE_H
 
 
-#include "object.h"
+#include "simpleobject.h"
 
 
 namespace fight {
 
 
-class Surface;
-
-
-class Building : public Object
+class TurretBase : public SimpleObject
 {
 public:
-    Building(Scenario *scenario, const QString &name, int size, float angle, int x, int y, int refx, int refy);
+    TurretBase(Scenario *scenario, txt::DesFile &file);
 
 public:
     void draw();
-    bool intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal);
 
 private:
-    struct Cluster
-    {
-        Module *module;
-        glm::vec3 offset;
-        float scale;
-        float angle;
-        glm::mat4 transform;
-        glm::mat4 invTransform;
-    };
-
-    std::vector<Cluster> m_clusters;
-    int m_size;
-    float m_angle;
+    std::unique_ptr<Object> m_body;
 };
 
 
 } // namespace fight
 
 
-#endif // FIGHT_BUILDING_H
+#endif // FIGHT_TURRETBASE_H

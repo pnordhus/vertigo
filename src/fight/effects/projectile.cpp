@@ -17,7 +17,7 @@
 
 #include "projectile.h"
 #include "billboard.h"
-#include "../scenario.h"
+#include "fight/scenario.h"
 
 
 namespace fight {
@@ -61,11 +61,12 @@ bool Projectile::update(float elapsedTime)
         disable();
         return true;
     }
-    Object *collision = m_scenario->collisionManager().testCollision(this, newPos, m_billboard->collisionRadius(), pos, normal);
+    Object *collision = m_scenario->collisionManager().testCollision(m_position, newPos, m_billboard->collisionRadius(), pos, normal, &m_collisionCache);
     if (collision)
     {
-        if (collision->type() == TrashObject)
-            collision->destroy();
+        ActiveObject *activeObject = dynamic_cast<ActiveObject *>(collision);
+        if (activeObject)
+            activeObject->destroy();
         else
             m_scenario->effectManager().addEffect(Explosion_11, pos, qrand()%360);
         disable();

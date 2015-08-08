@@ -19,7 +19,8 @@
 #define FIGHT_BILLBOARD_H
 
 
-#include "../object.h"
+#include "fight/objects/object.h"
+#include "gfx/texturemanager.h"
 
 
 namespace fight {

@@ -15,57 +15,31 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "navpoint.h"
-#include "scenario.h"
-#include "sfx/samplemap.h"
-#include <glm/geometric.hpp>
+#include "activeobject.h"
+#include "fight/scenario.h"
 
 
 namespace fight {
 
 
-NavPoint::NavPoint(Scenario *scenario, int num) :
-    Object(scenario),
-    m_num(num),
-    m_time(0),
-    m_reached(false)
+ActiveObject::ActiveObject(Scenario *scenario) :
+    Object(scenario)
 {
-    m_state0 = scenario->moduleManager().get("thumper2.mod");
-    m_state1 = scenario->moduleManager().get("thumper1.mod");
-    m_scale = 0.03;
-
-    m_base = m_state0;
-    m_state = 0;
 }
 
 
-bool NavPoint::update(float elapsedTime)
+ActiveObject::ActiveObject(Scenario *scenario, txt::DesFile &file) :
+    Object(scenario, file)
 {
-    m_time += elapsedTime;
-    while (m_time > 500.0f)
-    {
-        if (m_state == 0)
-        {
-            m_state = 1;
-            m_base = m_state1;
-        }
-        else
-        {
-            m_state = 0;
-            m_base = m_state0;
-        }
-        m_time -= 500.0f;
-    }
-    if (m_enabled && !m_reached)
-    {
-        glm::vec3 d = m_scenario->position() - m_position;
-        if (glm::dot(d, d) < 400.0f)
-        {
-            sfx::SampleMap::get(sfx::Sample::NavPoint).play();
-            m_reached = true;
-        }
-    }
-    return false;
+    file.setSection("defense");
+    //m_scale *= file.value("scale").toFloat();
+}
+
+
+void ActiveObject::destroy()
+{
+    disable();
+    m_eventDestroy.complete();
 }
 
 

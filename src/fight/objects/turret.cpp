@@ -16,20 +16,19 @@
  ***************************************************************************/
 
 #include "turret.h"
-#include "scenario.h"
+#include "fight/scenario.h"
 
 
 namespace fight {
 
 
-Turret::Turret(Scenario *scenario, const QString &name) :
-    Object(scenario, name),
+Turret::Turret(Scenario *scenario, txt::DesFile &file) :
+    Object(scenario, file),
     m_armLeft(nullptr),
     m_armRight(nullptr)
 {
-    txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
     file.setSection("cluster");
-    m_base = scenario->moduleManager().get(file.value("body").toString());
+    m_body = scenario->moduleManager().get(file.value("body").toString());
 
     if (file.contains("arml") && file.value("arml") != "no")
     {
@@ -53,7 +52,7 @@ void Turret::draw()
 {
     glTranslatef(m_position.x, m_position.y, m_position.z);
     //glScalef(m_scale, m_scale, m_scale);
-    m_base->draw();
+    m_body->draw();
 
     if (m_armLeft != nullptr)
     {

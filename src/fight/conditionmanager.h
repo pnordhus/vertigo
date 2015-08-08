@@ -19,7 +19,7 @@
 #define CONDITIONMANAGER_H
 
 
-#include "object.h"
+#include "objects/object.h"
 
 
 namespace fight {

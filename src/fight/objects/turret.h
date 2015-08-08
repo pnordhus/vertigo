@@ -15,35 +15,35 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef FIGHT_PROJECTILE_H
-#define FIGHT_PROJECTILE_H
+#ifndef FIGHT_TURRET_H
+#define FIGHT_TURRET_H
 
 
-#include "effect.h"
-#include "fight/collisionmanager.h"
+#include "object.h"
+#include "fight/module.h"
 
 
 namespace fight {
 
 
-class Projectile : public Effect
+class Turret : public Object
 {
 public:
-    Projectile(Scenario *scenario, Billboard *billboard);
+    Turret(Scenario *scenario, txt::DesFile &file);
 
 public:
-    void setPosition(const glm::vec3 &pos);
-    void setDirection(const glm::vec3 &direction);
-    bool update(float elapsedTime);
+    void draw();
 
 private:
-    glm::vec3 m_originPos;
-    glm::vec3 m_direction;
-    CollisionCache m_collisionCache;
+    Module *m_body;
+    Module *m_armLeft;
+    Module *m_armRight;
+    glm::vec3 m_armLeftPosition;
+    glm::vec3 m_armRightPosition;
 };
 
 
 } // namespace fight
 
 
-#endif // FIGHT_PROJECTILE_H
+#endif // FIGHT_TURRET_H

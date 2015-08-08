@@ -15,30 +15,24 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef FIGHT_TURRETBASE_H
-#define FIGHT_TURRETBASE_H
+#ifndef FIGHT_MINE_H
+#define FIGHT_MINE_H
 
 
-#include "object.h"
+#include "simpleobject.h"
 
 
 namespace fight {
 
 
-class TurretBase : public Object
+class Mine : public SimpleObject
 {
 public:
-    TurretBase(Scenario *scenario, const QString &name);
-
-public:
-    void draw();
-
-private:
-    std::unique_ptr<Object> m_body;
+    Mine(Scenario *scenario, txt::DesFile &file);
 };
 
 
 } // namespace fight
 
 
-#endif // FIGHT_TURRETBASE_H
+#endif // FIGHT_MINE_H

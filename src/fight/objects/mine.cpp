@@ -15,35 +15,18 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef FIGHT_PROJECTILE_H
-#define FIGHT_PROJECTILE_H
-
-
-#include "effect.h"
-#include "fight/collisionmanager.h"
+#include "mine.h"
+#include "fight/scenario.h"
 
 
 namespace fight {
 
 
-class Projectile : public Effect
+Mine::Mine(Scenario *scenario, txt::DesFile &file) :
+    SimpleObject(scenario, file)
 {
-public:
-    Projectile(Scenario *scenario, Billboard *billboard);
 
-public:
-    void setPosition(const glm::vec3 &pos);
-    void setDirection(const glm::vec3 &direction);
-    bool update(float elapsedTime);
-
-private:
-    glm::vec3 m_originPos;
-    glm::vec3 m_direction;
-    CollisionCache m_collisionCache;
-};
+}
 
 
 } // namespace fight
-
-
-#endif // FIGHT_PROJECTILE_H

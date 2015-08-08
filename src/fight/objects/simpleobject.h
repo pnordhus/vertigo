@@ -15,23 +15,38 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "mine.h"
-#include "scenario.h"
+#ifndef FIGHT_SIMPLEOBJECT_H
+#define FIGHT_SIMPLEOBJECT_H
+
+
+#include "activeobject.h"
+#include "fight/modulemanager.h"
 
 
 namespace fight {
 
 
-Mine::Mine(Scenario *scenario, const QString &name) :
-    Object(scenario, name)
-{
-    txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
-    file.setSection("cluster");
-    m_base = scenario->moduleManager().get(file.value("name").toString());
+class Scenario;
 
-    file.setSection("size");
-    m_scale = file.value("scale").toFloat() / 16;
-}
+
+class SimpleObject : public ActiveObject
+{
+public:
+    SimpleObject(Scenario *scenario, txt::DesFile &file, float scale = 1/32.0f);
+
+public:
+
+public:
+    void draw();
+    bool intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal);
+
+protected:
+    Module *m_base;
+    float m_scale;
+};
 
 
 } // namespace fight
+
+
+#endif // FIGHT_SIMPLEOBJECT_H

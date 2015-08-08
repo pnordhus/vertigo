@@ -16,7 +16,7 @@
  ***************************************************************************/
 
 #include "effectmanager.h"
-#include "../scenario.h"
+#include "fight/scenario.h"
 
 
 namespace fight {

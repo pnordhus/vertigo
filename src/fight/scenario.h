@@ -23,10 +23,12 @@
 #include <QTime>
 #include "util/rect.hpp"
 #include "util/deferreddeletable.h"
-#include "object.h"
+#include "objects/object.h"
 #include "surface/surface.h"
 #include "effects/effectmanager.h"
 #include "conditionmanager.h"
+#include "collisionmanager.h"
+#include "modulemanager.h"
 #include "sonar.h"
 
 #include <functional>

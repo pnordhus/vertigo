@@ -58,8 +58,7 @@ public:
 
 public:
     void addObject(Object *object);
-    Object* testCollision(const glm::vec3 &start, const glm::vec3 &end, float radius, glm::vec3 &position, glm::vec3 &normal);
-    Object* testCollision(Object *cacheObject, const glm::vec3 &end, float radius, glm::vec3 &position, glm::vec3 &normal);
+    Object* testCollision(const glm::vec3 &start, const glm::vec3 &end, float radius, glm::vec3 &position, glm::vec3 &normal, CollisionCache *collisionCache = nullptr);
 
 private:
 

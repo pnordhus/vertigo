@@ -18,7 +18,7 @@
 #include "digiblock.h"
 #include "hud.h"
 #include "fight/scenario.h"
-#include "fight/navpoint.h"
+#include "fight/objects/navpoint.h"
 #include <glm/common.hpp>
 #include <sstream>
 
@@ -54,7 +54,7 @@ void DigiBlock::draw()
     m_children[1]->setText(QString("%1M").arg(height));
     
     int speed = static_cast<int>(glm::round(m_hud->scenario()->speed()));
-    m_children[2]->setFont(speed >= 0 ? m_hud->fontGreen() : m_hud->fontRed());
+    m_children[2]->setFont(speed > -5 ? m_hud->fontGreen() : m_hud->fontRed());
     m_children[2]->setText(QString("%1KM/H").arg(speed));
     
     int noise = 1 + static_cast<int>(glm::round(m_hud->scenario()->noise()));

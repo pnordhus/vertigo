@@ -16,7 +16,7 @@
  ***************************************************************************/
 
 #include "object.h"
-#include "scenario.h"
+#include "fight/scenario.h"
 
 
 namespace fight {
@@ -25,26 +25,18 @@ namespace fight {
 Object::Object(Scenario *scenario) :
     m_scenario(scenario),
     m_enabled(true),
-    m_type(UnknownObject),
     m_static(true),
     m_condEnable(scenario, this)
 {
 }
 
 
-Object::Object(Scenario *scenario, const QString &name, float scale) :
+Object::Object(Scenario *scenario, txt::DesFile &file, float scale) :
     m_scenario(scenario),
     m_enabled(true),
-    m_type(UnknownObject),
     m_static(true),
     m_condEnable(scenario, this)
 {
-    txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
-    file.setSection("cluster");
-    m_base = scenario->moduleManager().get(file.value("base").toString());
-
-    file.setSection("size");
-    m_scale = file.value("scale").toFloat() * scale;
 }
 
 
@@ -66,14 +58,9 @@ void Object::disable()
 }
 
 
-void Object::setCollisionCache(CollisionCache *cache)
-{
-    m_collisionCache.reset(cache);
-}
-
-
 void Object::setPosition(const glm::vec3 &pos)
 {
+    m_box = m_box.translate(pos - m_position);
     m_position = pos;
 }
 
@@ -86,24 +73,12 @@ bool Object::update(float elapsedTime)
 
 void Object::draw()
 {
-    glPushMatrix();
-    glTranslatef(m_position.x, m_position.y, m_position.z);
-    glScalef(m_scale, m_scale, m_scale);
-    m_base->draw();
-    glPopMatrix();
 }
 
 
 bool Object::intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal)
 {
     return false;
-}
-
-
-void Object::destroy()
-{
-    disable();
-    m_eventDestroy.complete();
 }
 
 

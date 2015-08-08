@@ -19,7 +19,7 @@
 #include <QKeyEvent>
 #include "SDL.h"
 #include "fight/scenario.h"
-#include "fight/navpoint.h"
+#include "fight/objects/navpoint.h"
 #include "game/boat.h"
 #include "gfx/image.h"
 #include <glm/gtx/transform.hpp>

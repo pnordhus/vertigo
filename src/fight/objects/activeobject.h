@@ -15,8 +15,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef FIGHT_MINE_H
-#define FIGHT_MINE_H
+#ifndef FIGHT_ACTIVEOBJECT_H
+#define FIGHT_ACTIVEOBJECT_H
 
 
 #include "object.h"
@@ -25,14 +25,37 @@
 namespace fight {
 
 
-class Mine : public Object
+class Scenario;
+
+
+class ActiveObject : public Object
 {
 public:
-    Mine(Scenario *scenario, const QString &name);
+    ActiveObject(Scenario *scenario);
+    ActiveObject(Scenario *scenario, txt::DesFile &file);
+
+public:
+    ConditionEvent* eventDestroy() { return &m_eventDestroy; }
+    ConditionEvent* eventAttack() { return &m_eventAttack; }
+    ConditionEvent* eventIdentify() { return &m_eventIdentify; }
+    ConditionEvent* eventParalyze() { return &m_eventParalyze; }
+    ConditionEvent* eventFinish() { return &m_eventFinish; }
+    ConditionEvent* eventBoard() { return &m_eventBoard; }
+
+public:
+    virtual void destroy();
+
+protected:
+    ConditionEvent m_eventDestroy;
+    ConditionEvent m_eventAttack;
+    ConditionEvent m_eventIdentify;
+    ConditionEvent m_eventParalyze;
+    ConditionEvent m_eventFinish;
+    ConditionEvent m_eventBoard;
 };
 
 
 } // namespace fight
 
 
-#endif // FIGHT_MINE_H
+#endif // FIGHT_ACTIVEOBJECT_H

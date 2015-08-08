@@ -40,7 +40,9 @@ public:
     const glm::vec3& minPoint() const { return m_min; }
     const glm::vec3& maxPoint() const { return m_max; }
     glm::vec3 dim() const { return m_max - m_min; }
-    BoundingBox transform(const glm::mat4 &m)  const;
+    BoundingBox transform(const glm::mat4 &m) const;
+    BoundingBox scale(float scale) const;
+    BoundingBox translate(const glm::vec3 &t) const;
 
     void add(const glm::vec3 &point);
     void add(const BoundingBox &box);

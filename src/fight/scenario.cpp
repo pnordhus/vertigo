@@ -15,19 +15,21 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "building.h"
-#include "mine.h"
 #include "module.h"
 #include "scenario.h"
 #include "surface/surface.h"
 #include "effects/effect.h"
 #include "effects/projectile.h"
 #include "effects/trash.h"
-#include "turretbase.h"
-#include "navpoint.h"
 #include "conditionmanager.h"
 #include "game/boat.h"
 #include "sfx/samplemap.h"
+#include "objects/building.h"
+#include "objects/mine.h"
+#include "objects/turretbase.h"
+#include "objects/navpoint.h"
+#include "objects/simpleobject.h"
+
 #include <QGLContext>
 #include <QKeyEvent>
 #include <glm/gtc/matrix_transform.hpp>
@@ -65,7 +67,6 @@ Scenario::Scenario(const QString &name) :
     m_surface.load(m_file.value("name").toString().toLower(), m_file.value("maxheightscale").toInt(), m_file.value("patchcomb").toInt());
 
     std::map<int, QString> types;
-    types[ 0] = "anscout2";
     types[ 1] = "anscout2";
     types[ 5] = "guntow0";
     types[ 7] = "guntow2";
@@ -105,18 +106,23 @@ Scenario::Scenario(const QString &name) :
         entry.condBoarded = NULL;
 
         Object *object = NULL;
-
         const int type = m_file.value("typ").toInt();
+
+        txt::DesFile objectDes;
+        if (m_file.contains("dtyp") && type != TypeNavPoint && type != TypeCrawler)
+        {
+            const int dType = m_file.value("dtyp").toInt();
+            if (types.find(dType) == types.end()) {
+                qDebug() << "Unhandled dtype" << dType;
+                continue;
+            }
+            objectDes.load(QString("vfx:sobjects/%1.des").arg(types[dType]));
+        }
+
         switch (type) {
         case TypeBoat:
             {
-                const int dType = m_file.value("dtyp").toInt();
-                if (types.find(dType) == types.end()) {
-                    qDebug() << "Unhandled dtype" << dType;
-                    continue;
-                }
-
-                object = new Object(this, types[dType]);
+                object = new SimpleObject(this, objectDes);
                 glm::vec3 pos = getPosition();
                 pos.z += 20.0f;
                 object->setPosition(pos);
@@ -125,13 +131,7 @@ Scenario::Scenario(const QString &name) :
 
         case TypeBomber:
             {
-                const int dType = m_file.value("dtyp").toInt();
-                if (types.find(dType) == types.end()) {
-                    qDebug() << "Unhandled dtype" << dType;
-                    continue;
-                }
-
-                object = new Object(this, types[dType]);
+                object = new SimpleObject(this, objectDes);
                 glm::vec3 pos = getPosition();
                 pos.z += 20.0f;
                 object->setPosition(pos);
@@ -141,33 +141,21 @@ Scenario::Scenario(const QString &name) :
         case TypeTower:
         case TypeTorpedoTower:
             {
-                const int dType = m_file.value("dtyp").toInt();
-                if (types.find(dType) == types.end()) {
-                    qDebug() << "Unhandled dtype" << dType;
-                    continue;
-                }
-
-                object = new TurretBase(this, types[dType]);
+                object = new TurretBase(this, objectDes);
                 object->setPosition(getPosition());
             }
             break;
 
         case TypeBuilding:
             {
-                object = new Building(this, QString("gp%1x%1_%2").arg(m_file.value("siz").toInt() + 1).arg(m_file.value("buityp").toInt()), m_file.value("siz").toInt(), m_file.value("card", 0).toInt() * 45.0f, m_file.value("px").toInt(), m_file.value("py").toInt(), m_file.value("refx").toInt(), m_file.value("refy").toInt());
-                object->setPosition(getPosition());
+                objectDes.load(QString("vfx:sobjects/gp%1x%1_%2.des").arg(m_file.value("siz").toInt() + 1).arg(m_file.value("buityp").toInt()));
+                object = new Building(this, objectDes, m_file.value("siz").toInt(), m_file.value("card", 0).toInt() * 45.0f, m_file.value("px").toInt(), m_file.value("py").toInt(), m_file.value("refx").toInt(), m_file.value("refy").toInt());
             }
             break;
 
         case TypeMine:
             {
-                const int dType = m_file.value("dtyp").toInt();
-                if (types.find(dType) == types.end()) {
-                    qDebug() << "Unhandled dtype" << dType;
-                    continue;
-                }
-
-                object = new Mine(this, types[dType]);
+                object = new Mine(this, objectDes);
                 object->setPosition(getPosition());
             }
             break;
@@ -194,7 +182,8 @@ Scenario::Scenario(const QString &name) :
 
         case TypeCrawler:
             {
-                object = new Object(this, "gvehicle");
+                objectDes.load("vfx:sobjects/gvehicle.des");
+                object = new SimpleObject(this, objectDes);
                 object->setPosition(getPosition());
             }
             break;
@@ -209,13 +198,7 @@ Scenario::Scenario(const QString &name) :
 
         case TypeActiveBuilding:
             {
-                const int dType = m_file.value("dtyp").toInt();
-                if (types.find(dType) == types.end()) {
-                    qDebug() << "Unhandled dtype" << dType;
-                    continue;
-                }
-
-                object = new Object(this, types[dType], 16);
+                object = new SimpleObject(this, objectDes, 16);
                 object->setPosition(getPosition());
             }
             break;
@@ -269,12 +252,16 @@ Scenario::Scenario(const QString &name) :
             if (entry.cond1 != 0 || entry.del != 0)
                 object->disable();
             entry.condTrigger = object->condEnable();
-            entry.condSignal = object->eventDestroy();
-            entry.condAttacked = object->eventAttack();
-            entry.condIdentified = object->eventIdentify();
-            entry.condParalyzed = object->eventParalyze();
-            entry.condFinished = object->eventFinish();
-            entry.condBoarded = object->eventBoard();
+            ActiveObject *activeObject = dynamic_cast<ActiveObject *>(object);
+            if (activeObject)
+            {
+                entry.condSignal = activeObject->eventDestroy();
+                entry.condAttacked = activeObject->eventAttack();
+                entry.condIdentified = activeObject->eventIdentify();
+                entry.condParalyzed = activeObject->eventParalyze();
+                entry.condFinished = activeObject->eventFinish();
+                entry.condBoarded = activeObject->eventBoard();
+            }
         }
 
         // Reading Objectives
@@ -383,8 +370,9 @@ void Scenario::update(float elapsedTime)
         Object *collision = m_collisionManager.testCollision(prevPos, m_position, 1.5f, pos, normal);
         if (collision)
         {
-            if (collision->type() == TrashObject)
-                collision->destroy();
+            ActiveObject *activeObject = dynamic_cast<ActiveObject *>(collision);
+            if (activeObject)
+                activeObject->destroy();
             m_position = pos;
         }
     }
@@ -486,16 +474,16 @@ void Scenario::draw()
 
 void Scenario::keyPressEvent(QKeyEvent *e)
 {
-    if (e->key() == Qt::Key_Left)
+    if (e->key() == Qt::Key_Left || e->key() == Qt::Key_4)
         m_left = 1.0f;
-    if (e->key() == Qt::Key_Right)
+    if (e->key() == Qt::Key_Right || e->key() == Qt::Key_6)
         m_right = 1.0f;
-    if (e->key() == Qt::Key_Up)
+    if (e->key() == Qt::Key_Up || e->key() == Qt::Key_8)
     {
         m_up = 1.0f;
         m_inverseUpDown = 1.0f;
     }
-    if (e->key() == Qt::Key_Down)
+    if (e->key() == Qt::Key_Down || e->key() == Qt::Key_5)
     {
         m_down = 1.0f;
         m_inverseUpDown = 1.0f;
@@ -522,13 +510,13 @@ void Scenario::keyPressEvent(QKeyEvent *e)
 
 void Scenario::keyReleaseEvent(QKeyEvent *e)
 {
-    if (e->key() == Qt::Key_Left)
+    if (e->key() == Qt::Key_Left || e->key() == Qt::Key_4)
         m_left = 0.0f;
-    if (e->key() == Qt::Key_Right)
+    if (e->key() == Qt::Key_Right || e->key() == Qt::Key_6)
         m_right = 0.0f;
-    if (e->key() == Qt::Key_Up)
+    if (e->key() == Qt::Key_Up || e->key() == Qt::Key_8)
         m_up = 0.0f;
-    if (e->key() == Qt::Key_Down)
+    if (e->key() == Qt::Key_Down || e->key() == Qt::Key_5)
         m_down = 0.0f;
     if (e->key() == Qt::Key_A)
         m_forwards = 0.0f;

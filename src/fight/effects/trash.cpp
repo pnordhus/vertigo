@@ -17,7 +17,7 @@
 
 #include "trash.h"
 #include "billboard.h"
-#include "../scenario.h"
+#include "fight/scenario.h"
 
 #include <glm/gtx/norm.hpp>
 
@@ -28,7 +28,6 @@ Effects Trash::trashCollection[9] = {Trash_0, Trash_0, Trash_1, Trash_1, Trash_2
 Trash::Trash(Scenario *scenario, Billboard *billboard, const glm::vec3 &position) :
     Effect(scenario, billboard, static_cast<float>(qrand()%360), 1)
 {
-    m_type = TrashObject;
     m_scenario->collisionManager().addObject(this);
 
     glm::vec3 pos = position + glm::vec3(qrand()%50 - 25, qrand()%50 - 25, qrand()%25 - 25);
@@ -51,7 +50,7 @@ bool Trash::intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius
 void Trash::destroy()
 {
     m_scenario->effectManager().addEffect(Explosion_5, m_position, 0, glm::length2(m_box.dim()) > 15 ? 2 : 1);
-    Object::destroy();
+    ActiveObject::destroy();
 }
 
 

@@ -103,4 +103,15 @@ BoundingBox BoundingBox::transform(const glm::mat4 &m) const
 }
 
 
+BoundingBox BoundingBox::scale(float scale) const
+{
+    return BoundingBox(m_min*scale, m_max*scale);
+}
+
+
+BoundingBox BoundingBox::translate(const glm::vec3 &t) const
+{
+    return BoundingBox(m_min + t, m_max + t);
+}
+
 } // namespace fight

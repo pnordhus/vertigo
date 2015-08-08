@@ -18,7 +18,7 @@
 #include "heading.h"
 #include "hud.h"
 #include "fight/scenario.h"
-#include "fight/navpoint.h"
+#include "fight/objects/navpoint.h"
 #include <glm/trigonometric.hpp>
 
 

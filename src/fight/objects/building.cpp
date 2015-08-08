@@ -16,24 +16,21 @@
  ***************************************************************************/
 
 #include "building.h"
-#include "scenario.h"
-#include "surface/surface.h"
-#include "collisionmanager.h"
+#include "fight/scenario.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace fight {
 
 
-Building::Building(Scenario *scenario, const QString &name, int size, float angle, int x, int y, int refx, int refy) :
-    Object(scenario, name),
+Building::Building(Scenario *scenario, txt::DesFile &file, int size, float angle, int x, int y, int refx, int refy) :
+    Object(scenario, file),
     m_size(size),
     m_angle(angle)
 {
-    txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
-
     int i = 0;
     glm::vec3 scale = scenario->surface().scale();
+    m_position = glm::vec3(x + 0.5f, y + 0.5f - size, 0)*scale;
 
     while (file.sections().contains(QString("cluster%1").arg(i))) {
         file.setSection(QString("cluster%1").arg(i));
@@ -94,7 +91,7 @@ Building::Building(Scenario *scenario, const QString &name, int size, float angl
     for (Cluster &cluster : m_clusters)
     {
         glm::mat4 m(1);
-        m = glm::translate(m, glm::vec3((x + 0.5f)*scale.x, (y + 0.5f - size)*scale.y, 0));
+        m = glm::translate(m, m_position);
         m = glm::rotate(m, glm::radians(m_angle), glm::vec3(0, 0, 1));
         m = glm::translate(m, cluster.offset);
         m = glm::scale(m, glm::vec3(cluster.scale));
@@ -105,7 +102,6 @@ Building::Building(Scenario *scenario, const QString &name, int size, float angl
         cluster.invTransform = glm::inverse(m);
     }
 
-    m_type = BuildingObject;
     scenario->collisionManager().addObject(this);
 }
 
@@ -113,7 +109,7 @@ Building::Building(Scenario *scenario, const QString &name, int size, float angl
 void Building::draw()
 {
     glPushMatrix();
-    glTranslatef(m_position.x, m_position.y - m_size * 16.0f, 0);
+    glTranslatef(m_position.x, m_position.y, m_position.z);
     glRotatef(m_angle, 0, 0, 1);
 
     for (Cluster &cluster : m_clusters)

@@ -15,39 +15,61 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "turret.h"
-#include "turretbase.h"
+#include "navpoint.h"
+#include "fight/scenario.h"
+#include "sfx/samplemap.h"
+#include <glm/geometric.hpp>
 
 
 namespace fight {
 
 
-TurretBase::TurretBase(Scenario *scenario, const QString &name) :
-    Object(scenario, name)
+NavPoint::NavPoint(Scenario *scenario, int num) :
+    Object(scenario),
+    m_num(num),
+    m_time(0),
+    m_reached(false)
 {
-    txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
-    file.setSection("gunturret");
-    if (file.contains("name"))
-    {
-        m_body.reset(new Turret(scenario, file.value("name").toString())); // TODO: TurretGun
-        m_body->setPosition(glm::vec3(file.value("RelativePositionX").toFloat(), file.value("RelativePositionY").toFloat(), file.value("RelativePositionZ").toFloat()));
-    }
-    file.setSection("torpedoturret");
-    if (file.contains("name"))
-    {
-        m_body.reset(new Turret(scenario, file.value("name").toString())); // TODO: TurretTorpedo
-        m_body->setPosition(glm::vec3(file.value("RelativePositionX").toFloat(), file.value("RelativePositionY").toFloat(), file.value("RelativePositionZ").toFloat()));
-    }
+    m_state0 = scenario->moduleManager().get("thumper2.mod");
+    m_state1 = scenario->moduleManager().get("thumper1.mod");
+    m_scale = 0.03;
+    m_state = 0;
 }
 
 
-void TurretBase::draw()
+bool NavPoint::update(float elapsedTime)
+{
+    m_time += elapsedTime;
+    while (m_time > 500.0f)
+    {
+        if (m_state == 0)
+            m_state = 1;
+        else
+            m_state = 0;
+        m_time -= 500.0f;
+    }
+    if (m_enabled && !m_reached)
+    {
+        glm::vec3 d = m_scenario->position() - m_position;
+        if (glm::dot(d, d) < 400.0f)
+        {
+            sfx::SampleMap::get(sfx::Sample::NavPoint).play();
+            m_reached = true;
+        }
+    }
+    return false;
+}
+
+
+void NavPoint::draw()
 {
     glPushMatrix();
     glTranslatef(m_position.x, m_position.y, m_position.z);
     glScalef(m_scale, m_scale, m_scale);
-    m_base->draw();
-    m_body->draw();
+    if (m_state == 0)
+        m_state0->draw();
+    if (m_state == 1)
+        m_state1->draw();
     glPopMatrix();
 }
 
