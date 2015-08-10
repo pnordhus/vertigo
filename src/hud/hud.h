@@ -49,16 +49,19 @@ public:
 
     bool wide() const { return m_wide; }
     util::RectF rectHUD() const { return m_rectHUD; }
-    ui::Widget* widget() { return &m_rootWidget; }
+    ui::Widget* widget() { return m_integerScale ? &m_integerScaleWidget : &m_noScaleWidget; }
     gfx::Image getImage(const QString &name);
     gfx::Font& fontGreen() { return m_fontGreen; }
     gfx::Font& fontRed() { return m_fontRed; }
     gfx::Font& fontYellow() { return m_fontYellow; }
 
-    void load(game::Boat *boat);
-    void start(fight::Scenario *scenario);
+    const glm::mat4& hudProjectionMatrix() const { return m_integerScale ? m_integerScaleProjectionMatrix : m_noScaleProjectionMatrix; }
+    const glm::mat4& hudProjectionMatrixInverted() const { return m_integerScale ? m_integerScaleProjectionMatrixInverted : m_noScaleProjectionMatrixInverted; }
     glm::ivec2 project(const glm::ivec2 &point);
     util::Rect projectCenter(const util::Rect &rect);
+
+    void load(game::Boat *boat);
+    void start(fight::Scenario *scenario);
 
 protected:
     void setRect(const QRect &rect);
@@ -78,10 +81,14 @@ private:
     int m_navPoint;
 
     bool m_wide;
+    util::Rect m_rectGL;
     util::RectF m_rectHUD;
     glm::ivec2 m_center;
-    glm::mat4 m_hudProjectionMatrix;
-    glm::mat4 m_hudProjectionMatrixInverted;
+    bool m_integerScale;
+    glm::mat4 m_integerScaleProjectionMatrix;
+    glm::mat4 m_integerScaleProjectionMatrixInverted;
+    glm::mat4 m_noScaleProjectionMatrix;
+    glm::mat4 m_noScaleProjectionMatrixInverted;
 
     const gfx::ColorTable m_colorTable;
     gfx::Font m_fontGreen;
@@ -89,7 +96,8 @@ private:
     gfx::Font m_fontYellow;
 
     ui::Label m_cockpit;
-    ui::Label m_rootWidget;
+    ui::Label m_integerScaleWidget;
+    ui::Label m_noScaleWidget;
     std::vector<std::unique_ptr<ui::Widget>> m_children;
 };
 

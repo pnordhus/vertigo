@@ -121,15 +121,13 @@ void Sonar::update(float elapsedTime)
         float activeRange = m_activeRange + m_activeRangeMult*object->noise();
         glm::vec3 dir = object->position() - m_scenario->position();
         float dist = glm::length(dir);
-        dir /= dist;
         if (dist > passiveRange && (dist > activeRange || !m_active))
             continue;
 
         m_sonarEntries.emplace_back();
         SonarEntry &entry = m_sonarEntries.back();
         entry.object = object;
-        entry.dir = dir;
-        entry.isFriend = m_scenario->isFriend(0, object->iff());
+        entry.isFriend = !m_iff || m_scenario->isFriend(0, object->iff());
         entry.isPassive = dist > activeRange || !m_active;
     }
 }

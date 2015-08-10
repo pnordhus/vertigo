@@ -149,6 +149,8 @@ set(SOURCES
     hud/shield.h
     hud/activesonar.cpp
     hud/activesonar.h
+    hud/master.cpp
+    hud/master.h
 
     sfx/sound.cpp
     sfx/sound.h

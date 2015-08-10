@@ -34,6 +34,7 @@
 #include "energybar.h"
 #include "shield.h"
 #include "activesonar.h"
+#include "master.h"
 
 
 namespace hud {
@@ -75,8 +76,22 @@ void HUD::load(game::Boat *boat)
 
     file.setSection("front");
     m_center = glm::ivec2(file.value("VFX_StartX").toInt() + file.value("VFX_FlightX").toInt(), file.value("VFX_StartY").toInt() + file.value("VFX_FlightY").toInt());
-    Crosshair *crosshair = new Crosshair(this, m_center);
-    m_children.emplace_back(crosshair);
+
+    m_integerScale = true;
+
+    file.setSection("hudshield");
+    Shield *shield = new Shield(this, readRect(file));
+    m_children.emplace_back(shield);
+
+    file.setSection("hudactivesonarphase");
+    ActiveSonar *activeSonar = new ActiveSonar(this, readRect(file));
+    m_children.emplace_back(activeSonar);
+
+    file.setSection("radiomessage");
+    RadioMessage *radioMessage = new RadioMessage(this, util::Rect(file.value("X").toInt(), file.value("Y").toInt(), 640 - file.value("X").toInt()*2, 12));
+    m_children.emplace_back(radioMessage);
+
+    m_integerScale = true;
 
     file.setSection("hudheading");
     Heading *heading = new Heading(this, readRect(file));
@@ -98,21 +113,18 @@ void HUD::load(game::Boat *boat)
     DigiBlock *digiBlock = new DigiBlock(this, readRect(file));
     m_children.emplace_back(digiBlock);
 
-    file.setSection("radiomessage");
-    RadioMessage *radioMessage = new RadioMessage(this, util::Rect(file.value("X").toInt(), file.value("Y").toInt(), 640 - file.value("X").toInt()*2, 12));
-    m_children.emplace_back(radioMessage);
-
     file.setSection("hudenergybar");
     EnergyBar *energyBar = new EnergyBar(this, readRect(file));
     m_children.emplace_back(energyBar);
 
-    file.setSection("hudshield");
-    Shield *shield = new Shield(this, readRect(file));
-    m_children.emplace_back(shield);
+    m_integerScale = false;
 
-    file.setSection("hudactivesonarphase");
-    ActiveSonar *activeSonar = new ActiveSonar(this, readRect(file));
-    m_children.emplace_back(activeSonar);
+    file.setSection("masterhud");
+    Master *master = new Master(this, readRect(file));
+    m_children.emplace_back(master);
+
+    Crosshair *crosshair = new Crosshair(this, m_center);
+    m_children.emplace_back(crosshair);
 }
 
 
@@ -128,14 +140,18 @@ void HUD::start(fight::Scenario *scenario)
 
 void HUD::setRect(const QRect &rect)
 {
-    if (this->rect().width() == rect.width() && this->rect().height() == rect.height())
+    if (m_rectGL.width == rect.width() && m_rectGL.height == rect.height())
         return;
+
+    m_rectGL = util::Rect(rect.x(), rect.y(), rect.width(), rect.height());
     Renderer::setRect(rect);
 
     if (m_wide)
         m_rectHUD = util::RectF(rect.x(), rect.y() - rectOrtho().y()/rectOrtho().height()*rect.height(), rect.width(), rect.height()*480/rectOrtho().height());
     else
         m_rectHUD = util::RectF(rect.x() - rectOrtho().x()/rectOrtho().width()*rect.width(), rect.y() - rectOrtho().y()/rectOrtho().height()*rect.height(), rect.width()*640/rectOrtho().width(), rect.height()*480/rectOrtho().height());
+    Renderer::setRect(QRect(glm::round(m_rectHUD.x), glm::round(m_rectHUD.y), glm::round(m_rectHUD.width), glm::round(m_rectHUD.height)));
+
     if (m_scenario)
         m_scenario->setRect(m_rectHUD, glm::vec2(m_projectionMatrix * glm::vec4(m_center, 0, 1)));
 
@@ -146,14 +162,16 @@ void HUD::setRect(const QRect &rect)
         w += 640;
         h += 480;
     }
-    m_hudProjectionMatrix = glm::ortho(0.0f, rect.width()*640.0f/w, rect.height()*480.0f/h, 0.0f);
-    m_hudProjectionMatrixInverted = glm::inverse(m_hudProjectionMatrix);
+    m_integerScaleProjectionMatrix = glm::ortho(0.0f, m_rectHUD.width*640/w, m_rectHUD.height*480/h, 0.0f);
+    m_integerScaleProjectionMatrixInverted = glm::inverse(m_integerScaleProjectionMatrix);
+    m_noScaleProjectionMatrix = glm::ortho(0.0f, m_rectHUD.width, m_rectHUD.height, 0.0f);
+    m_noScaleProjectionMatrixInverted = glm::inverse(m_noScaleProjectionMatrix);
 }
 
 
 glm::ivec2 HUD::project(const glm::ivec2 &point)
 {
-    return glm::ivec2(glm::round(m_hudProjectionMatrixInverted * (m_projectionMatrix * glm::vec4(point, 0, 1))));
+    return glm::ivec2(glm::round(hudProjectionMatrixInverted() * (m_projectionMatrix * glm::vec4(point, 0, 1))));
 }
 
 
@@ -170,21 +188,27 @@ void HUD::draw()
     m_lastTicks = ticks;
     m_scenario->update(elapsedTime);
 
-    if (m_rectHUD.x > 0 || m_rectHUD.y > 0)
-        glViewport(m_rectHUD.x, m_rectHUD.y, m_rectHUD.width, m_rectHUD.height);
+    if (rect().x() != m_rectGL.x || rect().y() != m_rectGL.y)
+        glViewport(rect().x(), rect().y(), rect().width(), rect().height());
+
     if (m_scenario)
         m_scenario->draw();
-    if (m_rectHUD.x > 0 || m_rectHUD.y > 0)
-        glViewport(0, 0, rect().width(), rect().height());
 
     setupGL(false);
-
-
     m_cockpit.doDraw();
 
+    m_integerScale = true;
     glMatrixMode(GL_PROJECTION);
-    glLoadMatrixf(glm::value_ptr(m_hudProjectionMatrix));
-    m_rootWidget.doDraw();
+    glLoadMatrixf(glm::value_ptr(m_integerScaleProjectionMatrix));
+    m_integerScaleWidget.doDraw();
+
+    m_integerScale = false;
+    glMatrixMode(GL_PROJECTION);
+    glLoadMatrixf(glm::value_ptr(m_noScaleProjectionMatrix));
+    m_noScaleWidget.doDraw();
+
+    if (rect().x() != m_rectGL.x || rect().y() != m_rectGL.y)
+        glViewport(m_rectGL.x, m_rectGL.y, m_rectGL.width, m_rectGL.height);
 }
 
 

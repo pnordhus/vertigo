@@ -15,61 +15,48 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef SONAR_H
-#define SONAR_H
+#ifndef HUD_MASTER_H
+#define HUD_MASTER_H
 
 
-#include "objects/activeobject.h"
+#include "util/rect.hpp"
+#include "ui/widget.h"
+#include "ui/label.h"
 
 
-namespace fight {
+namespace hud {
 
 
-class Scenario;
-class Object;
+class HUD;
 
 
-class Sonar
+class Master : public ui::Widget
 {
 public:
-    Sonar(Scenario *scenario);
+    Master(HUD *hud, util::Rect rect);
 
-public:
-    struct SonarEntry
-    {
-        ActiveObject *object;
-        bool isFriend;
-        bool isPassive;
-    };
-
-    std::vector<SonarEntry>::const_iterator begin() const { return m_sonarEntries.cbegin(); }
-    std::vector<SonarEntry>::const_iterator end() const { return m_sonarEntries.cend(); }
-
-public:
-    void init(int sensor);
-    void activate();
-    void deactivate();
-    void toggle();
-    const bool isActive() { return m_active; }
-    const bool isActivating() { return m_activatingDelay > 0; }
-    void update(float elapsedTime);
+protected:
+    void draw();
 
 private:
-    Scenario *m_scenario;
-    float m_delay;
-    float m_passiveRange;
-    float m_passiveRangeMult;
-    float m_activeRange;
-    float m_activeRangeMult;
-    bool m_iff;
+    HUD *m_hud;
+    util::Rect m_rect;
 
-    bool m_active;
-    float m_activatingDelay;
-    std::vector<SonarEntry> m_sonarEntries;
+    gfx::Texture m_edgeBL;
+    gfx::Texture m_edgeBR;
+    gfx::Texture m_edgeTL;
+    gfx::Texture m_edgeTR;
+
+    gfx::Texture m_activeBlue;
+    gfx::Texture m_activeGreen;
+    gfx::Texture m_activeRed;
+    gfx::Texture m_passiveBlue;
+    gfx::Texture m_passiveGreen;
+    gfx::Texture m_passiveRed;
 };
 
 
-}
+} // namespace hud
 
 
-#endif // SONAR_H
+#endif // HUD_MASTER_H
