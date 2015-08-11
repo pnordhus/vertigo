@@ -46,6 +46,7 @@ void Master::draw()
 {
     glm::ivec2 rectPos = m_hud->project(m_rect.pos());
     util::Rect rect(rectPos, m_hud->project(m_rect.pos() + m_rect.size()) - rectPos);
+    m_clipRect.setRect(rect);
 
     util::RectangleInclusive<int> rectInc = rect;
     m_edgeBL.draw(rectInc.left(), rectInc.bottom() - m_edgeBL.height());
@@ -65,7 +66,7 @@ void Master::draw()
             tex = entry.isFriend ? &m_passiveGreen : &m_passiveRed;
         else
             tex = entry.isFriend ? &m_activeGreen : &m_activeRed;
-        tex->draw(point.x - tex->width()/2, point.y - tex->height()/2);
+        m_clipRect.draw(*tex, point.x - tex->width()/2, point.y - tex->height()/2);
     }
 }
 

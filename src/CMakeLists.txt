@@ -128,6 +128,8 @@ set(SOURCES
     gfx/texturemanager.h
     gfx/video.cpp
     gfx/video.h
+    gfx/cliprect.cpp
+    gfx/cliprect.h
 
     hud/hud.cpp
     hud/hud.h

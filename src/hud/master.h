@@ -22,6 +22,7 @@
 #include "util/rect.hpp"
 #include "ui/widget.h"
 #include "ui/label.h"
+#include "gfx/cliprect.h"
 
 
 namespace hud {
@@ -35,12 +36,16 @@ class Master : public ui::Widget
 public:
     Master(HUD *hud, util::Rect rect);
 
+public:
+    const gfx::ClipRect& clipRect() const { return m_clipRect; }
+
 protected:
     void draw();
 
 private:
     HUD *m_hud;
     util::Rect m_rect;
+    gfx::ClipRect m_clipRect;
 
     gfx::Texture m_edgeBL;
     gfx::Texture m_edgeBR;
