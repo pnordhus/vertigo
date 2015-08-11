@@ -33,6 +33,7 @@ public:
 
 public:
     void draw();
+    bool intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal);
 
 private:
     Module *m_body;

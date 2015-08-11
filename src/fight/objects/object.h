@@ -49,6 +49,7 @@ public:
     virtual void setPosition(const glm::vec3 &pos);
     const glm::vec3& position() const { return m_position; }
     const BoundingBox& box() const { return m_box; }
+    virtual glm::vec3 center() const { return (m_box.minPoint() + m_box.maxPoint())*0.5f; }
     bool isStatic() const { return m_static; }
 
     Condition* condEnable() { return &m_condEnable; }

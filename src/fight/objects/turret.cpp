@@ -29,6 +29,7 @@ Turret::Turret(Scenario *scenario, txt::DesFile &file) :
 {
     file.setSection("cluster");
     m_body = scenario->moduleManager().get(file.value("body").toString());
+    m_box = m_body->box();
 
     if (file.contains("arml") && file.value("arml") != "no")
     {
@@ -36,6 +37,7 @@ Turret::Turret(Scenario *scenario, txt::DesFile &file) :
         m_armLeftPosition.x = file.value("ArmLOffsetX").toFloat();
         m_armLeftPosition.y = file.value("ArmLOffsetY").toFloat();
         m_armLeftPosition.z = file.value("ArmLOffsetZ").toFloat();
+        m_box.add(m_armLeft->box().translate(m_armLeftPosition));
     }
 
     if (file.contains("armr") && file.value("armr") != "no")
@@ -44,6 +46,7 @@ Turret::Turret(Scenario *scenario, txt::DesFile &file) :
         m_armRightPosition.x = file.value("ArmROffsetX").toFloat();
         m_armRightPosition.y = file.value("ArmROffsetY").toFloat();
         m_armRightPosition.z = file.value("ArmROffsetZ").toFloat();
+        m_box.add(m_armRight->box().translate(m_armRightPosition));
     }
 }
 
@@ -69,6 +72,35 @@ void Turret::draw()
         m_armRight->draw();
         glPopMatrix();
     }
+}
+
+
+bool Turret::intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal)
+{
+    bool collision = m_body->intersect(start - m_position, dir, radius, distance, normal);
+
+    float d;
+    glm::vec3 norm;
+    if (m_armLeft != nullptr && m_armLeft->intersect(start - m_position - m_armLeftPosition, dir, radius, d, norm))
+    {
+        if (!collision || distance > d)
+        {
+            distance = d;
+            normal = norm;
+            collision = true;
+        }
+    }
+    if (m_armRight != nullptr && m_armRight->intersect(start - m_position - m_armRightPosition, dir, radius, d, norm))
+    {
+        if (!collision || distance > d)
+        {
+            distance = d;
+            normal = norm;
+            collision = true;
+        }
+    }
+
+    return collision;
 }
 
 

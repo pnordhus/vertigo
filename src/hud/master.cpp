@@ -57,7 +57,7 @@ void Master::draw()
     glm::mat4 m = m_hud->hudProjectionMatrixInverted() * m_hud->scenario()->projectionMatrix() * m_hud->scenario()->cameraMatrix();
     for (const auto &entry : m_hud->scenario()->sonar())
     {
-        glm::vec4 point4 = m * glm::vec4(entry.object->position() - m_hud->scenario()->position(), 1);
+        glm::vec4 point4 = m * glm::vec4(entry.object->center() - m_hud->scenario()->position(), 1);
         if (point4.z > 0)
             continue;
         glm::ivec2 point = glm::round(glm::vec2(point4)/point4.w);
