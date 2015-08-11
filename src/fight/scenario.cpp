@@ -79,6 +79,7 @@ Scenario::Scenario(const QString &name) :
     types[28] = "mine1";
     types[36] = "tortow0";
     types[39] = "anscout1";
+    types[40] = "anbombr2";
     types[41] = "atbomber";
     types[47] = "build2";
     types[48] = "build3";
@@ -181,7 +182,7 @@ Scenario::Scenario(const QString &name) :
             entry.condTrigger = m_conditionManager.addCondition(0);
 
             {
-                for (int i = 0; i < 27; i++)
+                /*for (int i = 0; i < 27; i++)
                     m_effectManager.addEffect((Effects)(Explosion_0 + i), m_position + glm::vec3(i*5, 0, 0))->setPermanent(true);
                 for (int i = 0; i < 9; i++)
                     m_effectManager.addEffect((Effects)(Shoot_0 + i), m_position + glm::vec3(i*5, -10, 0))->setPermanent(true);
@@ -190,7 +191,7 @@ Scenario::Scenario(const QString &name) :
                 for (int i = 0; i < 5; i++)
                     m_effectManager.addEffect((Effects)(Trash_0 + i), m_position + glm::vec3(i*5, -30, 0))->setPermanent(true);
                 for (int i = 0; i < 3; i++)
-                    m_effectManager.addEffect((Effects)(Bubble_0 + i), m_position + glm::vec3(i*5, -40, 0))->setPermanent(true);
+                    m_effectManager.addEffect((Effects)(Bubble_0 + i), m_position + glm::vec3(i*5, -40, 0))->setPermanent(true);*/
             }
             break;
 
@@ -220,19 +221,15 @@ Scenario::Scenario(const QString &name) :
         case TypeTrash:
             {
                 glm::vec3 pos = getPosition();
-                if (entry.cond1 != 0 || entry.del != 0)
-                    entry.condTrigger = m_conditionManager.addCondition(0);
+                entry.condTrigger = m_conditionManager.addCondition(0);
                 entry.condSignal = m_conditionManager.addCondition(9);
                 for (int i = 0; i < 9; i++)
                 {
                     Trash *trash = new Trash(this, m_effectManager.getBillboard(Trash::trashCollection[i]), pos);
                     m_objects.emplace_back(trash);
-                    if (entry.condTrigger != NULL)
-                    {
-                        trash->disable();
-                        trash->condEnable()->setLimit(1);
-                        entry.condTrigger->addDependency(trash->condEnable());
-                    }
+                    trash->disable();
+                    trash->condEnable()->setLimit(1);
+                    entry.condTrigger->addDependency(trash->condEnable());
                     trash->eventDestroy()->addDependency(static_cast<Condition *>(entry.condSignal));
                 }
             }
@@ -248,10 +245,7 @@ Scenario::Scenario(const QString &name) :
                                                                         m_file.value("dimy").toInt()*m_surface.scale().y,
                                                                         m_file.value("minz").toInt()*m_surface.scale().z,
                                                                         m_file.value("maxz").toInt()*m_surface.scale().z);
-                if (entry.cond1 != 0 || entry.del != 0)
-                    entry.condTrigger = space->condEnable();
-                else
-                    space->condEnable()->complete();
+                entry.condTrigger = space->condEnable();
                 entry.condSignal = space;
             }
             break;
@@ -263,8 +257,7 @@ Scenario::Scenario(const QString &name) :
         if (object != NULL)
         {
             m_objects.emplace_back(object);
-            if (entry.cond1 != 0 || entry.del != 0)
-                object->disable();
+            object->disable();
             entry.condTrigger = object->condEnable();
             ActiveObject *activeObject = dynamic_cast<ActiveObject *>(object);
             if (activeObject)
@@ -307,8 +300,6 @@ Scenario::Scenario(const QString &name) :
             qDebug() << "Unhandled radio type " << type;
 
         ConditionRadio *radio = m_conditionManager.addCondRadio(getPosition(), m_file.valueText("rtxt"));
-        if (entry.cond1 == 0 && entry.del == 0)
-            radio->complete();
         entry.condTrigger = radio;
         entry.condSignal = nullptr;
         entry.condAttacked = nullptr;

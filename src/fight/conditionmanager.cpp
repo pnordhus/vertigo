@@ -184,18 +184,17 @@ void ConditionManager::buildDependencies()
     for (const auto &pair : condEntries)
     {
         const ConditionEntry &entry = pair.second;
-
-        if (entry.cond1 == 0 && entry.cond2 != 0)
-            qDebug() << "Abnormal condition" << pair.first;
         if (entry.condTrigger == nullptr)
         {
             qDebug() << "Undefined object" << pair.first;
             continue;
         }
+
+        entry.condTrigger->setDelay(entry.del);
         if (entry.cond1 == 0)
         {
-            if (entry.del != 0)
-                delayComplete(entry.condTrigger, entry.del);
+            if (entry.cond2 != 0)
+                qDebug() << "Abnormal condition" << pair.first;
             continue;
         }
 
@@ -205,7 +204,6 @@ void ConditionManager::buildDependencies()
         entry.condTrigger->setLimit(entry.cond2 != 0 && entry.op == 0 ? 2 : 1);
         if (entry.op != 0 && entry.op != 1)
             qDebug() << "Unhandled condition operation" << entry.op;
-        entry.condTrigger->setDelay(entry.del);
     }
     for (const auto &pair : condEntries)
         if (pair.second.condTrigger)
