@@ -18,6 +18,7 @@
 #include "master.h"
 #include "hud.h"
 #include "fight/scenario.h"
+#include "fight/objects/navpoint.h"
 
 #include <glm/common.hpp>
 
@@ -37,7 +38,8 @@ Master::Master(HUD *hud, util::Rect rect) :
     m_activeRed(hud->getImage("hudscnar"), false),
     m_passiveBlue(hud->getImage("hudscnpb"), false),
     m_passiveGreen(hud->getImage("hudscnpg"), false),
-    m_passiveRed(hud->getImage("hudscnpr"), false)
+    m_passiveRed(hud->getImage("hudscnpr"), false),
+    m_way(hud->getImage("hudway1"), false)
 {
 }
 
@@ -66,7 +68,18 @@ void Master::draw()
             tex = entry.isFriend ? &m_passiveGreen : &m_passiveRed;
         else
             tex = entry.isFriend ? &m_activeGreen : &m_activeRed;
-        m_clipRect.draw(*tex, point.x - tex->width()/2, point.y - tex->height()/2);
+        tex->draw(point.x - tex->width()/2, point.y - tex->height()/2, &m_clipRect);
+    }
+
+    if (m_hud->navPoint() >= 0)
+    {
+        glm::vec4 point4 = m * glm::vec4(m_hud->scenario()->navPoints()[m_hud->navPoint()]->position() - m_hud->scenario()->position(), 1);
+        if (point4.z > 0)
+            return;
+        glm::ivec2 point = glm::round(glm::vec2(point4)/point4.w);
+        m_way.draw(point.x - (m_way.width() + 1)/2, point.y - (m_way.height() + 1)/2, &m_clipRect);
+
+        m_hud->fontYellow().draw(QString("NAV %1").arg(static_cast<char>('A' + m_hud->scenario()->navPoints()[m_hud->navPoint()]->num())), point.x - 16, point.y - 17, &m_clipRect);
     }
 }
 

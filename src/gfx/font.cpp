@@ -90,10 +90,10 @@ void FontPrivate::load(const QString &filename, const QVector<QRgb> &colorTable,
         m_texture.update(x, y, image);
 
         Symbol symbol;
-        symbol.rect.setLeft(x / res);
-        symbol.rect.setRight((x + image.width()) / res);
-        symbol.rect.setTop(y / res);
-        symbol.rect.setBottom((y + image.height()) / res);
+        symbol.rect.x = x / res;
+        symbol.rect.width = image.width() / res;
+        symbol.rect.y = y / res;
+        symbol.rect.height = image.height() / res;
         symbol.width = image.width() / scaleFactor;
         symbol.height = image.height() / scaleFactor;
         m_symbols.append(symbol);
@@ -106,40 +106,39 @@ void FontPrivate::load(const QString &filename, const QVector<QRgb> &colorTable,
     m_height = maxHeight / scaleFactor;
 }
 
-QRect FontPrivate::draw(const QString &text, int x, int y, int w, int h, bool alignHCenter, bool alignBottom)
+util::Rect FontPrivate::draw(const QString &text, const util::Rect &dstRect, bool alignHCenter, bool alignBottom, const ClipRect *clipRect)
 {
     m_texture.bind();
 
-    glPushMatrix();
+    util::Rect drawRect(dstRect.pos(), util::Size(0, m_height));
 
     if (alignHCenter) {
         const int totalW = width(text);
-        if (w > totalW)
-            x += (w - totalW) / 2;
+        if (dstRect.width > totalW)
+            drawRect.x += (dstRect.width - totalW) / 2;
     }
 
     QStringList strings = text.split(" ");
     if (alignBottom) {
-        const int totalH = height(w, strings);
-        if (h > totalH)
-            y += (h - totalH);
+        const int totalH = height(dstRect.width, strings);
+        if (dstRect.height > totalH)
+            drawRect.y += (dstRect.height - totalH);
     }
 
-    glTranslatef(x, y, 0);
+    util::Point pos = drawRect.pos();
 
     bool highlight = false;
-    int totalHeight = m_height;
-    int totalWidth = 0.0f;
-    int lineWidth = 0.0f;
+    int lineWidth = 0;
     int current = 0;
     foreach (QString word, strings) {
         if (++current < strings.size())
             word += " ";
         const int wordWidth = width(word);
-        if (w > 0 && lineWidth + wordWidth > w) {
-            glTranslatef(-lineWidth, m_height + 1, 0);
-            totalWidth = qMax(totalWidth, lineWidth);
-            totalHeight += m_height + 1;
+        if (dstRect.width > 0 && lineWidth + wordWidth > dstRect.width) {
+            pos.x -= lineWidth;
+            pos.y += m_height + 1;
+            drawRect.width = qMax(drawRect.width, lineWidth);
+            drawRect.height += m_height + 1;
             lineWidth = 0;
         }
 
@@ -165,7 +164,6 @@ QRect FontPrivate::draw(const QString &text, int x, int y, int w, int h, bool al
 
             Q_ASSERT(c < m_symbols.size());
             const Symbol &symbol = m_symbols[c];
-            const QRectF &rect = symbol.rect;
 
             if (m_alpha) {
                 if (highlight)
@@ -174,32 +172,33 @@ QRect FontPrivate::draw(const QString &text, int x, int y, int w, int h, bool al
                     glColor4f(qRed(m_colorNormal) / 255.0f, qGreen(m_colorNormal) / 255.0f, qBlue(m_colorNormal) / 255.0f, qAlpha(m_colorNormal) / 255.0f);
             }
 
-            glBegin(GL_QUADS);
-                glTexCoord2f(rect.left(), rect.top());
-                glVertex2f(0, 0);
-                glTexCoord2f(rect.left(), rect.bottom());
-                glVertex2f(0, symbol.height);
-                glTexCoord2f(rect.right(), rect.bottom());
-                glVertex2f(symbol.width, symbol.height);
-                glTexCoord2f(rect.right(), rect.top());
-                glVertex2f(symbol.width, 0);
-            glEnd();
+            util::RectF dst = util::RectF(pos, util::SizeF(symbol.width, symbol.height));
+            util::RectF src = symbol.rect;
+            if (clipRect != nullptr)
+                drawRect.x += 1;
+            if (clipRect == nullptr || clipRect->clip(dst, src))
+            {
+                glBegin(GL_QUADS);
+                    glTexCoord2f(src.left(), src.top());
+                    glVertex2f(dst.left(), dst.top());
+                    glTexCoord2f(src.left(), src.bottom());
+                    glVertex2f(dst.left(), dst.bottom());
+                    glTexCoord2f(src.right(), src.bottom());
+                    glVertex2f(dst.right(), dst.bottom());
+                    glTexCoord2f(src.right(), src.top());
+                    glVertex2f(dst.right(), dst.top());
+                glEnd();
+            }
 
-            glTranslatef(symbol.width, 0, 0);
+            pos.x += symbol.width;
             lineWidth += symbol.width;
         }
     }
-    totalWidth = qMax(totalWidth, lineWidth);
+    drawRect.width = qMax(drawRect.width, lineWidth);
 
-    glPopMatrix();
     glColor3f(1, 1, 1);
 
-    QRect rect;
-    rect.setLeft(x);
-    rect.setTop(y);
-    rect.setHeight(totalHeight);
-    rect.setWidth(totalWidth);
-    return rect;
+    return drawRect;
 }
 
 int FontPrivate::height(int w, const QStringList &strings) const

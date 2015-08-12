@@ -19,6 +19,7 @@
 #define GFX_TEXTURE_H
 
 
+#include "cliprect.h"
 #include <QImage>
 #include <QExplicitlySharedDataPointer>
 
@@ -49,13 +50,13 @@ public:
     void createEmpty(int w, int h, Texture::Format format, bool smooth = true);
     void createEmpty(const QSize &size, Texture::Format format, bool smooth = true);
     void update(int x, int y, QImage image);
-    QRectF draw();
-    QRectF draw(float x, float y);
-    QRectF draw(const QPointF &pos);
-    QRectF draw(const QRectF &rect);
-    QRectF draw(float x, float y, const QRectF &srcRect);
-    QRectF draw(const QPointF &pos, const QRectF &srcRect);
-    QRectF draw(const QRectF &rect, const QRectF &srcRect);
+    util::RectF draw(const ClipRect *clipRect = nullptr);
+    util::RectF draw(float x, float y, const ClipRect *clipRect = nullptr);
+    util::RectF draw(const util::PointF &dstPos, const ClipRect *clipRect = nullptr);
+    util::RectF draw(const util::RectF &dstRect, const ClipRect *clipRect = nullptr);
+    util::RectF draw(float x, float y, const util::RectF &srcRect, const ClipRect *clipRect = nullptr);
+    util::RectF draw(const util::PointF &dstPos, const util::RectF &srcRect, const ClipRect *clipRect = nullptr);
+    util::RectF draw(const util::RectF &dstRect, const util::RectF &srcRect, const ClipRect *clipRect = nullptr);
 
 private:
     QExplicitlySharedDataPointer<TexturePrivate> d;
@@ -78,7 +79,7 @@ public:
     void fromImage(const QImage &image, bool smooth);
     void createEmpty(int w, int h, Texture::Format format, bool smooth);
     void update(int x, int y, QImage image);
-    QRectF draw(const QRectF &rect, const QRectF &srcRect);
+    util::RectF draw(const util::RectF &dstRect, const util::RectF &srcRect, const ClipRect *clipRect);
 
 private:
     void clear();
@@ -161,45 +162,45 @@ inline void Texture::update(int x, int y, QImage image)
 }
 
 
-inline QRectF Texture::draw()
+inline util::RectF Texture::draw(const ClipRect *clipRect)
 {
-    return draw(QRectF(0, 0, width(), height()));
+    return draw(util::RectF(0, 0, width(), height()), clipRect);
 }
 
 
-inline QRectF Texture::draw(float x, float y)
+inline util::RectF Texture::draw(float x, float y, const ClipRect *clipRect)
 {
-    return draw(QRectF(x, y, width(), height()));
+    return draw(util::RectF(x, y, width(), height()), clipRect);
 }
 
 
-inline QRectF Texture::draw(const QPointF &pos)
+inline util::RectF Texture::draw(const util::PointF &dstPos, const ClipRect *clipRect)
 {
-    return draw(pos.x(), pos.y());
+    return draw(util::RectF(dstPos.x, dstPos.y, width(), height()), clipRect);
 }
 
 
-inline QRectF Texture::draw(const QRectF &destRect)
+inline util::RectF Texture::draw(const util::RectF &dstRect, const ClipRect *clipRect)
 {
-    return draw(destRect, QRectF(0, 0, width(), height()));
+    return draw(dstRect, util::RectF(0, 0, width(), height()), clipRect);
 }
 
 
-inline QRectF Texture::draw(float x, float y, const QRectF &srcRect)
+inline util::RectF Texture::draw(float x, float y, const util::RectF &srcRect, const ClipRect *clipRect)
 {
-    return draw(QRectF(x, y, srcRect.width(), srcRect.height()), srcRect);
+    return draw(util::RectF(x, y, srcRect.width, srcRect.height), srcRect, clipRect);
 }
 
 
-inline QRectF Texture::draw(const QPointF &pos, const QRectF &srcRect)
+inline util::RectF Texture::draw(const util::PointF &dstPos, const util::RectF &srcRect, const ClipRect *clipRect)
 {
-    return draw(pos.x(), pos.y(), srcRect);
+    return draw(util::RectF(dstPos.x, dstPos.y, srcRect.width, srcRect.height), srcRect, clipRect);
 }
 
 
-inline QRectF Texture::draw(const QRectF &destRect, const QRectF &srcRect)
+inline util::RectF Texture::draw(const util::RectF &dstRect, const util::RectF &srcRect, const ClipRect *clipRect)
 {
-    return d->draw(destRect, srcRect);
+    return d->draw(dstRect, srcRect, clipRect);
 }
 
 

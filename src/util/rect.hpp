@@ -19,6 +19,7 @@
 #define UTIL_RECT_H
 
 #include <glm/vec2.hpp>
+#include <glm/common.hpp>
 
 
 namespace util {
@@ -71,6 +72,9 @@ public:
 
     RectangleExclusive(const Rectangle<T> &base) : Rectangle<T>(base) { };
 
+    template<typename P>
+    RectangleExclusive(const Rectangle<P> &base) : Rectangle<T>(base.pos(), base.size()) { };
+
 public:
 
     T right() const { return this->x + this->width - 1; }
@@ -89,6 +93,9 @@ public:
 
     RectangleInclusive(const Rectangle<T> &base) : Rectangle<T>(base) { };
 
+    template<typename P>
+    RectangleInclusive(const Rectangle<P> &base) : Rectangle<T>(base.pos(), base.size()) { };
+
 public:
 
     T right() const { return this->x + this->width; }
@@ -96,9 +103,24 @@ public:
 };
 
 
+template<class R>
+inline R roundRect(const R &rect)
+{
+    return R(glm::round(rect.pos()), glm::round(rect.size()));
+}
+
+
 typedef RectangleExclusive<int> Rect;
 
 typedef RectangleInclusive<float> RectF;
+
+typedef glm::ivec2 Point;
+
+typedef glm::vec2 PointF;
+
+typedef glm::ivec2 Size;
+
+typedef glm::vec2 SizeF;
 
 
 } // namespace util

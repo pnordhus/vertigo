@@ -58,6 +58,8 @@ private:
     gfx::Texture m_passiveBlue;
     gfx::Texture m_passiveGreen;
     gfx::Texture m_passiveRed;
+
+    gfx::Texture m_way;
 };
 
 

@@ -27,18 +27,12 @@ ClipRect::ClipRect()
 }
 
 
-void ClipRect::setRect(const util::Rect &rect)
-{
-    m_rect = util::RectF(rect.pos(), rect.size());
-}
-
-
-void ClipRect::draw(Texture& tex, const util::RectF &dstRect, const util::RectF &srcRect) const
+bool ClipRect::clip(util::RectF &dstRect, util::RectF &srcRect) const
 {
     if (dstRect.right() <= m_rect.left() || dstRect.left() >= m_rect.right())
-        return;
+        return false;
     if (dstRect.bottom() <= m_rect.top() || dstRect.top() >= m_rect.bottom())
-        return;
+        return false;
     util::RectF dst = dstRect;
     util::RectF src = srcRect;
 
@@ -78,7 +72,9 @@ void ClipRect::draw(Texture& tex, const util::RectF &dstRect, const util::RectF 
         src.height -= clipBottom;
     }
 
-    tex.draw(QRectF(dst.x, dst.y, dst.width, dst.height), QRectF(src.x, src.y, src.width, src.height));
+    dstRect = dst;
+    srcRect = src;
+    return true;
 }
 
 

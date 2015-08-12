@@ -57,7 +57,7 @@ void RadioMessage::draw()
     }
 
     util::RectangleInclusive<int> rect = m_hud->projectCenter(m_rect);
-    m_black.draw(QRectF(rect.x, rect.y, rect.width, rect.height));
+    m_black.draw(rect);
     m_edgeBL.draw(rect.left(), rect.bottom() - m_edgeBL.height());
     m_edgeBR.draw(rect.right() - m_edgeBR.width(), rect.bottom() - m_edgeBR.height());
     m_edgeTL.draw(rect.left(), rect.top());

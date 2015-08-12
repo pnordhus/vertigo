@@ -40,7 +40,7 @@ void Heading::draw()
 {
     int offset = 360 + static_cast<int>(glm::degrees(m_hud->scenario()->yaw())*2);
     util::Rect rect = m_hud->projectCenter(m_rect);
-    m_head.draw(rect.x, rect.y, QRectF(offset, 0, m_rect.width, m_head.height()));
+    m_head.draw(rect.pos(), util::RectF(offset, 0, m_rect.width, m_head.height()));
     m_point.draw(rect.x + rect.width/2 - (m_point.width() + 1)/2, rect.y + m_head.height() + 1);
 
     if (m_hud->navPoint() >= 0)
@@ -69,7 +69,7 @@ void Heading::draw()
                 right = m_way.width()/2;
             navOffset = rect.width - m_way.width() - halfRect + halfWay;
         }
-        m_way.draw(rect.x + halfRect - halfWay + navOffset + right, rect.y + 7, QRectF(left, 0, m_way.width() - left - right, m_way.height()));
+        m_way.draw(rect.x + halfRect - halfWay + navOffset + right, rect.y + 7, util::RectF(left, 0, m_way.width() - left - right, m_way.height()));
     }
 }
 

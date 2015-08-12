@@ -20,7 +20,6 @@
 
 
 #include "util/rect.hpp"
-#include "texture.h"
 
 
 namespace gfx {
@@ -33,50 +32,12 @@ public:
 
 public:
     void setRect(const util::RectF &rect) { m_rect = rect; }
-    void setRect(const util::Rect &rect);
     const util::RectF& rect() const { return m_rect; }
-
-public:
-    void draw(Texture& tex, float x, float y) const;
-    void draw(Texture& tex, const glm::vec2 &dstPos) const;
-    void draw(Texture& tex, const util::RectF &dstRect) const;
-    void draw(Texture& tex, float x, float y, const util::RectF &srcRect) const;
-    void draw(Texture& tex, const glm::vec2 &dstPos, const util::RectF &srcRect) const;
-    void draw(Texture& tex, const util::RectF &dstRect, const util::RectF &srcRect) const;
+    bool clip(util::RectF &dstRect, util::RectF &srcRect) const;
 
 private:
     util::RectF m_rect;
 };
-
-
-inline void ClipRect::draw(Texture& tex, float x, float y) const
-{
-    draw(tex, util::RectF(x, y, tex.width(), tex.height()));
-}
-
-
-inline void ClipRect::draw(Texture& tex, const glm::vec2 &dstPos) const
-{
-    draw(tex, util::RectF(dstPos, glm::vec2(tex.width(), tex.height())));
-}
-
-
-inline void ClipRect::draw(Texture& tex, const util::RectF &dstRect) const
-{
-    draw(tex, dstRect, util::RectF(0, 0, tex.width(), tex.height()));
-}
-
-
-inline void ClipRect::draw(Texture& tex, float x, float y, const util::RectF &srcRect) const
-{
-    draw(tex, util::RectF(x, y, tex.width(), tex.height()), srcRect);
-}
-
-
-inline void ClipRect::draw(Texture& tex, const glm::vec2 &dstPos, const util::RectF &srcRect) const
-{
-    draw(tex, util::RectF(dstPos, glm::vec2(tex.width(), tex.height())), srcRect);
-}
 
 
 } // namespace gfx

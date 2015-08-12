@@ -35,7 +35,7 @@ void EnergyBar::draw()
 {
     int offset = 0;
     util::Rect rect = m_hud->projectCenter(m_rect);
-    m_energy.draw(rect.x, rect.y + offset, QRectF(0, offset, m_energy.width(), m_energy.height() - offset));
+    m_energy.draw(rect.x, rect.y + offset, util::RectF(0, offset, m_energy.width(), m_energy.height() - offset));
 }
 
 

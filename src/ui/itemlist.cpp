@@ -117,17 +117,17 @@ void ItemList::draw()
         }
     }
 
-    m_texture.draw(54, 0, QRectF(m_firstItem*54 + m_offset, 0, 435, 48));
+    m_texture.draw(54, 0, util::RectF(m_firstItem*54 + m_offset, 0, 435, 48));
     if (m_textureChecks.isValid())
-        m_textureChecks.draw(54, 0, QRectF(m_firstItem*54 + m_offset, 0, 435, 48));
+        m_textureChecks.draw(54, 0, util::RectF(m_firstItem*54 + m_offset, 0, 435, 48));
 
     int x = (m_selectedItem - m_firstItem)*54 - m_offset;
     if (x > -m_textureFrame.width() && x < 0)
-        m_textureFrame.draw(54, 0, QRectF(m_textureFrame.width() + x, 0, -x, m_textureFrame.height()));
+        m_textureFrame.draw(54, 0, util::RectF(m_textureFrame.width() + x, 0, -x, m_textureFrame.height()));
     else if (x >= 0 && x < 435 - m_textureFrame.width())
         m_textureFrame.draw(54 + x, 0);
     else if (x >= 435 - m_textureFrame.width() && x < 435)
-        m_textureFrame.draw(54 + x, 0, QRectF(0, 0, 435 - x, m_textureFrame.height()));
+        m_textureFrame.draw(54 + x, 0, util::RectF(0, 0, 435 - x, m_textureFrame.height()));
 }
 
 void ItemList::scrollLeft()
