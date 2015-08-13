@@ -59,6 +59,13 @@ private:
     gfx::Texture m_passiveGreen;
     gfx::Texture m_passiveRed;
 
+    gfx::Texture m_lockActiveYellow;
+    gfx::Texture m_lockActiveGreen;
+    gfx::Texture m_lockActiveRed;
+    gfx::Texture m_lockPassiveYellow;
+    gfx::Texture m_lockPassiveGreen;
+    gfx::Texture m_lockPassiveRed;
+
     gfx::Texture m_way;
 };
 

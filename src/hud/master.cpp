@@ -19,6 +19,8 @@
 #include "hud.h"
 #include "fight/scenario.h"
 #include "fight/objects/navpoint.h"
+#include "fight/objects/activeobject.h"
+#include "sfx/samplemap.h"
 
 #include <glm/common.hpp>
 
@@ -39,6 +41,12 @@ Master::Master(HUD *hud, util::Rect rect) :
     m_passiveBlue(hud->getImage("hudscnpb"), false),
     m_passiveGreen(hud->getImage("hudscnpg"), false),
     m_passiveRed(hud->getImage("hudscnpr"), false),
+    m_lockActiveYellow(hud->getImage("hudlocaa"), false),
+    m_lockActiveGreen(hud->getImage("hudlocag"), false),
+    m_lockActiveRed(hud->getImage("hudlocar"), false),
+    m_lockPassiveYellow(hud->getImage("hudlocpa"), false),
+    m_lockPassiveGreen(hud->getImage("hudlocpg"), false),
+    m_lockPassiveRed(hud->getImage("hudlocpr"), false),
     m_way(hud->getImage("hudway1"), false)
 {
 }
@@ -56,19 +64,33 @@ void Master::draw()
     m_edgeTL.draw(rectInc.left(), rectInc.top());
     m_edgeTR.draw(rectInc.right() - m_edgeTR.width(), rectInc.top());
 
+    bool lockNotLost = m_hud->locked() == nullptr;
     glm::mat4 m = m_hud->hudProjectionMatrixInverted() * m_hud->scenario()->projectionMatrix() * m_hud->scenario()->cameraMatrix();
     for (const auto &entry : m_hud->scenario()->sonar())
     {
+        lockNotLost |= m_hud->locked() == entry.object;
         glm::vec4 point4 = m * glm::vec4(entry.object->center() - m_hud->scenario()->position(), 1);
         if (point4.z > 0)
             continue;
         glm::ivec2 point = glm::round(glm::vec2(point4)/point4.w);
+
         gfx::Texture *tex;
-        if (entry.isPassive)
-            tex = entry.isFriend ? &m_passiveGreen : &m_passiveRed;
+        if (entry.object == m_hud->locked())
+        {
+            if (entry.isPassive)
+                tex = entry.isFriend ? &m_lockPassiveGreen : &m_lockPassiveRed;
+            else
+                tex = entry.isFriend ? &m_lockActiveGreen : &m_lockActiveRed;
+            tex->draw(point.x - tex->width()/2, point.y - tex->height()/2, &m_clipRect);
+        }
         else
-            tex = entry.isFriend ? &m_activeGreen : &m_activeRed;
-        tex->draw(point.x - tex->width()/2, point.y - tex->height()/2, &m_clipRect);
+        {
+            if (entry.isPassive)
+                tex = entry.isFriend ? &m_passiveGreen : &m_passiveRed;
+            else
+                tex = entry.isFriend ? &m_activeGreen : &m_activeRed;
+            tex->draw(point.x - tex->width()/2, point.y - tex->height()/2, &m_clipRect);
+        }
     }
 
     if (m_hud->navPoint() >= 0)
@@ -80,6 +102,12 @@ void Master::draw()
         m_way.draw(point.x - (m_way.width() + 1)/2, point.y - (m_way.height() + 1)/2, &m_clipRect);
 
         m_hud->fontYellow().draw(QString("NAV %1").arg(static_cast<char>('A' + m_hud->scenario()->navPoints()[m_hud->navPoint()]->num())), point.x - 16, point.y - 17, &m_clipRect);
+    }
+
+    if (!lockNotLost)
+    {
+        m_hud->lockReset();
+        sfx::SampleMap::get(sfx::Sample::TargetLost).play();
     }
 }
 

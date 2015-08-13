@@ -19,6 +19,7 @@
 #define GAME_CHAPTER_H
 
 
+#include <memory>
 #include "area.h"
 #include "briefing.h"
 #include "desktop.h"
@@ -27,10 +28,10 @@
 #include "movie.h"
 #include "task.h"
 #include "boat.h"
-#include "hud/hud.h"
 
 
 namespace fight { class Scenario; }
+namespace hud { class HUD; }
 
 
 namespace game {
@@ -141,7 +142,7 @@ private:
     bool m_movieHarbour;
     Mission *m_mission;
     fight::Scenario *m_scenario;
-    hud::HUD m_HUD;
+    std::unique_ptr<hud::HUD> m_HUD;
     txt::DesFile m_tasksFile;
     bool m_save;
     Boat *m_boat;

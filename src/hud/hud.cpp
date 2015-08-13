@@ -20,8 +20,10 @@
 #include "SDL.h"
 #include "fight/scenario.h"
 #include "fight/objects/navpoint.h"
+#include "fight/objects/activeobject.h"
 #include "game/boat.h"
 #include "gfx/image.h"
+
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -44,7 +46,8 @@ HUD::HUD() :
     m_colorTable("gfx:pal/gui/border.pal"),
     m_fontGreen("gfx:fnt/cpit1ahc.fnt", m_colorTable, true, false),
     m_fontRed("gfx:fnt/cpit1bhc.fnt", m_colorTable, true, false),
-    m_fontYellow("gfx:fnt/cpit1chc.fnt", m_colorTable, true, false)
+    m_fontYellow("gfx:fnt/cpit1chc.fnt", m_colorTable, true, false),
+    m_locked(nullptr)
 {
 
 }
@@ -212,6 +215,33 @@ void HUD::draw()
 }
 
 
+void HUD::lockReset()
+{
+    m_locked = nullptr;
+}
+
+
+void HUD::lockReticle()
+{
+    fight::ActiveObject *object = nullptr;
+    float minAngle = -1.0f;
+
+    for (const auto &entry : m_scenario->sonar())
+    {
+        glm::vec3 dir = glm::vec3(m_scenario->cameraMatrix() * glm::vec4(entry.object->center() - m_scenario->position(), 1));
+        dir /= -glm::length(dir);
+        if (minAngle < dir.z)
+        {
+            minAngle = dir.z;
+            object = entry.object;
+        }
+    }
+
+    if (minAngle > 0.98f)
+        m_locked = object;
+}
+
+
 void HUD::keyPressEvent(QKeyEvent *e)
 {
     if (e->key() == Qt::Key_Escape)
@@ -224,6 +254,8 @@ void HUD::keyPressEvent(QKeyEvent *e)
         if (m_navPoint >= m_scenario->navPoints().size())
             m_navPoint = -1;
     }
+    if (e->key() == Qt::Key_L)
+        lockReticle();
 
     if (m_scenario)
         m_scenario->keyPressEvent(e);

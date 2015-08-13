@@ -99,7 +99,7 @@ enum class Sample
     Sample68,
     Sample69,
     Sample70,
-    Sample71,
+    TargetLost,
     Sample72,
     Sample73,
     Sample74,

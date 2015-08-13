@@ -23,13 +23,13 @@
 #include "util/rect.hpp"
 #include "util/event.hpp"
 #include "ui/label.h"
-#include "txt/desfile.h"
 #include "gfx/colortable.h"
 #include "gfx/image.h"
 
 
-namespace fight { class Scenario; }
+namespace fight { class Scenario; class ActiveObject; }
 namespace game { class Boat; }
+namespace txt { class DesFile; }
 
 
 namespace hud {
@@ -46,6 +46,7 @@ public:
     game::Boat* boat() const { return m_boat; }
     fight::Scenario* scenario() const { return m_scenario; }
     int navPoint() const { return m_navPoint; }
+    fight::ActiveObject* locked() const { return m_locked; }
 
     bool wide() const { return m_wide; }
     util::RectF rectHUD() const { return m_rectHUD; }
@@ -63,6 +64,9 @@ public:
     void load(game::Boat *boat);
     void start(fight::Scenario *scenario);
 
+    void lockReset();
+    void lockReticle();
+
 protected:
     void setRect(const QRect &rect);
     void draw();
@@ -79,6 +83,7 @@ private:
     fight::Scenario *m_scenario;
     int m_lastTicks;
     int m_navPoint;
+    fight::ActiveObject *m_locked;
 
     bool m_wide;
     util::Rect m_rectGL;

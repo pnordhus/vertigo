@@ -18,6 +18,7 @@
 #include "chapter.h"
 #include "items.h"
 #include "fight/scenario.h"
+#include "hud/hud.h"
 #include "sfx/soundsystem.h"
 #include "txt/desfile.h"
 #include <QDesktopServices>
@@ -49,6 +50,7 @@ Chapter::Chapter(const QString &name, std::function<void(Renderer*)> funcSetRend
     m_credits(0),
     m_mission(NULL),
     m_scenario(NULL),
+    m_HUD(new hud::HUD()),
     m_boat(NULL),
     m_end(false),
     m_name(name),
@@ -67,7 +69,7 @@ Chapter::Chapter(const QString &name, std::function<void(Renderer*)> funcSetRend
 
     m_tasksFile.load("dat:story/tasks.des");
 
-    m_HUD.eventSuccess() += [this]() { finishMission(); };
+    m_HUD->eventSuccess() += [this]() { finishMission(); };
 }
 
 
@@ -190,7 +192,7 @@ void Chapter::load(const QString &filename, bool load)
     {
         delete m_boat;
         m_boat = new Boat(file);
-        m_HUD.load(m_boat);
+        m_HUD->load(m_boat);
     }
 
     // the intro has always been played
@@ -404,8 +406,8 @@ void Chapter::startScenario()
     Q_ASSERT(m_mission);
     Q_ASSERT(m_scenario == NULL);
     m_scenario = new fight::Scenario(m_mission->scenario());
-    m_HUD.start(m_scenario);
-    m_funcSetRenderer(&m_HUD);
+    m_HUD->start(m_scenario);
+    m_funcSetRenderer(m_HUD.get());
 }
 
 
@@ -667,7 +669,7 @@ void Chapter::toggleMovieHarbour()
 void Chapter::upgradeBoat(int type)
 {
     m_boat->upgrade(type);
-    m_HUD.load(m_boat);
+    m_HUD->load(m_boat);
 }
 
 
