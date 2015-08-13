@@ -19,11 +19,21 @@
 #define FIGHT_BILLBOARD_H
 
 
-#include "fight/objects/object.h"
-#include "gfx/texturemanager.h"
+#include <vector>
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+#include <glm/mat4x4.hpp>
+#include "gfx/texture.h"
+
+
+namespace gfx { class TextureManager; }
+namespace txt { class DesFile; }
 
 
 namespace fight {
+
+
+class BoundingBox;
 
 
 class Billboard

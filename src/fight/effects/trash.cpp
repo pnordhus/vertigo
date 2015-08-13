@@ -21,9 +21,12 @@
 
 #include <glm/gtx/norm.hpp>
 
+
 namespace fight {
 
-Effects Trash::trashCollection[9] = {Trash_0, Trash_0, Trash_1, Trash_1, Trash_2, Trash_2, Trash_3, Trash_3, Trash_4};
+
+Effects Trash::trashCollection[9] = { Effects::Trash_0, Effects::Trash_0, Effects::Trash_1, Effects::Trash_1, Effects::Trash_2, Effects::Trash_2, Effects::Trash_3, Effects::Trash_3, Effects::Trash_4 };
+
 
 Trash::Trash(Scenario *scenario, Billboard *billboard, const glm::vec3 &position) :
     Effect(scenario, billboard, static_cast<float>(qrand()%360), 1)
@@ -50,7 +53,7 @@ bool Trash::intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius
 
 void Trash::destroy()
 {
-    m_scenario->effectManager().addEffect(Explosion_5, m_position, 0, glm::length2(m_box.dim()) > 15 ? 2 : 1);
+    m_scenario->effectManager().addEffect(Effects::Explosion_5, m_position, 0, glm::length2(m_box.dim()) > 15 ? 2 : 1);
     ActiveObject::destroy();
 }
 

@@ -16,8 +16,9 @@
  ***************************************************************************/
 
 #include "surface.h"
-#include "tesselator.h"
 #include "element.h"
+#include "betaspline.h"
+#include "gfx/texture.h"
 #include "gfx/colortable.h"
 #include "gfx/image.h"
 #include "txt/desfile.h"

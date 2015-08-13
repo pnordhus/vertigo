@@ -19,16 +19,17 @@
 #define SURFACE_TESSELATOR_H
 
 
-#include "betaspline.h"
 #include <QByteArray>
+#include <glm/vec3.hpp>
+#include <glm/vec2.hpp>
 
 
 namespace fight {
 
 
-class BetaSpline;
 class Element;
 class Surface;
+class BetaSpline;
 
 
 class Tesselator
@@ -48,7 +49,7 @@ private:
 
 private:
 	std::vector<BetaSpline> m_splines;
-    std::vector<quint16> indices;
+    std::vector<unsigned short> indices;
 
     Surface *m_surface;
 };

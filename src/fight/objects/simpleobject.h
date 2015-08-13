@@ -20,13 +20,13 @@
 
 
 #include "activeobject.h"
-#include "fight/modulemanager.h"
 
 
 namespace fight {
 
 
 class Scenario;
+class Module;
 
 
 class SimpleObject : public ActiveObject

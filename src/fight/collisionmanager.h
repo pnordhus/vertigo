@@ -19,7 +19,8 @@
 #define FIGHT_COLLISIONMANAGER_H
 
 
-#include "boundingbox.h"
+#include <vector>
+#include <glm/vec3.hpp>
 
 
 namespace fight {

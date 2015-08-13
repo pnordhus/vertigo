@@ -22,8 +22,10 @@
 #include <QGLContext>
 #include "fight/boundingbox.h"
 #include "fight/condition.h"
-#include "txt/desfile.h"
 #include <memory>
+
+
+namespace txt { class DesFile; }
 
 
 namespace fight {

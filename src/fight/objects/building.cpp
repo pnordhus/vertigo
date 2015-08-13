@@ -17,6 +17,7 @@
 
 #include "building.h"
 #include "fight/scenario.h"
+#include "fight/module.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 

@@ -16,8 +16,12 @@
  ***************************************************************************/
 
 #include "billboard.h"
+#include "txt/desfile.h"
+#include "gfx/texturemanager.h"
+#include "fight/boundingbox.h"
 #include "fight/collisionmesh.h"
 
+#include <QGLContext>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/norm.hpp>
 

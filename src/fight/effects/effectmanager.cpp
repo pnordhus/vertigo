@@ -16,6 +16,9 @@
  ***************************************************************************/
 
 #include "effectmanager.h"
+#include "billboard.h"
+#include "effect.h"
+#include "projectile.h"
 #include "fight/scenario.h"
 
 
@@ -30,28 +33,34 @@ EffectManager::EffectManager(Scenario *scenario) :
     file.load("vfx:sobjects/explosio.des");
     for (int i = 0; i < 27; i++)
         m_billboards.emplace(std::piecewise_construct,
-            std::forward_as_tuple((Effects)(Explosion_0 + i)),
+            std::forward_as_tuple((Effects)((int)Effects::Explosion_0 + i)),
             std::forward_as_tuple(m_scenario->textureManager(), file, i));
     file.load("vfx:sobjects/shoot.des");
     for (int i = 0; i < 9; i++)
         m_billboards.emplace(std::piecewise_construct,
-            std::forward_as_tuple((Effects)(Shoot_0 + i)),
+            std::forward_as_tuple((Effects)((int)Effects::Shoot_0 + i)),
             std::forward_as_tuple(m_scenario->textureManager(), file, i));
     file.load("vfx:sobjects/debris.des");
     for (int i = 0; i < 23; i++)
         m_billboards.emplace(std::piecewise_construct,
-            std::forward_as_tuple((Effects)(Debris_0 + i)),
+            std::forward_as_tuple((Effects)((int)Effects::Debris_0 + i)),
             std::forward_as_tuple(m_scenario->textureManager(), file, i));
     file.load("vfx:sobjects/trash.des");
     for (int i = 0; i < 5; i++)
         m_billboards.emplace(std::piecewise_construct,
-            std::forward_as_tuple((Effects)(Trash_0 + i)),
+            std::forward_as_tuple((Effects)((int)Effects::Trash_0 + i)),
             std::forward_as_tuple(m_scenario->textureManager(), file, i));
     file.load("vfx:sobjects/bubble.des");
     for (int i = 0; i < 3; i++)
         m_billboards.emplace(std::piecewise_construct,
-            std::forward_as_tuple((Effects)(Bubble_0 + i)),
+            std::forward_as_tuple((Effects)((int)Effects::Bubble_0 + i)),
             std::forward_as_tuple(m_scenario->textureManager(), file, i));
+}
+
+
+Billboard* EffectManager::getBillboard(Effects effect)
+{
+    return &m_billboards.at(effect);
 }
 
 

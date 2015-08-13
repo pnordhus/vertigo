@@ -69,7 +69,7 @@ void Element::addVertex(int textureId, const glm::vec3 &position, const glm::vec
 }
 
 
-void Element::addTriangle(int textureId, quint16 a, quint16 b, quint16 c)
+void Element::addTriangle(int textureId, unsigned short a, unsigned short b, unsigned short c)
 {
     m_subsets[textureId].indices.push_back(a);
     m_subsets[textureId].indices.push_back(b);

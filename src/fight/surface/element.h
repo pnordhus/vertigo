@@ -19,11 +19,11 @@
 #define SURFACE_ELEMENT_H
 
 
-#include "gfx/texture.h"
-#include "util/rect.hpp"
 #include <map>
+#include <vector>
 #include <glm/vec3.hpp>
 #include <glm/vec2.hpp>
+#include "util/rect.hpp"
 
 
 namespace fight {
@@ -40,7 +40,7 @@ public:
 public:
     int numVertices(int textureId);
 	void addVertex(int textureId, const glm::vec3 &position, const glm::vec3 &normal, const glm::vec2 &texCoords);
-    void addTriangle(int textureId, quint16 a, quint16 b, quint16 c);
+    void addTriangle(int textureId, unsigned short a, unsigned short b, unsigned short c);
 
     void draw();
     util::Rect rect() const { return m_rect; }
@@ -55,7 +55,7 @@ private:
         std::vector<glm::vec3> vertices;
         std::vector<glm::vec3> normals;
         std::vector<glm::vec2> texCoords;
-        std::vector<quint16> indices;
+        std::vector<unsigned short> indices;
     };
 
 private:

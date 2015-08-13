@@ -17,6 +17,7 @@
 
 #include "simpleobject.h"
 #include "fight/scenario.h"
+#include "fight/module.h"
 
 
 namespace fight {

@@ -20,18 +20,19 @@
 
 
 #include <QDebug>
-#include <QTime>
+#include <QKeyEvent>
+#include <functional>
+#include <glm/mat4x4.hpp>
 #include "util/rect.hpp"
 #include "util/deferreddeletable.h"
-#include "objects/object.h"
+#include "gfx/texturemanager.h"
+#include "txt/desfile.h"
 #include "surface/surface.h"
 #include "effects/effectmanager.h"
 #include "conditionmanager.h"
 #include "collisionmanager.h"
 #include "modulemanager.h"
 #include "sonar.h"
-
-#include <functional>
 
 
 namespace game { class Boat; }
@@ -41,7 +42,6 @@ namespace fight {
 
 
 class Object;
-class Surface;
 class NavPoint;
 
 

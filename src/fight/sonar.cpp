@@ -17,6 +17,7 @@
 
 #include "sonar.h"
 #include "scenario.h"
+#include "objects/activeobject.h"
 #include "sfx/samplemap.h"
 
 #include <glm/geometric.hpp>

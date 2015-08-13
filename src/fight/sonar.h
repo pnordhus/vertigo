@@ -19,14 +19,14 @@
 #define SONAR_H
 
 
-#include "objects/activeobject.h"
+#include <vector>
 
 
 namespace fight {
 
 
 class Scenario;
-class Object;
+class ActiveObject;
 
 
 class Sonar

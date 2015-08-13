@@ -16,6 +16,7 @@
  ***************************************************************************/
 
 #include "module.h"
+#include "gfx/texturemanager.h"
 #include <QDataStream>
 #include <QFile>
 #include <QGLContext>

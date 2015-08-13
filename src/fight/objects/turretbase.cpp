@@ -17,6 +17,7 @@
 
 #include "turret.h"
 #include "turretbase.h"
+#include "fight/scenario.h"
 
 
 namespace fight {

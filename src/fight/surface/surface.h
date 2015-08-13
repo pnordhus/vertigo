@@ -19,8 +19,13 @@
 #define FIGHT_SURFACE_H
 
 
-#include "element.h"
+#include <map>
+#include <vector>
+#include <QImage>
 #include "tesselator.h"
+
+
+namespace gfx { class Texture; }
 
 
 namespace fight {

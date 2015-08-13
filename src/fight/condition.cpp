@@ -15,9 +15,9 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "objects/object.h"
-#include "conditionmanager.h"
+#include "condition.h"
 #include "scenario.h"
+#include "objects/object.h"
 #include <glm/common.hpp>
 
 
@@ -78,10 +78,10 @@ ConditionEvent::ConditionEvent() :
 void ConditionEvent::addDependency(Condition *cond, bool positive)
 {
     if (positive)
-        m_dependInc << cond;
+        m_dependInc.push_back(cond);
     else
     {
-        m_dependDec << cond;
+        m_dependDec.push_back(cond);
         cond->m_current++;
     }
 }
@@ -92,9 +92,9 @@ void ConditionEvent::complete()
     if (m_completed)
         return;
     m_completed = true;
-    foreach (Condition *cond, m_dependInc)
+    for (Condition *cond : m_dependInc)
         cond->inc();
-    foreach (Condition *cond, m_dependDec)
+    for (Condition *cond : m_dependDec)
         cond->dec();
 }
 

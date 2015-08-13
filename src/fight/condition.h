@@ -19,6 +19,7 @@
 #define CONDITION_H
 
 
+#include <vector>
 #include <glm/vec3.hpp>
 #include <QString>
 
@@ -45,8 +46,8 @@ public:
 
 protected:
     bool m_completed;
-    QList<Condition *> m_dependInc;
-    QList<Condition *> m_dependDec;
+    std::vector<Condition *> m_dependInc;
+    std::vector<Condition *> m_dependDec;
 };
 
 

@@ -17,6 +17,7 @@
 
 #include "navpoint.h"
 #include "fight/scenario.h"
+#include "fight/module.h"
 #include "sfx/samplemap.h"
 #include <glm/geometric.hpp>
 

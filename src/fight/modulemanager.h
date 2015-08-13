@@ -19,11 +19,17 @@
 #define FIGHT_MODULEMANAGER_H
 
 
-#include "module.h"
-#include "gfx/texturemanager.h"
+#include <map>
+#include <QString>
+
+
+namespace gfx { class TextureManager; }
 
 
 namespace fight {
+
+
+class Module;
 
 
 class ModuleManager

@@ -15,15 +15,15 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "module.h"
 #include "scenario.h"
-#include "surface/surface.h"
-#include "effects/effect.h"
-#include "effects/projectile.h"
+#include "module.h"
+#include "surface/element.h"
+#include "surface/betaspline.h"
+#include "effects/billboard.h"
 #include "effects/trash.h"
-#include "conditionmanager.h"
 #include "game/boat.h"
 #include "sfx/samplemap.h"
+
 #include "objects/building.h"
 #include "objects/mine.h"
 #include "objects/turretbase.h"
@@ -31,7 +31,7 @@
 #include "objects/simpleobject.h"
 
 #include <QGLContext>
-#include <QKeyEvent>
+#include <QTime>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/matrix_access.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -206,7 +206,7 @@ Scenario::Scenario(const QString &name) :
         case TypeNavPoint:
             {
                 object = new NavPoint(this, m_file.value("dtyp").toInt());
-                object->setPosition(getPosition() + glm::vec3(-0.5f*m_surface.scale().x, -0.5f*m_surface.scale().y, 12));
+                object->setPosition(getPosition() + glm::vec3(-0.5f*m_surface.scale().x, -0.5f*m_surface.scale().y, 10));
                 m_navPoints.push_back(static_cast<NavPoint*>(object));
             }
             break;
@@ -510,7 +510,7 @@ void Scenario::keyPressEvent(QKeyEvent *e)
     if (e->key() == Qt::Key_Space)
     {
         glm::vec3 dir = -glm::vec3(glm::row(m_cameraMatrix, 2));
-        m_effectManager.addProjectile(Shoot_Vendetta, m_position, dir);
+        m_effectManager.addProjectile(Effects::Shoot_Vendetta, m_position, dir);
     }
 
     if (e->key() == Qt::Key_R)

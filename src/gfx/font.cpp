@@ -174,8 +174,6 @@ util::Rect FontPrivate::draw(const QString &text, const util::Rect &dstRect, boo
 
             util::RectF dst = util::RectF(pos, util::SizeF(symbol.width, symbol.height));
             util::RectF src = symbol.rect;
-            if (clipRect != nullptr)
-                drawRect.x += 1;
             if (clipRect == nullptr || clipRect->clip(dst, src))
             {
                 glBegin(GL_QUADS);

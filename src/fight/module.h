@@ -19,9 +19,12 @@
 #define FIGHT_MODULE_H
 
 
-#include "gfx/texturemanager.h"
+#include "gfx/texture.h"
 #include "boundingbox.h"
 #include "collisionmesh.h"
+
+
+namespace gfx { class TextureManager; }
 
 
 namespace fight {

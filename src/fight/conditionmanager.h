@@ -19,10 +19,15 @@
 #define CONDITIONMANAGER_H
 
 
-#include "objects/object.h"
+#include <map>
+#include <list>
+#include "condition.h"
 
 
 namespace fight {
+
+
+class Scenario;
 
 
 class ConditionManager

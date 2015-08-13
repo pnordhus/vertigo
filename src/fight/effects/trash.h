@@ -25,6 +25,9 @@
 namespace fight {
 
 
+enum class Effects;
+
+
 class Trash : public Effect
 {
 public:

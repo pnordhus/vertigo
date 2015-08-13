@@ -57,7 +57,7 @@ bool Projectile::update(float elapsedTime)
     glm::vec3 pos, normal;
     if (m_scenario->surface().testCollision(m_position, newPos, m_billboard->collisionRadius(), pos, normal))
     {
-        m_scenario->effectManager().addEffect(Explosion_12, pos);
+        m_scenario->effectManager().addEffect(Effects::Explosion_12, pos);
         disable();
         return true;
     }
@@ -68,7 +68,7 @@ bool Projectile::update(float elapsedTime)
         if (activeObject)
             activeObject->destroy();
         else
-            m_scenario->effectManager().addEffect(Explosion_11, pos, qrand()%360);
+            m_scenario->effectManager().addEffect(Effects::Explosion_11, pos, qrand()%360);
         disable();
         return true;
     }
