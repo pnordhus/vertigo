@@ -19,6 +19,7 @@
 #include "hud.h"
 #include "fight/scenario.h"
 #include "fight/objects/navpoint.h"
+#include <glm/geometric.hpp>
 #include <glm/trigonometric.hpp>
 
 
@@ -43,9 +44,11 @@ void Heading::draw()
     m_head.draw(rect.pos(), util::RectF(offset, 0, m_rect.width, m_head.height()));
     m_point.draw(rect.x + rect.width/2 - (m_point.width() + 1)/2, rect.y + m_head.height() + 1);
 
-    if (m_hud->navPoint() >= 0 && (m_hud->scenario()->navPoints()[m_hud->navPoint()] != m_hud->scenario()->target().lockedNavPoint() || m_hud->scenario()->blink()))
+    if (m_hud->navPoint() >= 0)
     {
         glm::vec3 dir = m_hud->scenario()->position() - m_hud->scenario()->navPoints()[m_hud->navPoint()]->position();
+        if (glm::length(dir) <= 80.0f && m_hud->scenario()->blink())
+            return;
         int navOffset = 360 + static_cast<int>(glm::degrees(glm::atan(dir.x, dir.y))*2) - offset;
         if (navOffset < -360)
             navOffset += 720;

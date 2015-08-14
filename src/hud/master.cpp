@@ -34,7 +34,7 @@ Master::Master(HUD *hud, util::Rect rect) :
     m_edgeBR(hud->getImage("hudedgbr"), false),
     m_edgeTL(hud->getImage("hudedgtl"), false),
     m_edgeTR(hud->getImage("hudedgtr"), false),
-    m_arrowD(hud->getImage("hudarrd"), true),
+    m_arrowD(hud->getImage("hudarrd"), false),
     m_arrowL(hud->getImage("hudarrl"), false),
     m_arrowR(hud->getImage("hudarrr"), false),
     m_arrowU(hud->getImage("hudarru"), false),

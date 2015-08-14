@@ -125,7 +125,7 @@ void HUD::load(game::Boat *boat)
     Master *master = new Master(this, readRect(file));
     m_children.emplace_back(master);
 
-    Crosshair *crosshair = new Crosshair(this, m_center);
+    Crosshair *crosshair = new Crosshair(this, m_center, &master->clipRect());
     m_children.emplace_back(crosshair);
 }
 
@@ -220,11 +220,19 @@ void HUD::keyPressEvent(QKeyEvent *e)
         m_eventSuccess();
     if (e->key() == Qt::Key_N)
     {
-        m_navPoint++;
-        while (m_navPoint < m_scenario->navPoints().size() && !m_scenario->navPoints()[m_navPoint]->isEnabled())
+        if ((e->modifiers() & ~Qt::KeypadModifier) == Qt::ALT)
+        {
+            if (m_navPoint >= 0)
+                m_scenario->target().lockNavPoint(m_scenario->navPoints()[m_navPoint]);
+        }
+        else
+        {
             m_navPoint++;
-        if (m_navPoint >= m_scenario->navPoints().size())
-            m_navPoint = -1;
+            while (m_navPoint < m_scenario->navPoints().size() && !m_scenario->navPoints()[m_navPoint]->isEnabled())
+                m_navPoint++;
+            if (m_navPoint >= m_scenario->navPoints().size())
+                m_navPoint = -1;
+        }
     }
     if (e->key() == Qt::Key_L)
         m_scenario->target().lockReticle();
