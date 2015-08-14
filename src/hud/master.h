@@ -41,6 +41,7 @@ public:
 
 protected:
     void draw();
+    void drawPoint(const glm::vec4 &point4, const util::Rect &rect, bool isLocked, bool isFriend, bool isPassive);
 
 private:
     HUD *m_hud;
@@ -51,6 +52,11 @@ private:
     gfx::Texture m_edgeBR;
     gfx::Texture m_edgeTL;
     gfx::Texture m_edgeTR;
+
+    gfx::Texture m_arrowD;
+    gfx::Texture m_arrowL;
+    gfx::Texture m_arrowR;
+    gfx::Texture m_arrowU;
 
     gfx::Texture m_activeBlue;
     gfx::Texture m_activeGreen;

@@ -47,6 +47,7 @@ Scenario::Scenario(const QString &name) :
     m_effectManager(this),
     m_conditionManager(this),
     m_sonar(this),
+    m_target(this),
     m_speed(0),
     m_noise(0),
     m_time(0),

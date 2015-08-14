@@ -73,12 +73,15 @@ public:
     RectangleExclusive(const Rectangle<T> &base) : Rectangle<T>(base) { };
 
     template<typename P>
-    RectangleExclusive(const Rectangle<P> &base) : Rectangle<T>(base.pos(), base.size()) { };
+    RectangleExclusive(const Rectangle<P> &cast) : Rectangle<T>(cast.pos(), cast.size()) { };
 
 public:
 
     T right() const { return this->x + this->width - 1; }
     T bottom() const { return this->y + this->height - 1; }
+
+    bool contains(const glm::tvec2<T> &p) const { return contains(p.x, p.y); }
+    bool contains(T x, T y) const { return x >= this->x && y >= this->y && x < this->x + this->width && y < this->y + this->height; }
 };
 
 
@@ -94,12 +97,15 @@ public:
     RectangleInclusive(const Rectangle<T> &base) : Rectangle<T>(base) { };
 
     template<typename P>
-    RectangleInclusive(const Rectangle<P> &base) : Rectangle<T>(base.pos(), base.size()) { };
+    RectangleInclusive(const Rectangle<P> &cast) : Rectangle<T>(cast.pos(), cast.size()) { };
 
 public:
 
     T right() const { return this->x + this->width; }
     T bottom() const { return this->y + this->height; }
+
+    bool contains(const glm::tvec2<T> &p) const { return contains(p.x, p.y); }
+    bool contains(T x, T y) const { return x >= this->x && y >= this->y && x <= this->x + this->width && y <= this->y + this->height; }
 };
 
 

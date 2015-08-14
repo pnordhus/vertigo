@@ -46,10 +46,10 @@ public:
     game::Boat* boat() const { return m_boat; }
     fight::Scenario* scenario() const { return m_scenario; }
     int navPoint() const { return m_navPoint; }
-    fight::ActiveObject* locked() const { return m_locked; }
 
     bool wide() const { return m_wide; }
-    util::RectF rectHUD() const { return m_rectHUD; }
+    const util::RectF& rectHUD() const { return m_rectHUD; }
+    const util::Point& center() const { return m_center; }
     ui::Widget* widget() { return m_integerScale ? &m_integerScaleWidget : &m_noScaleWidget; }
     gfx::Image getImage(const QString &name);
     gfx::Font& fontGreen() { return m_fontGreen; }
@@ -58,14 +58,11 @@ public:
 
     const glm::mat4& hudProjectionMatrix() const { return m_integerScale ? m_integerScaleProjectionMatrix : m_noScaleProjectionMatrix; }
     const glm::mat4& hudProjectionMatrixInverted() const { return m_integerScale ? m_integerScaleProjectionMatrixInverted : m_noScaleProjectionMatrixInverted; }
-    glm::ivec2 project(const glm::ivec2 &point);
+    util::Point project(const util::Point &point);
     util::Rect projectCenter(const util::Rect &rect);
 
     void load(game::Boat *boat);
     void start(fight::Scenario *scenario);
-
-    void lockReset();
-    void lockReticle();
 
 protected:
     void setRect(const QRect &rect);
@@ -83,12 +80,11 @@ private:
     fight::Scenario *m_scenario;
     int m_lastTicks;
     int m_navPoint;
-    fight::ActiveObject *m_locked;
 
     bool m_wide;
     util::Rect m_rectGL;
     util::RectF m_rectHUD;
-    glm::ivec2 m_center;
+    util::Point m_center;
     bool m_integerScale;
     glm::mat4 m_integerScaleProjectionMatrix;
     glm::mat4 m_integerScaleProjectionMatrixInverted;

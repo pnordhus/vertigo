@@ -28,6 +28,8 @@ set(SOURCES
     fight/scenario.h
     fight/sonar.cpp
     fight/sonar.h
+    fight/target.cpp
+    fight/target.h
 
     fight/effects/billboard.cpp
     fight/effects/billboard.h

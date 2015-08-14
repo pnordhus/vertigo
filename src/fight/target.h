@@ -15,43 +15,39 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "activeobject.h"
-#include "fight/scenario.h"
-#include "sfx/samplemap.h"
+#ifndef FIGHT_TARGET_H
+#define FIGHT_TARGET_H
 
 
 namespace fight {
 
 
-ActiveObject::ActiveObject(Scenario *scenario) :
-    Object(scenario)
+class Scenario;
+class ActiveObject;
+class NavPoint;
+
+
+class Target
 {
+public:
+    Target(Scenario *scenario);
+
+public:
+    ActiveObject* locked() const { return m_locked; }
+    NavPoint* lockedNavPoint() const { return m_lockedNavPoint; }
+
+    void lockReset();
+    void lockReticle();
+    void lockNavPoint(NavPoint *navPoint);
+
+private:
+    Scenario *m_scenario;
+    ActiveObject *m_locked;
+    NavPoint *m_lockedNavPoint;
+};
+
+
 }
 
 
-ActiveObject::ActiveObject(Scenario *scenario, txt::DesFile &file, int iff, const QString &name, const QString &cargo) :
-    Object(scenario, file),
-    m_iff(iff),
-    m_name(name),
-    m_cargo(cargo)
-{
-    file.setSection("noise");
-    m_noise = file.value("level").toFloat();
-
-    file.setSection("defense");
-}
-
-
-void ActiveObject::destroy()
-{
-    disable();
-    m_eventDestroy.complete();
-    if (m_scenario->target().locked() == this)
-    {
-        m_scenario->target().lockReset();
-        sfx::SampleMap::get(sfx::Sample::TargetDestroyed).play();
-    }
-}
-
-
-} // namespace fight
+#endif // FIGHT_TARGET_H

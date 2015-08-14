@@ -33,6 +33,7 @@
 #include "collisionmanager.h"
 #include "modulemanager.h"
 #include "sonar.h"
+#include "target.h"
 
 
 namespace game { class Boat; }
@@ -64,6 +65,7 @@ public:
     const int noise() const { return m_noise; }
     const float time() const { return m_time; }
     const int buzzers() const { return m_buzzers; }
+    const bool blink() const { return static_cast<int>(m_time/500.0f)%2 == 0; }
 
     Surface& surface() { return m_surface; }
     gfx::TextureManager& textureManager() { return m_textureManager; }
@@ -73,6 +75,7 @@ public:
     ConditionManager& conditionManager() { return m_conditionManager; }
     std::vector<ConditionRadio*>& radio() { return m_radio; }
     Sonar& sonar() { return m_sonar; }
+    Target& target() { return m_target; }
 
     std::vector<std::unique_ptr<Object>>::const_iterator begin() const { return m_objects.cbegin(); }
     std::vector<std::unique_ptr<Object>>::const_iterator end() const { return m_objects.cend(); }
@@ -127,6 +130,7 @@ private:
     ConditionManager m_conditionManager;
     std::vector<ConditionRadio*> m_radio;
     Sonar m_sonar;
+    Target m_target;
 
     std::vector<std::unique_ptr<Object>> m_objects;
     std::vector<Object*> m_lightSources;

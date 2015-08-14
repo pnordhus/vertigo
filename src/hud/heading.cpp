@@ -43,7 +43,7 @@ void Heading::draw()
     m_head.draw(rect.pos(), util::RectF(offset, 0, m_rect.width, m_head.height()));
     m_point.draw(rect.x + rect.width/2 - (m_point.width() + 1)/2, rect.y + m_head.height() + 1);
 
-    if (m_hud->navPoint() >= 0)
+    if (m_hud->navPoint() >= 0 && (m_hud->scenario()->navPoints()[m_hud->navPoint()] != m_hud->scenario()->target().lockedNavPoint() || m_hud->scenario()->blink()))
     {
         glm::vec3 dir = m_hud->scenario()->position() - m_hud->scenario()->navPoints()[m_hud->navPoint()]->position();
         int navOffset = 360 + static_cast<int>(glm::degrees(glm::atan(dir.x, dir.y))*2) - offset;

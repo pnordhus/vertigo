@@ -117,6 +117,8 @@ void Sonar::update(float elapsedTime)
         ActiveObject *object = dynamic_cast<ActiveObject *>(object_ptr.get());
         if (!object || !object->isEnabled())
             continue;
+        if (!m_active && object->noise() <= 0.1f)
+            continue;
 
         float passiveRange = m_passiveRange + m_passiveRangeMult*object->noise();
         float activeRange = m_activeRange + m_activeRangeMult*object->noise();
