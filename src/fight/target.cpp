@@ -34,6 +34,16 @@ Target::Target(Scenario *scenario) :
 }
 
 
+glm::vec3 Target::position() const
+{
+    if (m_locked != nullptr)
+        return m_locked->center();
+    if (m_lockedNavPoint != nullptr)
+        return m_lockedNavPoint->position();
+    return glm::vec3(0);
+}
+
+
 void Target::lockReset()
 {
     m_locked = nullptr;

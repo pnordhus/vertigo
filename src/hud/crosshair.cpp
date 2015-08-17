@@ -40,9 +40,9 @@ void Crosshair::draw()
     m_targ.draw(p.x - (m_targ.width() + 1)/2, p.y - (m_targ.height() + 1)/2);
 
     fight::Target &target = m_hud->scenario()->target();
-    if (target.locked() != nullptr)
+    if (target.isLocked())
     {
-        glm::vec3 aimPoint = target.locked()->center();
+        glm::vec3 aimPoint = target.position();
 
         glm::mat4 m = m_hud->hudProjectionMatrixInverted() * m_hud->scenario()->projectionMatrix() * m_hud->scenario()->cameraMatrix();
         glm::vec4 point4 = m * glm::vec4(aimPoint - m_hud->scenario()->position(), 1);

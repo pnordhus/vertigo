@@ -21,6 +21,7 @@
 #include "fight/objects/navpoint.h"
 #include "fight/objects/activeobject.h"
 #include "sfx/samplemap.h"
+#include <glm/geometric.hpp>
 
 
 namespace hud {
@@ -155,6 +156,17 @@ void Master::drawPoint(const glm::vec4 &point4, const util::Rect &rect, bool isL
         else
             tex = isFriend ? &m_activeGreen : &m_activeRed;
         tex->draw(point.x - tex->width()/2, point.y - tex->height()/2, &m_clipRect);
+    }
+
+    if (isLocked && !isPassive)
+    {
+        fight::Target &target = m_hud->scenario()->target();
+        
+        float distance = glm::length(target.position() - m_hud->scenario()->position());
+        m_hud->fontGreen().draw(QString("%1M").arg(static_cast<int>(glm::round(distance))), util::Rect(point.x - 100, point.y + 26, 200, -1), true, false, &m_clipRect);
+        
+        if (target.locked() != nullptr)
+            m_hud->fontGreen().draw(target.locked()->name(), util::Rect(point.x - 100, point.y - 34, 200, -1), true, false, &m_clipRect);
     }
 }
 

@@ -19,6 +19,9 @@
 #define FIGHT_TARGET_H
 
 
+#include <glm/vec3.hpp>
+
+
 namespace fight {
 
 
@@ -33,6 +36,9 @@ public:
     Target(Scenario *scenario);
 
 public:
+    bool isLocked() const { return m_locked != nullptr || m_lockedNavPoint != nullptr; }
+    glm::vec3 position() const;
+
     ActiveObject* locked() const { return m_locked; }
     NavPoint* lockedNavPoint() const { return m_lockedNavPoint; }
 
