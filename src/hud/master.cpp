@@ -125,17 +125,17 @@ void Master::drawPoint(const glm::vec4 &point4, const util::Rect &rect, bool isL
         if (rect.contains(p))
         {
             if (p.x > center.x)
-                m_arrowR.draw(p.x - m_arrowR.width() + 1, p.y - m_arrowR.height()/2);
+                m_arrowR.draw(p.x - m_arrowR.width() + 1, p.y - (m_arrowR.height() + 1)/2);
             else
-                m_arrowL.draw(p.x, p.y - m_arrowL.height()/2);
+                m_arrowL.draw(p.x, p.y - (m_arrowL.height() + 1)/2);
         }
         else
         {
             p = center + util::Point(dim.y/dir.y*dir.x, dim.y);
             if (p.y > center.y)
-                m_arrowD.draw(p.x - m_arrowD.width()/2, p.y - m_arrowD.height() + 1);
+                m_arrowD.draw(p.x - (m_arrowD.width() + 1)/2, p.y - m_arrowD.height() + 1);
             else
-                m_arrowU.draw(p.x - m_arrowD.width()/2, p.y);
+                m_arrowU.draw(p.x - (m_arrowU.width() + 1)/2, p.y);
         }
     }
     if (point4.z > 0)

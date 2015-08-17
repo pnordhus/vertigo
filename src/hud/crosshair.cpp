@@ -66,7 +66,7 @@ void Crosshair::draw()
             if (!rect.contains(point))
                 point = center + util::Point(dim.y/dir.y*dir.x, dim.y);
         }
-        m_aim.draw(point.x - m_aim.width()/2, point.y - m_aim.height()/2, m_clipRect);
+        m_aim.draw(point.x - (m_aim.width() + 1)/2, point.y - (m_aim.height() + 1)/2, m_clipRect);
     }
 }
 
