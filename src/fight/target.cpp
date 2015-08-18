@@ -44,6 +44,16 @@ Vector3D Target::position() const
 }
 
 
+Object* Target::object() const
+{
+    if (m_locked != nullptr)
+        return m_locked;
+    if (m_lockedNavPoint != nullptr)
+        return m_lockedNavPoint;
+    return nullptr;
+}
+
+
 void Target::lockReset()
 {
     m_locked = nullptr;

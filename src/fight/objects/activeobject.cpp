@@ -33,10 +33,11 @@ ActiveObject::ActiveObject(Scenario *scenario, txt::DesFile &file, int iff, cons
     Object(scenario, file),
     m_iff(iff),
     m_name(name),
-    m_cargo(cargo)
+    m_cargo(cargo),
+    m_identified(false)
 {
     file.setSection("noise");
-    m_noise = file.value("level").toFloat();
+    m_noise = file.value("level").toFloat() + 1;
 
     file.setSection("defense");
 }
@@ -51,6 +52,13 @@ void ActiveObject::destroy()
         m_scenario->target().lockReset();
         sfx::SampleMap::get(sfx::Sample::TargetDestroyed).play();
     }
+}
+
+
+void ActiveObject::identify()
+{
+    m_eventIdentify.complete();
+    sfx::SampleMap::get(sfx::Sample::TargetIdentified).play();
 }
 
 

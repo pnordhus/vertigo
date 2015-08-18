@@ -46,9 +46,13 @@ public:
     const QString& name() const { return m_name; }
     const QString& cargo() const { return m_cargo; }
     float noise() const { return m_noise; }
+    bool isIdentified() const { return m_eventIdentify.isCompleted(); }
+
+    const Vector3D& velocity() const { return m_velocity; }
 
 public:
     virtual void destroy();
+    void identify();
 
 protected:
     ConditionEvent m_eventDestroy;
@@ -62,6 +66,9 @@ protected:
     QString m_name;
     QString m_cargo;
     float m_noise;
+    bool m_identified;
+
+    Vector3D m_velocity;
 };
 
 

@@ -40,38 +40,54 @@ void Sonar::init(int sensor)
     if (sensor == 6145)
     {
         m_delay = 12000;
-        m_passiveRange = 180.0f;
+        m_passiveRange = 160.0f;
         m_passiveRangeMult = 20.0f;
-        m_activeRange = 180.0f;
+        m_activeRange = 160.0f;
         m_activeRangeMult = 20.0f;
         m_iff = false;
+        m_detectArmor = false;
+        m_detectRange = false;
+        m_detectWeapons = false;
+        m_detectActivity = false;
     }
     if (sensor == 6146)
     {
         m_delay = 10000;
-        m_passiveRange = 200.0f;
+        m_passiveRange = 180.0f;
         m_passiveRangeMult = 30.0f;
-        m_activeRange = 180.0f;
+        m_activeRange = 160.0f;
         m_activeRangeMult = 20.0f;
         m_iff = true;
+        m_detectArmor = true;
+        m_detectRange = true;
+        m_detectWeapons = false;
+        m_detectActivity = false;
     }
     if (sensor == 6147)
     {
         m_delay = 8000;
-        m_passiveRange = 220.0f;
+        m_passiveRange = 200.0f;
         m_passiveRangeMult = 40.0f;
-        m_activeRange = 180.0f;
+        m_activeRange = 160.0f;
         m_activeRangeMult = 20.0f;
         m_iff = true;
+        m_detectArmor = true;
+        m_detectRange = true;
+        m_detectWeapons = true;
+        m_detectActivity = true;
     }
     if (sensor == 6148)
     {
         m_delay = 6000;
-        m_passiveRange = 240.0f;
+        m_passiveRange = 220.0f;
         m_passiveRangeMult = 50.0f;
-        m_activeRange = 180.0f;
+        m_activeRange = 160.0f;
         m_activeRangeMult = 20.0f;
         m_iff = true;
+        m_detectArmor = true;
+        m_detectRange = true;
+        m_detectWeapons = true;
+        m_detectActivity = true;
     }
 }
 
@@ -126,6 +142,8 @@ void Sonar::update(float elapsedTime)
         float dist = glm::length(dir);
         if (dist > passiveRange && (dist > activeRange || !m_active))
             continue;
+        if (m_scenario->target().locked() == object && !object->isIdentified() && dist <= 35.0f)
+            object->identify();
 
         m_sonarEntries.emplace_back();
         SonarEntry &entry = m_sonarEntries.back();

@@ -52,6 +52,12 @@ public:
     void toggle();
     const bool isActive() { return m_active; }
     const bool isActivating() { return m_activatingDelay > 0; }
+    const bool detectArmor() { return m_detectArmor; }
+    const bool detectRange() { return m_detectRange; }
+    const bool detectWeapons() { return m_detectWeapons; }
+    const bool detectActivity() { return m_detectActivity; }
+
+public:
     void update(float elapsedTime);
 
 private:
@@ -62,6 +68,10 @@ private:
     float m_activeRange;
     float m_activeRangeMult;
     bool m_iff;
+    bool m_detectArmor;
+    bool m_detectRange;
+    bool m_detectWeapons;
+    bool m_detectActivity;
 
     bool m_active;
     float m_activatingDelay;

@@ -37,6 +37,7 @@
 #include "shield.h"
 #include "activesonar.h"
 #include "master.h"
+#include "mastermonitor.h"
 
 
 namespace hud {
@@ -118,6 +119,10 @@ void HUD::load(game::Boat *boat)
     file.setSection("hudenergybar");
     EnergyBar *energyBar = new EnergyBar(this, readRect(file));
     m_children.emplace_back(energyBar);
+
+    file.setSection("mastermonitor");
+    MasterMonitor *masterMonitor = new MasterMonitor(this, readRect(file), Rect(file.value("ObservationX1").toInt(), file.value("ObservationY1").toInt(), file.value("ObservationWidth").toInt(), file.value("ObservationHeight").toInt()));
+    m_children.emplace_back(masterMonitor);
 
     m_integerScale = false;
 

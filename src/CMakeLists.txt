@@ -155,6 +155,8 @@ set(SOURCES
     hud/activesonar.h
     hud/master.cpp
     hud/master.h
+    hud/mastermonitor.cpp
+    hud/mastermonitor.h
 
     sfx/sound.cpp
     sfx/sound.h

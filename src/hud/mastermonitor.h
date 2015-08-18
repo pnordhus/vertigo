@@ -15,47 +15,38 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef FIGHT_TARGET_H
-#define FIGHT_TARGET_H
+#ifndef HUD_MASTERMONITOR_H
+#define HUD_MASTERMONITOR_H
 
 
-#include "util/geometry3d.h"
+#include "util/geometry2d.h"
+#include "ui/widget.h"
 
 
-namespace fight {
+namespace hud {
 
 
-class Scenario;
-class Object;
-class ActiveObject;
-class NavPoint;
+class HUD;
 
 
-class Target
+class MasterMonitor : public ui::Widget
 {
 public:
-    Target(Scenario *scenario);
+    MasterMonitor(HUD *hud, Rect rect, Rect observationRect);
 
 public:
-    bool isLocked() const { return m_locked != nullptr || m_lockedNavPoint != nullptr; }
-    Vector3D position() const;
-    Object* object() const;
 
-    ActiveObject* locked() const { return m_locked; }
-    NavPoint* lockedNavPoint() const { return m_lockedNavPoint; }
-
-    void lockReset();
-    void lockReticle();
-    void lockNavPoint(NavPoint *navPoint);
+protected:
+    void draw();
 
 private:
-    Scenario *m_scenario;
-    ActiveObject *m_locked;
-    NavPoint *m_lockedNavPoint;
+    HUD *m_hud;
+    Rect m_rect;
+    Rect m_observationRect;
 };
 
 
-}
+} // namespace hud
 
 
-#endif // FIGHT_TARGET_H
+#endif // HUD_MASTERMONITOR_H
