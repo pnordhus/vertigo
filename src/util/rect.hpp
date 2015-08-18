@@ -20,6 +20,7 @@
 
 #include <glm/vec2.hpp>
 #include <glm/common.hpp>
+#include "size.hpp"
 
 
 namespace util {
@@ -29,9 +30,10 @@ template<typename T>
 class Rectangle
 {
 public:
-    Rectangle() : /*x(0), y(0),*/ width(0), height(0) { };
-    Rectangle(T x, T y, T width, T height) : /*x(x), y(y),*/ posTest(x, y), width(width), height(height) { };
-    Rectangle(const glm::tvec2<T> &pos, const glm::tvec2<T> &size) : x(pos.x), y(pos.y), width(size.x), height(size.y) { };
+    Rectangle() /*: x(0), y(0), width(0), height(0)*/ { };
+    Rectangle(T x, T y, T width, T height) : /*x(x), y(y),*/ posTest(x, y), /*width(width), height(height)*/ sizeTest(width, height) { };
+    //Rectangle(const glm::tvec2<T> &pos, const glm::tvec2<T> &size) : x(pos.x), y(pos.y), width(size.x), height(size.y) { };
+    Rectangle(const glm::tvec2<T> &pos, const Size2D<T> &size) : x(pos.x), y(pos.y), width(size.width), height(size.height) { };
 
 public:
     T left() const { return x; }
@@ -39,9 +41,9 @@ public:
     glm::tvec2<T> center() const { return glm::tvec2<T>(x + width/2, y + height/2); }
 
     glm::tvec2<T> pos() const { return glm::tvec2<T>(x, y); }
-    glm::tvec2<T> size() const { return glm::tvec2<T>(width, height); }
+    Size2D<T> size() const { return Size2D<T>(width, height); }
     void setPos(const glm::tvec2<T> &pos) { x = pos.x; y = pos.y; }
-    void setSize(const glm::tvec2<T> &size) { width = size.x; height = size.y; }
+    void setSize(const Size2D<T> &size) { width = size.x; height = size.y; }
 
 public:
     union
@@ -56,8 +58,18 @@ public:
             T y;
         };
     };
-    T width;
-    T height;
+    union
+    {
+        struct
+        {
+           Size2D<T> sizeTest;
+        };
+        struct
+        {
+            T width;
+            T height;
+        };
+    };
 };
 
 
@@ -68,7 +80,7 @@ public:
     //using Rectangle<T>::Rectangle<T>;
     RectangleExclusive() = default;
     RectangleExclusive(T x, T y, T width, T height) : Rectangle<T>(x, y, width, height) { };
-    RectangleExclusive(const glm::tvec2<T> &pos, const glm::tvec2<T> &size) : Rectangle<T>(pos, size) { };
+    RectangleExclusive(const glm::tvec2<T> &pos, const Size2D<T> &size) : Rectangle<T>(pos, size) { };
 
     RectangleExclusive(const Rectangle<T> &base) : Rectangle<T>(base) { };
 
@@ -92,7 +104,7 @@ public:
     //using Rectangle<T>::Rectangle<T>;
     RectangleInclusive() = default;
     RectangleInclusive(T x, T y, T width, T height) : Rectangle<T>(x, y, width, height) { };
-    RectangleInclusive(const glm::tvec2<T> &pos, const glm::tvec2<T> &size) : Rectangle<T>(pos, size) { };
+    RectangleInclusive(const glm::tvec2<T> &pos, const Size2D<T> &size) : Rectangle<T>(pos, size) { };
 
     RectangleInclusive(const Rectangle<T> &base) : Rectangle<T>(base) { };
 
@@ -114,19 +126,6 @@ inline R roundRect(const R &rect)
 {
     return R(glm::round(rect.pos()), glm::round(rect.size()));
 }
-
-
-typedef RectangleExclusive<int> Rect;
-
-typedef RectangleInclusive<float> RectF;
-
-typedef glm::ivec2 Point;
-
-typedef glm::vec2 PointF;
-
-typedef glm::ivec2 Size;
-
-typedef glm::vec2 SizeF;
 
 
 } // namespace util

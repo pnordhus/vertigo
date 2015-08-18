@@ -52,9 +52,9 @@ HUD::HUD() :
 }
 
 
-util::Rect HUD::readRect(const txt::DesFile &file)
+Rect HUD::readRect(const txt::DesFile &file)
 {
-    return util::Rect(file.value("X1").toInt(), file.value("Y1").toInt(), file.value("Width").toInt(), file.value("Height").toInt());
+    return Rect(file.value("X1").toInt(), file.value("Y1").toInt(), file.value("Width").toInt(), file.value("Height").toInt());
 }
 
 
@@ -90,7 +90,7 @@ void HUD::load(game::Boat *boat)
     m_children.emplace_back(activeSonar);
 
     file.setSection("radiomessage");
-    RadioMessage *radioMessage = new RadioMessage(this, util::Rect(file.value("X").toInt(), file.value("Y").toInt(), 640 - file.value("X").toInt()*2, 12));
+    RadioMessage *radioMessage = new RadioMessage(this, Rect(file.value("X").toInt(), file.value("Y").toInt(), 640 - file.value("X").toInt()*2, 12));
     m_children.emplace_back(radioMessage);
 
     m_integerScale = true;
@@ -145,17 +145,17 @@ void HUD::setRect(const QRect &rect)
     if (m_rectGL.width == rect.width() && m_rectGL.height == rect.height())
         return;
 
-    m_rectGL = util::Rect(rect.x(), rect.y(), rect.width(), rect.height());
+    m_rectGL = Rect(rect.x(), rect.y(), rect.width(), rect.height());
     Renderer::setRect(rect);
 
     if (m_wide)
-        m_rectHUD = util::RectF(rect.x(), rect.y() - rectOrtho().y()/rectOrtho().height()*rect.height(), rect.width(), rect.height()*480/rectOrtho().height());
+        m_rectHUD = RectF(rect.x(), rect.y() - rectOrtho().y()/rectOrtho().height()*rect.height(), rect.width(), rect.height()*480/rectOrtho().height());
     else
-        m_rectHUD = util::RectF(rect.x() - rectOrtho().x()/rectOrtho().width()*rect.width(), rect.y() - rectOrtho().y()/rectOrtho().height()*rect.height(), rect.width()*640/rectOrtho().width(), rect.height()*480/rectOrtho().height());
+        m_rectHUD = RectF(rect.x() - rectOrtho().x()/rectOrtho().width()*rect.width(), rect.y() - rectOrtho().y()/rectOrtho().height()*rect.height(), rect.width()*640/rectOrtho().width(), rect.height()*480/rectOrtho().height());
     Renderer::setRect(QRect(glm::round(m_rectHUD.x), glm::round(m_rectHUD.y), glm::round(m_rectHUD.width), glm::round(m_rectHUD.height)));
 
     if (m_scenario)
-        m_scenario->setRect(m_rectHUD, glm::vec2(m_projectionMatrix * glm::vec4(m_center, 0, 1)));
+        m_scenario->setRect(m_rectHUD, Vector2D(m_projectionMatrix * Vector4D(m_center, 0, 1)));
 
     int w = 640;
     int h = 480;
@@ -171,15 +171,15 @@ void HUD::setRect(const QRect &rect)
 }
 
 
-util::Point HUD::project(const util::Point &point)
+Point HUD::project(const Point &point)
 {
-    return glm::ivec2(glm::round(hudProjectionMatrixInverted() * (m_projectionMatrix * glm::vec4(point, 0, 1))));
+    return glm::ivec2(glm::round(hudProjectionMatrixInverted() * (m_projectionMatrix * Vector4D(point, 0, 1))));
 }
 
 
-util::Rect HUD::projectCenter(const util::Rect &rect)
+Rect HUD::projectCenter(const Rect &rect)
 {
-    return util::Rect(project(rect.center()) - glm::ivec2(rect.width/2, rect.height/2), rect.size());
+    return Rect(project(rect.center()) - glm::ivec2(rect.width/2, rect.height/2), rect.size());
 }
 
 

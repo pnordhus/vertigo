@@ -31,10 +31,10 @@ enum class Effects;
 class Trash : public Effect
 {
 public:
-    Trash(Scenario *scenario, Billboard *billboard, const glm::vec3 &position);
+    Trash(Scenario *scenario, Billboard *billboard, const Vector3D &position);
 
 public:
-    bool intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal);
+    bool intersect(const Vector3D &start, const Vector3D &dir, float radius, float &distance, Vector3D &normal);
     void destroy();
 
 public:

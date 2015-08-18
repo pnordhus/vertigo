@@ -32,13 +32,13 @@ public:
     Projectile(Scenario *scenario, Billboard *billboard);
 
 public:
-    void setPosition(const glm::vec3 &pos);
-    void setDirection(const glm::vec3 &direction);
+    void setPosition(const Vector3D &pos);
+    void setDirection(const Vector3D &direction);
     bool update(float elapsedTime);
 
 private:
-    glm::vec3 m_originPos;
-    glm::vec3 m_direction;
+    Vector3D m_originPos;
+    Vector3D m_direction;
     CollisionCache m_collisionCache;
 };
 

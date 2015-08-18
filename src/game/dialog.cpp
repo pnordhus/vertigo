@@ -270,7 +270,7 @@ void Dialog::draw()
     const Option *lastOption = m_option;
     m_option = NULL;
 
-    gfx::Font(gfx::Font::DialogTop).draw(m_strings[entry.text], util::Rect(0, 0, width(), 36), false, true);
+    gfx::Font(gfx::Font::DialogTop).draw(m_strings[entry.text], Rect(0, 0, width(), 36), false, true);
 
     int y = 57;
     if (m_optionIndex == 0) {
@@ -297,11 +297,11 @@ int Dialog::drawOption(int y, const Option* option)
         m_finished = true;
     }
 
-    util::Rect rectTmp = gfx::Font(gfx::Font::DialogBottom).draw(text, util::Rect(0, y, width(), -1), false, false);
+    Rect rectTmp = gfx::Font(gfx::Font::DialogBottom).draw(text, Rect(0, y, width(), -1), false, false);
     QRect rect(rectTmp.x, rectTmp.y, rectTmp.width, rectTmp.height);
     rect.setWidth(width());
     if (mapToGlobal(rect).contains(m_mousePos)) {
-        gfx::Font(gfx::Font::DialogHighlight).draw(text, util::Rect(0, y, width(), -1), false, false);
+        gfx::Font(gfx::Font::DialogHighlight).draw(text, Rect(0, y, width(), -1), false, false);
         m_rect = rect;
         m_option = option;
     }

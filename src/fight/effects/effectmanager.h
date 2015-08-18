@@ -22,7 +22,7 @@
 #include <map>
 #include <list>
 #include <memory>
-#include <glm/vec3.hpp>
+#include "util/geometry3d.h"
 
 
 namespace fight {
@@ -43,8 +43,8 @@ public:
 public:
     Billboard* getBillboard(Effects effect);
 
-    Effect* addEffect(Effects effect, const glm::vec3 &position, float angle = 0, float scale = 1);
-    Projectile* addProjectile(Effects projectile, const glm::vec3 &position, const glm::vec3 &direction);
+    Effect* addEffect(Effects effect, const Vector3D &position, float angle = 0, float scale = 1);
+    Projectile* addProjectile(Effects projectile, const Vector3D &position, const Vector3D &direction);
 
     void update(float elapsedTime);
     void draw();

@@ -75,12 +75,12 @@ void Turret::draw()
 }
 
 
-bool Turret::intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal)
+bool Turret::intersect(const Vector3D &start, const Vector3D &dir, float radius, float &distance, Vector3D &normal)
 {
     bool collision = m_body->intersect(start - m_position, dir, radius, distance, normal);
 
     float d;
-    glm::vec3 norm;
+    Vector3D norm;
     if (m_armLeft != nullptr && m_armLeft->intersect(start - m_position - m_armLeftPosition, dir, radius, d, norm))
     {
         if (!collision || distance > d)

@@ -22,7 +22,7 @@
 namespace hud {
 
 
-Shield::Shield(HUD *hud, util::Rect rect) :
+Shield::Shield(HUD *hud, Rect rect) :
     ui::Widget(hud->widget()),
     m_hud(hud),
     m_rect(rect)
@@ -34,7 +34,7 @@ Shield::Shield(HUD *hud, util::Rect rect) :
 
 void Shield::draw()
 {
-    util::Rect rect = m_hud->projectCenter(m_rect);
+    Rect rect = m_hud->projectCenter(m_rect);
     m_shield[0].draw(rect.x + 3, rect.y + 3);
 
     // FRONT

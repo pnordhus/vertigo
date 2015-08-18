@@ -26,7 +26,7 @@
 namespace hud {
 
 
-DigiBlock::DigiBlock(HUD *hud, util::Rect rect) :
+DigiBlock::DigiBlock(HUD *hud, Rect rect) :
     ui::Widget(hud->widget()),
     m_hud(hud),
     m_rect(rect)

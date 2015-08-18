@@ -77,7 +77,7 @@ void Tesselator::InitIndices(int MaxLevel)
 }
 
 
-void Tesselator::PrepareElementSubset(Element &element, int level, const glm::vec3 &scale, int x, int y, int textureId, const glm::vec2 &t0, const glm::vec2 &tu, const glm::vec2 &tv)
+void Tesselator::PrepareElementSubset(Element &element, int level, const Vector3D &scale, int x, int y, int textureId, const Vector2D &t0, const Vector2D &tu, const Vector2D &tv)
 {
 	int i, j, k, l;
 
@@ -85,14 +85,14 @@ void Tesselator::PrepareElementSubset(Element &element, int level, const glm::ve
 
     BetaSpline &spline = m_splines[level];
 	spline.InitFrame(x, y);
-	glm::vec3 trans(x, y, 0);
+	Vector3D trans(x, y, 0);
 
 	float dt = 1.0f/(2*(level - 1));
 	int u = level - 1;
 	int v = level - 1;
 
-	glm::vec3 o = spline.Beta_3_3(u, v);
-	glm::vec3 t, b;
+	Vector3D o = spline.Beta_3_3(u, v);
+	Vector3D t, b;
 	spline.Beta_TB(u, v, t, b);
     element.addVertex(textureId, (o + trans)*scale, glm::cross(t, b), t0 + tu*(u*dt) + tv*(v*dt));
     float z = o.z;
@@ -124,7 +124,7 @@ void Tesselator::PrepareElementSubset(Element &element, int level, const glm::ve
 }
 
 
-float Tesselator::heightAt(const glm::vec2 &pos)
+float Tesselator::heightAt(const Vector2D &pos)
 {
     const int x = pos.x;
     const int y = pos.y;
@@ -138,7 +138,7 @@ float Tesselator::heightAt(const glm::vec2 &pos)
 }
 
 
-float Tesselator::heightAt(const glm::vec2 &pos, glm::vec3 &normal)
+float Tesselator::heightAt(const Vector2D &pos, Vector3D &normal)
 {
     const int x = pos.x;
     const int y = pos.y;
@@ -153,7 +153,7 @@ float Tesselator::heightAt(const glm::vec2 &pos, glm::vec3 &normal)
 }
 
 
-bool Tesselator::intersect(const glm::vec3 &start, const glm::vec3 &end, float radius, glm::vec3 &position, glm::vec3 &normal)
+bool Tesselator::intersect(const Vector3D &start, const Vector3D &end, float radius, Vector3D &position, Vector3D &normal)
 {
     BetaSpline &spline = m_splines[2];
 
@@ -164,7 +164,7 @@ bool Tesselator::intersect(const glm::vec3 &start, const glm::vec3 &end, float r
     float dy = start.y - y;
 
     float z = spline.Beta_3_3(dx, dy).z;
-    position = glm::vec3(start.x, start.y, z + radius + 1e-5);
+    position = Vector3D(start.x, start.y, z + radius + 1e-5);
     if (z > start.z - radius)
     {
         normal = spline.Beta_norm(dx, dy);
@@ -184,9 +184,9 @@ bool Tesselator::intersect(const glm::vec3 &start, const glm::vec3 &end, float r
     if (z <= end.z - radius)
         return false;
 
-    glm::vec3 l = start;
-    glm::vec3 r = end;
-    glm::vec3 m;
+    Vector3D l = start;
+    Vector3D r = end;
+    Vector3D m;
     while (glm::distance2(l, r) > 0.01f)
     {
         m = glm::mix(l, r, 0.5f);
@@ -213,7 +213,7 @@ bool Tesselator::intersect(const glm::vec3 &start, const glm::vec3 &end, float r
 }
 
 
-void Tesselator::tesselate(Element &element, int level, const glm::vec3 &scale, QByteArray &textureMap, QByteArray &textureDir, int mapping)
+void Tesselator::tesselate(Element &element, int level, const Vector3D &scale, QByteArray &textureMap, QByteArray &textureDir, int mapping)
 {
     for (int y = element.rect().top(); y <= element.rect().bottom(); y++) {
         for (int x = element.rect().left(); x <= element.rect().right(); x++) {
@@ -251,7 +251,7 @@ void Tesselator::tesselate(Element &element, int level, const glm::vec3 &scale, 
             const bool flip = !(d & 0x04);
 
             const float margin = 0.002f;
-            std::deque<glm::vec2> texCoords;
+            std::deque<Vector2D> texCoords;
             texCoords.emplace_back(0.5f + subTextureX - margin, 0.0f + subTextureY + margin);
             texCoords.emplace_back(0.0f + subTextureX + margin, 0.0f + subTextureY + margin);
             texCoords.emplace_back(0.0f + subTextureX + margin, 0.5f + subTextureY - margin);

@@ -20,9 +20,7 @@
 
 
 #include <vector>
-#include <glm/vec2.hpp>
-#include <glm/vec3.hpp>
-#include <glm/mat4x4.hpp>
+#include "util/geometry3d.h"
 #include "gfx/texture.h"
 
 
@@ -42,10 +40,10 @@ public:
     Billboard(gfx::TextureManager &texMan, txt::DesFile &name, int index);
 
 public:
-    void draw(const glm::vec3 &position, float angle, float scale, int time, const glm::mat4 &cameraMatrixInverted);
+    void draw(const Vector3D &position, float angle, float scale, int time, const Matrix &cameraMatrixInverted);
 
     BoundingBox box();
-    bool intersect(const glm::vec3 &start, const glm::vec3 &dir, float &distance);
+    bool intersect(const Vector3D &start, const Vector3D &dir, float &distance);
     
     int duration() const { return m_stages.size()*m_displayTime; }
     float range() const { return m_range; }
@@ -60,9 +58,9 @@ private:
     struct Stage
     {
         gfx::Texture texture;
-        glm::vec2 texCoords[4];
-        glm::vec2 scale;
-        glm::vec2 offset;
+        Vector2D texCoords[4];
+        Vector2D scale;
+        Vector2D offset;
     };
 
     int m_displayTime;

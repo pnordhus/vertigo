@@ -19,7 +19,7 @@
 #define HUD_ACTIVESONAR_H
 
 
-#include "util/rect.hpp"
+#include "util/geometry2d.h"
 #include "ui/widget.h"
 #include "gfx/texture.h"
 
@@ -33,14 +33,14 @@ class HUD;
 class ActiveSonar : public ui::Widget
 {
 public:
-    ActiveSonar(HUD *hud, util::Rect rect);
+    ActiveSonar(HUD *hud, Rect rect);
 
 protected:
     void draw();
 
 private:
     HUD *m_hud;
-    util::Rect m_rect;
+    Rect m_rect;
     gfx::Texture m_actBo;
     gfx::Texture m_actOu;
 };

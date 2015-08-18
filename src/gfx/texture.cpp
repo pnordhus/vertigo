@@ -148,10 +148,10 @@ void TexturePrivate::bind()
 }
 
 
-util::RectF TexturePrivate::draw(const util::RectF &dstRect, const util::RectF &srcRect, const ClipRect *clipRect)
+RectF TexturePrivate::draw(const RectF &dstRect, const RectF &srcRect, const ClipRect *clipRect)
 {
-    util::RectF dst = dstRect;
-    util::RectF src(srcRect.x/m_textureWidth, srcRect.y/m_textureHeight, srcRect.width/m_textureWidth, srcRect.height/m_textureHeight);
+    RectF dst = dstRect;
+    RectF src(srcRect.x/m_textureWidth, srcRect.y/m_textureHeight, srcRect.width/m_textureWidth, srcRect.height/m_textureHeight);
 
     if (clipRect == nullptr || clipRect->clip(dst, src))
     {

@@ -29,13 +29,13 @@ Projectile::Projectile(Scenario *scenario, Billboard *billboard) :
 }
 
 
-void Projectile::setPosition(const glm::vec3 &pos)
+void Projectile::setPosition(const Vector3D &pos)
 {
     m_originPos = pos;
     Object::setPosition(pos);
 }
 
-void Projectile::setDirection(const glm::vec3 &direction)
+void Projectile::setDirection(const Vector3D &direction)
 {
     m_direction = direction;
 }
@@ -52,9 +52,9 @@ bool Projectile::update(float elapsedTime)
         return true;
     }
 
-    glm::vec3 newPos = m_originPos + m_direction*(m_elapsedTime*m_billboard->velocity()/1000);
+    Vector3D newPos = m_originPos + m_direction*(m_elapsedTime*m_billboard->velocity()/1000);
 
-    glm::vec3 pos, normal;
+    Vector3D pos, normal;
     if (m_scenario->surface().testCollision(m_position, newPos, m_billboard->collisionRadius(), pos, normal))
     {
         m_scenario->effectManager().addEffect(Effects::Explosion_12, pos);

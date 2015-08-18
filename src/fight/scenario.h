@@ -22,8 +22,8 @@
 #include <QDebug>
 #include <QKeyEvent>
 #include <functional>
-#include <glm/mat4x4.hpp>
-#include "util/rect.hpp"
+#include "util/geometry2d.h"
+#include "util/geometry3d.h"
 #include "util/deferreddeletable.h"
 #include "gfx/texturemanager.h"
 #include "txt/desfile.h"
@@ -52,11 +52,11 @@ public:
     Scenario(const QString &name);
 
 public:
-    const glm::mat4& projectionMatrix() const { return m_projectionMatrix; }
-    const glm::mat4& projectionMatrixInverted() const { return m_projectionMatrixInverted; }
-    const glm::mat4& cameraMatrix() const { return m_cameraMatrix; }
-    const glm::mat4& cameraMatrixInverted() const { return m_cameraMatrixInverted; }
-    const glm::vec3& position() const { return m_position; }
+    const Matrix& projectionMatrix() const { return m_projectionMatrix; }
+    const Matrix& projectionMatrixInverted() const { return m_projectionMatrixInverted; }
+    const Matrix& cameraMatrix() const { return m_cameraMatrix; }
+    const Matrix& cameraMatrixInverted() const { return m_cameraMatrixInverted; }
+    const Vector3D& position() const { return m_position; }
     const float yaw() const { return m_yaw; }
     const float pitch() const { return m_pitch; }
     const float height() const { return m_height; }
@@ -84,14 +84,14 @@ public:
 
 public:
     void setBoat(const game::Boat *boat);
-    void setRect(const util::RectF &rect, const glm::vec2 &center);
+    void setRect(const RectF &rect, const Vector2D &center);
     void update(float elapsedTime);
     void draw();
     void keyPressEvent(QKeyEvent *);
     void keyReleaseEvent(QKeyEvent *);
 
 private:
-    glm::vec3 getPosition();
+    Vector3D getPosition();
 
 private:
     enum Type
@@ -111,7 +111,7 @@ private:
         TypeActiveBuilding = 2062,
     };
 
-    glm::vec3 m_position;
+    Vector3D m_position;
     float m_yaw;
     float m_pitch;
     float m_height;
@@ -148,10 +148,10 @@ private:
     float m_backwards;
     float m_inverseUpDown;
 
-    glm::mat4 m_projectionMatrix;
-    glm::mat4 m_projectionMatrixInverted;
-    glm::mat4 m_cameraMatrix;
-    glm::mat4 m_cameraMatrixInverted;
+    Matrix m_projectionMatrix;
+    Matrix m_projectionMatrixInverted;
+    Matrix m_cameraMatrix;
+    Matrix m_cameraMatrixInverted;
 };
 
 

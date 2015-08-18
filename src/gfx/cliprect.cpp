@@ -16,7 +16,6 @@
  ***************************************************************************/
 
 #include "cliprect.h"
-#include <QRectF>
 
 
 namespace gfx {
@@ -27,14 +26,14 @@ ClipRect::ClipRect()
 }
 
 
-bool ClipRect::clip(util::RectF &dstRect, util::RectF &srcRect) const
+bool ClipRect::clip(RectF &dstRect, RectF &srcRect) const
 {
     if (dstRect.right() <= m_rect.left() || dstRect.left() >= m_rect.right())
         return false;
     if (dstRect.bottom() <= m_rect.top() || dstRect.top() >= m_rect.bottom())
         return false;
-    util::RectF dst = dstRect;
-    util::RectF src = srcRect;
+    RectF dst = dstRect;
+    RectF src = srcRect;
 
     float clipLeft = m_rect.left() - dstRect.left();
     if (clipLeft > 0)

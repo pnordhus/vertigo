@@ -33,7 +33,7 @@ TurretBase::TurretBase(Scenario *scenario, txt::DesFile &file, int iff, const QS
     {
         txt::DesFile gunDes(QString("vfx:sobjects/%1.des").arg(file.value("name").toString()));
         m_body.reset(new Turret(scenario, gunDes)); // TODO: TurretGun
-        m_body->setPosition(glm::vec3(file.value("RelativePositionX").toFloat(), file.value("RelativePositionY").toFloat(), file.value("RelativePositionZ").toFloat()));
+        m_body->setPosition(Vector3D(file.value("RelativePositionX").toFloat(), file.value("RelativePositionY").toFloat(), file.value("RelativePositionZ").toFloat()));
         m_box.add(m_body->box().scale(m_scale));
     }
     file.setSection("torpedoturret");
@@ -41,7 +41,7 @@ TurretBase::TurretBase(Scenario *scenario, txt::DesFile &file, int iff, const QS
     {
         txt::DesFile torpedoDes(QString("vfx:sobjects/%1.des").arg(file.value("name").toString()));
         m_body.reset(new Turret(scenario, torpedoDes)); // TODO: TurretTorpedo
-        m_body->setPosition(glm::vec3(file.value("RelativePositionX").toFloat(), file.value("RelativePositionY").toFloat(), file.value("RelativePositionZ").toFloat()));
+        m_body->setPosition(Vector3D(file.value("RelativePositionX").toFloat(), file.value("RelativePositionY").toFloat(), file.value("RelativePositionZ").toFloat()));
         m_box.add(m_body->box().scale(m_scale));
     }
 }
@@ -58,14 +58,14 @@ void TurretBase::draw()
 }
 
 
-bool TurretBase::intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal)
+bool TurretBase::intersect(const Vector3D &start, const Vector3D &dir, float radius, float &distance, Vector3D &normal)
 {
     bool collision = m_base->intersect((start - m_position)/m_scale, dir, radius/m_scale, distance, normal);
     if (collision)
         distance *= m_scale;
 
     float d;
-    glm::vec3 norm;
+    Vector3D norm;
     if (m_body->intersect((start - m_position)/m_scale, dir, radius/m_scale, d, norm))
     {
         d *= m_scale;

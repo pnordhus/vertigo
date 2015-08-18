@@ -66,7 +66,7 @@ void Label::draw()
     if (m_text.isEmpty())
         m_drawRect = util::roundRect(m_texture.draw());
     else
-        m_drawRect = m_font.draw(m_text, util::Rect(0, 0, width(), height()), m_alignment & AlignHCenter, m_alignment & AlignBottom);
+        m_drawRect = m_font.draw(m_text, Rect(0, 0, width(), height()), m_alignment & AlignHCenter, m_alignment & AlignBottom);
 }
 
 

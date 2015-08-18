@@ -23,7 +23,7 @@
 namespace hud {
 
 
-ActiveSonar::ActiveSonar(HUD *hud, util::Rect rect) :
+ActiveSonar::ActiveSonar(HUD *hud, Rect rect) :
     ui::Widget(hud->widget()),
     m_hud(hud),
     m_rect(rect),
@@ -35,7 +35,7 @@ ActiveSonar::ActiveSonar(HUD *hud, util::Rect rect) :
 
 void ActiveSonar::draw()
 {
-    util::Rect rect = m_hud->projectCenter(m_rect);
+    Rect rect = m_hud->projectCenter(m_rect);
     if (m_hud->scenario()->sonar().isActive())
         m_actBo.draw(rect.x, rect.y + 1);
     else if (m_hud->scenario()->sonar().isActivating())

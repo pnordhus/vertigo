@@ -20,7 +20,7 @@
 
 
 #include <vector>
-#include <glm/vec3.hpp>
+#include "util/geometry3d.h"
 
 
 namespace fight {
@@ -35,16 +35,16 @@ public:
     CollisionCache();
 
 public:
-    void addObject(Object *object, bool collision, const glm::vec3 &position, const glm::vec3 &normal);
-    bool testObject(Object *object, bool &collision, glm::vec3 &position, glm::vec3 &normal);
+    void addObject(Object *object, bool collision, const Vector3D &position, const Vector3D &normal);
+    bool testObject(Object *object, bool &collision, Vector3D &position, Vector3D &normal);
 
 private:
     struct CacheEntry
     {
         Object *object;
         bool collision;
-        glm::vec3 position;
-        glm::vec3 normal;
+        Vector3D position;
+        Vector3D normal;
     };
 
 private:
@@ -59,7 +59,7 @@ public:
 
 public:
     void addObject(Object *object);
-    Object* testCollision(const glm::vec3 &start, const glm::vec3 &end, float radius, glm::vec3 &position, glm::vec3 &normal, CollisionCache *collisionCache = nullptr);
+    Object* testCollision(const Vector3D &start, const Vector3D &end, float radius, Vector3D &position, Vector3D &normal, CollisionCache *collisionCache = nullptr);
 
 private:
 

@@ -29,7 +29,7 @@ CollisionCache::CollisionCache()
 }
 
 
-void CollisionCache::addObject(Object *object, bool collision, const glm::vec3 &position, const glm::vec3 &normal)
+void CollisionCache::addObject(Object *object, bool collision, const Vector3D &position, const Vector3D &normal)
 {
     m_entries.emplace_back();
     CacheEntry &entry = m_entries.back();
@@ -40,7 +40,7 @@ void CollisionCache::addObject(Object *object, bool collision, const glm::vec3 &
 }
 
 
-bool CollisionCache::testObject(Object *object, bool &collision, glm::vec3 &position, glm::vec3 &normal)
+bool CollisionCache::testObject(Object *object, bool &collision, Vector3D &position, Vector3D &normal)
 {
     for (const CacheEntry &entry :  m_entries)
         if (entry.object == object)
@@ -65,9 +65,9 @@ void CollisionManager::addObject(Object *object)
 }
 
 
-Object* CollisionManager::testCollision(const glm::vec3 &start, const glm::vec3 &end, float radius, glm::vec3 &position, glm::vec3 &normal, CollisionCache *collisionCache)
+Object* CollisionManager::testCollision(const Vector3D &start, const Vector3D &end, float radius, Vector3D &position, Vector3D &normal, CollisionCache *collisionCache)
 {
-    glm::vec3 dir = end - start;
+    Vector3D dir = end - start;
     float distance = glm::length(dir);
     dir /= distance;
 
@@ -77,7 +77,7 @@ Object* CollisionManager::testCollision(const glm::vec3 &start, const glm::vec3 
         {
             bool collision = false;
             float d;
-            glm::vec3 pos, norm;
+            Vector3D pos, norm;
 
             if (object->isStatic() && collisionCache)
             {

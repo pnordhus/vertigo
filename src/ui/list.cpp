@@ -52,7 +52,7 @@ void List::draw()
 {
     int y = 0;
     foreach (const QString &line, m_text) {
-        util::Rect rect = m_font.draw(line, util::Rect(0, y, width(), -1), m_alignCenter, false);
+        Rect rect = m_font.draw(line, Rect(0, y, width(), -1), m_alignCenter, false);
         y += rect.height;
     }
 }

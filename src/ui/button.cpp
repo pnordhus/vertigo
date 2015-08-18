@@ -59,9 +59,9 @@ void Button::draw()
         else
             m_drawRect = util::roundRect(m_texture.draw());
     } else {
-        util::Point offset(m_pressed ? m_offset : 0);
+        Point offset(m_pressed ? m_offset : 0);
 
-        m_drawRect = m_font.draw(m_text, util::Rect(offset, util::Size(width(), height())), m_alignment & AlignHCenter, m_alignment & AlignBottom);
+        m_drawRect = m_font.draw(m_text, Rect(offset, Size(width(), height())), m_alignment & AlignHCenter, m_alignment & AlignBottom);
         m_drawRect.setPos(m_drawRect.pos() - offset);
     }
 }

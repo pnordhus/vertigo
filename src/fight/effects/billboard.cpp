@@ -28,7 +28,7 @@
 namespace fight {
 
 
-glm::vec3 square[4] = { glm::vec3(-1, 1, 0), glm::vec3(1, 1, 0), glm::vec3(1, -1, 0), glm::vec3(-1, -1, 0) };
+Vector3D square[4] = { Vector3D(-1, 1, 0), Vector3D(1, 1, 0), Vector3D(1, -1, 0), Vector3D(-1, -1, 0) };
 
 
 Billboard::Billboard(gfx::TextureManager &texMan, txt::DesFile &file, int index)
@@ -66,7 +66,7 @@ Billboard::Billboard(gfx::TextureManager &texMan, txt::DesFile &file, int index)
 
     int i, j, k;
     float width, height;
-    glm::vec2 center;
+    Vector2D center;
     for (i = -1; ; i++)
     {
         if (i < 0)
@@ -86,32 +86,32 @@ Billboard::Billboard(gfx::TextureManager &texMan, txt::DesFile &file, int index)
         Stage &stage = m_stages.back();
         stage.texture = texMan.getModule(file.value("imgblockname").toString(), true);
 
-        glm::vec2 t0(file.value("x1").toInt() / 255.0f, file.value("y1").toInt() / 255.0f);
+        Vector2D t0(file.value("x1").toInt() / 255.0f, file.value("y1").toInt() / 255.0f);
         stage.texCoords[0] = t0;
         if (file.contains("width"))
         {
             numInX = file.value("numinx").toInt();
             width = file.value("width").toInt() / 255.0f;
             height = file.value("height").toInt() / 255.0f;
-            center = glm::vec2(width/2, height/2);
-            stage.texCoords[1] = t0 + glm::vec2(width - 1/255.0f, 0);
-            stage.texCoords[2] = t0 + glm::vec2(width - 1/255.0f, height - 1/255.0f);
-            stage.texCoords[3] = t0 + glm::vec2(0, height - 1/255.0f);
+            center = Vector2D(width/2, height/2);
+            stage.texCoords[1] = t0 + Vector2D(width - 1/255.0f, 0);
+            stage.texCoords[2] = t0 + Vector2D(width - 1/255.0f, height - 1/255.0f);
+            stage.texCoords[3] = t0 + Vector2D(0, height - 1/255.0f);
         }
         else
         {
-            stage.texCoords[1] = glm::vec2(file.value("x2").toInt() / 255.0f, file.value("y2").toInt() / 255.0f);
-            stage.texCoords[2] = glm::vec2(file.value("x3").toInt() / 255.0f, file.value("y3").toInt() / 255.0f);
-            stage.texCoords[3] = glm::vec2(file.value("x4").toInt() / 255.0f, file.value("y4").toInt() / 255.0f);
+            stage.texCoords[1] = Vector2D(file.value("x2").toInt() / 255.0f, file.value("y2").toInt() / 255.0f);
+            stage.texCoords[2] = Vector2D(file.value("x3").toInt() / 255.0f, file.value("y3").toInt() / 255.0f);
+            stage.texCoords[3] = Vector2D(file.value("x4").toInt() / 255.0f, file.value("y4").toInt() / 255.0f);
 
             width = (stage.texCoords[1] - t0).x + 1/255.0f;
             height = (stage.texCoords[3] - t0).y + 1/255.0f;
-            center = glm::vec2(file.value("xcenter").toInt() / 255.0f, file.value("ycenter").toInt() / 255.0f);
+            center = Vector2D(file.value("xcenter").toInt() / 255.0f, file.value("ycenter").toInt() / 255.0f);
             center -= t0;
         }
 
-        stage.scale = glm::vec2(width, height)*scale*2.0f; // TODO: test scale
-        stage.offset = glm::vec2(1, -1) - glm::vec2(center.x/width, -center.y/height)*2.0f;
+        stage.scale = Vector2D(width, height)*scale*2.0f; // TODO: test scale
+        stage.offset = Vector2D(1, -1) - Vector2D(center.x/width, -center.y/height)*2.0f;
     }
 
     if (m_stages.size() < numOfStages)
@@ -125,14 +125,14 @@ Billboard::Billboard(gfx::TextureManager &texMan, txt::DesFile &file, int index)
             Stage &stage = m_stages.back();
             int x = (int)(stage.texCoords[0].x/width + 1e-5);
             for (k = 0; k < 4; k++)
-                stage.texCoords[k] += glm::vec2(width*((x + j)%numInX - x), height*((x + j)/numInX));
+                stage.texCoords[k] += Vector2D(width*((x + j)%numInX - x), height*((x + j)/numInX));
         }
     }
 }
 
 
 
-void Billboard::draw(const glm::vec3 &position, float angle, float scale, int time, const glm::mat4 &cameraMatrixInverted)
+void Billboard::draw(const Vector3D &position, float angle, float scale, int time, const Matrix &cameraMatrixInverted)
 {
     int currentStage = time/m_displayTime%m_stages.size();
 
@@ -164,11 +164,11 @@ void Billboard::draw(const glm::vec3 &position, float angle, float scale, int ti
 BoundingBox Billboard::box()
 {
     float scale = m_scale*m_stages[0].scale.length();
-    return BoundingBox(glm::vec3(-1, -1, -1)*scale, glm::vec3(1, 1, 1)*scale);
+    return BoundingBox(Vector3D(-1, -1, -1)*scale, Vector3D(1, 1, 1)*scale);
 }
 
 
-bool Billboard::intersect(const glm::vec3 &start, const glm::vec3 &dir, float &distance)
+bool Billboard::intersect(const Vector3D &start, const Vector3D &dir, float &distance)
 {
     return CollisionMesh::intersectSphereLine(start, dir, m_scale*m_scale*glm::length2(m_stages[0].scale), distance);
 }

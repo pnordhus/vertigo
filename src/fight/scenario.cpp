@@ -137,7 +137,7 @@ Scenario::Scenario(const QString &name) :
         case TypeBoat:
             {
                 object = new SimpleObject(this, objectDes, iff, name, cargo);
-                glm::vec3 pos = getPosition();
+                Vector3D pos = getPosition();
                 pos.z += 20.0f;
                 object->setPosition(pos);
             }
@@ -146,7 +146,7 @@ Scenario::Scenario(const QString &name) :
         case TypeBomber:
             {
                 object = new SimpleObject(this, objectDes, iff, name, cargo);
-                glm::vec3 pos = getPosition();
+                Vector3D pos = getPosition();
                 pos.z += 20.0f;
                 object->setPosition(pos);
             }
@@ -184,15 +184,15 @@ Scenario::Scenario(const QString &name) :
 
             {
                 /*for (int i = 0; i < 27; i++)
-                    m_effectManager.addEffect((Effects)(Explosion_0 + i), m_position + glm::vec3(i*5, 0, 0))->setPermanent(true);
+                    m_effectManager.addEffect((Effects)(Explosion_0 + i), m_position + Vector3D(i*5, 0, 0))->setPermanent(true);
                 for (int i = 0; i < 9; i++)
-                    m_effectManager.addEffect((Effects)(Shoot_0 + i), m_position + glm::vec3(i*5, -10, 0))->setPermanent(true);
+                    m_effectManager.addEffect((Effects)(Shoot_0 + i), m_position + Vector3D(i*5, -10, 0))->setPermanent(true);
                 for (int i = 0; i < 23; i++)
-                    m_effectManager.addEffect((Effects)(Debris_0 + i), m_position + glm::vec3(i*5, -20, 0))->setPermanent(true);
+                    m_effectManager.addEffect((Effects)(Debris_0 + i), m_position + Vector3D(i*5, -20, 0))->setPermanent(true);
                 for (int i = 0; i < 5; i++)
-                    m_effectManager.addEffect((Effects)(Trash_0 + i), m_position + glm::vec3(i*5, -30, 0))->setPermanent(true);
+                    m_effectManager.addEffect((Effects)(Trash_0 + i), m_position + Vector3D(i*5, -30, 0))->setPermanent(true);
                 for (int i = 0; i < 3; i++)
-                    m_effectManager.addEffect((Effects)(Bubble_0 + i), m_position + glm::vec3(i*5, -40, 0))->setPermanent(true);*/
+                    m_effectManager.addEffect((Effects)(Bubble_0 + i), m_position + Vector3D(i*5, -40, 0))->setPermanent(true);*/
             }
             break;
 
@@ -207,7 +207,7 @@ Scenario::Scenario(const QString &name) :
         case TypeNavPoint:
             {
                 object = new NavPoint(this, m_file.value("dtyp").toInt());
-                object->setPosition(getPosition() + glm::vec3(-0.5f*m_surface.scale().x, -0.5f*m_surface.scale().y, 10));
+                object->setPosition(getPosition() + Vector3D(-0.5f*m_surface.scale().x, -0.5f*m_surface.scale().y, 10));
                 m_navPoints.push_back(static_cast<NavPoint*>(object));
             }
             break;
@@ -221,7 +221,7 @@ Scenario::Scenario(const QString &name) :
 
         case TypeTrash:
             {
-                glm::vec3 pos = getPosition();
+                Vector3D pos = getPosition();
                 entry.condTrigger = m_conditionManager.addCondition(0);
                 entry.condSignal = m_conditionManager.addCondition(9);
                 for (int i = 0; i < 9; i++)
@@ -320,9 +320,9 @@ Scenario::Scenario(const QString &name) :
             m_attitudeMatrix[i][j] = m_file.value(QString("X%1Y%2").arg(j).arg(i)).toInt();
 
 
-    m_cameraMatrix = glm::mat4(1);
-    m_cameraMatrix = glm::rotate(m_cameraMatrix, glm::radians(initialDir), glm::vec3(0, 1, 0));
-    m_cameraMatrix = glm::rotate(m_cameraMatrix, glm::radians(-90.0f), glm::vec3(1, 0, 0));
+    m_cameraMatrix = Matrix(1);
+    m_cameraMatrix = glm::rotate(m_cameraMatrix, glm::radians(initialDir), Vector3D(0, 1, 0));
+    m_cameraMatrix = glm::rotate(m_cameraMatrix, glm::radians(-90.0f), Vector3D(1, 0, 0));
 
     qsrand(QTime::currentTime().second() * 1000 + QTime::currentTime().msec());
 
@@ -339,9 +339,9 @@ void Scenario::setBoat(const game::Boat *boat)
 }
 
 
-void Scenario::setRect(const util::RectF &rect, const glm::vec2 &center)
+void Scenario::setRect(const RectF &rect, const Vector2D &center)
 {
-    m_projectionMatrix = glm::translate(glm::vec3(center, 0)) * glm::perspective(glm::radians(60.0f), float(rect.width / rect.height), 0.1f, 10000.0f);
+    m_projectionMatrix = glm::translate(Vector3D(center, 0)) * glm::perspective(glm::radians(60.0f), float(rect.width / rect.height), 0.1f, 10000.0f);
     m_projectionMatrixInverted = glm::inverse(m_projectionMatrix);
 }
 
@@ -353,18 +353,18 @@ void Scenario::update(float elapsedTime)
     const float angleY = (m_right - m_left) * elapsedTime * 0.09f;
     const float angleX = (m_up - m_down) * m_inverseUpDown * elapsedTime * 0.09f;
 
-    m_cameraMatrix = glm::rotate(m_cameraMatrix, glm::radians(angleX), glm::vec3(glm::row(m_cameraMatrix, 0)));
-    m_cameraMatrix = glm::rotate(m_cameraMatrix, glm::radians(angleY), glm::vec3(0, 0, 1));
+    m_cameraMatrix = glm::rotate(m_cameraMatrix, glm::radians(angleX), Vector3D(glm::row(m_cameraMatrix, 0)));
+    m_cameraMatrix = glm::rotate(m_cameraMatrix, glm::radians(angleY), Vector3D(0, 0, 1));
     m_cameraMatrixInverted = glm::inverse(m_cameraMatrix);
 
-    glm::vec3 prevPos = m_position;
-    glm::vec3 dir = glm::vec3(glm::row(m_cameraMatrix, 2));
+    Vector3D prevPos = m_position;
+    Vector3D dir = Vector3D(glm::row(m_cameraMatrix, 2));
     m_position += dir * (m_backwards - m_forwards) * elapsedTime * 0.2f;
     m_yaw = glm::atan(dir.x, dir.y);
     m_pitch = dir.z < -1.0f ? -glm::half_pi<float>() : dir.z > 1.0f ? glm::half_pi<float>() : glm::asin(dir.z);
     m_speed = (m_forwards - m_backwards) * 0.2f * 3600.0f;
 
-    glm::vec3 up = glm::vec3(glm::row(m_cameraMatrix, 1));
+    Vector3D up = Vector3D(glm::row(m_cameraMatrix, 1));
     if (up.z < 0)
     {
         m_cameraMatrix = glm::rotate(m_cameraMatrix, glm::pi<float>(), dir);
@@ -373,7 +373,7 @@ void Scenario::update(float elapsedTime)
 
     if (m_position != prevPos)
     {
-        glm::vec3 pos, normal;
+        Vector3D pos, normal;
         if (m_surface.testCollision(prevPos, m_position, 1.5f, pos, normal))
             m_position = pos;
         m_height = m_position.z - m_surface.heightAt(m_position.x, m_position.y);
@@ -454,7 +454,7 @@ void Scenario::draw()
         glLightfv(GL_LIGHT1, GL_DIFFUSE, light_diffuse);
         
         glLightfv(GL_LIGHT1, GL_POSITION, glm::value_ptr(object->position()));
-        glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, glm::value_ptr(glm::vec3(glm::cos(0.005f*m_time), glm::sin(0.005f*m_time), 0.0f)));
+        glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, glm::value_ptr(Vector3D(glm::cos(0.005f*m_time), glm::sin(0.005f*m_time), 0.0f)));
 
         glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 90.0);
         glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, 0.1);
@@ -472,7 +472,7 @@ void Scenario::draw()
     glFogf(GL_FOG_START, 100.0);
     glFogf(GL_FOG_END, 200.0);
 
-    glm::vec3 dir = -glm::vec3(glm::row(m_cameraMatrix, 2));
+    Vector3D dir = -Vector3D(glm::row(m_cameraMatrix, 2));
     m_surface.draw(m_position, dir);
 
     for (const auto &object : m_objects)
@@ -510,7 +510,7 @@ void Scenario::keyPressEvent(QKeyEvent *e)
 
     if (e->key() == Qt::Key_Space)
     {
-        glm::vec3 dir = -glm::vec3(glm::row(m_cameraMatrix, 2));
+        Vector3D dir = -Vector3D(glm::row(m_cameraMatrix, 2));
         m_effectManager.addProjectile(Effects::Shoot_Vendetta, m_position, dir);
     }
 
@@ -540,9 +540,9 @@ void Scenario::keyReleaseEvent(QKeyEvent *e)
 }
 
 
-glm::vec3 Scenario::getPosition()
+Vector3D Scenario::getPosition()
 {
-    glm::vec3 pos;
+    Vector3D pos;
     pos.x = m_file.value("px").toInt() + 0.5f;
     pos.y = m_file.value("py").toInt() + 0.5f;
     pos.z = m_file.value("pz").toInt() + m_file.value("hei").toInt();

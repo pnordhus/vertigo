@@ -106,11 +106,11 @@ void FontPrivate::load(const QString &filename, const QVector<QRgb> &colorTable,
     m_height = maxHeight / scaleFactor;
 }
 
-util::Rect FontPrivate::draw(const QString &text, const util::Rect &dstRect, bool alignHCenter, bool alignBottom, const ClipRect *clipRect)
+Rect FontPrivate::draw(const QString &text, const Rect &dstRect, bool alignHCenter, bool alignBottom, const ClipRect *clipRect)
 {
     m_texture.bind();
 
-    util::Rect drawRect(dstRect.pos(), util::Size(0, m_height));
+    Rect drawRect(dstRect.pos(), Size(0, m_height));
 
     if (alignHCenter) {
         const int totalW = width(text);
@@ -125,7 +125,7 @@ util::Rect FontPrivate::draw(const QString &text, const util::Rect &dstRect, boo
             drawRect.y += (dstRect.height - totalH);
     }
 
-    util::Point pos = drawRect.pos();
+    Point pos = drawRect.pos();
 
     bool highlight = false;
     int lineWidth = 0;
@@ -172,8 +172,8 @@ util::Rect FontPrivate::draw(const QString &text, const util::Rect &dstRect, boo
                     glColor4f(qRed(m_colorNormal) / 255.0f, qGreen(m_colorNormal) / 255.0f, qBlue(m_colorNormal) / 255.0f, qAlpha(m_colorNormal) / 255.0f);
             }
 
-            util::RectF dst = util::RectF(pos, util::SizeF(symbol.width, symbol.height));
-            util::RectF src = symbol.rect;
+            RectF dst = RectF(pos, SizeF(symbol.width, symbol.height));
+            RectF src = symbol.rect;
             if (clipRect == nullptr || clipRect->clip(dst, src))
             {
                 glBegin(GL_QUADS);

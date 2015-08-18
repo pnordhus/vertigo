@@ -33,14 +33,14 @@ public:
 
 public:
     void draw();
-    bool intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal);
+    bool intersect(const Vector3D &start, const Vector3D &dir, float radius, float &distance, Vector3D &normal);
 
 private:
     Module *m_body;
     Module *m_armLeft;
     Module *m_armRight;
-    glm::vec3 m_armLeftPosition;
-    glm::vec3 m_armRightPosition;
+    Vector3D m_armLeftPosition;
+    Vector3D m_armRightPosition;
 };
 
 

@@ -51,7 +51,7 @@ bool NavPoint::update(float elapsedTime)
     }
     if (m_enabled && !m_reached)
     {
-        glm::vec3 d = m_scenario->position() - m_position;
+        Vector3D d = m_scenario->position() - m_position;
         if (glm::dot(d, d) < 400.0f)
         {
             sfx::SampleMap::get(sfx::Sample::NavPoint).play();

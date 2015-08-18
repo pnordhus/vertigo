@@ -30,8 +30,8 @@ Building::Building(Scenario *scenario, txt::DesFile &file, int size, float angle
     m_angle(angle)
 {
     int i = 0;
-    glm::vec3 scale = scenario->surface().scale();
-    m_position = glm::vec3(x + 0.5f, y + 0.5f - size, 0)*scale;
+    Vector3D scale = scenario->surface().scale();
+    m_position = Vector3D(x + 0.5f, y + 0.5f - size, 0)*scale;
 
     while (file.sections().contains(QString("cluster%1").arg(i))) {
         file.setSection(QString("cluster%1").arg(i));
@@ -91,12 +91,12 @@ Building::Building(Scenario *scenario, txt::DesFile &file, int size, float angle
 
     for (Cluster &cluster : m_clusters)
     {
-        glm::mat4 m(1);
+        Matrix m(1);
         m = glm::translate(m, m_position);
-        m = glm::rotate(m, glm::radians(m_angle), glm::vec3(0, 0, 1));
+        m = glm::rotate(m, glm::radians(m_angle), Vector3D(0, 0, 1));
         m = glm::translate(m, cluster.offset);
-        m = glm::scale(m, glm::vec3(cluster.scale));
-        m = glm::rotate(m, glm::radians(cluster.angle), glm::vec3(0, 0, 1));
+        m = glm::scale(m, Vector3D(cluster.scale));
+        m = glm::rotate(m, glm::radians(cluster.angle), Vector3D(0, 0, 1));
         m_box.add(cluster.module->box().transform(m));
         
         cluster.transform = m;
@@ -126,20 +126,20 @@ void Building::draw()
 }
 
 
-bool Building::intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal)
+bool Building::intersect(const Vector3D &start, const Vector3D &dir, float radius, float &distance, Vector3D &normal)
 {
     bool collision = false;
     for (Cluster &cluster : m_clusters)
     {
         float d;
-        glm::vec3 norm;
-        if (cluster.module->intersect(glm::vec3(cluster.invTransform * glm::vec4(start, 1)), glm::vec3(cluster.invTransform * glm::vec4(dir, 0))*cluster.scale, radius/cluster.scale, d, norm))
+        Vector3D norm;
+        if (cluster.module->intersect(Vector3D(cluster.invTransform * Vector4D(start, 1)), Vector3D(cluster.invTransform * Vector4D(dir, 0))*cluster.scale, radius/cluster.scale, d, norm))
         {
             d *= cluster.scale;
             if (!collision || distance > d)
             {
                 distance = d;
-                normal = glm::vec3(cluster.transform * glm::vec4(norm, 0))/cluster.scale;
+                normal = Vector3D(cluster.transform * Vector4D(norm, 0))/cluster.scale;
                 collision = true;
             }
         }

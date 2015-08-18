@@ -19,7 +19,7 @@
 #define FIGHT_TARGET_H
 
 
-#include <glm/vec3.hpp>
+#include "util/geometry3d.h"
 
 
 namespace fight {
@@ -37,7 +37,7 @@ public:
 
 public:
     bool isLocked() const { return m_locked != nullptr || m_lockedNavPoint != nullptr; }
-    glm::vec3 position() const;
+    Vector3D position() const;
 
     ActiveObject* locked() const { return m_locked; }
     NavPoint* lockedNavPoint() const { return m_lockedNavPoint; }

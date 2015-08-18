@@ -23,7 +23,7 @@
 namespace fight {
 
 
-Element::Element(Surface *surface, const util::Rect &rect) :
+Element::Element(Surface *surface, const Rect &rect) :
     m_surface(surface),
     m_rect(rect),
     m_maxZ(-1e3),
@@ -39,7 +39,7 @@ int Element::numVertices(int textureId)
 }
 
 
-void Element::addVertex(int textureId, const glm::vec3 &position, const glm::vec3 &normal, const glm::vec2 &texCoords)
+void Element::addVertex(int textureId, const Vector3D &position, const Vector3D &normal, const Vector2D &texCoords)
 {
 	m_subsets[textureId].vertices.push_back(position);
     m_subsets[textureId].normals.push_back(normal);
@@ -77,13 +77,13 @@ void Element::addTriangle(int textureId, unsigned short a, unsigned short b, uns
 }
 
 
-glm::vec3 Element::center() const
+Vector3D Element::center() const
 {
-    return glm::vec3(m_rect.center().x * m_surface->scale().x, m_rect.center().y * m_surface->scale().y, m_minZ + (m_maxZ - m_minZ)/2);
+    return Vector3D(m_rect.center().x * m_surface->scale().x, m_rect.center().y * m_surface->scale().y, m_minZ + (m_maxZ - m_minZ)/2);
 }
 
 
-bool Element::testCollision(const glm::vec3 &center, float radius)
+bool Element::testCollision(const Vector3D &center, float radius)
 {
     int ix = center.x/m_surface->scale().x - m_rect.x;
     int iy = center.y/m_surface->scale().y - m_rect.y;

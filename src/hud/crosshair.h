@@ -19,7 +19,7 @@
 #define HUD_CROSSHAIR_H
 
 
-#include "util/rect.hpp"
+#include "util/geometry2d.h"
 #include "ui/widget.h"
 #include "gfx/texture.h"
 #include "gfx/cliprect.h"

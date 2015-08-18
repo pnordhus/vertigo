@@ -48,10 +48,10 @@ public:
     void disable();
     bool isEnabled() const { return m_enabled; }
 
-    virtual void setPosition(const glm::vec3 &pos);
-    const glm::vec3& position() const { return m_position; }
+    virtual void setPosition(const Vector3D &pos);
+    const Vector3D& position() const { return m_position; }
     const BoundingBox& box() const { return m_box; }
-    virtual glm::vec3 center() const { return (m_box.minPoint() + m_box.maxPoint())*0.5f; }
+    virtual Vector3D center() const { return (m_box.minPoint() + m_box.maxPoint())*0.5f; }
     bool isStatic() const { return m_static; }
 
     Condition* condEnable() { return &m_condEnable; }
@@ -59,13 +59,13 @@ public:
 public:
     virtual bool update(float elapsedTime);
     virtual void draw();
-    virtual bool intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal);
+    virtual bool intersect(const Vector3D &start, const Vector3D &dir, float radius, float &distance, Vector3D &normal);
 
 protected:
     Scenario *m_scenario;
 
     bool m_enabled;
-    glm::vec3 m_position;
+    Vector3D m_position;
 
     BoundingBox m_box;
     bool m_static;

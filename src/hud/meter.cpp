@@ -24,7 +24,7 @@
 namespace hud {
 
 
-Meter::Meter(HUD *hud, util::Rect rect, glm::ivec2 barPos, int barHeight, bool k) :
+Meter::Meter(HUD *hud, Rect rect, glm::ivec2 barPos, int barHeight, bool k) :
     ui::Widget(hud->widget()),
     m_hud(hud),
     m_rect(rect),
@@ -40,7 +40,7 @@ Meter::Meter(HUD *hud, util::Rect rect, glm::ivec2 barPos, int barHeight, bool k
 
 void Meter::draw()
 {
-    util::Rect rect = m_hud->projectCenter(m_rect);
+    Rect rect = m_hud->projectCenter(m_rect);
     m_meter.draw(rect.x, rect.y);
     float depth = m_hud->scenario()->depth();
     if (m_k)

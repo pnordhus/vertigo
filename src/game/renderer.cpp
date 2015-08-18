@@ -116,7 +116,7 @@ void Renderer::setupGL(bool clear)
 
 QPointF Renderer::screenToImage(const QPointF &pos)
 {
-    glm::vec4 p = m_projectionMatrixInverted * glm::vec4(pos.x() / width() * 2.0f - 1.0f, 1.0f - pos.y() / height() * 2.0f, 0, 1);
+    Vector4D p = m_projectionMatrixInverted * Vector4D(pos.x() / width() * 2.0f - 1.0f, 1.0f - pos.y() / height() * 2.0f, 0, 1);
     return QPointF(p.x, p.y);
 }
 

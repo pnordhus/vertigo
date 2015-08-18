@@ -121,9 +121,9 @@ void MainMenu::draw()
             m_cursor = !m_cursor;
         }
 
-        util::Rect rect = gfx::Font(gfx::Font::Large).draw(m_name, util::Rect(0, 328, 640, -1), true, false);
+        Rect rect = gfx::Font(gfx::Font::Large).draw(m_name, Rect(0, 328, 640, -1), true, false);
         if (m_cursor)
-            gfx::Font(gfx::Font::Large).draw("_", rect.pos() + util::Point(rect.width, 2));
+            gfx::Font(gfx::Font::Large).draw("_", rect.pos() + Point(rect.width, 2));
     }
 }
 

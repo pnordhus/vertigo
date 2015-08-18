@@ -55,7 +55,7 @@ void Surface::load(const QString &name, int maxheightscale, int mapping)
         stream >> sx >> sy >> sz;
         if (sz < maxheightscale)
             sz = maxheightscale;
-        m_scale = glm::vec3(sx / 32.0f, sy / 32.0f, sz / 32.0f);
+        m_scale = Vector3D(sx / 32.0f, sy / 32.0f, sz / 32.0f);
     }
 
     {
@@ -88,13 +88,13 @@ void Surface::load(const QString &name, int maxheightscale, int mapping)
 
 float Surface::heightAt(float x, float y)
 {
-    return m_tesselator.heightAt(glm::vec2(x / m_scale.x, y / m_scale.y)) * m_scale.z;
+    return m_tesselator.heightAt(Vector2D(x / m_scale.x, y / m_scale.y)) * m_scale.z;
 }
 
 
-float Surface::heightAt(float x, float y, glm::vec3 &normal)
+float Surface::heightAt(float x, float y, Vector3D &normal)
 {
-    return m_tesselator.heightAt(glm::vec2(x / m_scale.x, y / m_scale.y), normal) * m_scale.z;
+    return m_tesselator.heightAt(Vector2D(x / m_scale.x, y / m_scale.y), normal) * m_scale.z;
 }
 
 
@@ -116,7 +116,7 @@ void Surface::setHeight(int x, int y, int refx, int refy, int offset)
 }
 
 
-bool Surface::testCollision(const glm::vec3 &start, const glm::vec3 &end, float radius, glm::vec3 &position, glm::vec3 &normal)
+bool Surface::testCollision(const Vector3D &start, const Vector3D &end, float radius, Vector3D &position, Vector3D &normal)
 {
     int x0 = end.x / m_scale.x / 8;
     int y0 = end.y / m_scale.y / 8;
@@ -147,13 +147,13 @@ Element& Surface::getElement(int x, int y)
         return it->second;
     Element &element = m_elements.emplace(std::piecewise_construct,
         std::forward_as_tuple(id),
-        std::forward_as_tuple(this, util::Rect(x, y, 8, 8))).first->second;
+        std::forward_as_tuple(this, Rect(x, y, 8, 8))).first->second;
     m_tesselator.tesselate(element, Level, m_scale, m_textureMap, m_textureDir, m_mapping);
     return element;
 }
 
 
-void Surface::draw(const glm::vec3 &position, const glm::vec3 &direction)
+void Surface::draw(const Vector3D &position, const Vector3D &direction)
 {
     int x0 = position.x / m_scale.x / 8;
     int y0 = position.y / m_scale.y / 8;

@@ -29,7 +29,7 @@ CollisionMesh::CollisionMesh()
 }
 
 
-void CollisionMesh::addTriangles(const std::vector<glm::vec3> &vertices, const std::vector<unsigned short> &indices)
+void CollisionMesh::addTriangles(const std::vector<Vector3D> &vertices, const std::vector<unsigned short> &indices)
 {
     for (int i = 0; i < indices.size(); i += 3)
     {
@@ -42,8 +42,8 @@ void CollisionMesh::addTriangles(const std::vector<glm::vec3> &vertices, const s
         tri.u = tri.vertices[1] - tri.vertices[0];
         tri.v = tri.vertices[2] - tri.vertices[0];
 
-        glm::vec3 n = glm::normalize(glm::cross(tri.u, tri.v));
-        tri.plane = glm::vec4(n, -glm::dot(tri.vertices[0], n));
+        Vector3D n = glm::normalize(glm::cross(tri.u, tri.v));
+        tri.plane = Vector4D(n, -glm::dot(tri.vertices[0], n));
 
         tri.uu = glm::dot(tri.u, tri.u);
         tri.uv = glm::dot(tri.u, tri.v);
@@ -56,10 +56,10 @@ void CollisionMesh::addTriangles(const std::vector<glm::vec3> &vertices, const s
 }
 
 
-bool CollisionMesh::intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal)
+bool CollisionMesh::intersect(const Vector3D &start, const Vector3D &dir, float radius, float &distance, Vector3D &normal)
 {
-    glm::vec4 dir4D(dir, 0);
-    glm::vec4 center(start, 1);
+    Vector4D dir4D(dir, 0);
+    Vector4D center(start, 1);
     float radiusSquared = radius*radius;
     bool collision = false;
     int i;
@@ -86,7 +86,7 @@ bool CollisionMesh::intersect(const glm::vec3 &start, const glm::vec3 &dir, floa
             if (distance > t)
             {
                 distance = t;
-                normal = glm::vec3(tri.plane);
+                normal = Vector3D(tri.plane);
                 collision = true;
             }
 	    }
@@ -106,23 +106,23 @@ bool CollisionMesh::intersect(const glm::vec3 &start, const glm::vec3 &dir, floa
 
         for (i = 0; i < 3; i++)
         {
-            const glm::vec3 &edge0 = tri.vertices[i];
-            const glm::vec3 &edge1 = tri.vertices[(i + 1)%3];
-            const glm::vec3 &lineDir = tri.lineDir[i];
+            const Vector3D &edge0 = tri.vertices[i];
+            const Vector3D &edge1 = tri.vertices[(i + 1)%3];
+            const Vector3D &lineDir = tri.lineDir[i];
 
-            glm::vec3 n = glm::cross(edge1 - edge0, edge1 - edge0 - dir);
+            Vector3D n = glm::cross(edge1 - edge0, edge1 - edge0 - dir);
             h = glm::dot(start, n) - glm::dot(edge0, n);
             float hSquared = h*h/glm::length2(n);
             if (hSquared > radiusSquared)
                 continue;
-            glm::vec3 pt0 = start - n*h/glm::length2(n);
+            Vector3D pt0 = start - n*h/glm::length2(n);
 
-            glm::vec3 fPoint = edge0 + glm::dot(pt0 - edge0, lineDir)*lineDir - pt0;
-            glm::vec3 fDir = glm::dot(dir, lineDir)*lineDir - dir;
+            Vector3D fPoint = edge0 + glm::dot(pt0 - edge0, lineDir)*lineDir - pt0;
+            Vector3D fDir = glm::dot(dir, lineDir)*lineDir - dir;
             if (!intersectSphereLine(fPoint, fDir, radiusSquared - hSquared, t))
                 continue;
 
-            glm::vec3 inter = edge0 + glm::dot(dir*t + pt0 - edge0, lineDir)*lineDir;
+            Vector3D inter = edge0 + glm::dot(dir*t + pt0 - edge0, lineDir)*lineDir;
             if (glm::dot(edge0 - inter, edge1 - inter) > 0)
                 continue;
             if (distance > t)
@@ -137,9 +137,9 @@ bool CollisionMesh::intersect(const glm::vec3 &start, const glm::vec3 &dir, floa
 }
 
 
-bool CollisionMesh::isPointInsideTriangle(const Triangle &tri, const glm::vec3 &point)
+bool CollisionMesh::isPointInsideTriangle(const Triangle &tri, const Vector3D &point)
 {
-    glm::vec3 w = point - tri.vertices[0];
+    Vector3D w = point - tri.vertices[0];
     float wu = glm::dot(w, tri.u);
     float wv = glm::dot(w, tri.v);
     float s = (tri.uv * wv - tri.vv * wu) * tri.invD;
@@ -152,7 +152,7 @@ bool CollisionMesh::isPointInsideTriangle(const Triangle &tri, const glm::vec3 &
 }
 
 
-bool CollisionMesh::intersectSphereLine(const glm::vec3 &point, const glm::vec3 &dir, float radiusSquared, float &t)
+bool CollisionMesh::intersectSphereLine(const Vector3D &point, const Vector3D &dir, float radiusSquared, float &t)
 {
     float a = glm::length2(dir);
     float b = 2*glm::dot(dir, point);

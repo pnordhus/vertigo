@@ -61,7 +61,7 @@ public:
     void buildDependencies();
 
     Condition* addCondition(int limit = 0);
-    ConditionRadio* addCondRadio(const glm::vec3 &pos, const QString &text);
+    ConditionRadio* addCondRadio(const Vector3D &pos, const QString &text);
     ConditionSpace* addCondSpace(int x, int y, int dimx, int dimy, int minz, int maxz);
     void testSpace(float x, float y, float height);
     void delayComplete(Condition *cond, int delay);

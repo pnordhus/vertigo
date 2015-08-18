@@ -64,7 +64,7 @@ Billboard* EffectManager::getBillboard(Effects effect)
 }
 
 
-Effect* EffectManager::addEffect(Effects effect, const glm::vec3 &position, float angle, float scale)
+Effect* EffectManager::addEffect(Effects effect, const Vector3D &position, float angle, float scale)
 {
     Effect *object = new Effect(m_scenario, getBillboard(effect), angle, scale);
     m_effects.emplace_back(object);
@@ -73,7 +73,7 @@ Effect* EffectManager::addEffect(Effects effect, const glm::vec3 &position, floa
 }
 
 
-Projectile* EffectManager::addProjectile(Effects projectile, const glm::vec3 &position, const glm::vec3 &direction)
+Projectile* EffectManager::addProjectile(Effects projectile, const Vector3D &position, const Vector3D &direction)
 {
     Projectile *object = new Projectile(m_scenario, getBillboard(projectile));
     m_effects.emplace_back(object);

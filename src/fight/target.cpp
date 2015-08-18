@@ -34,13 +34,13 @@ Target::Target(Scenario *scenario) :
 }
 
 
-glm::vec3 Target::position() const
+Vector3D Target::position() const
 {
     if (m_locked != nullptr)
         return m_locked->center();
     if (m_lockedNavPoint != nullptr)
         return m_lockedNavPoint->position();
-    return glm::vec3(0);
+    return Vector3D(0);
 }
 
 
@@ -57,7 +57,7 @@ void Target::lockReticle()
 
     for (const auto &entry : m_scenario->sonar())
     {
-        glm::vec3 dir = glm::vec3(m_scenario->cameraMatrix() * glm::vec4(entry.object->center() - m_scenario->position(), 1));
+        Vector3D dir = Vector3D(m_scenario->cameraMatrix() * Vector4D(entry.object->center() - m_scenario->position(), 1));
         dir /= -glm::length(dir);
         if (minAngle < dir.z)
         {
@@ -76,7 +76,7 @@ void Target::lockReticle()
     {
         if (!navPoint->isEnabled())
             continue;
-        glm::vec3 dir = glm::vec3(m_scenario->cameraMatrix() * glm::vec4(navPoint->position() - m_scenario->position(), 1));
+        Vector3D dir = Vector3D(m_scenario->cameraMatrix() * Vector4D(navPoint->position() - m_scenario->position(), 1));
         dir /= -glm::length(dir);
         if (minAngle < dir.z && dir.z > 0.98f)
         {

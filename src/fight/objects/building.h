@@ -36,17 +36,17 @@ public:
 
 public:
     void draw();
-    bool intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal);
+    bool intersect(const Vector3D &start, const Vector3D &dir, float radius, float &distance, Vector3D &normal);
 
 private:
     struct Cluster
     {
         Module *module;
-        glm::vec3 offset;
+        Vector3D offset;
         float scale;
         float angle;
-        glm::mat4 transform;
-        glm::mat4 invTransform;
+        Matrix transform;
+        Matrix invTransform;
     };
 
     std::vector<Cluster> m_clusters;

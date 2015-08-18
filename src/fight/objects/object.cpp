@@ -58,7 +58,7 @@ void Object::disable()
 }
 
 
-void Object::setPosition(const glm::vec3 &pos)
+void Object::setPosition(const Vector3D &pos)
 {
     m_box = m_box.translate(pos - m_position);
     m_position = pos;
@@ -76,7 +76,7 @@ void Object::draw()
 }
 
 
-bool Object::intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal)
+bool Object::intersect(const Vector3D &start, const Vector3D &dir, float radius, float &distance, Vector3D &normal)
 {
     return false;
 }

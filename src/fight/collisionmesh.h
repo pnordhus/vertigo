@@ -20,8 +20,7 @@
 
 
 #include <vector>
-#include <glm/vec3.hpp>
-#include <glm/vec4.hpp>
+#include "util/geometry3d.h"
 
 
 namespace fight {
@@ -33,23 +32,23 @@ public:
     CollisionMesh();
 
 public:
-    void addTriangles(const std::vector<glm::vec3> &vertices, const std::vector<unsigned short> &indices);
-    bool intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal);
+    void addTriangles(const std::vector<Vector3D> &vertices, const std::vector<unsigned short> &indices);
+    bool intersect(const Vector3D &start, const Vector3D &dir, float radius, float &distance, Vector3D &normal);
 
-    static bool intersectSphereLine(const glm::vec3 &point, const glm::vec3 &dir, float radiusSquared, float &t);
+    static bool intersectSphereLine(const Vector3D &point, const Vector3D &dir, float radiusSquared, float &t);
 
 private:
     struct Triangle
     {
-        glm::vec3 vertices[3];
-        glm::vec3 u;
-        glm::vec3 v;
-        glm::vec4 plane;
+        Vector3D vertices[3];
+        Vector3D u;
+        Vector3D v;
+        Vector4D plane;
         float uu, uv, vv, invD;
-        glm::vec3 lineDir[3];
+        Vector3D lineDir[3];
     };
 
-    bool isPointInsideTriangle(const Triangle &tri, const glm::vec3 &point);
+    bool isPointInsideTriangle(const Triangle &tri, const Vector3D &point);
 
 private:
     std::vector<Triangle> m_triangles;

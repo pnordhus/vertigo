@@ -19,7 +19,8 @@
 #define HUD_MASTER_H
 
 
-#include "util/rect.hpp"
+#include "util/geometry2d.h"
+#include "util/geometry3d.h"
 #include "ui/widget.h"
 #include "ui/label.h"
 #include "gfx/cliprect.h"
@@ -34,18 +35,18 @@ class HUD;
 class Master : public ui::Widget
 {
 public:
-    Master(HUD *hud, util::Rect rect);
+    Master(HUD *hud, Rect rect);
 
 public:
     const gfx::ClipRect& clipRect() const { return m_clipRect; }
 
 protected:
     void draw();
-    void drawPoint(const glm::vec4 &point4, const util::Rect &rect, bool isLocked, bool isFriend, bool isPassive);
+    void drawPoint(const Vector4D &point4, const Rect &rect, bool isLocked, bool isFriend, bool isPassive);
 
 private:
     HUD *m_hud;
-    util::Rect m_rect;
+    Rect m_rect;
     gfx::ClipRect m_clipRect;
 
     gfx::Texture m_edgeBL;

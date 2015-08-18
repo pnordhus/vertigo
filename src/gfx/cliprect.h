@@ -19,7 +19,7 @@
 #define GFX_CLIPRECT_H
 
 
-#include "util/rect.hpp"
+#include "util/geometry2d.h"
 
 
 namespace gfx {
@@ -31,12 +31,12 @@ public:
     ClipRect();
 
 public:
-    void setRect(const util::RectF &rect) { m_rect = rect; }
-    const util::RectF& rect() const { return m_rect; }
-    bool clip(util::RectF &dstRect, util::RectF &srcRect) const;
+    void setRect(const RectF &rect) { m_rect = rect; }
+    const RectF& rect() const { return m_rect; }
+    bool clip(RectF &dstRect, RectF &srcRect) const;
 
 private:
-    util::RectF m_rect;
+    RectF m_rect;
 };
 
 

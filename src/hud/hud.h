@@ -20,7 +20,7 @@
 
 
 #include "game/renderer.h"
-#include "util/rect.hpp"
+#include "util/geometry2d.h"
 #include "util/event.hpp"
 #include "ui/label.h"
 #include "gfx/colortable.h"
@@ -48,18 +48,18 @@ public:
     int navPoint() const { return m_navPoint; }
 
     bool wide() const { return m_wide; }
-    const util::RectF& rectHUD() const { return m_rectHUD; }
-    const util::Point& center() const { return m_center; }
+    const RectF& rectHUD() const { return m_rectHUD; }
+    const Point& center() const { return m_center; }
     ui::Widget* widget() { return m_integerScale ? &m_integerScaleWidget : &m_noScaleWidget; }
     gfx::Image getImage(const QString &name);
     gfx::Font& fontGreen() { return m_fontGreen; }
     gfx::Font& fontRed() { return m_fontRed; }
     gfx::Font& fontYellow() { return m_fontYellow; }
 
-    const glm::mat4& hudProjectionMatrix() const { return m_integerScale ? m_integerScaleProjectionMatrix : m_noScaleProjectionMatrix; }
-    const glm::mat4& hudProjectionMatrixInverted() const { return m_integerScale ? m_integerScaleProjectionMatrixInverted : m_noScaleProjectionMatrixInverted; }
-    util::Point project(const util::Point &point);
-    util::Rect projectCenter(const util::Rect &rect);
+    const Matrix& hudProjectionMatrix() const { return m_integerScale ? m_integerScaleProjectionMatrix : m_noScaleProjectionMatrix; }
+    const Matrix& hudProjectionMatrixInverted() const { return m_integerScale ? m_integerScaleProjectionMatrixInverted : m_noScaleProjectionMatrixInverted; }
+    Point project(const Point &point);
+    Rect projectCenter(const Rect &rect);
 
     void load(game::Boat *boat);
     void start(fight::Scenario *scenario);
@@ -71,7 +71,7 @@ protected:
     void keyReleaseEvent(QKeyEvent *);
 
 private:
-    util::Rect readRect(const txt::DesFile &file);
+    Rect readRect(const txt::DesFile &file);
 
 private:
     util::event<> m_eventSuccess;
@@ -82,14 +82,14 @@ private:
     int m_navPoint;
 
     bool m_wide;
-    util::Rect m_rectGL;
-    util::RectF m_rectHUD;
-    util::Point m_center;
+    Rect m_rectGL;
+    RectF m_rectHUD;
+    Point m_center;
     bool m_integerScale;
-    glm::mat4 m_integerScaleProjectionMatrix;
-    glm::mat4 m_integerScaleProjectionMatrixInverted;
-    glm::mat4 m_noScaleProjectionMatrix;
-    glm::mat4 m_noScaleProjectionMatrixInverted;
+    Matrix m_integerScaleProjectionMatrix;
+    Matrix m_integerScaleProjectionMatrixInverted;
+    Matrix m_noScaleProjectionMatrix;
+    Matrix m_noScaleProjectionMatrixInverted;
 
     const gfx::ColorTable m_colorTable;
     gfx::Font m_fontGreen;

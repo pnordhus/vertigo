@@ -162,7 +162,7 @@ void ConditionSpace::test(float x, float y, float height)
 }
 
 
-ConditionRadio::ConditionRadio(Scenario *scenario, const glm::vec3 &pos, const QString &text) :
+ConditionRadio::ConditionRadio(Scenario *scenario, const Vector3D &pos, const QString &text) :
     Condition(scenario, 0),
     m_pos(pos),
     m_text(text)

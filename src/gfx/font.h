@@ -19,7 +19,7 @@
 #define GFX_FONT_H
 
 
-#include "util/rect.hpp"
+#include "util/geometry2d.h"
 #include "cliprect.h"
 #include "texture.h"
 #include <QExplicitlySharedDataPointer>
@@ -35,7 +35,7 @@ public:
 
 public:
     void load(const QString &filename, const QVector<QRgb> &colorTable, bool scale, bool smooth);
-    util::Rect draw(const QString &text, const util::Rect &dstRect, bool alignHCenter = false, bool alignBottom = false, const ClipRect *clipRect = nullptr);
+    Rect draw(const QString &text, const Rect &dstRect, bool alignHCenter = false, bool alignBottom = false, const ClipRect *clipRect = nullptr);
     int height() const { return m_height; }
     int height(int w, const QStringList &strings) const;
     int width(const QString &text) const;
@@ -43,7 +43,7 @@ public:
 private:
     struct Symbol
     {
-        util::RectF rect;
+        RectF rect;
         int width;
         int height;
     };
@@ -79,10 +79,10 @@ public:
 public:
     void load(const QString &filename, const QVector<QRgb> &colorTable, bool scale = false, bool smooth = true);
     void load(const QString &filename, const QRgb &colorNormal, const QRgb &colorHighlight, bool scale = false, bool smooth = true);
-    util::Rect draw(const QString &text, int x, int y, const ClipRect *clipRect = nullptr);
-    util::Rect draw(const QString &text, const util::Point &dstPos, const ClipRect *clipRect = nullptr);
-    util::Rect draw(const QString &text, const util::Rect &dstRect, const ClipRect *clipRect = nullptr);
-    util::Rect draw(const QString &text, const util::Rect &dstRect, bool alignHCenter, bool alignBottom, const ClipRect *clipRect = nullptr);
+    Rect draw(const QString &text, int x, int y, const ClipRect *clipRect = nullptr);
+    Rect draw(const QString &text, const Point &dstPos, const ClipRect *clipRect = nullptr);
+    Rect draw(const QString &text, const Rect &dstRect, const ClipRect *clipRect = nullptr);
+    Rect draw(const QString &text, const Rect &dstRect, bool alignHCenter, bool alignBottom, const ClipRect *clipRect = nullptr);
     int height() const;
     int width(const QString &text) const;
 
@@ -124,25 +124,25 @@ inline void Font::load(const QString &filename, const QRgb &colorNormal, const Q
 }
 
 
-inline util::Rect Font::draw(const QString &text, int x, int y, const ClipRect *clipRect)
+inline Rect Font::draw(const QString &text, int x, int y, const ClipRect *clipRect)
 {
-    return d->draw(text, util::Rect(x, y, -1, -1), false, false, clipRect);
+    return d->draw(text, Rect(x, y, -1, -1), false, false, clipRect);
 }
 
 
-inline util::Rect Font::draw(const QString &text, const util::Point &dstPos, const ClipRect *clipRect)
+inline Rect Font::draw(const QString &text, const Point &dstPos, const ClipRect *clipRect)
 {
     return draw(text, dstPos.x, dstPos.y, clipRect);
 }
 
 
-inline util::Rect Font::draw(const QString &text, const util::Rect &dstRect, const ClipRect *clipRect)
+inline Rect Font::draw(const QString &text, const Rect &dstRect, const ClipRect *clipRect)
 {
     return d->draw(text, dstRect, false, false, clipRect);
 }
 
 
-inline util::Rect Font::draw(const QString &text, const util::Rect &dstRect, bool alignHCenter, bool alignBottom, const ClipRect *clipRect)
+inline Rect Font::draw(const QString &text, const Rect &dstRect, bool alignHCenter, bool alignBottom, const ClipRect *clipRect)
 {
     return d->draw(text, dstRect, alignHCenter, alignBottom, clipRect);
 }

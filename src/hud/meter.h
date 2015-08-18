@@ -19,7 +19,7 @@
 #define HUD_METER_H
 
 
-#include "util/rect.hpp"
+#include "util/geometry2d.h"
 #include "ui/widget.h"
 #include "gfx/texture.h"
 
@@ -33,14 +33,14 @@ class HUD;
 class Meter : public ui::Widget
 {
 public:
-    Meter(HUD *hud, util::Rect rect, glm::ivec2 barPos, int barHeight, bool k);
+    Meter(HUD *hud, Rect rect, glm::ivec2 barPos, int barHeight, bool k);
 
 protected:
     void draw();
 
 private:
     HUD *m_hud;
-    util::Rect m_rect;
+    Rect m_rect;
     glm::ivec2 m_barPos;
     int m_barHeight;
     bool m_k;

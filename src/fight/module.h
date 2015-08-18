@@ -38,15 +38,15 @@ public:
 public:
     void draw();
     const BoundingBox& box() const { return m_box; }
-    bool intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal);
+    bool intersect(const Vector3D &start, const Vector3D &dir, float radius, float &distance, Vector3D &normal);
 
 private:
     struct Mesh
     {
         gfx::Texture texture;
-        std::vector<glm::vec3> vertices;
-        //std::vector<glm::vec3> normals;
-        std::vector<glm::vec2> texCoords;
+        std::vector<Vector3D> vertices;
+        //std::vector<Vector3D> normals;
+        std::vector<Vector2D> texCoords;
         std::vector<quint16> indices;
     };
 

@@ -122,7 +122,7 @@ void Sonar::update(float elapsedTime)
 
         float passiveRange = m_passiveRange + m_passiveRangeMult*object->noise();
         float activeRange = m_activeRange + m_activeRangeMult*object->noise();
-        glm::vec3 dir = object->center() - m_scenario->position();
+        Vector3D dir = object->center() - m_scenario->position();
         float dist = glm::length(dir);
         if (dist > passiveRange && (dist > activeRange || !m_active))
             continue;

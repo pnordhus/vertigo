@@ -24,7 +24,7 @@
 namespace hud {
 
 
-RadioMessage::RadioMessage(HUD *hud, util::Rect rect) :
+RadioMessage::RadioMessage(HUD *hud, Rect rect) :
     ui::Widget(hud->widget()),
     m_hud(hud),
     m_rect(rect),

@@ -42,18 +42,18 @@ void Crosshair::draw()
     fight::Target &target = m_hud->scenario()->target();
     if (target.isLocked())
     {
-        glm::vec3 aimPoint = target.position();
+        Vector3D aimPoint = target.position();
 
-        glm::mat4 m = m_hud->hudProjectionMatrixInverted() * m_hud->scenario()->projectionMatrix() * m_hud->scenario()->cameraMatrix();
-        glm::vec4 point4 = m * glm::vec4(aimPoint - m_hud->scenario()->position(), 1);
-        util::Point point = glm::round(glm::vec2(point4)/point4.w);
-        util::Rect rect = m_clipRect->rect();
+        Matrix m = m_hud->hudProjectionMatrixInverted() * m_hud->scenario()->projectionMatrix() * m_hud->scenario()->cameraMatrix();
+        Vector4D point4 = m * Vector4D(aimPoint - m_hud->scenario()->position(), 1);
+        Point point = glm::round(Vector2D(point4)/point4.w);
+        Rect rect = m_clipRect->rect();
 
         if (point4.z > 0 || !rect.contains(point))
         {
-            util::Point center = m_hud->project(m_hud->center());
-            glm::vec2 dir = glm::vec2(point4) - glm::vec2(center)*point4.w;
-            glm::vec2 dim;
+            Point center = m_hud->project(m_hud->center());
+            Vector2D dir = Vector2D(point4) - Vector2D(center)*point4.w;
+            Vector2D dim;
             if (dir.x > 0)
                 dim.x = rect.right() - center.x;
             else
@@ -62,9 +62,9 @@ void Crosshair::draw()
                 dim.y = rect.bottom() - center.y;
             else
                 dim.y = rect.top() - center.y;
-            point = center + util::Point(dim.x, dim.x/dir.x*dir.y);
+            point = center + Point(dim.x, dim.x/dir.x*dir.y);
             if (!rect.contains(point))
-                point = center + util::Point(dim.y/dir.y*dir.x, dim.y);
+                point = center + Point(dim.y/dir.y*dir.x, dim.y);
         }
         m_aim.draw(point.x - (m_aim.width() + 1)/2, point.y - (m_aim.height() + 1)/2, m_clipRect);
     }

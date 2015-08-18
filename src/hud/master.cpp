@@ -27,7 +27,7 @@
 namespace hud {
 
 
-Master::Master(HUD *hud, util::Rect rect) :
+Master::Master(HUD *hud, Rect rect) :
     ui::Widget(hud->widget()),
     m_hud(hud),
     m_rect(rect),
@@ -58,8 +58,8 @@ Master::Master(HUD *hud, util::Rect rect) :
 
 void Master::draw()
 {
-    util::Point rectPos = m_hud->project(m_rect.pos());
-    util::Rect rect(rectPos, m_hud->project(m_rect.pos() + m_rect.size()) - rectPos);
+    Point rectPos = m_hud->project(m_rect.pos());
+    Rect rect(rectPos, m_hud->project(m_rect.pos() + m_rect.size()) - rectPos);
     m_clipRect.setRect(rect);
 
     util::RectangleInclusive<int> rectInc = rect;
@@ -68,28 +68,28 @@ void Master::draw()
     m_edgeTL.draw(rectInc.left(), rectInc.top());
     m_edgeTR.draw(rectInc.right() - m_edgeTR.width(), rectInc.top());
 
-    glm::mat4 m = m_hud->hudProjectionMatrixInverted() * m_hud->scenario()->projectionMatrix() * m_hud->scenario()->cameraMatrix();
+    Matrix m = m_hud->hudProjectionMatrixInverted() * m_hud->scenario()->projectionMatrix() * m_hud->scenario()->cameraMatrix();
     fight::Target &target = m_hud->scenario()->target();
     bool lockNotLost = target.locked() == nullptr;
 
     for (const auto &entry : m_hud->scenario()->sonar())
     {
         lockNotLost |= target.locked() == entry.object;
-        glm::vec4 point4 = m * glm::vec4(entry.object->center() - m_hud->scenario()->position(), 1);
+        Vector4D point4 = m * Vector4D(entry.object->center() - m_hud->scenario()->position(), 1);
         drawPoint(point4, rect, entry.object == target.locked(), entry.isFriend, entry.isPassive);
     }
     if (target.lockedNavPoint() != nullptr)
     {
-        glm::vec4 point4 = m * glm::vec4(target.lockedNavPoint()->position() - m_hud->scenario()->position(), 1);
+        Vector4D point4 = m * Vector4D(target.lockedNavPoint()->position() - m_hud->scenario()->position(), 1);
         drawPoint(point4, rect, true, true, true);
     }
 
     if (m_hud->navPoint() >= 0)
     {
-        glm::vec4 point4 = m * glm::vec4(m_hud->scenario()->navPoints()[m_hud->navPoint()]->position() - m_hud->scenario()->position(), 1);
+        Vector4D point4 = m * Vector4D(m_hud->scenario()->navPoints()[m_hud->navPoint()]->position() - m_hud->scenario()->position(), 1);
         if (point4.z > 0)
             return;
-        util::Point point = glm::round(glm::vec2(point4)/point4.w);
+        Point point = glm::round(Vector2D(point4)/point4.w);
         m_way.draw(point.x - (m_way.width() + 1)/2, point.y - (m_way.height() + 1)/2, &m_clipRect);
 
         m_hud->fontYellow().draw(QString("NAV %1").arg(static_cast<char>('A' + m_hud->scenario()->navPoints()[m_hud->navPoint()]->num())), point.x - 16, point.y - 17, &m_clipRect);
@@ -103,16 +103,16 @@ void Master::draw()
 }
 
 
-void Master::drawPoint(const glm::vec4 &point4, const util::Rect &rect, bool isLocked, bool isFriend, bool isPassive)
+void Master::drawPoint(const Vector4D &point4, const Rect &rect, bool isLocked, bool isFriend, bool isPassive)
 {
     gfx::Texture *tex;
-    util::Point point = glm::round(glm::vec2(point4)/point4.w);
+    Point point = glm::round(Vector2D(point4)/point4.w);
 
     if (isLocked && (point4.z > 0 || !rect.contains(point)))
     {
-        util::Point center = m_hud->project(m_hud->center());
-        glm::vec2 dir = glm::vec2(point4) - glm::vec2(center)*point4.w;
-        glm::vec2 dim;
+        Point center = m_hud->project(m_hud->center());
+        Vector2D dir = Vector2D(point4) - Vector2D(center)*point4.w;
+        Vector2D dim;
         if (dir.x > 0)
             dim.x = rect.right() - center.x;
         else
@@ -121,7 +121,7 @@ void Master::drawPoint(const glm::vec4 &point4, const util::Rect &rect, bool isL
             dim.y = rect.bottom() - center.y;
         else
             dim.y = rect.top() - center.y;
-        util::Point p = center + util::Point(dim.x, dim.x/dir.x*dir.y);
+        Point p = center + Point(dim.x, dim.x/dir.x*dir.y);
         if (rect.contains(p))
         {
             if (p.x > center.x)
@@ -131,7 +131,7 @@ void Master::drawPoint(const glm::vec4 &point4, const util::Rect &rect, bool isL
         }
         else
         {
-            p = center + util::Point(dim.y/dir.y*dir.x, dim.y);
+            p = center + Point(dim.y/dir.y*dir.x, dim.y);
             if (p.y > center.y)
                 m_arrowD.draw(p.x - (m_arrowD.width() + 1)/2, p.y - m_arrowD.height() + 1);
             else
@@ -163,10 +163,10 @@ void Master::drawPoint(const glm::vec4 &point4, const util::Rect &rect, bool isL
         fight::Target &target = m_hud->scenario()->target();
         
         float distance = glm::length(target.position() - m_hud->scenario()->position());
-        m_hud->fontGreen().draw(QString("%1M").arg(static_cast<int>(glm::round(distance))), util::Rect(point.x - 100, point.y + 26, 200, -1), true, false, &m_clipRect);
+        m_hud->fontGreen().draw(QString("%1M").arg(static_cast<int>(glm::round(distance))), Rect(point.x - 100, point.y + 26, 200, -1), true, false, &m_clipRect);
         
         if (target.locked() != nullptr)
-            m_hud->fontGreen().draw(target.locked()->name(), util::Rect(point.x - 100, point.y - 34, 200, -1), true, false, &m_clipRect);
+            m_hud->fontGreen().draw(target.locked()->name(), Rect(point.x - 100, point.y - 34, 200, -1), true, false, &m_clipRect);
     }
 }
 

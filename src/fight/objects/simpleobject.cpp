@@ -47,7 +47,7 @@ void SimpleObject::draw()
 }
 
 
-bool SimpleObject::intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal)
+bool SimpleObject::intersect(const Vector3D &start, const Vector3D &dir, float radius, float &distance, Vector3D &normal)
 {
     if (m_base->intersect((start - m_position)/m_scale, dir, radius/m_scale, distance, normal))
     {
