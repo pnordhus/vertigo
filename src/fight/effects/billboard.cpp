@@ -163,7 +163,7 @@ void Billboard::draw(const Vector3D &position, float angle, float scale, int tim
 
 BoundingBox Billboard::box()
 {
-    float scale = m_scale*m_stages[0].scale.length();
+    float scale = m_scale*glm::length(m_stages[0].scale);
     return BoundingBox(Vector3D(-1, -1, -1)*scale, Vector3D(1, 1, 1)*scale);
 }
 

@@ -35,6 +35,7 @@ NavPoint::NavPoint(Scenario *scenario, int num) :
     m_state1 = scenario->moduleManager().get("thumper1.mod");
     m_scale = 0.03;
     m_state = 0;
+    m_box = m_state0->box().scale(m_scale);
 }
 
 

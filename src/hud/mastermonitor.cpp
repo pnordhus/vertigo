@@ -23,6 +23,8 @@
 #include "txt/stringtable.h"
 #include "sfx/samplemap.h"
 #include <glm/geometric.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 
 namespace hud {
@@ -52,7 +54,8 @@ void MasterMonitor::draw()
     QString txtGun = "----";
     QString txtTorpedo = "----";
 
-    fight::ActiveObject *object = m_hud->scenario()->target().locked();
+    fight::Target &target = m_hud->scenario()->target();
+    fight::ActiveObject *object = target.locked();
     if (object != nullptr)
     {
         isFriend = m_hud->scenario()->isFriend(0, object->iff());
@@ -81,7 +84,7 @@ void MasterMonitor::draw()
         }
     }
 
-    fight::NavPoint *navPoint = m_hud->scenario()->target().lockedNavPoint();
+    fight::NavPoint *navPoint = target.lockedNavPoint();
     if (navPoint != nullptr)
     {
         txtName = QString("NAV %1").arg(static_cast<char>('A' + navPoint->num()));
@@ -89,6 +92,33 @@ void MasterMonitor::draw()
         txtHeight = "10M";
         txtVelocity = "0KMH";
         txtNoise = "0";
+    }
+
+    if (target.isLocked())
+    {
+        Point observePos = m_hud->project(m_rect.pos() + m_observationRect.pos());
+        Point observeCenter = m_hud->project(m_rect.pos() + m_observationRect.center());
+        Matrix m(1);
+        m = glm::translate(m, Vector3D(observeCenter, -0.5f));
+        m = glm::scale(m, Vector3D(observeCenter.x - observePos.x, observePos.y - observeCenter.y, 0.5f));
+        m *= m_hud->scenario()->cameraMatrix();
+
+        fight::Object *obj = target.object();
+        const fight::BoundingBox& box = obj->box();
+        m = glm::scale(m, Vector3D(2/glm::length(box.dim())));
+        m = glm::translate(m, -0.5f*(box.maxPoint() + box.minPoint()));
+
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
+        glFrontFace(GL_CW);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadMatrixf(glm::value_ptr(m));
+        obj->draw();
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+        glDisable(GL_CULL_FACE);
+        glFrontFace(GL_CCW);
+        glDisable(GL_DEPTH_TEST);
     }
 
     pos = m_hud->project(m_rect.pos() + Point(m_rect.width/2, 4));
