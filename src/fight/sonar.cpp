@@ -89,6 +89,9 @@ void Sonar::init(int sensor)
         m_detectWeapons = true;
         m_detectActivity = true;
     }
+    // TODO: remove
+    m_iff = true;
+    m_detectArmor = true;
 }
 
 

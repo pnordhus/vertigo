@@ -73,6 +73,12 @@ private:
     gfx::Texture m_lockPassiveGreen;
     gfx::Texture m_lockPassiveRed;
 
+    std::vector<gfx::Texture> m_kineticShield;
+    std::vector<gfx::Texture> m_shockShield;
+    gfx::Texture m_inRange;
+    gfx::Texture m_sensor1;
+    gfx::Texture m_sensor2;
+
     gfx::Texture m_way;
 };
 

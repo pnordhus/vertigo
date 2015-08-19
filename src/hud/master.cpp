@@ -51,8 +51,16 @@ Master::Master(HUD *hud, Rect rect) :
     m_lockPassiveYellow(hud->getImage("hudlocpa"), false),
     m_lockPassiveGreen(hud->getImage("hudlocpg"), false),
     m_lockPassiveRed(hud->getImage("hudlocpr"), false),
+    m_inRange(hud->getImage("hudinrag"), false),
+    m_sensor1(hud->getImage("hudsens1"), false),
+    m_sensor2(hud->getImage("hudsens2"), false),
     m_way(hud->getImage("hudway1"), false)
 {
+    int i;
+    for (i = 9; i >= 0; i--)
+        m_kineticShield.emplace_back(hud->getImage(QString("hudinte%1").arg(i)), false);
+    for (i = 9; i >= 0; i--)
+        m_shockShield.emplace_back(hud->getImage(QString("hudeemp%1").arg(i)), false);
 }
 
 
@@ -141,32 +149,56 @@ void Master::drawPoint(const Vector4D &point4, const Rect &rect, bool isLocked, 
     if (point4.z > 0)
         return;
     
-    if (isLocked)
+    if (!isLocked)
     {
-        if (isPassive)
-            tex = isFriend && m_hud->scenario()->blink() ? &m_lockPassiveGreen : &m_lockPassiveRed;
+        if (!isPassive)
+            tex = isFriend ? &m_activeGreen : &m_activeRed;
         else
-            tex = isFriend && m_hud->scenario()->blink() ? &m_lockActiveGreen : &m_lockActiveRed;
+            tex = isFriend ? &m_passiveGreen : &m_passiveRed;
         tex->draw(point.x - tex->width()/2, point.y - tex->height()/2, &m_clipRect);
     }
     else
     {
-        if (isPassive)
-            tex = isFriend ? &m_passiveGreen : &m_passiveRed;
+        if (!isPassive)
+            tex = isFriend && m_hud->scenario()->blink() ? &m_lockActiveGreen : &m_lockActiveRed;
         else
-            tex = isFriend ? &m_activeGreen : &m_activeRed;
+            tex = isFriend && m_hud->scenario()->blink() ? &m_lockPassiveGreen : &m_lockPassiveRed;
         tex->draw(point.x - tex->width()/2, point.y - tex->height()/2, &m_clipRect);
-    }
 
-    if (isLocked && !isPassive)
-    {
         fight::Target &target = m_hud->scenario()->target();
-        
         float distance = glm::length(target.position() - m_hud->scenario()->position());
-        m_hud->fontGreen().draw(QString("%1M").arg(static_cast<int>(glm::round(distance))), Rect(point.x - 100, point.y + 26, 200, -1), true, false, &m_clipRect);
-        
-        if (target.locked() != nullptr)
+
+        if (!isPassive)
+            m_hud->fontGreen().draw(QString("%1M").arg(static_cast<int>(glm::round(distance))), Rect(point.x - 100, point.y + 26, 200, -1), true, false, &m_clipRect);
+
+        if (target.locked() == nullptr)
+            return;
+
+        if (!isPassive)
+        {
             m_hud->fontGreen().draw(target.locked()->name(), Rect(point.x - 100, point.y - 34, 200, -1), true, false, &m_clipRect);
+
+            if (m_hud->scenario()->sonar().detectArmor())
+            {
+                int kinetic = 10*1000/(1000 + 1);
+                m_kineticShield[kinetic].draw(point.x + 30, point.y - 20, &m_clipRect);
+                int shock = 10*1000/(1000 + 1);
+                m_shockShield[shock].draw(point.x + 35, point.y - 20, &m_clipRect);
+            }
+        }
+
+        tex = nullptr;
+        //tex = &m_sensor2;
+        if (tex && isPassive)
+            tex->draw(point.x - 22, point.y - 11, &m_clipRect);
+        if (tex && !isPassive)
+            tex->draw(point.x - 34, point.y - 23, &m_clipRect);
+
+        tex = distance < 105.0f ? &m_inRange : nullptr;
+        if (tex && isPassive)
+            m_inRange.draw(point.x - 21, point.y + 11, &m_clipRect);
+        if (tex && !isPassive)
+            m_inRange.draw(point.x - 33, point.y + 17, &m_clipRect);
     }
 }
 
