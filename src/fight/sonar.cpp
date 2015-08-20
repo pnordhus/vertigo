@@ -145,7 +145,7 @@ void Sonar::update(float elapsedTime)
         float dist = glm::length(dir);
         if (dist > passiveRange && (dist > activeRange || !m_active))
             continue;
-        if (m_scenario->target().locked() == object && !object->isIdentified() && dist <= 35.0f)
+        if (m_active && m_scenario->target().locked() == object && !object->isIdentified() && dist <= 35.0f)
             object->identify();
 
         m_sonarEntries.emplace_back();

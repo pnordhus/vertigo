@@ -181,9 +181,9 @@ void Master::drawPoint(const Vector4D &point4, const Rect &rect, bool isLocked, 
             if (m_hud->scenario()->sonar().detectArmor())
             {
                 int kinetic = 10*1000/(1000 + 1);
-                m_kineticShield[kinetic].draw(point.x + 30, point.y - 20, &m_clipRect);
+                m_kineticShield[kinetic].draw(point.x + 25, point.y - 20, &m_clipRect);
                 int shock = 10*1000/(1000 + 1);
-                m_shockShield[shock].draw(point.x + 35, point.y - 20, &m_clipRect);
+                m_shockShield[shock].draw(point.x + 29, point.y - 20, &m_clipRect);
             }
         }
 
@@ -196,7 +196,7 @@ void Master::drawPoint(const Vector4D &point4, const Rect &rect, bool isLocked, 
 
         tex = distance < 105.0f ? &m_inRange : nullptr;
         if (tex && isPassive)
-            m_inRange.draw(point.x - 21, point.y + 11, &m_clipRect);
+            m_inRange.draw(point.x - 21, point.y + 5, &m_clipRect);
         if (tex && !isPassive)
             m_inRange.draw(point.x - 33, point.y + 17, &m_clipRect);
     }
