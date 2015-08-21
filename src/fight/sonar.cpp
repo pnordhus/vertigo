@@ -18,6 +18,7 @@
 #include "sonar.h"
 #include "scenario.h"
 #include "objects/activeobject.h"
+#include "objects/navpoint.h"
 #include "sfx/samplemap.h"
 
 #include <glm/geometric.hpp>
@@ -130,6 +131,14 @@ void Sonar::update(float elapsedTime)
         }
     }
 
+    Target &target = m_scenario->target();
+    bool lockNotLost = !target.isLocked();
+    if (target.lockedNavPoint() != nullptr)
+    {
+        lockNotLost = true;
+        target.setDistance(glm::distance(target.lockedNavPoint()->position(), m_scenario->position()));
+    }
+
     m_sonarEntries.clear();
     for (const auto &object_ptr : *m_scenario)
     {
@@ -145,14 +154,26 @@ void Sonar::update(float elapsedTime)
         float dist = glm::length(dir);
         if (dist > passiveRange && (dist > activeRange || !m_active))
             continue;
-        if (m_active && m_scenario->target().locked() == object && !object->isIdentified() && dist <= 35.0f)
-            object->identify();
+        if (target.locked() == object)
+        {
+            lockNotLost = true;
+            target.setDistance(dist);
+            if (m_active && !object->isIdentified() && dist <= 35.0f)
+                object->identify();
+        }
 
         m_sonarEntries.emplace_back();
         SonarEntry &entry = m_sonarEntries.back();
         entry.object = object;
+        entry.distance = dist;
         entry.isFriend = !m_iff || m_scenario->isFriend(0, object->iff());
         entry.isPassive = dist > activeRange || !m_active;
+    }
+
+    if (!lockNotLost)
+    {
+        target.lockReset();
+        sfx::SampleMap::get(sfx::Sample::TargetLost).play();
     }
 }
 

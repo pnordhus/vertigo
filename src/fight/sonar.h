@@ -38,6 +38,7 @@ public:
     struct SonarEntry
     {
         ActiveObject *object;
+        float distance;
         bool isFriend;
         bool isPassive;
     };

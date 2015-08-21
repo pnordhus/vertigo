@@ -513,9 +513,6 @@ void Scenario::keyPressEvent(QKeyEvent *e)
         Vector3D dir = -Vector3D(glm::row(m_cameraMatrix, 2));
         m_effectManager.addProjectile(Effects::Shoot_Vendetta, m_position, dir);
     }
-
-    if (e->key() == Qt::Key_R)
-        m_sonar.toggle();
 }
 
 

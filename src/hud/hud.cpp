@@ -38,6 +38,7 @@
 #include "activesonar.h"
 #include "master.h"
 #include "mastermonitor.h"
+#include "sonarmonitor.h"
 
 
 namespace hud {
@@ -123,6 +124,14 @@ void HUD::load(game::Boat *boat)
     file.setSection("mastermonitor");
     MasterMonitor *masterMonitor = new MasterMonitor(this, readRect(file), Rect(file.value("ObservationX1").toInt(), file.value("ObservationY1").toInt(), file.value("ObservationWidth").toInt(), file.value("ObservationHeight").toInt()));
     m_children.emplace_back(masterMonitor);
+
+    file.setSection("roundmonitor0");
+    m_sonar1 = new SonarMonitor(this, Point(file.value("X1").toInt(), file.value("Y1").toInt()), file.value("Radius").toInt(), 360);
+    m_children.emplace_back(m_sonar1);
+
+    file.setSection("roundmonitor1");
+    m_sonar2 = new SonarMonitor(this, Point(file.value("X1").toInt(), file.value("Y1").toInt()), file.value("Radius").toInt(), 180);
+    m_children.emplace_back(m_sonar2);
 
     m_integerScale = false;
 
@@ -238,6 +247,21 @@ void HUD::keyPressEvent(QKeyEvent *e)
             if (m_navPoint >= m_scenario->navPoints().size())
                 m_navPoint = -1;
         }
+    }
+    if (e->key() == Qt::Key_R)
+    {
+        if ((e->modifiers() & ~Qt::KeypadModifier) == Qt::ALT)
+        {
+            int scale = m_sonar1->scale();
+            if (scale == 90)
+                scale = 360;
+            else
+                scale /= 2;
+            m_sonar1->setScale(scale);
+            m_sonar2->setScale(scale/2);
+        }
+        else
+            m_scenario->sonar().toggle();
     }
     if (e->key() == Qt::Key_L)
         m_scenario->target().lockReticle();

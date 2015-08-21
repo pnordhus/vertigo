@@ -35,6 +35,9 @@ namespace txt { class DesFile; }
 namespace hud {
 
 
+class SonarMonitor;
+
+
 class HUD : public game::Renderer
 {
 public:
@@ -100,6 +103,8 @@ private:
     ui::Label m_integerScaleWidget;
     ui::Label m_noScaleWidget;
     std::vector<std::unique_ptr<ui::Widget>> m_children;
+    SonarMonitor* m_sonar1;
+    SonarMonitor* m_sonar2;
 };
 
 

@@ -20,7 +20,6 @@
 #include "fight/scenario.h"
 #include "fight/objects/navpoint.h"
 #include "fight/objects/activeobject.h"
-#include "sfx/samplemap.h"
 #include <glm/geometric.hpp>
 
 
@@ -78,11 +77,9 @@ void Master::draw()
 
     Matrix m = m_hud->hudProjectionMatrixInverted() * m_hud->scenario()->projectionMatrix() * m_hud->scenario()->cameraMatrix();
     fight::Target &target = m_hud->scenario()->target();
-    bool lockNotLost = target.locked() == nullptr;
 
     for (const auto &entry : m_hud->scenario()->sonar())
     {
-        lockNotLost |= target.locked() == entry.object;
         Vector4D point4 = m * Vector4D(entry.object->center() - m_hud->scenario()->position(), 1);
         drawPoint(point4, rect, entry.object == target.locked(), entry.isFriend, entry.isPassive);
     }
@@ -101,12 +98,6 @@ void Master::draw()
         m_way.draw(point.x - (m_way.width() + 1)/2, point.y - (m_way.height() + 1)/2, &m_clipRect);
 
         m_hud->fontYellow().draw(QString("NAV %1").arg(static_cast<char>('A' + m_hud->scenario()->navPoints()[m_hud->navPoint()]->num())), point.x - 16, point.y - 17, &m_clipRect);
-    }
-
-    if (!lockNotLost)
-    {
-        target.lockReset();
-        sfx::SampleMap::get(sfx::Sample::TargetLost).play();
     }
 }
 
@@ -166,10 +157,9 @@ void Master::drawPoint(const Vector4D &point4, const Rect &rect, bool isLocked, 
         tex->draw(point.x - tex->width()/2, point.y - tex->height()/2, &m_clipRect);
 
         fight::Target &target = m_hud->scenario()->target();
-        float distance = glm::length(target.position() - m_hud->scenario()->position());
 
         if (!isPassive)
-            m_hud->fontGreen().draw(QString("%1M").arg(static_cast<int>(glm::round(distance))), Rect(point.x - 100, point.y + 26, 200, -1), true, false, &m_clipRect);
+            m_hud->fontGreen().draw(QString("%1M").arg(static_cast<int>(glm::round(target.distance()))), Rect(point.x - 100, point.y + 26, 200, -1), true, false, &m_clipRect);
 
         if (target.locked() == nullptr)
             return;
@@ -194,7 +184,7 @@ void Master::drawPoint(const Vector4D &point4, const Rect &rect, bool isLocked, 
         if (tex && !isPassive)
             tex->draw(point.x - 34, point.y - 23, &m_clipRect);
 
-        tex = distance < 105.0f ? &m_inRange : nullptr;
+        tex = target.distance() < 105.0f ? &m_inRange : nullptr;
         if (tex && isPassive)
             m_inRange.draw(point.x - 21, point.y + 5, &m_clipRect);
         if (tex && !isPassive)

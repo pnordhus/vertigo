@@ -15,50 +15,48 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef FIGHT_TARGET_H
-#define FIGHT_TARGET_H
+#ifndef HUD_SONARMONITOR_H
+#define HUD_SONARMONITOR_H
 
 
-#include "util/geometry3d.h"
+#include "util/geometry2d.h"
+#include "ui/widget.h"
+#include "gfx/texture.h"
 
 
-namespace fight {
+namespace hud {
 
 
-class Scenario;
-class Object;
-class ActiveObject;
-class NavPoint;
+class HUD;
 
 
-class Target
+class SonarMonitor : public ui::Widget
 {
 public:
-    Target(Scenario *scenario);
+    SonarMonitor(HUD *hud, Point point, int radius, int scale);
 
 public:
-    bool isLocked() const { return m_locked != nullptr || m_lockedNavPoint != nullptr; }
-    Vector3D position() const;
-    Object* object() const;
-    float distance() const { return m_distance; }
-    void setDistance(float distance) { m_distance = distance; }
+    int scale() const { return m_scale; }
+    void setScale(int scale) { m_scale = scale; }
 
-    ActiveObject* locked() const { return m_locked; }
-    NavPoint* lockedNavPoint() const { return m_lockedNavPoint; }
-
-    void lockReset();
-    void lockReticle();
-    void lockNavPoint(NavPoint *navPoint);
+protected:
+    void draw();
 
 private:
-    Scenario *m_scenario;
-    ActiveObject *m_locked;
-    NavPoint *m_lockedNavPoint;
-    float m_distance;
+    HUD *m_hud;
+    Point m_point;
+    int m_radius;
+    int m_scale;
+
+    gfx::Texture m_center;
+    gfx::Texture m_nav;
+    gfx::Texture m_friend;
+    gfx::Texture m_enemy;
+    gfx::Texture m_target;
 };
 
 
-}
+} // namespace hud
 
 
-#endif // FIGHT_TARGET_H
+#endif // HUD_SONARMONITOR_H

@@ -21,7 +21,6 @@
 #include "fight/objects/activeobject.h"
 #include "fight/objects/navpoint.h"
 #include "txt/stringtable.h"
-#include "sfx/samplemap.h"
 #include <glm/geometric.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -67,7 +66,7 @@ void MasterMonitor::draw()
         else
             txtCargo = txt::StringTable::get(txt::Target_NotIdentified);
 
-        int distance = static_cast<int>(glm::round(glm::distance(m_hud->scenario()->position(), object->center())));
+        int distance = static_cast<int>(glm::round(target.distance()));
         txtDistance = QString("%1M").arg(distance);
         int height = static_cast<int>(glm::round(object->center().z - m_hud->scenario()->surface().heightAt(object->center().x, object->center().y)));
         txtHeight = QString("%1M").arg(height);
@@ -88,7 +87,7 @@ void MasterMonitor::draw()
     if (navPoint != nullptr)
     {
         txtName = QString("NAV %1").arg(static_cast<char>('A' + navPoint->num()));
-        txtDistance = QString("%1M").arg(static_cast<int>(glm::round(glm::distance(m_hud->scenario()->position(), navPoint->position()))));
+        txtDistance = QString("%1M").arg(static_cast<int>(glm::round(target.distance())));
         txtHeight = "10M";
         txtVelocity = "0KMH";
         txtNoise = "0";
