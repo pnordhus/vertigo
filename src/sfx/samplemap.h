@@ -106,12 +106,12 @@ enum class Sample
     Sample75,
     Sample76,
     Sample77,
-    Sample78,
-    Sample79,
+    MissionAccomplished,
+    Autopilot,
     NavPoint,
     Sample81,
     Sample82,
-    Sample83,
+    MissionFailed,
 };
 
 

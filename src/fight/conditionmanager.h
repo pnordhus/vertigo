@@ -67,6 +67,8 @@ public:
     void delayComplete(Condition *cond, int delay);
     void update(float elapsedTime);
 
+    bool autopilot() const { return m_condAutopilot.isCompleted(); }
+
 private:
     Scenario *m_scenario;
     std::map<int, ConditionEntry> condEntries;

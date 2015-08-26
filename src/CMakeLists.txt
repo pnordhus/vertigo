@@ -159,6 +159,8 @@ set(SOURCES
     hud/mastermonitor.h
     hud/sonarmonitor.cpp
     hud/sonarmonitor.h
+    hud/autopilot.cpp
+    hud/autopilot.h
 
     sfx/sound.cpp
     sfx/sound.h

@@ -27,6 +27,7 @@ ConditionManager::ConditionManager(Scenario *scenario) :
     m_condAutopilot(scenario),
     m_condFailure(scenario)
 {
+    m_condFailure.addDependency(&m_condAutopilot, false);
 }
 
 

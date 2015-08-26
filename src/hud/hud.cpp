@@ -39,6 +39,7 @@
 #include "master.h"
 #include "mastermonitor.h"
 #include "sonarmonitor.h"
+#include "autopilot.h"
 
 
 namespace hud {
@@ -90,6 +91,10 @@ void HUD::load(game::Boat *boat)
     file.setSection("hudactivesonarphase");
     ActiveSonar *activeSonar = new ActiveSonar(this, readRect(file));
     m_children.emplace_back(activeSonar);
+
+    file.setSection("hudautopilot");
+    Autopilot *autopilot = new Autopilot(this, readRect(file));
+    m_children.emplace_back(autopilot);
 
     file.setSection("radiomessage");
     RadioMessage *radioMessage = new RadioMessage(this, Rect(file.value("X").toInt(), file.value("Y").toInt(), 640 - file.value("X").toInt()*2, 12));
@@ -265,6 +270,14 @@ void HUD::keyPressEvent(QKeyEvent *e)
     }
     if (e->key() == Qt::Key_L)
         m_scenario->target().lockReticle();
+    if (e->key() == Qt::Key_A)
+    {
+        if ((e->modifiers() & ~Qt::KeypadModifier) == Qt::ALT)
+        {
+            if (m_scenario->conditionManager().autopilot())
+                m_eventSuccess.fire();
+        }
+    }
 
     if (m_scenario)
         m_scenario->keyPressEvent(e);

@@ -18,7 +18,7 @@
 #include "condition.h"
 #include "scenario.h"
 #include "objects/object.h"
-#include <glm/common.hpp>
+#include "sfx/samplemap.h"
 
 
 namespace fight {
@@ -100,28 +100,30 @@ void ConditionEvent::complete()
 
 
 ConditionAutopilot::ConditionAutopilot(Scenario *scenario) :
-    Condition(scenario, 0)
+    Condition(scenario, 1)
 {
+    m_delay = 5;
 }
 
 
 void ConditionAutopilot::complete()
 {
     Condition::complete();
-    //m_scenario->
+    sfx::SampleMap::get(sfx::Sample::Autopilot).play();
 }
 
 
 ConditionFailure::ConditionFailure(Scenario *scenario) :
     Condition(scenario, 1)
 {
+    m_delay = 5;
 }
 
 
 void ConditionFailure::complete()
 {
     Condition::complete();
-    //m_scenario->
+    sfx::SampleMap::get(sfx::Sample::MissionFailed).play();
 }
 
 
