@@ -102,7 +102,7 @@ void ConditionEvent::complete()
 ConditionAutopilot::ConditionAutopilot(Scenario *scenario) :
     Condition(scenario, 1)
 {
-    m_delay = 5;
+    m_delay = 3;
 }
 
 
@@ -116,7 +116,6 @@ void ConditionAutopilot::complete()
 ConditionFailure::ConditionFailure(Scenario *scenario) :
     Condition(scenario, 1)
 {
-    m_delay = 5;
 }
 
 
@@ -124,6 +123,7 @@ void ConditionFailure::complete()
 {
     Condition::complete();
     sfx::SampleMap::get(sfx::Sample::MissionFailed).play();
+    m_scenario->conditionManager().delayComplete(this, 10);
 }
 
 

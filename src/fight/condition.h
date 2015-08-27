@@ -93,9 +93,6 @@ public:
 
 public:
     void complete();
-
-private:
-    Scenario *m_scenario;
 };
 
 
