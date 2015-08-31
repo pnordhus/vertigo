@@ -19,6 +19,7 @@
 #define GAME_BRIEFING_H
 
 
+#include "util/event.hpp"
 #include "menu.h"
 #include "gfx/texture.h"
 #include "sfx/sound.h"
@@ -36,7 +37,11 @@ private:
     enum State { Init, Text, Targets, Hints, Arrow, PressKey };
 
 public:
-    Briefing(std::function<void()> &&funcStart);
+    Briefing();
+
+public:
+    util::event<>& eventInit() { return m_eventInit; }
+    util::event<>& eventStart() { return m_eventStart; }
 
 private:
     void activate();
@@ -59,7 +64,8 @@ private:
     State m_state;
     bool m_toggleState;
     int m_nextLine;
-    std::function<void()> m_funcStart;
+    util::event<> m_eventInit;
+    util::event<> m_eventStart;
 };
 
 

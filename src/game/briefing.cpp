@@ -29,10 +29,9 @@
 namespace game {
 
 
-Briefing::Briefing(std::function<void()> &&funcStart) :
+Briefing::Briefing() :
     m_state(Init),
-    m_toggleState(false),
-    m_funcStart(std::move(funcStart))
+    m_toggleState(false)
 {
     hideCursor();
 
@@ -45,8 +44,7 @@ Briefing::Briefing(std::function<void()> &&funcStart) :
     m_woopSound.load("sfx:snd/desktop/woop.pcm", 33075);
     m_woopSound.setVolume(0.1f);
 
-    // TODO: Choose cockpit
-    m_background.setTexture(gfx::Image::load("vfx:cockpit/000/cockpit.r16", 640, 480));
+    m_background.setTexture(gfx::Image::load(QString("vfx:cockpit/%1/cockpit.r16").arg(Chapter::get()->boat()->cockpit()), 640, 480));
     setRootWidget(&m_background);
 
     QImage image(640, 480, QImage::Format_Indexed8);
@@ -180,6 +178,7 @@ void Briefing::draw()
         {
             m_state = Arrow;
             m_nextLine = 0;
+            m_eventInit();
         }
     }
 
@@ -212,7 +211,7 @@ void Briefing::draw()
 void Briefing::keyPressEvent(QKeyEvent *event)
 {
     if (m_state == PressKey) {
-        m_funcStart();
+        m_eventStart();
     }
 }
 

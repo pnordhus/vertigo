@@ -73,8 +73,7 @@ void Boat::load()
     if (m_type == 2049)
     {
         file.load("vfx:sobjects/hiob.des");
-        m_flipMovie1 = "hiob1.mvi";
-        m_flipMovie2 = "hiob2.mvi";
+        m_moviePrefix = "hiob";
         m_maxBuzzers = 2;
 
         addMounting("DEFE", 0, 3, 280, 173, "TopLeft");

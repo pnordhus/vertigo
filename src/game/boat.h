@@ -48,8 +48,7 @@ public:
     int type() const { return m_type; }
     const QString& name() const { return m_name; }
     const QString& cockpit() const { return m_cockpit; }
-    const QString& flipMovie1() const { return m_flipMovie1; }
-    const QString& flipMovie2() const { return m_flipMovie2; }
+    const QString& moviePrefix() const { return m_moviePrefix; }
 
     const std::vector<Mounting>& mountings() const { return m_mountings; }
 
@@ -87,8 +86,7 @@ private:
     int m_type;
     QString m_name;
     QString m_cockpit;
-    QString m_flipMovie1;
-    QString m_flipMovie2;
+    QString m_moviePrefix;
 
     std::vector<Mounting> m_mountings;
     std::set<int> m_compatibility;

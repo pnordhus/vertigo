@@ -152,6 +152,7 @@ void HUD::load(game::Boat *boat)
 void HUD::start(fight::Scenario *scenario)
 {
     hideCursor();
+    m_rectGL = Rect();
     m_scenario = scenario;
     m_scenario->setBoat(m_boat);
     m_lastTicks = SDL_GetTicks();

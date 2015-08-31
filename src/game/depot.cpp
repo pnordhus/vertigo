@@ -98,8 +98,8 @@ Depot::Depot(std::function<void()> &&funcClose) :
     m_lblItemText->setAlignCenter(false);
 
 
-    m_videoFlip1.open(QString("gfx:mvi/sflip/%1").arg(Chapter::get()->boat()->flipMovie1()));
-    m_videoFlip2.open(QString("gfx:mvi/sflip/%1").arg(Chapter::get()->boat()->flipMovie2()));
+    m_videoFlip1.open(QString("gfx:mvi/sflip/%011.mvi").arg(Chapter::get()->boat()->moviePrefix()));
+    m_videoFlip2.open(QString("gfx:mvi/sflip/%012.mvi").arg(Chapter::get()->boat()->moviePrefix()));
     m_videoFlip1.setFrameRate(25);
     m_videoFlip2.setFrameRate(25);
     m_videoFlip2.play();

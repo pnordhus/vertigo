@@ -353,7 +353,7 @@ void Chapter::setStation(int stationIndex, bool load)
     }
 
     if (m_movieHarbour && previousStation >= 0)
-        m_movies << QString("gfx:mvi/film/%1hf.mvi").arg("hiob");
+        m_movies << QString("gfx:mvi/film/%1hf.mvi").arg(m_boat->moviePrefix());
 
     if (!m_mission && !load)
         playApproach(true);
@@ -382,17 +382,23 @@ void Chapter::startMission(const QString &name)
 
     m_currentStation = -1;
 
-    startMission();
+    if (m_movieHarbour)
+        m_movies << QString("gfx:mvi/film/%1hf.mvi").arg(m_boat->moviePrefix());
+
+    playMovies();
 }
 
 
 void Chapter::startMission()
 {
     Q_ASSERT(m_mission);
+    Q_ASSERT(m_scenario == NULL);
 
     if (m_briefing)
         m_briefing->deleteLater();
-    m_briefing = new Briefing([this]() { startScenario(); });
+    m_briefing = new Briefing();
+    m_briefing->eventInit() += [this]() { m_scenario = new fight::Scenario(m_mission->scenario()); };
+    m_briefing->eventStart() += [this]() { startScenario(); };
     m_funcSetRenderer(m_briefing);
 }
 
@@ -404,8 +410,7 @@ void Chapter::startScenario()
     m_briefing = NULL;
 
     Q_ASSERT(m_mission);
-    Q_ASSERT(m_scenario == NULL);
-    m_scenario = new fight::Scenario(m_mission->scenario());
+    Q_ASSERT(m_scenario);
     m_HUD->start(m_scenario);
     m_funcSetRenderer(m_HUD.get());
 }
@@ -425,7 +430,7 @@ void Chapter::finishMission()
     m_save = true;
 
     if (m_currentStation < 0) {
-        //TODO: this should be selectable from within the mission
+        //TODO: this should be selectable from within the mission if more than one station is enabled
         foreach (const Station& station, m_stations) {
             if (station.isEnabled()) {
                 setStation(station.index());
@@ -433,7 +438,7 @@ void Chapter::finishMission()
             }
         }
     } else {
-        playApproach(false);
+        playApproach(true);
         playMovies();
     }
 }
@@ -452,7 +457,7 @@ void Chapter::playApproach(bool autopilot)
         m_movies << "gfx:mvi/film/" + movie;
     } else {
         if (m_movieAutopilot && autopilot)
-            m_movies << QString("gfx:mvi/film/%1fl.mvi").arg("hiob");
+            m_movies << QString("gfx:mvi/film/%1fl.mvi").arg(m_boat->moviePrefix());
         if (m_movieApproach)
             m_movies << m_desktop->approachMovie();
     }
