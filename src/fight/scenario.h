@@ -66,6 +66,7 @@ public:
     const float time() const { return m_time; }
     const int buzzers() const { return m_buzzers; }
     const bool blink() const { return static_cast<int>(m_time/500.0f)%2 == 0; }
+    const int endType() const { return m_endType; }
 
     Surface& surface() { return m_surface; }
     gfx::TextureManager& textureManager() { return m_textureManager; }
@@ -137,6 +138,7 @@ private:
     std::vector<NavPoint*> m_navPoints;
 
     char m_attitudeMatrix[9][9];
+    int m_endType;
 
     float m_time;
 

@@ -76,10 +76,10 @@ protected:
 };
 
 
-class ConditionAutopilot : public Condition
+class ConditionSuccess : public Condition
 {
 public:
-    ConditionAutopilot(Scenario *scenario);
+    ConditionSuccess(Scenario *scenario);
 
 public:
     void complete();

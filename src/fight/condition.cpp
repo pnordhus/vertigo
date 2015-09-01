@@ -99,17 +99,27 @@ void ConditionEvent::complete()
 }
 
 
-ConditionAutopilot::ConditionAutopilot(Scenario *scenario) :
+ConditionSuccess::ConditionSuccess(Scenario *scenario) :
     Condition(scenario, 1)
 {
-    m_delay = 3;
 }
 
 
-void ConditionAutopilot::complete()
+void ConditionSuccess::complete()
 {
-    Condition::complete();
-    sfx::SampleMap::get(sfx::Sample::Autopilot).play();
+    if (m_delay == 0)
+    {
+        if (m_scenario->endType() == 0)
+            sfx::SampleMap::get(sfx::Sample::MissionAccomplished).play();
+
+        m_delay = 3;
+        tryComplete();
+    }
+    else
+    {
+        Condition::complete();
+        sfx::SampleMap::get(sfx::Sample::Autopilot).play();
+    }
 }
 
 

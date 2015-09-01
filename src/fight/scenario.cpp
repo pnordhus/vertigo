@@ -319,6 +319,9 @@ Scenario::Scenario(const QString &name) :
         for (int j = 0; j < 9; j++)
             m_attitudeMatrix[i][j] = m_file.value(QString("X%1Y%2").arg(j).arg(i)).toInt();
 
+    m_file.setSection("End");
+    m_endType = m_file.value("Type").toInt();
+
 
     m_cameraMatrix = Matrix(1);
     m_cameraMatrix = glm::rotate(m_cameraMatrix, glm::radians(initialDir), Vector3D(0, 1, 0));

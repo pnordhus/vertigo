@@ -67,7 +67,7 @@ public:
     void delayComplete(Condition *cond, int delay);
     void update(float elapsedTime);
 
-    bool autopilot() const { return m_condAutopilot.isCompleted(); }
+    bool autopilot() const { return m_condSuccess.isCompleted(); }
 
 private:
     Scenario *m_scenario;
@@ -76,7 +76,7 @@ private:
     std::list<ConditionRadio> m_condRadio;
     std::list<ConditionSpace> m_condSpaces;
 
-    ConditionAutopilot m_condAutopilot;
+    ConditionSuccess m_condSuccess;
     ConditionFailure m_condFailure;
     std::map<int, Condition> m_condObjectives;
 

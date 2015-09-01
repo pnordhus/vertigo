@@ -24,10 +24,10 @@ namespace fight {
 
 ConditionManager::ConditionManager(Scenario *scenario) :
     m_scenario(scenario),
-    m_condAutopilot(scenario),
+    m_condSuccess(scenario),
     m_condFailure(scenario)
 {
-    m_condFailure.addDependency(&m_condAutopilot, false);
+    m_condFailure.addDependency(&m_condSuccess, false);
 }
 
 
@@ -141,8 +141,8 @@ void ConditionManager::updateObjective(int id, int index, int wccond)
                 std::forward_as_tuple(m_scenario, 1)).first->second;
             if (objective < 16)
             {
-                cond->addDependency(&m_condAutopilot);
-                m_condAutopilot.setLimit(m_condAutopilot.limit() + 1);
+                cond->addDependency(&m_condSuccess);
+                m_condSuccess.setLimit(m_condSuccess.limit() + 1);
             }
         }
         else
@@ -253,7 +253,7 @@ void ConditionManager::initCondition(int cond, int dep, int ref, Condition *cond
             qDebug() << "Unhandled condition dep" << cond << dep;
         if (ref != -1)
             qDebug() << "Unexpected reference" << cond << ref;
-        m_condAutopilot.addDependency(condDepend);
+        m_condSuccess.addDependency(condDepend);
     }
     if (cond == 5)
     {
