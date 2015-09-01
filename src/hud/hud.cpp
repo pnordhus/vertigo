@@ -46,6 +46,7 @@ namespace hud {
 
 
 HUD::HUD() :
+    m_scenario(nullptr),
     m_colorTable("gfx:pal/gui/border.pal"),
     m_fontGreen("gfx:fnt/cpit1ahc.fnt", m_colorTable, true, false),
     m_fontRed("gfx:fnt/cpit1bhc.fnt", m_colorTable, true, false),
@@ -205,6 +206,13 @@ Rect HUD::projectCenter(const Rect &rect)
 
 void HUD::draw()
 {
+    if (!m_scenario)
+    {
+        setupGL(true);
+        m_cockpit.doDraw();
+        return;
+    }
+
     int ticks = SDL_GetTicks();
     float elapsedTime = ticks - m_lastTicks;
     m_lastTicks = ticks;
@@ -213,8 +221,7 @@ void HUD::draw()
     if (rect().x() != m_rectGL.x || rect().y() != m_rectGL.y)
         glViewport(rect().x(), rect().y(), rect().width(), rect().height());
 
-    if (m_scenario)
-        m_scenario->draw();
+    m_scenario->draw();
 
     setupGL(false);
     m_cockpit.doDraw();
@@ -236,6 +243,9 @@ void HUD::draw()
 
 void HUD::keyPressEvent(QKeyEvent *e)
 {
+    if (!m_scenario)
+        return;
+
     if (e->key() == Qt::Key_Escape)
         m_eventSuccess();
     if (e->key() == Qt::Key_N)
@@ -276,19 +286,24 @@ void HUD::keyPressEvent(QKeyEvent *e)
         if ((e->modifiers() & ~Qt::KeypadModifier) == Qt::ALT)
         {
             if (m_scenario->conditionManager().autopilot())
+            {
+                m_scenario = nullptr;
                 m_eventSuccess.fire();
+                return;
+            }
         }
     }
 
-    if (m_scenario)
-        m_scenario->keyPressEvent(e);
+    m_scenario->keyPressEvent(e);
 }
 
 
 void HUD::keyReleaseEvent(QKeyEvent *e)
 {
-    if (m_scenario)
-        m_scenario->keyReleaseEvent(e);
+    if (!m_scenario)
+        return;
+
+    m_scenario->keyReleaseEvent(e);
 }
 
 

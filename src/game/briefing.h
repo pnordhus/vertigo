@@ -20,18 +20,17 @@
 
 
 #include "util/event.hpp"
-#include "menu.h"
+#include "renderer.h"
 #include "gfx/texture.h"
 #include "sfx/sound.h"
 #include "ui/label.h"
 #include <QTime>
 
-#include <functional>
 
 namespace game {
 
 
-class Briefing : public Menu
+class Briefing : public Renderer
 {
 private:
     enum State { Init, Text, Targets, Hints, Arrow, PressKey };
@@ -46,6 +45,7 @@ public:
 private:
     void activate();
     void deactivate();
+    void setRect(const QRect &rect);
     void draw();
     void keyPressEvent(QKeyEvent *);
 
@@ -54,8 +54,7 @@ private:
     sfx::Sound m_backgroundSound;
     sfx::Sound m_openSound;
     sfx::Sound m_woopSound;
-    ui::Label m_background;
-    ui::Label *m_lblMain;
+    ui::Label m_lblMain;
     ui::Label *m_lblMap;
     ui::Label *m_lblArrow;
     ui::Label *m_lblPressKey;

@@ -67,9 +67,10 @@ public:
     void load(game::Boat *boat);
     void start(fight::Scenario *scenario);
 
-protected:
     void setRect(const QRect &rect);
     void draw();
+
+protected:
     void keyPressEvent(QKeyEvent *);
     void keyReleaseEvent(QKeyEvent *);
 

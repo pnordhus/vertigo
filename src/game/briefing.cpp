@@ -21,6 +21,7 @@
 #include "gfx/image.h"
 #include "txt/stringtable.h"
 #include "sfx/soundsystem.h"
+#include "hud/hud.h"
 #include <QApplication>
 #include <QGLContext>
 #include <QKeyEvent>
@@ -44,16 +45,12 @@ Briefing::Briefing() :
     m_woopSound.load("sfx:snd/desktop/woop.pcm", 33075);
     m_woopSound.setVolume(0.1f);
 
-    m_background.setTexture(gfx::Image::load(QString("vfx:cockpit/%1/cockpit.r16").arg(Chapter::get()->boat()->cockpit()), 640, 480));
-    setRootWidget(&m_background);
-
     QImage image(640, 480, QImage::Format_Indexed8);
     image.fill(0);
     image.setColorTable(QVector<QRgb>() << qRgba(0, 0, 0, 128));
-    m_lblMain = new ui::Label(&m_background);
-    m_lblMain->setTexture(image);
+    m_lblMain.setTexture(image);
 
-    m_lblMap = new ui::Label(m_lblMain);
+    m_lblMap = new ui::Label(&m_lblMain);
     m_lblMap->setPosition(304, 32);
     m_lblMap->setTexture(gfx::Image::load(QString("gfx:pic/area/%1.r16").arg(Chapter::get()->area()->map()), 304, 284, true));
 
@@ -75,9 +72,19 @@ void Briefing::deactivate()
     m_backgroundSound.stop();
 }
 
+
+void Briefing::setRect(const QRect &rect)
+{
+    Chapter::get()->hud()->setRect(rect);
+    Renderer::setRect(rect);
+}
+
+
 void Briefing::draw()
 {
-    Menu::draw();
+    Chapter::get()->hud()->draw();
+    setupGL(false);
+    m_lblMain.doDraw();
 
     switch (m_state)
     {
@@ -109,7 +116,7 @@ void Briefing::draw()
     {
         if (m_nextLine < Chapter::get()->mission()->textB().count())
         {
-            label = new ui::Label(m_lblMain);
+            label = new ui::Label(&m_lblMain);
             label->setFont(m_font);
             label->setText(Chapter::get()->mission()->textB().at(m_nextLine));
             label->setPosition(0, 64 + m_nextLine*11);
@@ -132,7 +139,7 @@ void Briefing::draw()
         {
             if (m_nextLine >= -2)
             {
-                label = new ui::Label(m_lblMain);
+                label = new ui::Label(&m_lblMain);
                 label->setFont(m_font);
                 if (m_nextLine == -2)
                     label->setText(txt::StringTable::get(txt::Briefing_Targets));
@@ -160,7 +167,7 @@ void Briefing::draw()
         {
             if (m_nextLine >= -2)
             {
-                label = new ui::Label(m_lblMain);
+                label = new ui::Label(&m_lblMain);
                 label->setFont(m_font);
                 if (m_nextLine == -2)
                     label->setText(txt::StringTable::get(txt::Briefing_Hints));
@@ -188,7 +195,7 @@ void Briefing::draw()
         m_nextLine++;
         if (m_nextLine > 5)
         {
-            m_lblPressKey = new ui::Label(m_lblMain);
+            m_lblPressKey = new ui::Label(&m_lblMain);
             m_lblPressKey->setFont(m_font);
             m_lblPressKey->setText(txt::StringTable::get(txt::Briefing_PressAnyKey));
             m_lblPressKey->setPosition(0, 454);

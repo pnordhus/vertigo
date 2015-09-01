@@ -88,6 +88,7 @@ public:
     QList<Task> tasks();
     Boat* boat() const { return m_boat; }
     int credits() const { return m_credits; }
+    hud::HUD* hud() const { return m_HUD.get(); }
 
 private:
     void load(const QString &filename, bool load);
