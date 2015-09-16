@@ -249,7 +249,11 @@ void HUD::keyPressEvent(QKeyEvent *e)
         return;
 
     if (e->key() == Qt::Key_Escape)
+    {
+        m_scenario = nullptr;
         m_eventSuccess();
+        return;
+    }
     if (e->key() == Qt::Key_N)
     {
         if ((e->modifiers() & ~Qt::KeypadModifier) == Qt::ALT)
