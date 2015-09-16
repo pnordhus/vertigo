@@ -294,7 +294,7 @@ void HUD::keyPressEvent(QKeyEvent *e)
             if (m_scenario->conditionManager().autopilot())
             {
                 m_scenario = nullptr;
-                m_eventSuccess.fire();
+                m_eventSuccess();
                 return;
             }
         }

@@ -17,6 +17,15 @@ AI
 
 HUD
 - Friendly fire messages
+- Torpedo lock and countdown
+- Synthetic horizon
+- Voxel radar
+- Slave monitor
+- Alert
+- Icons: locked, radiation, current
+- Pause
+- Enemy sonar yellow icon
+- Turrets targeting
 
 Effects
 - Bubbles
