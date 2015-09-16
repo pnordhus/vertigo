@@ -110,7 +110,7 @@ void Chapter::loadChapter(int chapter)
 
 void Chapter::load(const QString &filename, bool load)
 {
-    m_movies.clear();
+    m_movies = std::queue<Movie, std::list<Movie>>();
     delete m_area;
     if (m_desktop)
         m_desktop->deleteLater();
@@ -353,7 +353,9 @@ void Chapter::setStation(int stationIndex, bool load)
     }
 
     if (m_movieHarbour && previousStation >= 0)
-        m_movies << QString("gfx:mvi/film/%1hf.mvi").arg(m_boat->moviePrefix());
+        m_movies.emplace(QString("gfx:mvi/film/%1hf.mvi").arg(m_boat->moviePrefix()), Movie::MovieTransit, 
+                         txt::StringTable::get(txt::Movie_Dock), 
+                         QString("%1 %2 ...").arg(txt::StringTable::get(txt::Movie_Leaving)).arg(m_stations[previousStation].name()));
 
     if (!m_mission && !load)
         playApproach(true);
@@ -380,10 +382,12 @@ void Chapter::startMission(const QString &name)
         }
     }
 
-    m_currentStation = -1;
-
     if (m_movieHarbour)
-        m_movies << QString("gfx:mvi/film/%1hf.mvi").arg(m_boat->moviePrefix());
+        m_movies.emplace(QString("gfx:mvi/film/%1hf.mvi").arg(m_boat->moviePrefix()), Movie::MovieTransit,
+                         txt::StringTable::get(txt::Movie_Dock),
+                         QString("%1 %2 ...").arg(txt::StringTable::get(txt::Movie_Leaving)).arg(m_stations[m_currentStation].name()));
+
+    m_currentStation = -1;
 
     playMovies();
 }
@@ -454,26 +458,28 @@ void Chapter::playApproach(bool autopilot)
             if (reg.cap(1).toInt() == 36)
                 m_end = true;
         }
-        m_movies << "gfx:mvi/film/" + movie;
+        m_movies.emplace("gfx:mvi/film/" + movie, Movie::MovieFilm);
     } else {
         if (m_movieAutopilot && autopilot)
-            m_movies << QString("gfx:mvi/film/%1fl.mvi").arg(m_boat->moviePrefix());
+            m_movies.emplace(QString("gfx:mvi/film/%1fl.mvi").arg(m_boat->moviePrefix()), Movie::MovieTransit,
+                             txt::StringTable::get(txt::Movie_Autopilot),
+                             QString("%1 %2 ...").arg(txt::StringTable::get(txt::Movie_Approaching)).arg(m_desktop->name()));
         if (m_movieApproach)
-            m_movies << m_desktop->approachMovie();
+            m_movies.emplace(m_desktop->approachMovie(), Movie::MovieStation, m_desktop->name(), m_desktop->description());
     }
 }
 
 
 void Chapter::playMovie(int movie)
 {
-    m_movies << QString("gfx:mvi/film/d%1.mvi").arg(movie, 2, 10, QChar('0'));
+    m_movies.emplace(QString("gfx:mvi/film/d%1.mvi").arg(movie, 2, 10, QChar('0')), Movie::MovieFilm);
     playMovies();
 }
 
 
 void Chapter::playMovies()
 {
-    if (m_movies.isEmpty()) {
+    if (m_movies.empty()) {
         sfx::SoundSystem::get()->resumeAll();
         if (m_mission) {
             startMission();
@@ -489,8 +495,8 @@ void Chapter::playMovies()
     } else {
         sfx::SoundSystem::get()->pauseAll();
         Q_ASSERT(m_movie == NULL);
-        m_movie = new Movie([this]() { movieFinished(); });
-        m_movie->play(m_movies.takeFirst());
+        m_movie = &m_movies.front();
+        m_movie->play([this]() { movieFinished(); });
         m_funcSetRenderer(m_movie);
     }
 }
@@ -499,8 +505,8 @@ void Chapter::playMovies()
 void Chapter::movieFinished()
 {
     m_funcSetRenderer(nullptr);
-    delete m_movie;
     m_movie = NULL;
+    m_movies.pop();
     playMovies();
 }
 

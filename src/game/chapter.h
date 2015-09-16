@@ -20,6 +20,7 @@
 
 
 #include <memory>
+#include <queue>
 #include "area.h"
 #include "briefing.h"
 #include "desktop.h"
@@ -124,7 +125,7 @@ private:
     Desktop *m_desktop;
     Briefing *m_briefing;
     Movie *m_movie;
-    QStringList m_movies;
+    std::queue<Movie, std::list<Movie>> m_movies;
     QMap<int, QString> m_approachMovieReplacement;
     QMap<int, Station> m_stations;
     int m_currentStation;

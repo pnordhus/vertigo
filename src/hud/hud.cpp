@@ -173,10 +173,12 @@ void HUD::setRect(const QRect &rect)
         m_rectHUD = RectF(rect.x(), rect.y() - rectOrtho().y()/rectOrtho().height()*rect.height(), rect.width(), rect.height()*480/rectOrtho().height());
     else
         m_rectHUD = RectF(rect.x() - rectOrtho().x()/rectOrtho().width()*rect.width(), rect.y() - rectOrtho().y()/rectOrtho().height()*rect.height(), rect.width()*640/rectOrtho().width(), rect.height()*480/rectOrtho().height());
-    Renderer::setRect(QRect(glm::round(m_rectHUD.x), glm::round(m_rectHUD.y), glm::round(m_rectHUD.width), glm::round(m_rectHUD.height)));
 
     if (m_scenario)
+    {
+        Renderer::setRect(QRect(glm::round(m_rectHUD.x), glm::round(m_rectHUD.y), glm::round(m_rectHUD.width), glm::round(m_rectHUD.height)));
         m_scenario->setRect(m_rectHUD, Vector2D(m_projectionMatrix * Vector4D(m_center, 0, 1)));
+    }
 
     int w = 640;
     int h = 480;
