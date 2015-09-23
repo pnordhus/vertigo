@@ -57,8 +57,8 @@ void DigiBlock::draw()
     m_children[2]->setFont(speed > -5 ? m_hud->fontGreen() : m_hud->fontRed());
     m_children[2]->setText(QString("%1KM/H").arg(speed));
     
-    int noise = 1 + static_cast<int>(glm::round(m_hud->scenario()->noise()));
-    m_children[3]->setFont(noise == 1 ? m_hud->fontGreen() : m_hud->fontRed());
+    int noise = m_hud->scenario()->noise();
+    m_children[3]->setFont(noise <= 1 ? m_hud->fontGreen() : m_hud->fontRed());
     m_children[3]->setText(QString("NL %1").arg(noise));
 
     int time = static_cast<int>(m_hud->scenario()->time()/1000);

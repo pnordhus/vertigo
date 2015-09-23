@@ -42,7 +42,14 @@ void CollisionMesh::addTriangles(const std::vector<Vector3D> &vertices, const st
         tri.u = tri.vertices[1] - tri.vertices[0];
         tri.v = tri.vertices[2] - tri.vertices[0];
 
-        Vector3D n = glm::normalize(glm::cross(tri.u, tri.v));
+        Vector3D n = glm::cross(tri.u, tri.v);
+        float l = glm::length(n);
+        if (l < 1e-5)
+        {
+            m_triangles.pop_back();
+            continue;
+        }
+        n /= l;
         tri.plane = Vector4D(n, -glm::dot(tri.vertices[0], n));
 
         tri.uu = glm::dot(tri.u, tri.u);

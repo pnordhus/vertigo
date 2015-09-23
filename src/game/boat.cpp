@@ -68,11 +68,9 @@ Boat::Boat(txt::DesFile &file) :
 
 void Boat::load()
 {
-    txt::DesFile file;
-
     if (m_type == 2049)
     {
-        file.load("vfx:sobjects/hiob.des");
+        m_boatFile.load("vfx:sobjects/hiob.des");
         m_moviePrefix = "hiob";
         m_maxBuzzers = 2;
 
@@ -82,15 +80,15 @@ void Boat::load()
         addMounting("TORP", 1, 0, 276, 129, "TopLeft");
     }
 
-    file.setSection("Ship");
-    m_name = file.value("Name").toString();
-    file.setSection("Cockpit");
-    m_cockpit = file.value("Name").toString();
+    m_boatFile.setSection("Ship");
+    m_name = m_boatFile.value("Name").toString();
+    m_boatFile.setSection("Cockpit");
+    m_cockpit = m_boatFile.value("Name").toString();
 
-    file.setSection("Compatibility");
-    for (int comp = 0; file.contains(QString("Comp%1").arg(comp)); comp++)
+    m_boatFile.setSection("Compatibility");
+    for (int comp = 0; m_boatFile.contains(QString("Comp%1").arg(comp)); comp++)
     {
-        QString str = file.value(QString("Comp%1").arg(comp)).toString();
+        QString str = m_boatFile.value(QString("Comp%1").arg(comp)).toString();
         str.truncate(str.indexOf(' '));
         int model = str.toInt();
         if (model != 99999)

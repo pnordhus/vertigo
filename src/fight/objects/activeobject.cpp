@@ -26,6 +26,7 @@ namespace fight {
 ActiveObject::ActiveObject(Scenario *scenario) :
     Object(scenario)
 {
+    m_shockShield = m_shockShieldMax = 10000000;
 }
 
 
@@ -40,6 +41,28 @@ ActiveObject::ActiveObject(Scenario *scenario, txt::DesFile &file, int iff, cons
     m_noise = file.value("level").toFloat() + 1;
 
     file.setSection("defense");
+    m_kineticShield = m_kineticShieldMax = file.value("kineticshield0").toInt();
+    m_shockShield = m_shockShieldMax = file.value("shockshield0", 10000000).toInt();
+
+    file.setSection("offense");
+    m_kineticStrength = file.value("kineticstrength").toInt();
+    m_shockStrength = file.value("shockstrength").toInt();
+}
+
+
+void ActiveObject::damage(int kinetic, int shock, const Vector3D &position)
+{
+    m_kineticShield -= kinetic;
+    m_shockShield -= shock;
+    if (m_kineticShield < 0)
+    {
+        destroy();
+        return;
+    }
+    if (m_shockShield < 0)
+    {
+        m_eventParalyze.complete();
+    }
 }
 
 

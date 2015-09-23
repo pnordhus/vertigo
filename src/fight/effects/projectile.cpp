@@ -26,6 +26,9 @@ namespace fight {
 Projectile::Projectile(Scenario *scenario, Billboard *billboard) : 
     Effect(scenario, billboard, 0, 2)
 {
+    m_kineticShield = m_kineticShieldMax = billboard->kineticShield();
+    m_kineticStrength = billboard->kineticStrength();
+    m_shockStrength = billboard->shockStrength();
 }
 
 
@@ -66,7 +69,7 @@ bool Projectile::update(float elapsedTime)
     {
         ActiveObject *activeObject = dynamic_cast<ActiveObject *>(collision);
         if (activeObject)
-            activeObject->destroy();
+            activeObject->damage(m_kineticStrength, m_shockStrength, pos - normal*m_billboard->collisionRadius());
         else
             m_scenario->effectManager().addEffect(Effects::Explosion_11, pos, qrand()%360);
         disable();

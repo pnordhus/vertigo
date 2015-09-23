@@ -49,6 +49,7 @@ public:
     const QString& name() const { return m_name; }
     const QString& cockpit() const { return m_cockpit; }
     const QString& moviePrefix() const { return m_moviePrefix; }
+    txt::DesFile& boatFile() { return m_boatFile; }
 
     const std::vector<Mounting>& mountings() const { return m_mountings; }
 
@@ -87,6 +88,7 @@ private:
     QString m_name;
     QString m_cockpit;
     QString m_moviePrefix;
+    txt::DesFile m_boatFile;
 
     std::vector<Mounting> m_mountings;
     std::set<int> m_compatibility;

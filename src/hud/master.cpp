@@ -170,9 +170,9 @@ void Master::drawPoint(const Vector4D &point4, const Rect &rect, bool isLocked, 
 
             if (m_hud->scenario()->sonar().detectArmor())
             {
-                int kinetic = 10*1000/(1000 + 1);
+                int kinetic = 10*target.locked()->kineticShield()/(target.locked()->kineticShieldMax() + 1);
                 m_kineticShield[kinetic].draw(point.x + 25, point.y - 20, &m_clipRect);
-                int shock = 10*1000/(1000 + 1);
+                int shock = 10*target.locked()->shockShield()/(target.locked()->shockShieldMax() + 1);
                 m_shockShield[shock].draw(point.x + 29, point.y - 20, &m_clipRect);
             }
         }

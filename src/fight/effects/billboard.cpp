@@ -43,7 +43,7 @@ Billboard::Billboard(gfx::TextureManager &texMan, txt::DesFile &file, int index)
     m_noiseLevel = file.value("level").toFloat();
 
     file.setSection(QString("defense%1").arg(index));
-    m_kineticShield = file.value("kineticshield").toInt();
+    m_kineticShield = file.value("kineticshield0").toInt();
 
     file.setSection(QString("offense%1").arg(index));
     m_kineticStrength = file.value("kineticstrength").toInt();

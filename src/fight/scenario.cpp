@@ -29,6 +29,7 @@
 #include "objects/turretbase.h"
 #include "objects/navpoint.h"
 #include "objects/simpleobject.h"
+#include "objects/player.h"
 
 #include <QGLContext>
 #include <QTime>
@@ -49,7 +50,6 @@ Scenario::Scenario(const QString &name) :
     m_sonar(this),
     m_target(this),
     m_speed(0),
-    m_noise(0),
     m_time(0),
     m_left(0.0f),
     m_right(0.0f),
@@ -333,12 +333,21 @@ Scenario::Scenario(const QString &name) :
 }
 
 
-void Scenario::setBoat(const game::Boat *boat)
+void Scenario::setBoat(game::Boat *boat)
 {
+    m_player.reset(new Player(this, boat));
+    m_player->setPosition(m_position);
+
     m_buzzers = boat->buzzers().size();
 
     m_sonar.init(boat->sensor());
     m_sonar.activate();
+}
+
+
+const int Scenario::noise() const
+{
+    return static_cast<int>(glm::round(m_player->noise()));
 }
 
 
@@ -379,16 +388,21 @@ void Scenario::update(float elapsedTime)
         Vector3D pos, normal;
         if (m_surface.testCollision(prevPos, m_position, 1.5f, pos, normal))
             m_position = pos;
-        m_height = m_position.z - m_surface.heightAt(m_position.x, m_position.y);
 
         Object *collision = m_collisionManager.testCollision(prevPos, m_position, 1.5f, pos, normal);
         if (collision)
         {
             ActiveObject *activeObject = dynamic_cast<ActiveObject *>(collision);
             if (activeObject)
-                activeObject->destroy();
+            {
+                activeObject->damage(m_player->kineticStrength(), m_player->shockStrength(), pos - normal*1.5f);
+                m_player->damage(activeObject->kineticStrength(), activeObject->shockStrength(), pos - normal*1.5f);
+            }
             m_position = pos;
         }
+
+        m_height = m_position.z - m_surface.heightAt(m_position.x, m_position.y);
+        m_player->setPosition(m_position);
     }
 
     m_conditionManager.update(elapsedTime);

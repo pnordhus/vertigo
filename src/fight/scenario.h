@@ -44,6 +44,7 @@ namespace fight {
 
 class Object;
 class NavPoint;
+class Player;
 
 
 class Scenario : public util::DeferredDeletable
@@ -62,7 +63,7 @@ public:
     const float height() const { return m_height; }
     const float depth() const { return m_depth - m_position.z; }
     const float speed() const { return m_speed; }
-    const int noise() const { return m_noise; }
+    const int noise() const;
     const float time() const { return m_time; }
     const int buzzers() const { return m_buzzers; }
     const bool blink() const { return static_cast<int>(m_time/500.0f)%2 == 0; }
@@ -84,7 +85,7 @@ public:
     bool isFriend(int iffX, int iffY) const { return m_attitudeMatrix[iffY][iffX] == 0; }
 
 public:
-    void setBoat(const game::Boat *boat);
+    void setBoat(game::Boat *boat);
     void setRect(const RectF &rect, const Vector2D &center);
     void update(float elapsedTime);
     void draw();
@@ -117,8 +118,8 @@ private:
     float m_pitch;
     float m_height;
     float m_speed;
-    int m_noise;
     int m_buzzers;
+    std::unique_ptr<Player> m_player;
 
     txt::DesFile m_file;
     int m_depth;

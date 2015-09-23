@@ -58,6 +58,8 @@ set(SOURCES
     fight/objects/turret.h
     fight/objects/turretbase.cpp
     fight/objects/turretbase.h
+    fight/objects/player.cpp
+    fight/objects/player.h
 
     fight/surface/betaspline.cpp
     fight/surface/betaspline.h

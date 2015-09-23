@@ -37,6 +37,10 @@ Trash::Trash(Scenario *scenario, Billboard *billboard, const Vector3D &position)
     m_identified = false;
     m_noise = billboard->noiseLevel();
     
+    m_kineticShield = m_kineticShieldMax = billboard->kineticShield();
+    m_kineticStrength = billboard->kineticStrength();
+    m_shockStrength = billboard->shockStrength();
+
     m_scenario->collisionManager().addObject(this);
     m_box = m_billboard->box();
 
