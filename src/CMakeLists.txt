@@ -201,6 +201,8 @@ set(SOURCES
     util/event.hpp
     util/file.cpp
     util/file.h
+    util/rect.hpp
+    util/size.hpp
 )
 
 add_executable(vertigo WIN32 ${SOURCES})

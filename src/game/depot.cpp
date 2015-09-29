@@ -32,7 +32,12 @@ Depot::Depot(std::function<void()> &&funcClose) :
     Frame(std::move(funcClose)),
     m_boat(Chapter::get()->boat()),
     m_side(1),
-    m_state(Flipping)
+    m_state(Flipping),
+    m_backgroundLabel(this),
+    m_panelMountings(&m_backgroundLabel),
+    m_panelRepair(&m_backgroundLabel, false),
+    m_repairCost(&m_panelRepair),
+    m_repairButton(&m_panelRepair)
 {
     const gfx::ColorTable colorTable("gfx:pal/gui/border.pal");
     gfx::ColorTable colorTableDisabled;
@@ -42,37 +47,36 @@ Depot::Depot(std::function<void()> &&funcClose) :
     gfx::Image backgroundImage = gfx::Image::load("gfx:img/desktop/depot/depoback.img", colorTable);
     setupFrame(backgroundImage.size() + QSize(18, 24), "DEPOT", true);
 
-    m_backgroundLabel = new ui::Label(this);
-    m_backgroundLabel->setPosition(9, 15);
-    m_backgroundLabel->setTexture(backgroundImage);
+    m_backgroundLabel.setPosition(9, 15);
+    m_backgroundLabel.setTexture(backgroundImage);
 
     ui::Label *label;
 
     gfx::Image horline = gfx::Image::load("gfx:img/desktop/gui/horline.img", colorTable);
 
-    label = new ui::Label(m_backgroundLabel);
+    label = new ui::Label(&m_backgroundLabel);
     label->setTexture(horline);
     label->setPosition(8, 64);
 
-    label = new ui::Label(m_backgroundLabel);
+    label = new ui::Label(&m_backgroundLabel);
     label->setTexture(horline);
     label->setPosition(8, 283);
 
-    label = new ui::Label(m_backgroundLabel);
+    label = new ui::Label(&m_backgroundLabel);
     label->setTexture(gfx::Image::load("gfx:img/desktop/gui/verline.img", colorTable));
     label->setPosition(352, 75);
 
-    m_boatName = new ui::Label(m_backgroundLabel);
+    m_boatName = new ui::Label(&m_panelMountings);
     m_boatName->setFont(gfx::Font::Large);
     m_boatName->setPosition(16, 75);
     m_boatName->setText(m_boat->name());
 
-    m_credits = new ui::Label(m_backgroundLabel);
+    m_credits = new ui::Label(&m_backgroundLabel);
     m_credits->setFont(gfx::Font::Large);
     m_credits->setPosition(16, 263);
     updateCredits();
 
-    m_lblInfo = new ui::Label(m_backgroundLabel);
+    m_lblInfo = new ui::Label(&m_backgroundLabel);
     m_lblInfo->hide();
 
     m_lblItemName = new ui::Label(m_lblInfo);
@@ -108,35 +112,35 @@ Depot::Depot(std::function<void()> &&funcClose) :
     Q_ASSERT(m_videoFlip1.height() == m_videoFlip2.height());
     m_boatTexture.createEmpty(m_videoFlip1.width(), m_videoFlip1.height(), gfx::Texture::RGBA);
 
-    m_boatLabel = new ui::Label(m_backgroundLabel);
+    m_boatLabel = new ui::Label(&m_panelMountings);
     m_boatLabel->setTexture(m_boatTexture);
     m_boatLabel->setPosition(16, 75);
 
 
-    m_btnFlip = new ui::Button([this]() { flip(); }, m_backgroundLabel);
+    m_btnFlip = new ui::Button([this]() { flip(); }, &m_backgroundLabel);
     m_btnFlip->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdfliu.img", colorTable));
     m_btnFlip->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdflid.img", colorTable));
     m_btnFlip->setDisabledTexture(gfx::Image::load("gfx:img/desktop/depot/gdfliu.img", colorTableDisabled));
     m_btnFlip->setPosition(304, 243);
 
-    m_btnRepair = new ui::Button([this]() { repair(); }, m_backgroundLabel);
+    m_btnRepair = new ui::Button([this]() { repair(); }, &m_backgroundLabel);
     m_btnRepair->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdammou.img", colorTable));
     m_btnRepair->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdammod.img", colorTable));
     m_btnRepair->setPosition(304, 75);
 
-    m_btnBuy = new ui::Button([this]() { buy(); }, m_backgroundLabel);
+    m_btnBuy = new ui::Button([this]() { buy(); }, &m_backgroundLabel);
     m_btnBuy->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdbuyu.img", colorTable));
     m_btnBuy->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdbuyd.img", colorTable));
     m_btnBuy->setDisabledTexture(gfx::Image::load("gfx:img/desktop/depot/gdbuyu.img", colorTableDisabled));
     m_btnBuy->setPosition(507, 243);
 
-    m_btnSell = new ui::Button([this]() { sell(); }, m_backgroundLabel);
+    m_btnSell = new ui::Button([this]() { sell(); }, &m_backgroundLabel);
     m_btnSell->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdselu.img", colorTable));
     m_btnSell->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdseld.img", colorTable));
     m_btnSell->setDisabledTexture(gfx::Image::load("gfx:img/desktop/depot/gdselu.img", colorTableDisabled));
     m_btnSell->setPosition(507, 75);
 
-    m_btnInfo = new ui::Button([this]() { toggleInfo(); }, m_backgroundLabel);
+    m_btnInfo = new ui::Button([this]() { toggleInfo(); }, &m_backgroundLabel);
     m_btnInfo->setTexture(gfx::Image::load("gfx:img/desktop/depot/gdtinfu.img", colorTable));
     m_btnInfo->setPressedTexture(gfx::Image::load("gfx:img/desktop/depot/gdtinfd.img", colorTable));
     m_btnInfo->setDisabledTexture(gfx::Image::load("gfx:img/desktop/depot/gdtinfu.img", colorTableDisabled));
@@ -145,24 +149,111 @@ Depot::Depot(std::function<void()> &&funcClose) :
     updateButtons();
 
 
-    m_itemList1 = new ui::ItemList([this](int n) { itemListClicked1(n); }, m_backgroundLabel, true);
+    m_itemList1 = new ui::ItemList([this](int n) { itemListClicked1(n); }, &m_backgroundLabel, true);
     m_itemList1->setPosition(8, 8);
 
-    m_itemList2 = new ui::ItemList([this](int n) { itemListClicked2(n); }, m_backgroundLabel, false);
+    m_itemList2 = new ui::ItemList([this](int n) { itemListClicked2(n); }, &m_backgroundLabel, false);
     m_itemList2->setPosition(8, 293);
 
-    for (int i = 0; i < m_boat->mountings().size(); i++)
+    int i;
+    bool tur1 = false;
+    bool tur2 = false;
+    for (i = 0; i < m_boat->mountings().size(); i++)
     {
         const Boat::Mounting &mounting = m_boat->mountings()[i];
         ui::Arrow &arrow = m_mountingArrows.emplace(
             std::piecewise_construct,
             std::forward_as_tuple(i),
-            std::forward_as_tuple(mounting.dir, mounting.pos, true, [this](int n) { loadMounting(n); }, m_backgroundLabel)
+            std::forward_as_tuple(mounting.dir, mounting.pos, true, [this](int n) { loadMounting(n); }, &m_panelMountings)
         ).first->second;
         arrow.setText(mounting.name);
         arrow.setValue(i);
         arrow.hide();
+        if (mounting.name == "TUR1")
+            tur1 = true;
+        if (mounting.name == "TUR2")
+            tur2 = true;
     }
+
+
+    m_repairLabels.emplace_back(&m_panelRepair);
+    m_repairLabels.back().setFont(gfx::Font::Large);
+    m_repairLabels.back().setPosition(16, 75);
+    m_repairLabels.back().setText(txt::StringTable::get(txt::Repair));
+
+    m_repairLabels.emplace_back(&m_panelRepair);
+    m_repairLabels.back().setFont(gfx::Font::Medium);
+    m_repairLabels.back().setPosition(42, 107);
+    m_repairLabels.back().setText(txt::StringTable::get(txt::Repair_Type));
+
+    m_repairLabels.emplace_back(&m_panelRepair);
+    m_repairLabels.back().setFont(gfx::Font::Medium);
+    m_repairLabels.back().setPosition(98, 107);
+    m_repairLabels.back().setText(txt::StringTable::get(txt::Repair_State));
+
+    m_repairLabels.emplace_back(&m_panelRepair);
+    m_repairLabels.back().setFont(gfx::Font::Medium);
+    m_repairLabels.back().setPosition(162, 107);
+    m_repairLabels.back().setText(txt::StringTable::get(txt::Repair_Cost));
+
+    m_repairItems.emplace_back(m_boat->gun(), "GUN", &m_panelRepair);
+    m_repairItems.emplace_back(m_boat->magazine(), "TORP", &m_panelRepair);
+    m_repairItems.emplace_back(m_boat->armor(), "DEFE", &m_panelRepair);
+    if (tur1)
+        m_repairItems.emplace_back(m_boat->tur1(), "TUR1", &m_panelRepair);
+    if (tur2)
+        m_repairItems.emplace_back(m_boat->tur2(), "TUR2", &m_panelRepair);
+
+    gfx::Font fontMediumDisabled("gfx:fnt/dpmedium.fnt", colorTableDisabled);
+
+    int total = 0;
+    for (i = 0; i < m_repairItems.size(); i++)
+    {
+        RepairItem &item = m_repairItems[i];
+        item.state = m_boat->repairState(item.model, item.mounting);
+        item.cost = m_boat->repairCost(item.model, item.mounting);
+        total += item.cost;
+
+        m_repairLabels.emplace_back(&m_panelRepair);
+        m_repairLabels.back().setFont(gfx::Font::Medium);
+        m_repairLabels.back().setPosition(42, 131 + i*16);
+        m_repairLabels.back().setText(i == 2 ? "ARMO" : item.mounting);
+
+        item.lblState.setFont(gfx::Font::Medium);
+        item.lblState.setPosition(98, 131 + i*16);
+        item.lblState.setText(QString("%1%").arg(item.state));
+
+        item.lblCost.setFont(gfx::Font::Medium);
+        item.lblCost.setPosition(162, 131 + i*16);
+        item.lblCost.setText(QString("$%1").arg(item.cost));
+
+        item.btnRepair.setFont(gfx::Font::Medium);
+        item.btnRepair.setDisabledFont(fontMediumDisabled);
+        item.btnRepair.setPosition(218, 131 + i*16);
+        item.btnRepair.setText(txt::StringTable::get(txt::Repair));
+        if (item.cost == 0)
+            item.btnRepair.disable();
+        item.btnRepair.eventClicked() += [this, i] { m_sndButton.play(); repairItem(i); };
+    }
+
+    m_repairLabels.emplace_back(&m_panelRepair);
+    m_repairLabels.back().setFont(gfx::Font::Medium);
+    m_repairLabels.back().setPosition(162, 131 + i*16);
+    m_repairLabels.back().setText("-----");
+    i++;
+
+    m_repairCost.setFont(gfx::Font::Medium);
+    m_repairCost.setPosition(162, 131 + i*16);
+    m_repairCost.setText(QString("$%1").arg(total));
+
+    m_repairButton.setFont(gfx::Font::Medium);
+    m_repairButton.setDisabledFont(fontMediumDisabled);
+    m_repairButton.setPosition(218, 131 + i*16);
+    m_repairButton.setText(txt::StringTable::get(txt::Repair));
+    if (total == 0)
+        m_repairButton.disable();
+    m_repairButton.eventClicked() += [this] { m_sndButton.play(); repairAll(); };
+
 
     m_sndFlip.load("sfx:snd/desktop/shipdreh.pcm");
     m_sndWeapon.load("sfx:snd/desktop/weapchng.pcm");
@@ -242,6 +333,8 @@ void Depot::itemListClicked1(int index)
 
 void Depot::itemListClicked2(int index)
 {
+    if (m_state == Repair)
+        repair();
     if (m_selectedList == 1)
         m_itemList1->selectItem(-1);
     m_selectedList = 2;
@@ -267,6 +360,20 @@ void Depot::toggleInfo()
 void Depot::repair()
 {
     m_sndButton.play();
+    if (m_state == Repair)
+    {
+        m_panelMountings.show();
+        m_panelRepair.hide();
+        m_btnFlip->enable();
+        m_state = Ready;
+    }
+    else if (m_state == Ready)
+    {
+        m_panelMountings.hide();
+        m_panelRepair.show();
+        m_btnFlip->disable();
+        m_state = Repair;
+    }
 }
 
 
@@ -293,11 +400,12 @@ void Depot::updateInfo()
 
     int price = Items::getDepotPrice(item->model);
     if (m_selectedList == 2) {
-        if (m_boat->canSell(item->model, m_boat->mountings()[m_mounting].name)) {
+        if (m_boat->repairCost(item->model, m_boat->mountings()[m_mounting].name) > 0)
+            m_lblItemPrice->setText(txt::StringTable::get(txt::Repair_Defective));
+        else if (m_boat->canSell(item->model, m_boat->mountings()[m_mounting].name))
             m_lblItemPrice->setText(txt::StringTable::get(txt::Depot_Bid) + QString("%1").arg(price));
-        } else {
+        else
             m_lblItemPrice->setText(txt::StringTable::get(txt::Depot_Value) + QString("%1").arg(price));
-        }
     }
     if (m_selectedList == 1)
     {
@@ -339,7 +447,7 @@ void Depot::updateButtons()
         m_btnSell->disable();
     }
 
-    if (m_state == Ready && m_selectedItem >= 0)
+    if ((m_state == Ready && m_selectedItem >= 0) || m_state == Repair)
     {
         m_btnInfo->enable();
 
@@ -427,7 +535,7 @@ void Depot::draw()
 {
     ui::Label::draw();
 
-    if (m_state == Ready)
+    if (m_state == Ready || m_state == Repair)
     {
         if (m_lblInfo->isVisible())
         {
@@ -570,6 +678,54 @@ bool Depot::mousePressEvent(const QPoint &pos, Qt::MouseButton button)
     }
 
     return false;
+}
+
+
+void Depot::repairItem(int index)
+{
+    if (Chapter::get()->credits() == 0)
+    {
+        m_sndError.play();
+        return;
+    }
+
+    RepairItem &item = m_repairItems[index];
+    float amount = 1.0f;
+    int cost = item.cost;
+    if (cost > Chapter::get()->credits())
+    {
+        cost = Chapter::get()->credits();
+        amount = static_cast<float>(cost)/item.cost;
+    }
+    Chapter::get()->addCredit(-cost);
+    m_boat->repair(item.model, item.mounting, amount);
+    item.state = m_boat->repairState(item.model, item.mounting);
+    item.cost = m_boat->repairCost(item.model, item.mounting);
+
+    item.lblState.setText(QString("%1%").arg(item.state));
+    item.lblCost.setText(QString("$%1").arg(item.cost));
+    if (item.cost == 0)
+        item.btnRepair.disable();
+    
+    int total = 0;
+    for (RepairItem &item : m_repairItems)
+        total += item.cost;
+    m_repairCost.setText(QString("$%1").arg(total));
+    if (total == 0)
+        m_repairButton.disable();
+    updateCredits();
+}
+
+
+void Depot::repairAll()
+{
+    if (Chapter::get()->credits() == 0)
+    {
+        m_sndError.play();
+        return;
+    }
+    for (int i = 0; i < m_repairItems.size() && Chapter::get()->credits() > 0; i++)
+        repairItem(i);
 }
 
 

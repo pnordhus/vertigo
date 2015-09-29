@@ -43,6 +43,17 @@ public:
         QPoint pos;
         QString dir;
     };
+    enum Defect
+    {
+        DefectGun,
+        DefectToMa,
+        DefectFArm,
+        DefectLArm,
+        DefectRArm,
+        DefectBArm,
+        DefectTur1,
+        DefectTur2
+    };
 
 public:
     int type() const { return m_type; }
@@ -57,6 +68,9 @@ public:
     bool canBuy(int model, const QString& mounting, int *oldModel);
     bool canSell(int model, const QString& mounting);
     bool isCompatible(int model);
+    int repairState(int model, const QString& mounting);
+    int repairCost(int model, const QString& mounting);
+    void repair(int model, const QString& mounting, float amount);
     void buy(int model, const QString& mounting);
     void sell(int model, int index, const QString& mounting);
 
@@ -77,6 +91,8 @@ public:
     int tur2soft() const { return m_tur2soft; }
     const std::vector<int>& buzzers() const { return m_buzzers; }
     int fixer() const { return m_fixer; }
+
+    const float* defects() const { return m_defects; }
 
 private:
     void load();
@@ -109,6 +125,8 @@ private:
     int m_tur2soft;
     std::vector<int> m_buzzers;
     int m_fixer;
+
+    float m_defects[8];
 };
 
 

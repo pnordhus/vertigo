@@ -314,6 +314,16 @@ void Chapter::save() const
         }
     }
 
+    file.setSection("Defect");
+    file.setValue("Gun", m_boat->defects()[Boat::DefectGun]);
+    file.setValue("ToMa", m_boat->defects()[Boat::DefectToMa]);
+    file.setValue("FArm", m_boat->defects()[Boat::DefectFArm]);
+    file.setValue("LArm", m_boat->defects()[Boat::DefectLArm]);
+    file.setValue("RArm", m_boat->defects()[Boat::DefectRArm]);
+    file.setValue("BArm", m_boat->defects()[Boat::DefectBArm]);
+    file.setValue("Tur1", m_boat->defects()[Boat::DefectTur1]);
+    file.setValue("Tur2", m_boat->defects()[Boat::DefectTur2]);
+
     const QString path = dataLocation();
     file.save(QString("%1/save/%2.des").arg(path, m_name));
 }

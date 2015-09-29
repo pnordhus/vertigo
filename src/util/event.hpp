@@ -28,7 +28,7 @@ class event
 {
 public:
     event() { };
-    event(const std::function<void(Args...)> &func) { connect(func); };
+    template<class F> event(const F &func) { connect(func); };
     event(std::function<void(Args...)> &&func) { connect(std::move(func)); };
 
 public:

@@ -63,6 +63,16 @@ Boat::Boat(txt::DesFile &file) :
         if (file.contains("software"))
             buy(file.value("software").toInt(), mounting.name);
     }
+
+    file.setSection("defect");
+    m_defects[DefectGun] = file.value("gun", 1.0f).toFloat();
+    m_defects[DefectToMa] = file.value("toma", 1.0f).toFloat();
+    m_defects[DefectFArm] = file.value("farm", 1.0f).toFloat();
+    m_defects[DefectLArm] = file.value("larm", 1.0f).toFloat();
+    m_defects[DefectRArm] = file.value("rarm", 1.0f).toFloat();
+    m_defects[DefectBArm] = file.value("barm", 1.0f).toFloat();
+    m_defects[DefectTur1] = file.value("tur1", 1.0f).toFloat();
+    m_defects[DefectTur2] = file.value("tur2", 1.0f).toFloat();
 }
 
 
@@ -78,6 +88,44 @@ void Boat::load()
         addMounting("GENE", 0, 4, 80, 132, "BottomRight");
         addMounting("GUN", 1, 1, 324, 188, "BottomLeft");
         addMounting("TORP", 1, 0, 276, 129, "TopLeft");
+    }
+    if (m_type == 2050)
+    {
+        m_boatFile.load("vfx:sobjects/gator.des");
+        m_moviePrefix = "gator";
+        m_maxBuzzers = 2;
+
+        addMounting("DEFE", 0, 3, 280, 173, "TopLeft");
+        addMounting("GENE", 0, 4, 80, 132, "BottomRight");
+        addMounting("GUN", 1, 1, 324, 188, "BottomLeft");
+        addMounting("TORP", 1, 0, 276, 129, "TopLeft");
+        addMounting("TUR1", 1, 2, 276, 129, "TopLeft");
+    }
+    if (m_type == 2051)
+    {
+        m_boatFile.load("vfx:sobjects/zorn.des");
+        m_moviePrefix = "zorn";
+        m_maxBuzzers = 2;
+
+        addMounting("DEFE", 0, 3, 280, 173, "TopLeft");
+        addMounting("GENE", 0, 4, 80, 132, "BottomRight");
+        addMounting("TUR2", 0, 2, 276, 129, "TopLeft");
+        addMounting("GUN", 1, 1, 324, 188, "BottomLeft");
+        addMounting("TORP", 1, 0, 276, 129, "TopLeft");
+        addMounting("TUR1", 1, 2, 276, 129, "TopLeft");
+    }
+    if (m_type == 2052)
+    {
+        m_boatFile.load("vfx:sobjects/succubus.des");
+        m_moviePrefix = "succub";
+        m_maxBuzzers = 2;
+
+        addMounting("DEFE", 0, 3, 280, 173, "TopLeft");
+        addMounting("GENE", 0, 4, 80, 132, "BottomRight");
+        addMounting("TUR2", 0, 2, 276, 129, "TopLeft");
+        addMounting("GUN", 1, 1, 324, 188, "BottomLeft");
+        addMounting("TORP", 1, 0, 276, 129, "TopLeft");
+        addMounting("TUR1", 1, 2, 276, 129, "TopLeft");
     }
 
     m_boatFile.setSection("Ship");
@@ -286,14 +334,14 @@ bool Boat::canSell(int model, const QString& mounting)
     }
     if (mounting == "TUR1")
     {
-        if (item->type == Items::Gun)
+        if (item->type == Items::Gun && m_defects[DefectTur1] == 1.0f)
             return true;
         if (item->type == Items::Software)
             return true;
     }
     if (mounting == "TUR2")
     {
-        if (item->type == Items::Gun)
+        if (item->type == Items::Gun && m_defects[DefectTur2] == 1.0f)
             return true;
         if (item->type == Items::Software)
             return true;
@@ -305,6 +353,134 @@ bool Boat::canSell(int model, const QString& mounting)
 bool Boat::isCompatible(int model)
 {
     return m_compatibility.find(model) != m_compatibility.end();
+}
+
+
+int Boat::repairState(int model, const QString& mounting)
+{
+    Items::Item *item = Items::get(model);
+    if (item == nullptr)
+        return 100;
+    float state = 100;
+    if (mounting == "DEFE")
+    {
+        if (item->type == Items::Armor)
+        {
+            state = m_defects[DefectFArm]*25;
+            state += m_defects[DefectLArm]*25;
+            state += m_defects[DefectRArm]*25;
+            state += m_defects[DefectBArm]*25;
+        }
+    }
+    if (mounting == "GENE")
+    {
+    }
+    if (mounting == "GUN")
+    {
+        if (item->type == Items::Gun)
+            state = m_defects[DefectGun]*100;
+    }
+    if (mounting == "TORP")
+    {
+        if (item->type == Items::Magazine)
+            state = m_defects[DefectToMa]*100;
+    }
+    if (mounting == "TUR1")
+    {
+        if (item->type == Items::Gun)
+            state = m_defects[DefectTur1]*100;
+    }
+    if (mounting == "TUR2")
+    {
+        if (item->type == Items::Gun)
+            state = m_defects[DefectTur2]*100;
+    }
+    return static_cast<int>(state);
+}
+
+
+int Boat::repairCost(int model, const QString& mounting)
+{
+    Items::Item *item = Items::get(model);
+    if (item == nullptr)
+        return 0;
+    int price = Items::getDepotPrice(model);
+    float cost = 0;
+    if (mounting == "DEFE")
+    {
+        if (item->type == Items::Armor)
+        {
+            cost += (1.0f - m_defects[DefectFArm])*price/32;
+            cost += (1.0f - m_defects[DefectLArm])*price/32;
+            cost += (1.0f - m_defects[DefectRArm])*price/32;
+            cost += (1.0f - m_defects[DefectBArm])*price/32;
+        }
+    }
+    if (mounting == "GENE")
+    {
+    }
+    if (mounting == "GUN")
+    {
+        if (item->type == Items::Gun)
+            cost = (1.0f - m_defects[DefectGun])*price/40;
+    }
+    if (mounting == "TORP")
+    {
+        if (item->type == Items::Magazine)
+            cost = (1.0f - m_defects[DefectToMa])*price/18.2f;
+    }
+    if (mounting == "TUR1")
+    {
+        if (item->type == Items::Gun)
+            cost = (1.0f - m_defects[DefectTur1])*price/40;
+    }
+    if (mounting == "TUR2")
+    {
+        if (item->type == Items::Gun)
+            cost = (1.0f - m_defects[DefectTur2])*price/40;
+    }
+    return static_cast<int>(cost);
+}
+
+
+void Boat::repair(int model, const QString& mounting, float amount)
+{
+    Items::Item *item = Items::get(model);
+    if (item == nullptr)
+        return;
+    if (mounting == "DEFE")
+    {
+        if (item->type == Items::Armor)
+        {
+            m_defects[DefectFArm] = amount == 1.0f ? 1.0f : m_defects[DefectFArm]*(1 - amount) + amount;
+            m_defects[DefectLArm] = amount == 1.0f ? 1.0f : m_defects[DefectLArm]*(1 - amount) + amount;
+            m_defects[DefectRArm] = amount == 1.0f ? 1.0f : m_defects[DefectRArm]*(1 - amount) + amount;
+            m_defects[DefectBArm] = amount == 1.0f ? 1.0f : m_defects[DefectBArm]*(1 - amount) + amount;
+        }
+    }
+    if (mounting == "GENE")
+    {
+    }
+    if (mounting == "GUN")
+    {
+        if (item->type == Items::Gun)
+            m_defects[DefectGun] = amount == 1.0f ? 1.0f : m_defects[DefectGun]*(1 - amount) + amount;
+    }
+    if (mounting == "TORP")
+    {
+        if (item->type == Items::Magazine)
+            m_defects[DefectToMa] = amount == 1.0f ? 1.0f : m_defects[DefectToMa]*(1 - amount) + amount;
+    }
+    if (mounting == "TUR1")
+    {
+        if (item->type == Items::Gun)
+            m_defects[DefectTur1] = amount == 1.0f ? 1.0f : m_defects[DefectTur1]*(1 - amount) + amount;
+    }
+    if (mounting == "TUR2")
+    {
+        if (item->type == Items::Gun)
+            m_defects[DefectTur2] = amount == 1.0f ? 1.0f : m_defects[DefectTur2]*(1 - amount) + amount;
+    }
 }
 
 

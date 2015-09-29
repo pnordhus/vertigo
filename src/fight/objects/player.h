@@ -15,45 +15,38 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef UI_BUTTON_H
-#define UI_BUTTON_H
+#ifndef FIGHT_PLAYER_H
+#define FIGHT_PLAYER_H
 
-#include "label.h"
-#include "util/event.hpp"
 
-#include <functional>
+#include "activeobject.h"
 
-namespace ui {
 
-class Button : public Label
+namespace game { class Boat; }
+
+
+namespace fight {
+
+
+class Player : public ActiveObject
 {
 public:
-    Button(Widget *parent = NULL);
-    Button(util::event<> &&eventClicked, Widget *parent = NULL);
+    Player(Scenario *scenario, game::Boat *boat);
 
 public:
-    util::event<>& eventClicked() { return m_eventClicked; }
+    int shield(int index) const { return m_shield[index]; };
+    int shieldMax(int index) const { return m_shieldMax[index]; };
 
 public:
-    void setOffset(int offset);
-    void setPressedTexture(const gfx::Texture &texture);
-    void setDisabledTexture(const gfx::Texture &texture);
-    void setDisabledFont(const gfx::Font &font);
-
-protected:
-    void draw();
-    bool mousePressEvent(const QPoint &pos, Qt::MouseButton button);
-    void mouseReleaseEvent(const QPoint &pos, Qt::MouseButton button);
+    virtual void damage(int kinetic, int shock, const Vector3D &position);
 
 private:
-    bool m_pressed;
-    int m_offset;
-    gfx::Texture m_pressedTexture;
-    gfx::Texture m_disabledTexture;
-    gfx::Font m_disabledFont;
-    util::event<> m_eventClicked;
+    int m_shield[4];
+    int m_shieldMax[4];
 };
 
-} // namespace ui
 
-#endif // UI_BUTTON_H
+} // namespace fight
+
+
+#endif // FIGHT_PLAYER_H
