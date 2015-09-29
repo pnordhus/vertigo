@@ -95,11 +95,11 @@ void Boat::load()
         m_moviePrefix = "gator";
         m_maxBuzzers = 2;
 
-        addMounting("DEFE", 0, 3, 280, 173, "TopLeft");
-        addMounting("GENE", 0, 4, 80, 132, "BottomRight");
-        addMounting("GUN", 1, 1, 324, 188, "BottomLeft");
-        addMounting("TORP", 1, 0, 276, 129, "TopLeft");
-        addMounting("TUR1", 1, 2, 276, 129, "TopLeft");
+        addMounting("DEFE", 0, 3, 240, 183, "BottomLeft");
+        addMounting("GENE", 0, 4, 56, 163, "TopRight");
+        addMounting("GUN", 1, 1, 311, 163, "TopLeft");
+        addMounting("TORP", 1, 0, 175, 148, "BottomRight");
+        addMounting("TUR1", 1, 2, 90, 175, "TopRight");
     }
     if (m_type == 2051)
     {
@@ -107,12 +107,12 @@ void Boat::load()
         m_moviePrefix = "zorn";
         m_maxBuzzers = 2;
 
-        addMounting("DEFE", 0, 3, 280, 173, "TopLeft");
-        addMounting("GENE", 0, 4, 80, 132, "BottomRight");
-        addMounting("TUR2", 0, 2, 276, 129, "TopLeft");
-        addMounting("GUN", 1, 1, 324, 188, "BottomLeft");
-        addMounting("TORP", 1, 0, 276, 129, "TopLeft");
-        addMounting("TUR1", 1, 2, 276, 129, "TopLeft");
+        addMounting("DEFE", 0, 3, 217, 194, "BottomLeft");
+        addMounting("GENE", 0, 4, 116, 175, "BottomLeft");
+        addMounting("TUR2", 0, 2, 132, 129, "BottomRight");
+        addMounting("GUN", 1, 1, 235, 180, "TopLeft");
+        addMounting("TORP", 1, 0, 251, 211, "BottomLeft");
+        addMounting("TUR1", 1, 2, 119, 146, "TopRight");
     }
     if (m_type == 2052)
     {
@@ -120,12 +120,12 @@ void Boat::load()
         m_moviePrefix = "succub";
         m_maxBuzzers = 2;
 
-        addMounting("DEFE", 0, 3, 280, 173, "TopLeft");
-        addMounting("GENE", 0, 4, 80, 132, "BottomRight");
-        addMounting("TUR2", 0, 2, 276, 129, "TopLeft");
-        addMounting("GUN", 1, 1, 324, 188, "BottomLeft");
-        addMounting("TORP", 1, 0, 276, 129, "TopLeft");
-        addMounting("TUR1", 1, 2, 276, 129, "TopLeft");
+        addMounting("DEFE", 0, 3, 216, 191, "BottomLeft");
+        addMounting("GENE", 0, 4, 155, 143, "TopRight");
+        addMounting("TUR2", 0, 2, 106, 175, "BottomRight");
+        addMounting("GUN", 1, 1, 253, 186, "BottomLeft");
+        addMounting("TORP", 1, 0, 253, 161, "TopLeft");
+        addMounting("TUR1", 1, 2, 143, 174, "BottomLeft");
     }
 
     m_boatFile.setSection("Ship");
@@ -358,9 +358,9 @@ bool Boat::isCompatible(int model)
 
 int Boat::repairState(int model, const QString& mounting)
 {
-    Items::Item *item = Items::get(model);
-    if (item == nullptr)
+    if (model == 0)
         return 100;
+    Items::Item *item = Items::get(model);
     float state = 100;
     if (mounting == "DEFE")
     {
@@ -401,9 +401,9 @@ int Boat::repairState(int model, const QString& mounting)
 
 int Boat::repairCost(int model, const QString& mounting)
 {
-    Items::Item *item = Items::get(model);
-    if (item == nullptr)
+    if (model == 0)
         return 0;
+    Items::Item *item = Items::get(model);
     int price = Items::getDepotPrice(model);
     float cost = 0;
     if (mounting == "DEFE")
@@ -446,8 +446,6 @@ int Boat::repairCost(int model, const QString& mounting)
 void Boat::repair(int model, const QString& mounting, float amount)
 {
     Items::Item *item = Items::get(model);
-    if (item == nullptr)
-        return;
     if (mounting == "DEFE")
     {
         if (item->type == Items::Armor)
