@@ -43,7 +43,7 @@ Renderer::Renderer() :
 }
 
 
-void Renderer::setWindow(QWidget *window)
+void Renderer::setWindow(QGLWidget *window)
 {
     m_window = window;
 }

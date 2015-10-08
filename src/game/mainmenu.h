@@ -29,7 +29,7 @@ namespace game {
 class MainMenu : public Menu
 {
 private:
-    enum State { Invalid, Presents, Title };
+    enum State { Invalid, Presents, Title, Loading };
 
 public:
     MainMenu(std::function<void(QString)> funcStartGame, std::function<void(QString)> funcLoadGame, std::function<void()> funcQuit);
@@ -38,6 +38,7 @@ private:
     void showMain();
     void showNew();
     void showLoad();
+    void showLoading();
 
     void draw();
     void activate();
@@ -66,12 +67,17 @@ private:
     ui::Button m_btnLoadBack;
     std::list<ui::Label> m_lblLoadSave;
     std::list<ui::Button> m_btnLoadSave;
+    ui::Label m_lblLoading;
+    ui::Label m_lblLoadingTitle;
+    ui::Label m_lblLoadingWait;
+
     sfx::Sound m_backgroundSound;
     QString m_name;
     bool m_cursor;
     QTime m_time;
     std::function<void(QString)> m_funcStartGame;
     std::function<void(QString)> m_funcLoadGame;
+    QString m_loadingGame;
 };
 
 } // namespace game

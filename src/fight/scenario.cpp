@@ -184,15 +184,15 @@ Scenario::Scenario(const QString &name) :
 
             {
                 /*for (int i = 0; i < 27; i++)
-                    m_effectManager.addEffect((Effects)(Explosion_0 + i), m_position + Vector3D(i*5, 0, 0))->setPermanent(true);
+                    m_effectManager.addEffect((Effects)((int)Effects::Explosion_0 + i), m_position + Vector3D(i*5, 0, 0))->setPermanent(true);
                 for (int i = 0; i < 9; i++)
-                    m_effectManager.addEffect((Effects)(Shoot_0 + i), m_position + Vector3D(i*5, -10, 0))->setPermanent(true);
+                    m_effectManager.addEffect((Effects)((int)Effects::Shoot_0 + i), m_position + Vector3D(i*5, -10, 0))->setPermanent(true);
                 for (int i = 0; i < 23; i++)
-                    m_effectManager.addEffect((Effects)(Debris_0 + i), m_position + Vector3D(i*5, -20, 0))->setPermanent(true);
+                    m_effectManager.addEffect((Effects)((int)Effects::Debris_0 + i), m_position + Vector3D(i*5, -20, 0))->setPermanent(true);
                 for (int i = 0; i < 5; i++)
-                    m_effectManager.addEffect((Effects)(Trash_0 + i), m_position + Vector3D(i*5, -30, 0))->setPermanent(true);
+                    m_effectManager.addEffect((Effects)((int)Effects::Trash_0 + i), m_position + Vector3D(i*5, -30, 0))->setPermanent(true);
                 for (int i = 0; i < 3; i++)
-                    m_effectManager.addEffect((Effects)(Bubble_0 + i), m_position + Vector3D(i*5, -40, 0))->setPermanent(true);*/
+                    m_effectManager.addEffect((Effects)((int)Effects::Bubble_0 + i), m_position + Vector3D(i*5, -40, 0))->setPermanent(true);*/
             }
             break;
 

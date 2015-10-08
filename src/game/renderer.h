@@ -27,6 +27,7 @@
 
 class QKeyEvent;
 class QMouseEvent;
+class QGLWidget;
 
 
 namespace game {
@@ -43,7 +44,7 @@ public:
     virtual void deactivate() {}
 
 public:
-    void setWindow(QWidget *window);
+    void setWindow(QGLWidget *window);
     virtual bool isCursorVisible() const { return m_cursorVisible; }
     virtual void setRect(const QRect &rect);
     QRect rect() const { return m_rect; }
@@ -66,7 +67,7 @@ protected:
     void hideCursor();
     void setupOrthographicMatrix(float w, float h);
     void setupGL(bool clear = true);
-    QWidget* window() const { return m_window; }
+    QGLWidget* window() const { return m_window; }
 
 protected:
     Matrix m_projectionMatrix;
@@ -76,7 +77,7 @@ private:
     bool m_cursorVisible;
     QRect m_rect;
     QRectF m_rectOrtho;
-    QWidget *m_window;
+    QGLWidget *m_window;
 };
 
 
