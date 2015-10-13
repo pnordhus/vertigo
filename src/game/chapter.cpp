@@ -160,7 +160,7 @@ void Chapter::load(const QString &filename, bool load)
     foreach (const QString &key, file.keys().filter(QRegExp("^mission\\d*")))
         m_successfulMissions.append(file.value(key).toString());
 
-    file.setSection("area2");
+    file.setSection(QString("area%1").arg(m_area->code()));
     foreach (const QString &key, file.keys().filter(QRegExp("^mission\\d*")))
         addMission(file.value(key).toString(), -1);
 
@@ -258,11 +258,11 @@ void Chapter::save() const
     i = 1;
     foreach (const Mission *mission, m_missions) {
         if (mission->station() == -1) {
-            file.setSection("area2");
+            file.setSection(QString("area%1").arg(m_area->code()));
             file.setValue(QString("mission%1").arg(i++), mission->shortName());
         } else {
             file.setSection(QString("station%1").arg(mission->station()));
-            file.setValue("mission1", mission->shortName());
+            file.setValue("mission1", mission->shortName()); // TODO: Mission index
         }
     }
 
