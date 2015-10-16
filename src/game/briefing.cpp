@@ -122,7 +122,7 @@ void Briefing::draw()
             label->setPosition(0, 64 + m_nextLine*11);
             label->setWidth(304);
             label->setAlignment(ui::Label::AlignHCenter);
-            m_woopSound.play();
+            m_woopSound.playInstance();
             m_nextLine++;
         }
         else
@@ -149,7 +149,7 @@ void Briefing::draw()
                     label->setText(Chapter::get()->mission()->textP().at(m_nextLine));
                 label->setPosition(18, 354 + m_nextLine*11);
                 label->setWidth(304);
-                m_woopSound.play();
+                m_woopSound.playInstance();
             }
             m_nextLine++;
         }
@@ -177,7 +177,7 @@ void Briefing::draw()
                     label->setText(Chapter::get()->mission()->textS().at(m_nextLine));
                 label->setPosition(322, 354 + m_nextLine*11);
                 label->setWidth(304);
-                m_woopSound.play();
+                m_woopSound.playInstance();
             }
             m_nextLine++;
         }

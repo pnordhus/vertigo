@@ -37,14 +37,16 @@ public:
     void stop();
     void play();
     void playLoop();
+    void playInstance();
     void pause();
     void resume();
     void load(const QString &file, int rate = 0);
     void load(const QString &leftFile, const QString &rightFile);
     void setVolume(float volume);
+    bool isInstance() const { return m_instance; }
 
 private:
-    Q_DISABLE_COPY(Sound);
+    Sound(const Sound &o);
     QByteArray loadFile(const QString &filename);
     bool acquire();
 
@@ -52,6 +54,7 @@ private:
     quint32 m_source;
     quint32 m_buffer;
     float m_volume;
+    bool m_instance;
 };
 
 

@@ -62,6 +62,13 @@ SoundSystem::SoundSystem()
 
 SoundSystem::~SoundSystem()
 {
+    QMapIterator<quint32, Sound*> it(m_sources);
+    while (it.hasNext()) {
+        it.next();
+        if (it.value()->isInstance())
+            it.value()->stop();
+    }
+
     qDeleteAll(m_standardSounds);
     SampleMap::reset();
 
