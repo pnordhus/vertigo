@@ -164,7 +164,7 @@ Depot::Depot(std::function<void()> &&funcClose) :
         ui::Arrow &arrow = m_mountingArrows.emplace(
             std::piecewise_construct,
             std::forward_as_tuple(i),
-            std::forward_as_tuple(mounting.dir, mounting.pos, true, [this](int n) { loadMounting(n); }, &m_panelMountings)
+            std::forward_as_tuple(mounting.dir, QPoint(mounting.pos.x, mounting.pos.y), true, [this](int n) { loadMounting(n); }, &m_panelMountings)
         ).first->second;
         arrow.setText(mounting.name);
         arrow.setValue(i);

@@ -335,6 +335,8 @@ Scenario::Scenario(const QString &name) :
 
 void Scenario::setBoat(game::Boat *boat)
 {
+    //if (boat->gun() == 3081)
+    //    boat->buy(3083, "GUN"); // TODO: remove
     m_player.reset(new Player(this, boat));
     m_player->setPosition(m_position);
 
@@ -345,9 +347,9 @@ void Scenario::setBoat(game::Boat *boat)
 }
 
 
-const int Scenario::noise() const
+int Scenario::noise() const
 {
-    return static_cast<int>(glm::round(m_player->noise()));
+    return static_cast<int>(glm::round(m_player->noise())) + (m_sonar.isActive() || m_sonar.isActivating() ? 1 : 0);
 }
 
 
@@ -413,6 +415,8 @@ void Scenario::update(float elapsedTime)
     for (const auto &object : m_objects)
         if (object->isEnabled())
             object->update(elapsedTime);
+
+    m_player->update(elapsedTime);
 
     m_effectManager.update(elapsedTime);
 
@@ -524,12 +528,8 @@ void Scenario::keyPressEvent(QKeyEvent *e)
         m_forwards = 0.2f;
     if (e->key() == Qt::Key_X)
         m_backwards = 0.2f;
-
     if (e->key() == Qt::Key_Space)
-    {
-        Vector3D dir = -Vector3D(glm::row(m_cameraMatrix, 2));
-        m_effectManager.addProjectile(Effects::Shoot_Vendetta, m_position, dir);
-    }
+        m_player->fire();
 }
 
 
@@ -551,6 +551,8 @@ void Scenario::keyReleaseEvent(QKeyEvent *e)
         m_forwards = 0.0f;
     if (e->key() == Qt::Key_X)
         m_backwards = 0.0f;
+    if (e->key() == Qt::Key_Space)
+        m_player->fireStop();
 }
 
 

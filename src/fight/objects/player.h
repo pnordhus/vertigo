@@ -20,6 +20,8 @@
 
 
 #include "activeobject.h"
+#include "fight/weapons/gun.h"
+#include <memory>
 
 
 namespace game { class Boat; }
@@ -39,10 +41,18 @@ public:
 
 public:
     virtual void damage(int kinetic, int shock, const Vector3D &position);
+    bool update(float elapsedTime);
+    void fire();
+    void fireStop();
 
 private:
     int m_shield[4];
     int m_shieldMax[4];
+
+    bool m_firing;
+    Gun m_gun;
+    std::unique_ptr<Gun> m_tur1;
+    std::unique_ptr<Gun> m_tur2;
 };
 
 

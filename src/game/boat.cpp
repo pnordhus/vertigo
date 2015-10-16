@@ -147,13 +147,30 @@ void Boat::load()
 
 void Boat::addMounting(const QString &name, int side, int type, int x, int y, const QString &dir)
 {
+    Vector3D rel;
+    m_boatFile.setSection(QString("shipmounting%1").arg(m_mountings.size()));
+    if (m_boatFile.contains("relativex"))
+        rel = Vector3D(m_boatFile.value("relativex").toFloat()/32, m_boatFile.value("relativey").toFloat()/32, m_boatFile.value("relativez").toFloat()/32);
+    if (m_boatFile.contains("relative0x"))
+        rel = Vector3D(m_boatFile.value("relative0x").toFloat()/32, m_boatFile.value("relative0y").toFloat()/32, m_boatFile.value("relative0z").toFloat()/32);
+
     m_mountings.emplace_back();
     Mounting &mounting = m_mountings.back();
     mounting.name = name;
     mounting.side = side;
     mounting.type = type;
-    mounting.pos = QPoint(x, y);
+    mounting.pos = Point(x, y);
     mounting.dir = dir;
+    mounting.rel = rel;
+}
+
+
+const Boat::Mounting* Boat::getMounting(const QString& mounting)
+{
+    auto it = std::find_if(m_mountings.begin(), m_mountings.end(), [&mounting](const Mounting &x) { return x.name == mounting; });
+    if (it != m_mountings.end())
+        return &(*it);
+    return nullptr;
 }
 
 

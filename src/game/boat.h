@@ -24,6 +24,8 @@
 #include <vector>
 #include <set>
 #include "txt/desfile.h"
+#include "util/geometry2d.h"
+#include "util/geometry3d.h"
 
 
 namespace game {
@@ -40,8 +42,9 @@ public:
         QString name;
         int side;
         int type;
-        QPoint pos;
+        Point pos;
         QString dir;
+        Vector3D rel;
     };
     enum Defect
     {
@@ -63,6 +66,7 @@ public:
     txt::DesFile& boatFile() { return m_boatFile; }
 
     const std::vector<Mounting>& mountings() const { return m_mountings; }
+    const Mounting* getMounting(const QString& mounting);
 
     std::vector<int> getItems(const QString& mounting);
     bool canBuy(int model, const QString& mounting, int *oldModel);

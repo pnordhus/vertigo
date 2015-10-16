@@ -51,12 +51,12 @@ public:
     void activate();
     void deactivate();
     void toggle();
-    const bool isActive() { return m_active; }
-    const bool isActivating() { return m_activatingDelay > 0; }
-    const bool detectArmor() { return m_detectArmor; }
-    const bool detectRange() { return m_detectRange; }
-    const bool detectWeapons() { return m_detectWeapons; }
-    const bool detectActivity() { return m_detectActivity; }
+    bool isActive() const { return m_active; }
+    bool isActivating() const { return m_activatingDelay > 0; }
+    bool detectArmor() const { return m_detectArmor; }
+    bool detectRange() const { return m_detectRange; }
+    bool detectWeapons() const { return m_detectWeapons; }
+    bool detectActivity() const { return m_detectActivity; }
 
 public:
     void update(float elapsedTime);

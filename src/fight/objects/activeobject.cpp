@@ -38,7 +38,7 @@ ActiveObject::ActiveObject(Scenario *scenario, txt::DesFile &file, int iff, cons
     m_identified(false)
 {
     file.setSection("noise");
-    m_noise = file.value("level").toFloat() + 1;
+    m_noise = file.value("level").toFloat();
 
     file.setSection("defense");
     m_kineticShield = m_kineticShieldMax = file.value("kineticshield0").toInt();

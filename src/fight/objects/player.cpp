@@ -19,6 +19,7 @@
 #include "fight/scenario.h"
 #include "game/boat.h"
 
+#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/matrix_access.hpp>
 #include <glm/geometric.hpp>
 
@@ -27,7 +28,9 @@ namespace fight {
 
 
 Player::Player(Scenario *scenario, game::Boat *boat) :
-    ActiveObject(scenario, boat->boatFile(), 0, nullptr, nullptr)
+    ActiveObject(scenario, boat->boatFile(), 0, nullptr, nullptr),
+    m_firing(false),
+    m_gun(scenario, boat->gun() - 3073)
 {
     int i;
     txt::DesFile &file = boat->boatFile();
@@ -55,6 +58,21 @@ Player::Player(Scenario *scenario, game::Boat *boat) :
         m_noise -= 1;
     if (boat->nrskin() == 5126)
         m_noise -= 1;
+
+    m_gun.addMuzzles(Vector3D(3.0f, 0, 0), boat->gun());
+    m_gun.setDefect(boat->defects()[game::Boat::DefectGun]);
+    if (boat->tur1() != 0)
+    {
+        m_tur1.reset(new Gun(m_scenario, boat->tur1() - 3073));
+        m_tur1->addMuzzles(Vector3D(3.0f, 0, 0) + boat->getMounting("TUR1")->rel, boat->tur1());
+        m_tur1->setDefect(boat->defects()[game::Boat::DefectTur1]);
+    }
+    if (boat->tur2() != 0)
+    {
+        m_tur2.reset(new Gun(m_scenario, boat->tur2() - 3073));
+        m_tur2->addMuzzles(Vector3D(3.0f, 0, 0) + boat->getMounting("TUR2")->rel, boat->tur2());
+        m_tur2->setDefect(boat->defects()[game::Boat::DefectTur2]);
+    }
 }
 
 
@@ -74,6 +92,48 @@ void Player::damage(int kinetic, int shock, const Vector3D &position)
         else
             m_shield[2] -= kinetic;
     }
+}
+
+
+bool Player::update(float elapsedTime)
+{
+    Vector3D pos = m_scenario->position();
+    Vector3D dir = -Vector3D(glm::row(m_scenario->cameraMatrix(), 2));
+    Vector3D up = Vector3D(glm::row(m_scenario->cameraMatrix(), 1));
+    Vector3D left = Vector3D(glm::row(m_scenario->cameraMatrix(), 0));
+
+    m_gun.update(elapsedTime);
+    if (m_firing && m_gun.state() == Gun::StateReady)
+        if (m_gun.fire(pos, dir, up, left))
+            sfx::SampleMap::get(m_gun.sample()).playInstance();
+    if (m_tur1)
+    {
+        m_tur1->update(elapsedTime);
+        if (m_firing && m_tur1->state() == Gun::StateReady)
+            if (m_tur1->fire(pos, dir, up, left))
+                sfx::SampleMap::get(m_tur1->sample()).playInstance();
+    }
+    if (m_tur2)
+    {
+        m_tur2->update(elapsedTime);
+        if (m_firing && m_tur2->state() == Gun::StateReady)
+            if (m_tur2->fire(pos, dir, up, left))
+                sfx::SampleMap::get(m_tur2->sample()).playInstance();
+    }
+
+    return false;
+}
+
+
+void Player::fire()
+{
+    m_firing = true;
+}
+
+
+void Player::fireStop()
+{
+    m_firing = false;
 }
 
 

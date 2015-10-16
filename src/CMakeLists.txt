@@ -70,6 +70,9 @@ set(SOURCES
     fight/surface/tesselator.cpp
     fight/surface/tesselator.h
 
+    fight/weapons/gun.cpp
+    fight/weapons/gun.h
+
     game/area.cpp
     game/area.h
     game/boat.cpp

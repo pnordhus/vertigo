@@ -58,16 +58,16 @@ public:
     const Matrix& cameraMatrix() const { return m_cameraMatrix; }
     const Matrix& cameraMatrixInverted() const { return m_cameraMatrixInverted; }
     const Vector3D& position() const { return m_position; }
-    const float yaw() const { return m_yaw; }
-    const float pitch() const { return m_pitch; }
-    const float height() const { return m_height; }
-    const float depth() const { return m_depth - m_position.z; }
-    const float speed() const { return m_speed; }
-    const int noise() const;
-    const float time() const { return m_time; }
-    const int buzzers() const { return m_buzzers; }
-    const bool blink() const { return static_cast<int>(m_time/500.0f)%2 == 0; }
-    const int endType() const { return m_endType; }
+    float yaw() const { return m_yaw; }
+    float pitch() const { return m_pitch; }
+    float height() const { return m_height; }
+    float depth() const { return m_depth - m_position.z; }
+    float speed() const { return m_speed; }
+    int noise() const;
+    float time() const { return m_time; }
+    int buzzers() const { return m_buzzers; }
+    bool blink() const { return static_cast<int>(m_time/500.0f)%2 == 0; }
+    int endType() const { return m_endType; }
 
     Surface& surface() { return m_surface; }
     gfx::TextureManager& textureManager() { return m_textureManager; }

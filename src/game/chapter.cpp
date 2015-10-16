@@ -262,7 +262,7 @@ void Chapter::save() const
             file.setValue(QString("mission%1").arg(i++), mission->shortName());
         } else {
             file.setSection(QString("station%1").arg(mission->station()));
-            file.setValue("mission1", mission->shortName()); // TODO: Mission index
+            file.setValue(QString("mission%1").arg(i++), mission->shortName()); // TODO: Mission index
         }
     }
 

@@ -27,6 +27,7 @@ TurretBase::TurretBase(Scenario *scenario, txt::DesFile &file, int iff, const QS
     SimpleObject(scenario, file, iff, name, cargo)
 {
     m_static = false;
+    m_noise++;
 
     file.setSection("gunturret");
     if (file.contains("name"))
