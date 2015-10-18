@@ -37,7 +37,7 @@ class BoundingBox;
 class Billboard
 {
 public:
-    Billboard(gfx::TextureManager &texMan, txt::DesFile &name, int index);
+    Billboard(gfx::TextureManager &texMan, txt::DesFile &name, int index, bool blendColor = true);
 
 public:
     void draw(const Vector3D &position, float angle, float scale, int time, const Matrix &cameraMatrixInverted);
@@ -66,6 +66,7 @@ private:
     int m_displayTime;
     std::vector<Stage> m_stages;
     float m_scale;
+    bool m_blendColor;
 
     float m_range;
     float m_velocity;

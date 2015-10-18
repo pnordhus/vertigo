@@ -28,6 +28,7 @@ Sound::Sound() :
     m_source(0),
     m_buffer(0),
     m_volume(1.0f),
+    m_randomPitch(0),
     m_instance(false)
 {
 
@@ -39,6 +40,7 @@ Sound::Sound(Sound&& o)
     m_source = o.m_source;
     m_buffer = o.m_buffer;
     m_volume = o.m_volume;
+    m_randomPitch = o.m_randomPitch;
     m_instance = o.m_instance;
     o.m_source = 0;
     o.m_buffer = 0;
@@ -48,6 +50,7 @@ Sound::Sound(const QString &file) :
     m_source(0),
     m_buffer(0),
     m_volume(1.0f),
+    m_randomPitch(0),
     m_instance(false)
 {
     load(file);
@@ -58,6 +61,7 @@ Sound::Sound(const Sound &o) :
     m_source(0),
     m_buffer(o.m_buffer),
     m_volume(o.m_volume),
+    m_randomPitch(o.m_randomPitch),
     m_instance(true)
 {
 }
@@ -114,6 +118,8 @@ void Sound::play()
         return;
 
     alSourcei(m_source, AL_LOOPING, AL_FALSE);
+    if (m_randomPitch > 0)
+        alSourcef(m_source, AL_PITCH, 1 - m_randomPitch*qrand()/RAND_MAX);
     alSourcei(m_source, AL_BUFFER, m_buffer);
     alSourcePlay(m_source);
 }
@@ -203,6 +209,12 @@ void Sound::setVolume(float volume)
     m_volume = volume;
     if (m_source > 0)
         alSourcef(m_source, AL_GAIN, volume);
+}
+
+
+void Sound::setRandomPitch(float randomPitch)
+{
+    m_randomPitch = randomPitch;
 }
 
 

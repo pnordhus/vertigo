@@ -49,7 +49,7 @@ Gun::Gun(Scenario *scenario, int model) :
     m_longName = file.value("longname").toString();
     m_shortName = file.value("shortname").toString();
     m_imageName = file.value("imagename").toString();
-    m_rearmingTime = file.value("rearmingtime").toFloat();
+    m_rearmingTime = file.value("rearmingtime").toFloat() + 0.03f;
     m_energyDemand = file.value("energydemand").toFloat();
     m_defectDamping = file.value("defectdamping").toFloat();
     m_defectDelay = file.value("defectdelay").toFloat();
@@ -79,6 +79,7 @@ void Gun::addMuzzles(const Vector3D &muzzle, int model)
         addMuzzle(muzzle + Vector3D(0, -1, 0));
         addMuzzle(muzzle + Vector3D(0, 1, 0));
         addMuzzle(muzzle + Vector3D(0, 0, 1));
+        m_ammo *= 3;
     }
     else if (model == 3077 || model == 3083)
     {
@@ -86,11 +87,13 @@ void Gun::addMuzzles(const Vector3D &muzzle, int model)
         addMuzzle(muzzle + Vector3D(0, 1, 0));
         addMuzzle(muzzle + Vector3D(0, -1, -1));
         addMuzzle(muzzle + Vector3D(0, 1, -1));
+        m_ammo *= 4;
     }
     else
     {
         addMuzzle(muzzle + Vector3D(0, -1, 0));
         addMuzzle(muzzle + Vector3D(0, 1, 0));
+        m_ammo *= 2;
     }
 }
 
@@ -110,11 +113,10 @@ bool Gun::update(float elapsedTime)
 }
 
 
-bool Gun::fire(const Vector3D &pos, const Vector3D &dir, const Vector3D &up, const Vector3D &left)
+void Gun::fire(const Vector3D &pos, const Vector3D &dir, const Vector3D &up, const Vector3D &left)
 {
-    bool fired = false;
     if (m_state != StateReady)
-        return fired;
+        return;
     m_state = StateFiring;
     bool jammed = false;
     float defect = (1.0f - (m_defect < 0.2f ? 0.2f : m_defect)/m_defectDamping)/m_muzzles.size(); // TODO: check formula
@@ -124,12 +126,12 @@ bool Gun::fire(const Vector3D &pos, const Vector3D &dir, const Vector3D &up, con
             jammed = true;
         else
         {
-            m_scenario->effectManager().addProjectile(m_projectile, pos + dir*(m_muzzles[i].x*(i + 1)) + left*m_muzzles[i].y + up*m_muzzles[i].z, dir);
-            fired = true;
+            m_scenario->effectManager().addProjectile(m_projectile, pos + dir*m_muzzles[i].x + left*m_muzzles[i].y + up*m_muzzles[i].z, dir);
+            if (m_energyDemand == 0.0f)
+                m_ammo--;
+            sfx::SampleMap::get(m_sample).playInstance();
         }
     }
-    if (m_energyDemand == 0.0f)
-        m_ammo--;
     if (jammed)
     {
         m_state = StateJammed;
@@ -140,7 +142,6 @@ bool Gun::fire(const Vector3D &pos, const Vector3D &dir, const Vector3D &up, con
         m_state = StateRearming;
         m_stateTime = m_scenario->time() + m_rearmingTime*1000;
     }
-    return fired;
 }
 
 

@@ -41,6 +41,7 @@ void SampleMap::load()
             continue;
         m_samples.back().load(QString("sfx:snd/%1.pcm").arg(nam), fileDes.value(QString("per%1").arg(i)).toInt());
         m_samples.back().setVolume(fileDes.value(QString("vol%1").arg(i)).toInt()/255.0f);
+        m_samples.back().setRandomPitch(fileDes.value(QString("ran%1").arg(i)).toFloat());
     }
 }
 

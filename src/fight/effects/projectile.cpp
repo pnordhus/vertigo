@@ -24,7 +24,7 @@ namespace fight {
 
 
 Projectile::Projectile(Scenario *scenario, Billboard *billboard) : 
-    Effect(scenario, billboard, 0, 2)
+    Effect(scenario, billboard, qrand()%360, 2)
 {
     m_kineticShield = m_kineticShieldMax = billboard->kineticShield();
     m_kineticStrength = billboard->kineticStrength();

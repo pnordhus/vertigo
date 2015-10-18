@@ -43,6 +43,7 @@ public:
     void load(const QString &file, int rate = 0);
     void load(const QString &leftFile, const QString &rightFile);
     void setVolume(float volume);
+    void setRandomPitch(float randomPitch);
     bool isInstance() const { return m_instance; }
 
 private:
@@ -54,6 +55,7 @@ private:
     quint32 m_source;
     quint32 m_buffer;
     float m_volume;
+    float m_randomPitch;
     bool m_instance;
 };
 

@@ -104,21 +104,18 @@ bool Player::update(float elapsedTime)
 
     m_gun.update(elapsedTime);
     if (m_firing && m_gun.state() == Gun::StateReady)
-        if (m_gun.fire(pos, dir, up, left))
-            sfx::SampleMap::get(m_gun.sample()).playInstance();
+        m_gun.fire(pos, dir, up, left);
     if (m_tur1)
     {
         m_tur1->update(elapsedTime);
         if (m_firing && m_tur1->state() == Gun::StateReady)
-            if (m_tur1->fire(pos, dir, up, left))
-                sfx::SampleMap::get(m_tur1->sample()).playInstance();
+            m_tur1->fire(pos, dir, up, left);
     }
     if (m_tur2)
     {
         m_tur2->update(elapsedTime);
         if (m_firing && m_tur2->state() == Gun::StateReady)
-            if (m_tur2->fire(pos, dir, up, left))
-                sfx::SampleMap::get(m_tur2->sample()).playInstance();
+            m_tur2->fire(pos, dir, up, left);
     }
 
     return false;

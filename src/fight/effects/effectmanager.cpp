@@ -34,7 +34,7 @@ EffectManager::EffectManager(Scenario *scenario) :
     for (int i = 0; i < 27; i++)
         m_billboards.emplace(std::piecewise_construct,
             std::forward_as_tuple((Effects)((int)Effects::Explosion_0 + i)),
-            std::forward_as_tuple(m_scenario->textureManager(), file, i));
+            std::forward_as_tuple(m_scenario->textureManager(), file, i, i < 12));
     file.load("vfx:sobjects/shoot.des");
     for (int i = 0; i < 9; i++)
         m_billboards.emplace(std::piecewise_construct,
@@ -44,17 +44,17 @@ EffectManager::EffectManager(Scenario *scenario) :
     for (int i = 0; i < 23; i++)
         m_billboards.emplace(std::piecewise_construct,
             std::forward_as_tuple((Effects)((int)Effects::Debris_0 + i)),
-            std::forward_as_tuple(m_scenario->textureManager(), file, i));
+            std::forward_as_tuple(m_scenario->textureManager(), file, i, false));
     file.load("vfx:sobjects/trash.des");
     for (int i = 0; i < 5; i++)
         m_billboards.emplace(std::piecewise_construct,
             std::forward_as_tuple((Effects)((int)Effects::Trash_0 + i)),
-            std::forward_as_tuple(m_scenario->textureManager(), file, i));
+            std::forward_as_tuple(m_scenario->textureManager(), file, i, false));
     file.load("vfx:sobjects/bubble.des");
     for (int i = 0; i < 3; i++)
         m_billboards.emplace(std::piecewise_construct,
             std::forward_as_tuple((Effects)((int)Effects::Bubble_0 + i)),
-            std::forward_as_tuple(m_scenario->textureManager(), file, i));
+            std::forward_as_tuple(m_scenario->textureManager(), file, i, false));
 }
 
 

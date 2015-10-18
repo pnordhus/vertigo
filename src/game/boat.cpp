@@ -17,6 +17,7 @@
 
 #include "boat.h"
 #include "items.h"
+#include <algorithm>
 
 
 namespace game {

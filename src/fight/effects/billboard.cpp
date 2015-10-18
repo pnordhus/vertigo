@@ -31,7 +31,8 @@ namespace fight {
 Vector3D square[4] = { Vector3D(-1, 1, 0), Vector3D(1, 1, 0), Vector3D(1, -1, 0), Vector3D(-1, -1, 0) };
 
 
-Billboard::Billboard(gfx::TextureManager &texMan, txt::DesFile &file, int index)
+Billboard::Billboard(gfx::TextureManager &texMan, txt::DesFile &file, int index, bool blendColor) :
+    m_blendColor(blendColor)
 {
     file.setSection(QString("size%1").arg(index));
     m_scale = file.value("scale").toFloat();
@@ -140,6 +141,8 @@ void Billboard::draw(const Vector3D &position, float angle, float scale, int tim
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
+    if (m_blendColor)
+        glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR);
     glEnable(GL_ALPHA_TEST);
     glAlphaFunc(GL_NOTEQUAL, 0.0);
 
@@ -157,6 +160,9 @@ void Billboard::draw(const Vector3D &position, float angle, float scale, int tim
     glDrawArrays(GL_QUADS, 0, 4);
 
     glPopMatrix();
+
+    if (m_blendColor)
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDisable(GL_ALPHA_TEST);
 }
 
