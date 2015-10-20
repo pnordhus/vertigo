@@ -29,6 +29,9 @@ namespace fight {
 
 Player::Player(Scenario *scenario, game::Boat *boat) :
     ActiveObject(scenario, boat->boatFile(), 0, nullptr, nullptr),
+    m_engineState(EngineOff),
+    m_engineThrottle(0),
+    m_engineThrottleTarget(0),
     m_firing(false),
     m_gun(scenario, boat->gun() - 3073)
 {
@@ -76,6 +79,12 @@ Player::Player(Scenario *scenario, game::Boat *boat) :
 }
 
 
+float Player::noise() const
+{
+    return (m_engineState != EngineOff ? ActiveObject::noise() : 0) + (m_scenario->sonar().isActive() || m_scenario->sonar().isActivating() ? 1 : 0);
+}
+
+
 void Player::damage(int kinetic, int shock, const Vector3D &position)
 {
     Vector3D dirDamage = glm::normalize(position - m_position);
@@ -102,6 +111,28 @@ bool Player::update(float elapsedTime)
     Vector3D up = Vector3D(glm::row(m_scenario->cameraMatrix(), 1));
     Vector3D left = Vector3D(glm::row(m_scenario->cameraMatrix(), 0));
 
+    if (m_engineState == EngineStartup && m_engineTime < m_scenario->time())
+    {
+        m_engineState = EngineRunning;
+        sfx::SampleMap::get(sfx::Sample::Engine).playLoop();
+    }
+    if (m_engineState == EngineShutdown && m_engineTime < m_scenario->time())
+        m_engineState = EngineOff;
+    if (m_engineThrottle < m_engineThrottleTarget)
+    {
+        m_engineThrottle += m_engineThrottle >= 0 ? elapsedTime/1000 : elapsedTime/500;
+        if (m_engineThrottle > m_engineThrottleTarget)
+            m_engineThrottle = m_engineThrottleTarget;
+        sfx::SampleMap::get(sfx::Sample::Engine).setPitch(1.0f + 1.5f*glm::abs(m_engineThrottle));
+    }
+    if (m_engineThrottle > m_engineThrottleTarget)
+    {
+        m_engineThrottle -= m_engineThrottle >= 0 ? elapsedTime/500 : elapsedTime/1000;
+        if (m_engineThrottle < m_engineThrottleTarget)
+            m_engineThrottle = m_engineThrottleTarget;
+        sfx::SampleMap::get(sfx::Sample::Engine).setPitch(1.0f + 1.5f*glm::abs(m_engineThrottle));
+    }
+
     m_gun.update(elapsedTime);
     if (m_firing && m_gun.state() == Gun::StateReady)
         m_gun.fire(pos, dir, up, left);
@@ -119,6 +150,33 @@ bool Player::update(float elapsedTime)
     }
 
     return false;
+}
+
+
+void Player::engineToggle()
+{
+    if (m_engineState == EngineOff)
+    {
+        m_engineState = EngineStartup;
+        m_engineTime = m_scenario->time() + 1000;
+        sfx::SampleMap::get(sfx::Sample::Engine_Startup).play();
+    }
+    if (m_engineState == EngineRunning)
+    {
+        m_engineState = EngineShutdown;
+        m_engineTime = m_scenario->time() + 1000;
+        m_engineThrottleTarget = 0;
+        sfx::SampleMap::get(sfx::Sample::Engine_Shutdown).play();
+        sfx::SampleMap::get(sfx::Sample::Engine).stop();
+    }
+}
+
+
+void Player::setEngineThrottle(float throttle)
+{
+    if (m_engineState != EngineRunning)
+        return;
+    m_engineThrottleTarget = throttle;
 }
 
 

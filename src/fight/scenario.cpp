@@ -344,12 +344,8 @@ void Scenario::setBoat(game::Boat *boat)
 
     m_sonar.init(boat->sensor());
     m_sonar.activate();
-}
 
-
-int Scenario::noise() const
-{
-    return static_cast<int>(glm::round(m_player->noise())) + (m_sonar.isActive() || m_sonar.isActivating() ? 1 : 0);
+    m_player->engineToggle();
 }
 
 
@@ -373,10 +369,13 @@ void Scenario::update(float elapsedTime)
 
     Vector3D prevPos = m_position;
     Vector3D dir = Vector3D(glm::row(m_cameraMatrix, 2));
-    m_position += dir * (m_backwards - m_forwards) * elapsedTime * 0.2f;
+    float speed = 70/3600.0f*m_player->engineThrottle();
+    if (m_forwards > 1 || m_backwards > 1)
+        speed = (m_forwards - m_backwards)/100;
+    m_position += -speed * dir * elapsedTime ;
     m_yaw = glm::atan(dir.x, dir.y);
     m_pitch = dir.z < -1.0f ? -glm::half_pi<float>() : dir.z > 1.0f ? glm::half_pi<float>() : glm::asin(dir.z);
-    m_speed = (m_forwards - m_backwards) * 0.2f * 3600.0f;
+    m_speed = speed * 3600.0f;
 
     Vector3D up = Vector3D(glm::row(m_cameraMatrix, 1));
     if (up.z < 0)
@@ -503,7 +502,7 @@ void Scenario::draw()
     m_effectManager.draw();
 }
 
-
+static float pitch = 1.0f;
 void Scenario::keyPressEvent(QKeyEvent *e)
 {
     if (e->key() == Qt::Key_Left || e->key() == Qt::Key_4)
@@ -521,13 +520,21 @@ void Scenario::keyPressEvent(QKeyEvent *e)
         m_inverseUpDown = 1.0f;
     }
     if (e->key() == Qt::Key_A)
-        m_forwards = 1.0f;
+        m_forwards = 10.0f;
     if (e->key() == Qt::Key_Z || e->key() == Qt::Key_Y)
-        m_backwards = 1.0f;
+        m_backwards = 10.0f;
     if (e->key() == Qt::Key_S)
-        m_forwards = 0.2f;
+    {
+        m_forwards = 1.0f;
+        m_player->setEngineThrottle(m_forwards - m_backwards);
+    }
     if (e->key() == Qt::Key_X)
-        m_backwards = 0.2f;
+    {
+        m_backwards = 1.0f;
+        m_player->setEngineThrottle(m_forwards - m_backwards);
+    }
+    if (e->key() == Qt::Key_QuoteLeft)
+        m_player->engineToggle();
     if (e->key() == Qt::Key_Space)
         m_player->fire();
 }
@@ -548,9 +555,15 @@ void Scenario::keyReleaseEvent(QKeyEvent *e)
     if (e->key() == Qt::Key_Z || e->key() == Qt::Key_Y)
         m_backwards = 0.0f;
     if (e->key() == Qt::Key_S)
+    {
         m_forwards = 0.0f;
+        m_player->setEngineThrottle(m_forwards - m_backwards);
+    }
     if (e->key() == Qt::Key_X)
+    {
         m_backwards = 0.0f;
+        m_player->setEngineThrottle(m_forwards - m_backwards);
+    }
     if (e->key() == Qt::Key_Space)
         m_player->fireStop();
 }

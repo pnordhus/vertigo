@@ -45,7 +45,7 @@ public:
     int iff() const { return m_iff; }
     const QString& name() const { return m_name; }
     const QString& cargo() const { return m_cargo; }
-    float noise() const { return m_noise; }
+    virtual float noise() const { return m_noise; }
     bool isIdentified() const { return m_eventIdentify.isCompleted(); }
 
     int kineticShield() const { return m_kineticShield; };

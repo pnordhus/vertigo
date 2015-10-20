@@ -63,11 +63,12 @@ public:
     float height() const { return m_height; }
     float depth() const { return m_depth - m_position.z; }
     float speed() const { return m_speed; }
-    int noise() const;
     float time() const { return m_time; }
     int buzzers() const { return m_buzzers; }
     bool blink() const { return static_cast<int>(m_time/500.0f)%2 == 0; }
     int endType() const { return m_endType; }
+
+    Player* player() const { return m_player.get(); }
 
     Surface& surface() { return m_surface; }
     gfx::TextureManager& textureManager() { return m_textureManager; }

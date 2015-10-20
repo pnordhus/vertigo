@@ -218,4 +218,11 @@ void Sound::setRandomPitch(float randomPitch)
 }
 
 
+void Sound::setPitch(float pitch)
+{
+    if (m_source > 0)
+        alSourcef(m_source, AL_PITCH, pitch);
+}
+
+
 } // namespace sfx
