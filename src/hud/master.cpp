@@ -20,6 +20,7 @@
 #include "fight/scenario.h"
 #include "fight/objects/navpoint.h"
 #include "fight/objects/activeobject.h"
+#include "fight/boats/player.h"
 #include <glm/geometric.hpp>
 
 
@@ -177,14 +178,13 @@ void Master::drawPoint(const Vector4D &point4, const Rect &rect, bool isLocked, 
             }
         }
 
-        tex = nullptr;
-        //tex = &m_sensor2;
+        tex = target.locked()->sensor() == 2 ? &m_sensor2 : target.locked()->sensor() == 1 ? &m_sensor1 : nullptr;
         if (tex && isPassive)
             tex->draw(point.x - 22, point.y - 11, &m_clipRect);
         if (tex && !isPassive)
             tex->draw(point.x - 34, point.y - 23, &m_clipRect);
 
-        tex = target.distance() < 105.0f ? &m_inRange : nullptr;
+        tex = target.distance() < m_hud->scenario()->player()->range() ? &m_inRange : nullptr;
         if (tex && isPassive)
             m_inRange.draw(point.x - 21, point.y + 5, &m_clipRect);
         if (tex && !isPassive)

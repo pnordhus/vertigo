@@ -40,8 +40,10 @@ public:
     bool isLocked() const { return m_locked != nullptr || m_lockedNavPoint != nullptr; }
     Vector3D position() const;
     Object* object() const;
+
     float distance() const { return m_distance; }
-    void setDistance(float distance) { m_distance = distance; }
+    bool isPassive() const { return m_isPassive; }
+    void update(float distance, bool isPassive) { m_distance = distance; m_isPassive = isPassive; }
 
     ActiveObject* locked() const { return m_locked; }
     NavPoint* lockedNavPoint() const { return m_lockedNavPoint; }
@@ -55,6 +57,7 @@ private:
     ActiveObject *m_locked;
     NavPoint *m_lockedNavPoint;
     float m_distance;
+    bool m_isPassive;
 };
 
 

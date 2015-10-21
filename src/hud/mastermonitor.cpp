@@ -74,9 +74,9 @@ void MasterMonitor::draw()
         txtVelocity = QString("%1KMH").arg(static_cast<int>(glm::round(glm::length(object->velocity()))));
         txtNoise = QString("%1").arg(object->noise());
 
-        if (m_hud->scenario()->sonar().detectRange())
-            txtRange = "NIMP";
-        if (m_hud->scenario()->sonar().detectWeapons())
+        if (m_hud->scenario()->sonar().detectRange() && !target.isPassive() && object->sensor() > 0)
+            txtRange = QString("%1M").arg(object->sensorRange());
+        if (m_hud->scenario()->sonar().detectWeapons() && !target.isPassive())
         {
             txtGun = "NIMP";
             txtTorpedo = "NIMP";

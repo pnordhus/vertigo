@@ -93,6 +93,7 @@ void Sonar::init(int sensor)
     // TODO: remove
     m_iff = true;
     m_detectArmor = true;
+    m_detectRange = true;
 }
 
 
@@ -136,7 +137,7 @@ void Sonar::update(float elapsedTime)
     if (target.lockedNavPoint() != nullptr)
     {
         lockNotLost = true;
-        target.setDistance(glm::distance(target.lockedNavPoint()->position(), m_scenario->position()));
+        target.update(glm::distance(target.lockedNavPoint()->position(), m_scenario->position()), true);
     }
 
     m_sonarEntries.clear();
@@ -152,12 +153,13 @@ void Sonar::update(float elapsedTime)
         float activeRange = m_activeRange + m_activeRangeMult*object->noise();
         Vector3D dir = object->center() - m_scenario->position();
         float dist = glm::length(dir);
-        if (dist > passiveRange && (dist > activeRange || !m_active))
+        bool passive = dist > activeRange || !m_active;
+        if (dist > passiveRange && passive)
             continue;
         if (target.locked() == object)
         {
             lockNotLost = true;
-            target.setDistance(dist);
+            target.update(dist, passive);
             if (m_active && !object->isIdentified() && dist <= 35.0f)
                 object->identify();
         }
@@ -167,7 +169,7 @@ void Sonar::update(float elapsedTime)
         entry.object = object;
         entry.distance = dist;
         entry.isFriend = !m_iff || m_scenario->isFriend(0, object->iff());
-        entry.isPassive = dist > activeRange || !m_active;
+        entry.isPassive = passive;
     }
 
     if (!lockNotLost)

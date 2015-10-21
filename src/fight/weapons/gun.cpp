@@ -19,6 +19,7 @@
 #include "fight/scenario.h"
 #include "txt/desfile.h"
 #include "fight/effects/effectmanager.h"
+#include "fight/effects/billboard.h"
 
 
 namespace fight {
@@ -58,6 +59,8 @@ Gun::Gun(Scenario *scenario, int model) :
 
     static Effects effects[14] = { Effects::Shoot_PlasmaGun, Effects::Shoot_PlasmaGun, Effects::Shoot_PlasmaDeath, Effects::Shoot_PlasmaDeath, Effects::Shoot_PlasmaDeath, Effects::Shoot_DoomMortar, Effects::Shoot_MaximumImpactI, Effects::Shoot_MaximumImpact2, Effects::Shoot_Vendetta, Effects::Shoot_Vendetta, Effects::Shoot_Vendetta, Effects::Shoot_MaximumImpactI, Effects::Shoot_MaximumImpact2, Effects::Shoot_Vendetta };
     m_projectile = effects[model];
+
+    m_range = m_scenario->effectManager().getBillboard(m_projectile)->range();
 
     static sfx::Sample samples[14] = { sfx::Sample::Shoot_PlasmaGun, sfx::Sample::Shoot_PlasmaGun, sfx::Sample::Shoot_PlasmaDeath, sfx::Sample::Shoot_PlasmaDeath, sfx::Sample::Shoot_PlasmaDeath, sfx::Sample::Shoot_DoomMortar, sfx::Sample::Shoot_MaximumImpact, sfx::Sample::Shoot_MaximumImpact, sfx::Sample::Shoot_Vendetta, sfx::Sample::Shoot_Vendetta, sfx::Sample::Shoot_Vendetta, sfx::Sample::Shoot_MaximumImpact, sfx::Sample::Shoot_MaximumImpact, sfx::Sample::Shoot_Vendetta };
     m_sample = samples[model];
