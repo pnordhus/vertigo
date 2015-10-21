@@ -32,7 +32,7 @@ class Module;
 class SimpleObject : public ActiveObject
 {
 public:
-    SimpleObject(Scenario *scenario, txt::DesFile &file, int iff, const QString &name, const QString &cargo, float scale = 1/32.0f);
+    SimpleObject(Scenario *scenario, txt::DesFile &file, const ObjectInfo &info, float scale = 1/32.0f);
 
 public:
 

@@ -19,7 +19,7 @@
 #include "hud.h"
 #include "fight/scenario.h"
 #include "fight/objects/navpoint.h"
-#include "fight/objects/player.h"
+#include "fight/boats/player.h"
 #include <glm/common.hpp>
 #include <sstream>
 

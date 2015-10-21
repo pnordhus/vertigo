@@ -19,7 +19,7 @@
 #define FIGHT_PLAYER_H
 
 
-#include "activeobject.h"
+#include "simpleboat.h"
 #include "fight/weapons/gun.h"
 #include <memory>
 
@@ -30,7 +30,7 @@ namespace game { class Boat; }
 namespace fight {
 
 
-class Player : public ActiveObject
+class Player : public SimpleBoat
 {
 public:
     enum EngineState { EngineOff, EngineStartup, EngineRunning, EngineShutdown };
@@ -44,6 +44,7 @@ public:
     bool engineRunning() const { return m_engineState == EngineRunning; }
     float engineThrottle() const { return m_engineThrottle; }
     float noise() const;
+    float range() const;
 
 public:
     virtual void damage(int kinetic, int shock, const Vector3D &position);

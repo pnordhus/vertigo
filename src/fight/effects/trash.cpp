@@ -31,10 +31,6 @@ Effects Trash::trashCollection[9] = { Effects::Trash_0, Effects::Trash_0, Effect
 Trash::Trash(Scenario *scenario, Billboard *billboard, const Vector3D &position) :
     Effect(scenario, billboard, static_cast<float>(qrand()%360), 1)
 {
-    m_iff = 0;
-    m_name = "";
-    m_cargo = "";
-    m_identified = false;
     m_noise = billboard->noiseLevel();
     
     m_kineticShield = m_kineticShieldMax = billboard->kineticShield();

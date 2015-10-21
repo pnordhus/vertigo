@@ -30,11 +30,9 @@ ActiveObject::ActiveObject(Scenario *scenario) :
 }
 
 
-ActiveObject::ActiveObject(Scenario *scenario, txt::DesFile &file, int iff, const QString &name, const QString &cargo) :
+ActiveObject::ActiveObject(Scenario *scenario, txt::DesFile &file, const ObjectInfo &info) :
     Object(scenario, file),
-    m_iff(iff),
-    m_name(name),
-    m_cargo(cargo),
+    m_info(info),
     m_identified(false)
 {
     file.setSection("noise");

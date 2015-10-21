@@ -23,11 +23,10 @@
 namespace fight {
 
 
-TurretBase::TurretBase(Scenario *scenario, txt::DesFile &file, int iff, const QString &name, const QString &cargo) :
-    SimpleObject(scenario, file, iff, name, cargo)
+TurretBase::TurretBase(Scenario *scenario, txt::DesFile &file, const ObjectInfo &info) :
+    SimpleObject(scenario, file, info)
 {
     m_static = false;
-    m_noise++;
 
     file.setSection("gunturret");
     if (file.contains("name"))

@@ -29,7 +29,9 @@
 #include "objects/turretbase.h"
 #include "objects/navpoint.h"
 #include "objects/simpleobject.h"
-#include "objects/player.h"
+
+#include "boats/simpleboat.h"
+#include "boats/player.h"
 
 #include <QGLContext>
 #include <QTime>
@@ -123,20 +125,22 @@ Scenario::Scenario(const QString &name) :
             objectDes.load(QString("vfx:sobjects/%1.des").arg(types[dType]));
         }
 
-        int iff = 0;
+        ActiveObject::ObjectInfo info;
         if (m_file.contains("iff"))
-            iff = m_file.value("iff").toInt();
-        QString name;
+            info.iff = m_file.value("iff").toInt();
         if (m_file.contains("inf"))
-            name = m_file.valueText("inf");
-        QString cargo;
+            info.name = m_file.valueText("inf");
         if (m_file.contains("carg"))
-            cargo = m_file.valueText("carg");
+            info.cargo = m_file.valueText("carg");
+        if (m_file.contains("sen"))
+            info.sensor = m_file.value("sen").toInt();
+        if (m_file.contains("senr"))
+            info.sensorRange = m_file.value("senr").toInt();
 
         switch (type) {
         case TypeBoat:
             {
-                object = new SimpleObject(this, objectDes, iff, name, cargo);
+                object = new SimpleBoat(this, objectDes, info);
                 Vector3D pos = getPosition();
                 pos.z += 20.0f;
                 object->setPosition(pos);
@@ -145,7 +149,7 @@ Scenario::Scenario(const QString &name) :
 
         case TypeBomber:
             {
-                object = new SimpleObject(this, objectDes, iff, name, cargo);
+                object = new SimpleBoat(this, objectDes, info);
                 Vector3D pos = getPosition();
                 pos.z += 20.0f;
                 object->setPosition(pos);
@@ -155,7 +159,7 @@ Scenario::Scenario(const QString &name) :
         case TypeTower:
         case TypeTorpedoTower:
             {
-                object = new TurretBase(this, objectDes, iff, name, cargo);
+                object = new TurretBase(this, objectDes, info);
                 object->setPosition(getPosition());
             }
             break;
@@ -170,7 +174,7 @@ Scenario::Scenario(const QString &name) :
         case TypeMine:
             {
                 // TODO: dis num
-                object = new Mine(this, objectDes, iff);
+                object = new Mine(this, objectDes, info);
                 object->setPosition(getPosition());
             }
             break;
@@ -199,7 +203,7 @@ Scenario::Scenario(const QString &name) :
         case TypeCrawler:
             {
                 objectDes.load("vfx:sobjects/gvehicle.des");
-                object = new SimpleObject(this, objectDes, iff, name, cargo);
+                object = new SimpleObject(this, objectDes, info);
                 object->setPosition(getPosition());
             }
             break;
@@ -214,7 +218,7 @@ Scenario::Scenario(const QString &name) :
 
         case TypeActiveBuilding:
             {
-                object = new SimpleObject(this, objectDes, iff, name, cargo, 16);
+                object = new SimpleObject(this, objectDes, info, 16);
                 object->setPosition(getPosition());
             }
             break;
@@ -344,8 +348,6 @@ void Scenario::setBoat(game::Boat *boat)
 
     m_sonar.init(boat->sensor());
     m_sonar.activate();
-
-    m_player->engineToggle();
 }
 
 

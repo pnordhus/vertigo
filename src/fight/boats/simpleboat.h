@@ -15,18 +15,29 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "mine.h"
-#include "fight/scenario.h"
+#ifndef FIGHT_SIMPLEBOAT_H
+#define FIGHT_SIMPLEBOAT_H
+
+
+#include "fight/objects/simpleobject.h"
+#include "fight/weapons/gun.h"
 
 
 namespace fight {
 
 
-Mine::Mine(Scenario *scenario, txt::DesFile &file, const ObjectInfo &info) :
-    SimpleObject(scenario, file, info)
+class SimpleBoat : public SimpleObject
 {
+public:
+    SimpleBoat(Scenario *scenario, txt::DesFile &file, const ObjectInfo &info);
 
-}
+public:
+
+private:
+};
 
 
 } // namespace fight
+
+
+#endif // FIGHT_SIMPLEBOAT_H

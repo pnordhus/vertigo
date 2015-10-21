@@ -31,8 +31,20 @@ class Scenario;
 class ActiveObject : public Object
 {
 public:
+    struct ObjectInfo
+    {
+        int iff;
+        QString name;
+        QString cargo;
+        int sensor;
+        int sensorRange;
+
+        ObjectInfo() : iff(0), name(""), cargo(""), sensor(0), sensorRange(0) { }
+    };
+
+public:
     ActiveObject(Scenario *scenario);
-    ActiveObject(Scenario *scenario, txt::DesFile &file, int iff, const QString &name, const QString &cargo);
+    ActiveObject(Scenario *scenario, txt::DesFile &file, const ObjectInfo &info);
 
 public:
     ConditionEvent* eventDestroy() { return &m_eventDestroy; }
@@ -42,10 +54,12 @@ public:
     ConditionEvent* eventFinish() { return &m_eventFinish; }
     ConditionEvent* eventBoard() { return &m_eventBoard; }
 
-    int iff() const { return m_iff; }
-    const QString& name() const { return m_name; }
-    const QString& cargo() const { return m_cargo; }
-    virtual float noise() const { return m_noise; }
+    int iff() const { return m_info.iff; }
+    const QString& name() const { return m_info.name; }
+    const QString& cargo() const { return m_info.cargo; }
+    int sensor() const { return m_info.sensor; }
+    int sensorRange() const { return m_info.sensorRange; }
+    virtual float noise() const { return m_noise + (m_info.sensor > 1 ? 1 : 0); }
     bool isIdentified() const { return m_eventIdentify.isCompleted(); }
 
     int kineticShield() const { return m_kineticShield; };
@@ -70,9 +84,7 @@ protected:
     ConditionEvent m_eventFinish;
     ConditionEvent m_eventBoard;
 
-    int m_iff;
-    QString m_name;
-    QString m_cargo;
+    ObjectInfo m_info;
     float m_noise;
     bool m_identified;
 

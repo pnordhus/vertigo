@@ -23,8 +23,8 @@
 namespace fight {
 
 
-SimpleObject::SimpleObject(Scenario *scenario, txt::DesFile &file, int iff, const QString &name, const QString &cargo, float scale) :
-    ActiveObject(scenario, file, iff, name, cargo)
+SimpleObject::SimpleObject(Scenario *scenario, txt::DesFile &file, const ObjectInfo &info, float scale) :
+    ActiveObject(scenario, file, info)
 {
     file.setSection("cluster");
     m_base = scenario->moduleManager().get(file.value("base").toString());

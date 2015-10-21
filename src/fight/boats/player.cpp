@@ -28,8 +28,8 @@ namespace fight {
 
 
 Player::Player(Scenario *scenario, game::Boat *boat) :
-    ActiveObject(scenario, boat->boatFile(), 0, nullptr, nullptr),
-    m_engineState(EngineOff),
+    SimpleBoat(scenario, boat->boatFile(), ObjectInfo()),
+    m_engineState(EngineRunning),
     m_engineThrottle(0),
     m_engineThrottleTarget(0),
     m_firing(false),
@@ -76,12 +76,20 @@ Player::Player(Scenario *scenario, game::Boat *boat) :
         m_tur2->addMuzzles(Vector3D(3.0f, 0, 0) + boat->getMounting("TUR2")->rel, boat->tur2());
         m_tur2->setDefect(boat->defects()[game::Boat::DefectTur2]);
     }
+
+    sfx::SampleMap::get(sfx::Sample::Engine).playLoop();
 }
 
 
 float Player::noise() const
 {
     return (m_engineState != EngineOff ? ActiveObject::noise() : 0) + (m_scenario->sonar().isActive() || m_scenario->sonar().isActivating() ? 1 : 0);
+}
+
+
+float Player::range() const
+{
+    return m_gun.range();
 }
 
 
@@ -120,17 +128,17 @@ bool Player::update(float elapsedTime)
         m_engineState = EngineOff;
     if (m_engineThrottle < m_engineThrottleTarget)
     {
-        m_engineThrottle += m_engineThrottle >= 0 ? elapsedTime/1000 : elapsedTime/500;
+        m_engineThrottle += m_engineThrottle >= 0 ? elapsedTime/3000 : elapsedTime/5000;
         if (m_engineThrottle > m_engineThrottleTarget)
             m_engineThrottle = m_engineThrottleTarget;
-        sfx::SampleMap::get(sfx::Sample::Engine).setPitch(1.0f + 1.5f*glm::abs(m_engineThrottle));
+        sfx::SampleMap::get(sfx::Sample::Engine).setPitch(1.0f + 1.0f*glm::abs(m_engineThrottle));
     }
     if (m_engineThrottle > m_engineThrottleTarget)
     {
-        m_engineThrottle -= m_engineThrottle >= 0 ? elapsedTime/500 : elapsedTime/1000;
+        m_engineThrottle -= m_engineThrottle >= 0 ? elapsedTime/5000 : elapsedTime/3000;
         if (m_engineThrottle < m_engineThrottleTarget)
             m_engineThrottle = m_engineThrottleTarget;
-        sfx::SampleMap::get(sfx::Sample::Engine).setPitch(1.0f + 1.5f*glm::abs(m_engineThrottle));
+        sfx::SampleMap::get(sfx::Sample::Engine).setPitch(1.0f + 1.0f*glm::abs(m_engineThrottle));
     }
 
     m_gun.update(elapsedTime);
