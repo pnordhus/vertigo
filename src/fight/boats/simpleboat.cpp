@@ -43,7 +43,7 @@ bool SimpleBoat::update(float elapsedTime)
 {
     updateOrientation(elapsedTime);
     updateVelocity(elapsedTime);
-    m_position += m_velocity*(elapsedTime/1000);
+    m_position += m_velocity*elapsedTime;
 
     return false;
 }
@@ -61,14 +61,14 @@ void SimpleBoat::updateVelocity(float elapsedTime)
         orientationAcceleration = m_maxOrientationRetardation*(m_fullThrottle ? 2 : 1);
     acceleration.y += orientationAcceleration;
 
-    velocity += acceleration*(elapsedTime/1000);
+    velocity += acceleration*elapsedTime;
     m_velocity = m_orientationInverted * velocity;
 }
 
 
 void SimpleBoat::updateOrientation(float elapsedTime)
 {
-    m_orientation *= glm::mat3(glm::rotate(m_turnX*1.5f*elapsedTime/1000, right()) * glm::rotate(m_turnZ*1.5f*elapsedTime/1000, Vector3D(0, 0, 1)));
+    m_orientation *= glm::mat3(glm::rotate(m_turnX*1.5f*elapsedTime, right()) * glm::rotate(m_turnZ*1.5f*elapsedTime, Vector3D(0, 0, 1)));
     m_orientationInverted = glm::transpose(m_orientation);
 }
 

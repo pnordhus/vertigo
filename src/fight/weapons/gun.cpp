@@ -106,7 +106,7 @@ bool Gun::update(float elapsedTime)
     if (m_state == StateJammed && m_stateTime < m_scenario->time())
     {
         m_state = StateRearming;
-        m_stateTime = m_scenario->time() + m_rearmingTime*1000;
+        m_stateTime = m_scenario->time() + m_rearmingTime;
     }
     if (m_state == StateRearming && m_stateTime < m_scenario->time())
         m_state = StateReady;
@@ -138,12 +138,12 @@ void Gun::fire(const Vector3D &pos, const Vector3D &dir, const Vector3D &up, con
     if (jammed)
     {
         m_state = StateJammed;
-        m_stateTime = m_scenario->time() + m_defectDelay*1000;
+        m_stateTime = m_scenario->time() + m_defectDelay;
     }
     else
     {
         m_state = StateRearming;
-        m_stateTime = m_scenario->time() + m_rearmingTime*1000;
+        m_stateTime = m_scenario->time() + m_rearmingTime;
     }
 }
 

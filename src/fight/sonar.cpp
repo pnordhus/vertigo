@@ -40,7 +40,7 @@ void Sonar::init(int sensor)
     // TODO: check values
     if (sensor == 6145)
     {
-        m_delay = 12000;
+        m_delay = 12;
         m_passiveRange = 160.0f;
         m_passiveRangeMult = 20.0f;
         m_activeRange = 160.0f;
@@ -53,7 +53,7 @@ void Sonar::init(int sensor)
     }
     if (sensor == 6146)
     {
-        m_delay = 10000;
+        m_delay = 10;
         m_passiveRange = 180.0f;
         m_passiveRangeMult = 30.0f;
         m_activeRange = 160.0f;
@@ -66,7 +66,7 @@ void Sonar::init(int sensor)
     }
     if (sensor == 6147)
     {
-        m_delay = 8000;
+        m_delay = 8;
         m_passiveRange = 200.0f;
         m_passiveRangeMult = 40.0f;
         m_activeRange = 160.0f;
@@ -79,7 +79,7 @@ void Sonar::init(int sensor)
     }
     if (sensor == 6148)
     {
-        m_delay = 6000;
+        m_delay = 6;
         m_passiveRange = 220.0f;
         m_passiveRangeMult = 50.0f;
         m_activeRange = 160.0f;

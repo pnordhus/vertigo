@@ -42,13 +42,13 @@ NavPoint::NavPoint(Scenario *scenario, int num) :
 bool NavPoint::update(float elapsedTime)
 {
     m_time += elapsedTime;
-    while (m_time > 500.0f)
+    while (m_time > 0.5f)
     {
         if (m_state == 0)
             m_state = 1;
         else
             m_state = 0;
-        m_time -= 500.0f;
+        m_time -= 0.5f;
     }
     if (m_enabled && !m_reached)
     {

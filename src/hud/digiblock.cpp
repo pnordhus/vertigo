@@ -62,7 +62,7 @@ void DigiBlock::draw()
     m_children[3]->setFont(noise <= 2 ? m_hud->fontGreen() : m_hud->fontRed());
     m_children[3]->setText(QString("NL %1").arg(noise));
 
-    int time = static_cast<int>(m_hud->scenario()->time()/1000);
+    int time = static_cast<int>(m_hud->scenario()->time());
     std::stringstream st;
     if (time >= 3600)
     {

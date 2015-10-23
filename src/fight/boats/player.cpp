@@ -161,13 +161,13 @@ void Player::engineToggle()
     if (m_engineState == EngineOff)
     {
         m_engineState = EngineStartup;
-        m_engineTime = m_scenario->time() + 1000;
+        m_engineTime = m_scenario->time() + 1;
         sfx::SampleMap::get(sfx::Sample::Engine_Startup).play();
     }
     if (m_engineState == EngineRunning)
     {
         m_engineState = EngineShutdown;
-        m_engineTime = m_scenario->time() + 1000;
+        m_engineTime = m_scenario->time() + 1;
         sfx::SampleMap::get(sfx::Sample::Engine_Shutdown).play();
         sfx::SampleMap::get(sfx::Sample::Engine).stop();
     }

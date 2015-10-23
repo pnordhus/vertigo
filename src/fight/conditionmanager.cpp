@@ -63,7 +63,7 @@ void ConditionManager::delayComplete(Condition *cond, int delay)
 {
     m_delayEntries.emplace_back();
     m_delayEntries.back().cond = cond;
-    m_delayEntries.back().completeTime = m_scenario->time() + delay*1000;
+    m_delayEntries.back().completeTime = m_scenario->time() + delay;
 }
 
 

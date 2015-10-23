@@ -40,12 +40,12 @@ public:
     Billboard(gfx::TextureManager &texMan, txt::DesFile &name, int index, bool blendColor = true);
 
 public:
-    void draw(const Vector3D &position, float angle, float scale, int time, const Matrix &cameraMatrixInverted);
+    void draw(const Vector3D &position, float angle, float scale, float time, const Matrix &cameraMatrixInverted);
 
     BoundingBox box();
     bool intersect(const Vector3D &start, const Vector3D &dir, float &distance);
     
-    int duration() const { return m_stages.size()*m_displayTime; }
+    float duration() const { return m_stages.size()*m_displayTime; }
     float range() const { return m_range; }
     float velocity() const { return m_velocity; }
     float collisionRadius() const { return m_collisionRadius; }
@@ -63,7 +63,7 @@ private:
         Vector2D offset;
     };
 
-    int m_displayTime;
+    float m_displayTime;
     std::vector<Stage> m_stages;
     float m_scale;
     bool m_blendColor;

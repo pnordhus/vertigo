@@ -46,16 +46,16 @@ void Projectile::setDirection(const Vector3D &direction)
 
 bool Projectile::update(float elapsedTime)
 {
-    m_elapsedTime += elapsedTime;
-    if (m_elapsedTime == 0)
+    m_time += elapsedTime;
+    if (m_time == 0)
         return false;
-    if (m_elapsedTime*m_billboard->velocity()/1000 > m_billboard->range())
+    if (m_time*m_billboard->velocity() > m_billboard->range())
     {
         disable();
         return true;
     }
 
-    Vector3D newPos = m_originPos + m_direction*(m_elapsedTime*m_billboard->velocity()/1000);
+    Vector3D newPos = m_originPos + m_direction*(m_time*m_billboard->velocity());
 
     Vector3D pos, normal;
     if (m_scenario->surface().testCollision(m_position, newPos, m_billboard->collisionRadius(), pos, normal))

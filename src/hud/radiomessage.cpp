@@ -45,7 +45,7 @@ void RadioMessage::draw()
     int i = m_hud->scenario()->radio().size() - 1;
     while (i >= 0 && m_hud->scenario()->radio()[i]->time() > m_hud->scenario()->time())
         i--;
-    if (i < 0 || m_hud->scenario()->radio()[i]->time() < m_hud->scenario()->time() - 4500.0f)
+    if (i < 0 || m_hud->scenario()->radio()[i]->time() < m_hud->scenario()->time() - 4.5f)
     {
         m_lblText.setVisible(false);
         return;

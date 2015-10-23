@@ -61,7 +61,7 @@ Billboard::Billboard(gfx::TextureManager &texMan, txt::DesFile &file, int index,
     file.setSection(QString("anim%1").arg(index));
     float scale = file.value("scale").toFloat();
 
-    m_displayTime = (int)(file.value("displaytime").toFloat()*1000) + 20;
+    m_displayTime = file.value("displaytime").toFloat() + 0.02f;
     int numOfStages = file.value("numofstages").toInt();
     int numInX = 0;
 
@@ -133,9 +133,9 @@ Billboard::Billboard(gfx::TextureManager &texMan, txt::DesFile &file, int index,
 
 
 
-void Billboard::draw(const Vector3D &position, float angle, float scale, int time, const Matrix &cameraMatrixInverted)
+void Billboard::draw(const Vector3D &position, float angle, float scale, float time, const Matrix &cameraMatrixInverted)
 {
-    int currentStage = time/m_displayTime%m_stages.size();
+    int currentStage = static_cast<int>(time/m_displayTime)%m_stages.size();
 
     glEnable(GL_TEXTURE_2D);
     glEnableClientState(GL_VERTEX_ARRAY);

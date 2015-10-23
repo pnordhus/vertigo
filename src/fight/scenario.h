@@ -65,7 +65,7 @@ public:
     float speed() const { return m_speed; }
     float time() const { return m_time; }
     int buzzers() const { return m_buzzers; }
-    bool blink() const { return static_cast<int>(m_time/500.0f)%2 == 0; }
+    bool blink() const { return static_cast<int>(m_time/0.5f)%2 == 0; }
     int endType() const { return m_endType; }
 
     Player* player() const { return m_player.get(); }

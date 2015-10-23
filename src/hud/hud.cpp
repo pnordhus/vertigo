@@ -216,7 +216,7 @@ void HUD::draw()
     }
 
     int ticks = SDL_GetTicks();
-    float elapsedTime = ticks - m_lastTicks;
+    float elapsedTime = (ticks - m_lastTicks)/1000.0f;
     m_lastTicks = ticks;
     m_scenario->update(elapsedTime);
 

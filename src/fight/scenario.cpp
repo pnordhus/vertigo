@@ -372,7 +372,7 @@ void Scenario::update(float elapsedTime)
         vel -= dir*100.0f;
     m_yaw = glm::atan(-dir.x, -dir.y);
     m_pitch = dir.z < -1.0f ? -glm::half_pi<float>() : dir.z > 1.0f ? glm::half_pi<float>() : glm::asin(dir.z);
-    m_position += vel*(elapsedTime/1000);
+    m_position += vel*elapsedTime;
     m_speed = glm::length(vel)*3.6f;
     if (glm::dot(dir, vel) < 0)
         m_speed = -m_speed;

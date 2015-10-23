@@ -186,8 +186,8 @@ void ConditionRadio::complete()
 {
     Condition::complete();
     m_time = m_scenario->time();
-    if (m_scenario->radio().size() > 0 && m_time < m_scenario->radio().back()->time() + 5000.0f)
-        m_time = m_scenario->radio().back()->time() + 5000.0f;
+    if (m_scenario->radio().size() > 0 && m_time < m_scenario->radio().back()->time() + 5.0f)
+        m_time = m_scenario->radio().back()->time() + 5.0f;
     m_scenario->radio().push_back(this);
 }
 
