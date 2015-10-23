@@ -52,6 +52,7 @@ Scenario::Scenario(const QString &name) :
     m_sonar(this),
     m_target(this),
     m_speed(0),
+    m_velocityTarget(0),
     m_time(0),
     m_left(0.0f),
     m_right(0.0f),
@@ -327,9 +328,6 @@ Scenario::Scenario(const QString &name) :
     m_endType = m_file.value("Type").toInt();
 
 
-    m_cameraMatrix = Matrix(1);
-    m_cameraMatrix = glm::rotate(m_cameraMatrix, glm::radians(initialDir), Vector3D(0, 1, 0));
-    m_cameraMatrix = glm::rotate(m_cameraMatrix, glm::radians(-90.0f), Vector3D(1, 0, 0));
 
     qsrand(QTime::currentTime().second() * 1000 + QTime::currentTime().msec());
 
@@ -362,29 +360,29 @@ void Scenario::update(float elapsedTime)
 {
     m_time += elapsedTime;
 
-    const float angleY = (m_right - m_left) * elapsedTime * 0.09f;
-    const float angleX = (m_up - m_down) * m_inverseUpDown * elapsedTime * 0.09f;
-
-    m_cameraMatrix = glm::rotate(m_cameraMatrix, glm::radians(angleX), Vector3D(glm::row(m_cameraMatrix, 0)));
-    m_cameraMatrix = glm::rotate(m_cameraMatrix, glm::radians(angleY), Vector3D(0, 0, 1));
-    m_cameraMatrixInverted = glm::inverse(m_cameraMatrix);
+    m_player->setTurnVelocity(m_right - m_left, (m_up - m_down)*m_inverseUpDown);
+    m_player->update(elapsedTime);
 
     Vector3D prevPos = m_position;
-    Vector3D dir = Vector3D(glm::row(m_cameraMatrix, 2));
-    float speed = 70/3600.0f*m_player->engineThrottle();
-    if (m_forwards > 1 || m_backwards > 1)
-        speed = (m_forwards - m_backwards)/100;
-    m_position += -speed * dir * elapsedTime ;
-    m_yaw = glm::atan(dir.x, dir.y);
+    Vector3D dir = m_player->dir();
+    Vector3D vel = m_player->velocity();
+    if (m_forwards == 100)
+        vel += dir*100.0f;
+    if (m_backwards == 100)
+        vel -= dir*100.0f;
+    m_yaw = glm::atan(-dir.x, -dir.y);
     m_pitch = dir.z < -1.0f ? -glm::half_pi<float>() : dir.z > 1.0f ? glm::half_pi<float>() : glm::asin(dir.z);
-    m_speed = speed * 3600.0f;
+    m_position += vel*(elapsedTime/1000);
+    m_speed = glm::length(vel)*3.6f;
+    if (glm::dot(dir, vel) < 0)
+        m_speed = -m_speed;
 
-    Vector3D up = Vector3D(glm::row(m_cameraMatrix, 1));
+    /*Vector3D up = Vector3D(glm::row(m_cameraMatrix, 1));
     if (up.z < 0)
     {
         m_cameraMatrix = glm::rotate(m_cameraMatrix, glm::pi<float>(), dir);
         m_inverseUpDown = -1.0f;
-    }
+    }*/
 
     if (m_position != prevPos)
     {
@@ -408,6 +406,9 @@ void Scenario::update(float elapsedTime)
         m_player->setPosition(m_position);
     }
 
+    m_cameraMatrixInverted = Matrix(Vector4D(m_player->right(), 0), Vector4D(m_player->up(), 0), Vector4D(-m_player->dir(), 0), Vector4D(m_position, 1));
+    m_cameraMatrix = glm::inverse(m_cameraMatrixInverted);
+
     m_conditionManager.update(elapsedTime);
 
     float height = m_surface.heightAt(m_position.x, m_position.y);
@@ -416,8 +417,6 @@ void Scenario::update(float elapsedTime)
     for (const auto &object : m_objects)
         if (object->isEnabled())
             object->update(elapsedTime);
-
-    m_player->update(elapsedTime);
 
     m_effectManager.update(elapsedTime);
 
@@ -440,7 +439,6 @@ void Scenario::draw()
 
     glMatrixMode(GL_MODELVIEW);
     glLoadMatrixf(glm::value_ptr(m_cameraMatrix));
-    glTranslatef(-m_position.x, -m_position.y, -m_position.z);
 
     GLfloat global_ambient[] = { 0.5f, 0.5f, 1.0f, 1.0f };
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, global_ambient);
@@ -494,8 +492,7 @@ void Scenario::draw()
     glFogf(GL_FOG_START, 100.0);
     glFogf(GL_FOG_END, 200.0);
 
-    Vector3D dir = -Vector3D(glm::row(m_cameraMatrix, 2));
-    m_surface.draw(m_position, dir);
+    m_surface.draw(m_position, m_player->dir());
 
     for (const auto &object : m_objects)
         if (object->isEnabled())
@@ -521,19 +518,43 @@ void Scenario::keyPressEvent(QKeyEvent *e)
         m_down = 1.0f;
         m_inverseUpDown = 1.0f;
     }
+    if (e->key() == Qt::Key_Q)
+        m_forwards = 100;
+    if (e->key() == Qt::Key_W)
+        m_backwards = 100;
     if (e->key() == Qt::Key_A)
-        m_forwards = 10.0f;
-    if (e->key() == Qt::Key_Z || e->key() == Qt::Key_Y)
-        m_backwards = 10.0f;
+    {
+        m_forwards = 1;
+        m_player->setVelocityTarget(m_player->maxVelocity());
+        m_player->setFullThrottle(true);
+    }
+    if (e->key() == Qt::Key_Z)
+    {
+        m_backwards = 1;
+        m_player->setVelocityTarget(m_player->minVelocity());
+        m_player->setFullThrottle(true);
+    }
     if (e->key() == Qt::Key_S)
     {
-        m_forwards = 1.0f;
-        m_player->setEngineThrottle(m_forwards - m_backwards);
+        m_velocityTarget += 2.778f;
+        if (m_velocityTarget > m_player->maxVelocity())
+            m_velocityTarget = m_player->maxVelocity();
+        if (m_forwards != 1 && m_backwards != 1)
+            m_player->setVelocityTarget(m_velocityTarget);
     }
     if (e->key() == Qt::Key_X)
     {
-        m_backwards = 1.0f;
-        m_player->setEngineThrottle(m_forwards - m_backwards);
+        m_velocityTarget -= 2.778f;
+        if (m_velocityTarget < m_player->minVelocity())
+            m_velocityTarget = m_player->minVelocity();
+        if (m_forwards != 1 && m_backwards != 1)
+            m_player->setVelocityTarget(m_velocityTarget);
+    }
+    if (e->key() == Qt::Key_C)
+    {
+        m_velocityTarget = 0;
+        if (m_forwards != 1 && m_backwards != 1)
+            m_player->setVelocityTarget(m_velocityTarget);
     }
     if (e->key() == Qt::Key_QuoteLeft)
         m_player->engineToggle();
@@ -552,19 +573,31 @@ void Scenario::keyReleaseEvent(QKeyEvent *e)
         m_up = 0.0f;
     if (e->key() == Qt::Key_Down || e->key() == Qt::Key_5)
         m_down = 0.0f;
+    if (e->key() == Qt::Key_Q)
+        m_forwards = 0;
+    if (e->key() == Qt::Key_W)
+        m_backwards = 0;
     if (e->key() == Qt::Key_A)
-        m_forwards = 0.0f;
-    if (e->key() == Qt::Key_Z || e->key() == Qt::Key_Y)
-        m_backwards = 0.0f;
-    if (e->key() == Qt::Key_S)
     {
-        m_forwards = 0.0f;
-        m_player->setEngineThrottle(m_forwards - m_backwards);
+        m_forwards = 0;
+        if (m_backwards > 0)
+            m_player->setVelocityTarget(m_player->minVelocity());
+        else
+        {
+            m_player->setVelocityTarget(m_velocityTarget);
+            m_player->setFullThrottle(false);
+        }
     }
-    if (e->key() == Qt::Key_X)
+    if (e->key() == Qt::Key_Z)
     {
-        m_backwards = 0.0f;
-        m_player->setEngineThrottle(m_forwards - m_backwards);
+        m_backwards = 0;
+        if (m_forwards > 0)
+            m_player->setVelocityTarget(m_player->maxVelocity());
+        else
+        {
+            m_player->setVelocityTarget(m_velocityTarget);
+            m_player->setFullThrottle(false);
+        }
     }
     if (e->key() == Qt::Key_Space)
         m_player->fireStop();

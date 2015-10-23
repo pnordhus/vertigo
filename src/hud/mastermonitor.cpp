@@ -101,6 +101,7 @@ void MasterMonitor::draw()
         m = glm::translate(m, Vector3D(observeCenter, -0.5f));
         m = glm::scale(m, Vector3D(observeCenter.x - observePos.x, observePos.y - observeCenter.y, 0.5f));
         m *= m_hud->scenario()->cameraMatrix();
+        m = glm::translate(m, m_hud->scenario()->position());
 
         fight::Object *obj = target.object();
         const fight::BoundingBox& box = obj->box();

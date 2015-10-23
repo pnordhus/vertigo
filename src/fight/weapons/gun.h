@@ -63,7 +63,7 @@ public:
 
 public:
     bool update(float elapsedTime);
-    void fire(const Vector3D &pos, const Vector3D &dir, const Vector3D &up, const Vector3D &left);
+    void fire(const Vector3D &pos, const Vector3D &dir, const Vector3D &up, const Vector3D &right);
 
 protected:
     Scenario *m_scenario;

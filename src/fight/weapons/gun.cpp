@@ -79,23 +79,23 @@ void Gun::addMuzzles(const Vector3D &muzzle, int model)
         addMuzzle(muzzle);
     else if (model == 3082)
     {
-        addMuzzle(muzzle + Vector3D(0, -1, 0));
-        addMuzzle(muzzle + Vector3D(0, 1, 0));
+        addMuzzle(muzzle + Vector3D(-1, 0, 0));
+        addMuzzle(muzzle + Vector3D(1, 0, 0));
         addMuzzle(muzzle + Vector3D(0, 0, 1));
         m_ammo *= 3;
     }
     else if (model == 3077 || model == 3083)
     {
-        addMuzzle(muzzle + Vector3D(0, -1, 0));
-        addMuzzle(muzzle + Vector3D(0, 1, 0));
-        addMuzzle(muzzle + Vector3D(0, -1, -1));
-        addMuzzle(muzzle + Vector3D(0, 1, -1));
+        addMuzzle(muzzle + Vector3D(-1, 0, 0));
+        addMuzzle(muzzle + Vector3D(1, 0, 0));
+        addMuzzle(muzzle + Vector3D(-1, 0, -1));
+        addMuzzle(muzzle + Vector3D(1, 0, -1));
         m_ammo *= 4;
     }
     else
     {
-        addMuzzle(muzzle + Vector3D(0, -1, 0));
-        addMuzzle(muzzle + Vector3D(0, 1, 0));
+        addMuzzle(muzzle + Vector3D(-1, 0, 0));
+        addMuzzle(muzzle + Vector3D(1, 0, 0));
         m_ammo *= 2;
     }
 }
@@ -116,7 +116,7 @@ bool Gun::update(float elapsedTime)
 }
 
 
-void Gun::fire(const Vector3D &pos, const Vector3D &dir, const Vector3D &up, const Vector3D &left)
+void Gun::fire(const Vector3D &pos, const Vector3D &dir, const Vector3D &up, const Vector3D &right)
 {
     if (m_state != StateReady)
         return;
@@ -129,7 +129,7 @@ void Gun::fire(const Vector3D &pos, const Vector3D &dir, const Vector3D &up, con
             jammed = true;
         else
         {
-            m_scenario->effectManager().addProjectile(m_projectile, pos + dir*m_muzzles[i].x + left*m_muzzles[i].y + up*m_muzzles[i].z, dir);
+            m_scenario->effectManager().addProjectile(m_projectile, pos + right*m_muzzles[i].x + dir*m_muzzles[i].y + up*m_muzzles[i].z, dir);
             if (m_energyDemand == 0.0f)
                 m_ammo--;
             sfx::SampleMap::get(m_sample).playInstance();

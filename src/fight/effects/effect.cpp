@@ -48,7 +48,7 @@ bool Effect::update(float elapsedTime)
 
 void Effect::draw()
 {
-    m_billboard->draw(m_position, m_angle, m_scale, m_elapsedTime, m_scenario->cameraMatrixInverted());
+    m_billboard->draw(m_position - m_scenario->position(), m_angle, m_scale, m_elapsedTime, m_scenario->cameraMatrixInverted());
 }
 
 

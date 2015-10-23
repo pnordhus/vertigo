@@ -42,7 +42,6 @@ public:
     int shield(int index) const { return m_shield[index]; };
     int shieldMax(int index) const { return m_shieldMax[index]; };
     bool engineRunning() const { return m_engineState == EngineRunning; }
-    float engineThrottle() const { return m_engineThrottle; }
     float noise() const;
     float range() const;
 
@@ -51,8 +50,6 @@ public:
     bool update(float elapsedTime);
 
     void engineToggle();
-    void setEngineThrottle(float throttle);
-
     void fire();
     void fireStop();
 
@@ -62,8 +59,6 @@ private:
 
     EngineState m_engineState;
     float m_engineTime;
-    float m_engineThrottle;
-    float m_engineThrottleTarget;
 
     bool m_firing;
     Gun m_gun;

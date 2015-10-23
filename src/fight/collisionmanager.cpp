@@ -65,6 +65,14 @@ void CollisionManager::addObject(Object *object)
 }
 
 
+void CollisionManager::removeObject(Object *object)
+{
+    auto it = std::find(m_objects.begin(), m_objects.end(), object);
+    (*it) = m_objects.back();
+    m_objects.pop_back();
+}
+
+
 Object* CollisionManager::testCollision(const Vector3D &start, const Vector3D &end, float radius, Vector3D &position, Vector3D &normal, CollisionCache *collisionCache)
 {
     Vector3D dir = end - start;

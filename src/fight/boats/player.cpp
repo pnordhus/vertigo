@@ -30,8 +30,6 @@ namespace fight {
 Player::Player(Scenario *scenario, game::Boat *boat) :
     SimpleBoat(scenario, boat->boatFile(), ObjectInfo()),
     m_engineState(EngineRunning),
-    m_engineThrottle(0),
-    m_engineThrottleTarget(0),
     m_firing(false),
     m_gun(scenario, boat->gun() - 3073)
 {
@@ -62,22 +60,24 @@ Player::Player(Scenario *scenario, game::Boat *boat) :
     if (boat->nrskin() == 5126)
         m_noise -= 1;
 
-    m_gun.addMuzzles(Vector3D(3.0f, 0, 0), boat->gun());
+    m_gun.addMuzzles(Vector3D(0, 3.0f, 0), boat->gun());
     m_gun.setDefect(boat->defects()[game::Boat::DefectGun]);
     if (boat->tur1() != 0)
     {
         m_tur1.reset(new Gun(m_scenario, boat->tur1() - 3073));
-        m_tur1->addMuzzles(Vector3D(3.0f, 0, 0) + boat->getMounting("TUR1")->rel, boat->tur1());
+        m_tur1->addMuzzles(Vector3D(0, 3.0f, 0) + boat->getMounting("TUR1")->rel, boat->tur1());
         m_tur1->setDefect(boat->defects()[game::Boat::DefectTur1]);
     }
     if (boat->tur2() != 0)
     {
         m_tur2.reset(new Gun(m_scenario, boat->tur2() - 3073));
-        m_tur2->addMuzzles(Vector3D(3.0f, 0, 0) + boat->getMounting("TUR2")->rel, boat->tur2());
+        m_tur2->addMuzzles(Vector3D(0, 3.0f, 0) + boat->getMounting("TUR2")->rel, boat->tur2());
         m_tur2->setDefect(boat->defects()[game::Boat::DefectTur2]);
     }
 
     sfx::SampleMap::get(sfx::Sample::Engine).playLoop();
+
+    m_scenario->collisionManager().removeObject(this);
 }
 
 
@@ -96,14 +96,14 @@ float Player::range() const
 void Player::damage(int kinetic, int shock, const Vector3D &position)
 {
     Vector3D dirDamage = glm::normalize(position - m_position);
-    float cosZ = glm::dot(dirDamage, Vector3D(glm::row(m_scenario->cameraMatrix(), 2)));
+    float cosZ = glm::dot(dirDamage, dir());
     if (cosZ > 0.9)
         m_shield[0] -= kinetic;
     else if (cosZ < -0.9)
         m_shield[3] -= kinetic;
     else
     {
-        float cosY = glm::dot(dirDamage, Vector3D(glm::row(m_scenario->cameraMatrix(), 1)));
+        float cosY = glm::dot(dirDamage, up());
         if (cosY > 0)
             m_shield[1] -= kinetic;
         else
@@ -114,10 +114,10 @@ void Player::damage(int kinetic, int shock, const Vector3D &position)
 
 bool Player::update(float elapsedTime)
 {
+    updateOrientation(elapsedTime);
+    updateVelocity(elapsedTime);
+
     Vector3D pos = m_scenario->position();
-    Vector3D dir = -Vector3D(glm::row(m_scenario->cameraMatrix(), 2));
-    Vector3D up = Vector3D(glm::row(m_scenario->cameraMatrix(), 1));
-    Vector3D left = Vector3D(glm::row(m_scenario->cameraMatrix(), 0));
 
     if (m_engineState == EngineStartup && m_engineTime < m_scenario->time())
     {
@@ -126,35 +126,30 @@ bool Player::update(float elapsedTime)
     }
     if (m_engineState == EngineShutdown && m_engineTime < m_scenario->time())
         m_engineState = EngineOff;
-    if (m_engineThrottle < m_engineThrottleTarget)
+    if (m_engineState == EngineRunning)
     {
-        m_engineThrottle += m_engineThrottle >= 0 ? elapsedTime/3000 : elapsedTime/5000;
-        if (m_engineThrottle > m_engineThrottleTarget)
-            m_engineThrottle = m_engineThrottleTarget;
-        sfx::SampleMap::get(sfx::Sample::Engine).setPitch(1.0f + 1.0f*glm::abs(m_engineThrottle));
-    }
-    if (m_engineThrottle > m_engineThrottleTarget)
-    {
-        m_engineThrottle -= m_engineThrottle >= 0 ? elapsedTime/5000 : elapsedTime/3000;
-        if (m_engineThrottle < m_engineThrottleTarget)
-            m_engineThrottle = m_engineThrottleTarget;
-        sfx::SampleMap::get(sfx::Sample::Engine).setPitch(1.0f + 1.0f*glm::abs(m_engineThrottle));
+        float pitch = glm::length(m_velocity)*0.036f;
+        if (pitch > 1.0f)
+            pitch = 1.0f;
+        if (pitch < -0.5f)
+            pitch = -0.5f;
+        sfx::SampleMap::get(sfx::Sample::Engine).setPitch(1.0f + pitch);
     }
 
     m_gun.update(elapsedTime);
     if (m_firing && m_gun.state() == Gun::StateReady)
-        m_gun.fire(pos, dir, up, left);
+        m_gun.fire(pos, dir(), up(), right());
     if (m_tur1)
     {
         m_tur1->update(elapsedTime);
         if (m_firing && m_tur1->state() == Gun::StateReady)
-            m_tur1->fire(pos, dir, up, left);
+            m_tur1->fire(pos, dir(), up(), right());
     }
     if (m_tur2)
     {
         m_tur2->update(elapsedTime);
         if (m_firing && m_tur2->state() == Gun::StateReady)
-            m_tur2->fire(pos, dir, up, left);
+            m_tur2->fire(pos, dir(), up(), right());
     }
 
     return false;
@@ -173,18 +168,9 @@ void Player::engineToggle()
     {
         m_engineState = EngineShutdown;
         m_engineTime = m_scenario->time() + 1000;
-        m_engineThrottleTarget = 0;
         sfx::SampleMap::get(sfx::Sample::Engine_Shutdown).play();
         sfx::SampleMap::get(sfx::Sample::Engine).stop();
     }
-}
-
-
-void Player::setEngineThrottle(float throttle)
-{
-    if (m_engineState != EngineRunning)
-        return;
-    m_engineThrottleTarget = throttle;
 }
 
 

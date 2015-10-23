@@ -27,7 +27,7 @@ SimpleObject::SimpleObject(Scenario *scenario, txt::DesFile &file, const ObjectI
     ActiveObject(scenario, file, info)
 {
     file.setSection("cluster");
-    m_base = scenario->moduleManager().get(file.value("base").toString());
+    m_base = scenario->moduleManager().get(file.contains("base") ? file.value("base").toString() : file.value("name").toString());
 
     file.setSection("size");
     m_scale = file.value("scale").toFloat() * scale;

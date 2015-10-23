@@ -67,7 +67,7 @@ void Target::lockReticle()
 
     for (const auto &entry : m_scenario->sonar())
     {
-        Vector3D dir = Vector3D(m_scenario->cameraMatrix() * Vector4D(entry.object->center() - m_scenario->position(), 1));
+        Vector3D dir = Vector3D(m_scenario->cameraMatrix() * Vector4D(entry.object->center(), 1));
         dir /= -glm::length(dir);
         if (minAngle < dir.z)
         {
@@ -86,7 +86,7 @@ void Target::lockReticle()
     {
         if (!navPoint->isEnabled())
             continue;
-        Vector3D dir = Vector3D(m_scenario->cameraMatrix() * Vector4D(navPoint->position() - m_scenario->position(), 1));
+        Vector3D dir = Vector3D(m_scenario->cameraMatrix() * Vector4D(navPoint->position(), 1));
         dir /= -glm::length(dir);
         if (minAngle < dir.z && dir.z > 0.98f)
         {

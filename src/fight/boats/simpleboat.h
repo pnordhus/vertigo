@@ -21,7 +21,7 @@
 
 #include "fight/objects/simpleobject.h"
 #include "fight/weapons/gun.h"
-
+#include <glm/mat3x3.hpp>
 
 namespace fight {
 
@@ -32,8 +32,39 @@ public:
     SimpleBoat(Scenario *scenario, txt::DesFile &file, const ObjectInfo &info);
 
 public:
+    const glm::mat3& orientation() const { return m_orientation; }
+    const Vector3D& dir() const { return m_orientationInverted[1]; }
+    const Vector3D& up() const { return m_orientationInverted[2]; }
+    const Vector3D& right() const { return m_orientationInverted[0]; }
 
-private:
+    float maxVelocity() const { return m_maxVelocity; }
+    float minVelocity() const { return m_minVelocity; }
+
+    float velocityTarget() const { return m_velocityTarget; }
+    void setVelocityTarget(float velocityTarget) { m_velocityTarget = velocityTarget; }
+    bool fullThrottle() const { return m_fullThrottle; }
+    void setFullThrottle(bool fullThrottle) { m_fullThrottle = fullThrottle; }
+    void setTurnVelocity(float yaw, float pitch) { m_turnX = pitch; m_turnZ = yaw; }
+
+public:
+    bool update(float elapsedTime);
+    void updateVelocity(float elapsedTime);
+    void updateOrientation(float elapsedTime);
+
+protected:
+    glm::mat3 m_orientation;
+    glm::mat3 m_orientationInverted;
+
+    float m_velocityTarget;
+    bool m_fullThrottle;
+    float m_turnX;
+    float m_turnZ;
+
+    float m_maxVelocity;
+    float m_minVelocity;
+    float m_maxOrientationAcceleration;
+    float m_maxOrientationRetardation;
+    Vector3D m_orientationFriction;
 };
 
 

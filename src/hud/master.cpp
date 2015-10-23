@@ -81,7 +81,7 @@ void Master::draw()
 
     for (const auto &entry : m_hud->scenario()->sonar())
     {
-        Vector4D point4 = m * Vector4D(entry.object->center() - m_hud->scenario()->position(), 1);
+        Vector4D point4 = m * Vector4D(entry.object->center(), 1);
         drawPoint(point4, rect, entry.object == target.locked(), entry.isFriend, entry.isPassive);
     }
     if (target.lockedNavPoint() != nullptr)
@@ -92,7 +92,7 @@ void Master::draw()
 
     if (m_hud->navPoint() >= 0)
     {
-        Vector4D point4 = m * Vector4D(m_hud->scenario()->navPoints()[m_hud->navPoint()]->position() - m_hud->scenario()->position(), 1);
+        Vector4D point4 = m * Vector4D(m_hud->scenario()->navPoints()[m_hud->navPoint()]->position(), 1);
         if (point4.z > 0)
             return;
         Point point = glm::round(Vector2D(point4)/point4.w);

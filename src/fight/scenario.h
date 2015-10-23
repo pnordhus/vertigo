@@ -121,6 +121,7 @@ private:
     float m_speed;
     int m_buzzers;
     std::unique_ptr<Player> m_player;
+    float m_velocityTarget;
 
     txt::DesFile m_file;
     int m_depth;
@@ -148,8 +149,8 @@ private:
     float m_right;
     float m_up;
     float m_down;
-    float m_forwards;
-    float m_backwards;
+    int m_forwards;
+    int m_backwards;
     float m_inverseUpDown;
 
     Matrix m_projectionMatrix;
