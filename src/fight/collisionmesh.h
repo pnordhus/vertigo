@@ -32,7 +32,7 @@ public:
     CollisionMesh();
 
 public:
-    void addTriangles(const std::vector<Vector3D> &vertices, const std::vector<unsigned short> &indices);
+    void addTriangles(const std::vector<Vector3D> &vertices, const std::vector<Vector3D> &normals, const std::vector<unsigned short> &indices);
     bool intersect(const Vector3D &start, const Vector3D &dir, float radius, float &distance, Vector3D &normal);
 
     static bool intersectSphereLine(const Vector3D &point, const Vector3D &dir, float radiusSquared, float &t);

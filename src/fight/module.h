@@ -45,7 +45,7 @@ private:
     {
         gfx::Texture texture;
         std::vector<Vector3D> vertices;
-        //std::vector<Vector3D> normals;
+        std::vector<Vector3D> normals;
         std::vector<Vector2D> texCoords;
         std::vector<quint16> indices;
     };

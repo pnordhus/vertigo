@@ -29,7 +29,7 @@ CollisionMesh::CollisionMesh()
 }
 
 
-void CollisionMesh::addTriangles(const std::vector<Vector3D> &vertices, const std::vector<unsigned short> &indices)
+void CollisionMesh::addTriangles(const std::vector<Vector3D> &vertices, const std::vector<Vector3D> &normals, const std::vector<unsigned short> &indices)
 {
     for (int i = 0; i < indices.size(); i += 3)
     {
@@ -42,14 +42,20 @@ void CollisionMesh::addTriangles(const std::vector<Vector3D> &vertices, const st
         tri.u = tri.vertices[1] - tri.vertices[0];
         tri.v = tri.vertices[2] - tri.vertices[0];
 
-        Vector3D n = glm::cross(tri.u, tri.v);
+        Vector3D n = normals[indices[i + 2]];
+        if (glm::length2(n) < 1e-3)
+        {
+            m_triangles.pop_back();
+            continue;
+        }
+        /*Vector3D n = glm::cross(tri.u, tri.v);
         float l = glm::length(n);
         if (l < 1e-5)
         {
             m_triangles.pop_back();
             continue;
         }
-        n /= l;
+        n /= l;*/
         tri.plane = Vector4D(n, -glm::dot(tri.vertices[0], n));
 
         tri.uu = glm::dot(tri.u, tri.u);
