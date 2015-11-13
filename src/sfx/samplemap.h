@@ -55,7 +55,7 @@ enum class Sample
     Sample24,
     Shoot_DoomMortar,
     Shoot_PlasmaDeath,
-    Sample27,
+    Boat_Collision,
     Sample28,
     Sample29,
     Sample30,

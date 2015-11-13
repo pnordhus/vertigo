@@ -42,8 +42,11 @@ public:
     int shield(int index) const { return m_shield[index]; };
     int shieldMax(int index) const { return m_shieldMax[index]; };
     bool engineRunning() const { return m_engineState == EngineRunning; }
+    float speed() const { return m_speed; };
     float noise() const;
     float range() const;
+
+    void setDebugBoost(float debugBoost) { m_debugBoost = debugBoost; }
 
 public:
     virtual void damage(int kinetic, int shock, const Vector3D &position);
@@ -59,6 +62,9 @@ private:
 
     EngineState m_engineState;
     float m_engineTime;
+
+    float m_speed;
+    float m_debugBoost;
 
     float m_roll;
     float m_rollCenterVelocity;

@@ -23,6 +23,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/matrix_access.hpp>
 #include <glm/geometric.hpp>
+#include <glm/gtx/norm.hpp>
 
 
 namespace fight {
@@ -31,8 +32,10 @@ namespace fight {
 Player::Player(Scenario *scenario, game::Boat *boat, float yaw) :
     SimpleBoat(scenario, boat->boatFile(), ObjectInfo(), yaw),
     m_engineState(EngineRunning),
+    m_speed(0),
+    m_debugBoost(0),
     m_roll(0),
-    m_currentTime(8.0f),
+    m_currentTime(10.0f),
     m_currentNoise1(0),
     m_currentNoise2(0),
     m_firing(false),
@@ -145,7 +148,7 @@ bool Player::update(float elapsedTime)
 
     m_angleVelocity.z = m_roll*m_bottomAlphaSupport*m_maxAngleVelocity.z;
 
-    const float currentLen = 8.0f;
+    const float currentLen = 5.0f;
     m_currentTime += elapsedTime;
     if (m_currentTime > currentLen*0.75f)
     {
@@ -166,8 +169,6 @@ bool Player::update(float elapsedTime)
 
     updateVelocity(elapsedTime);
 
-    Vector3D pos = m_scenario->position();
-
     if (m_engineState == EngineStartup && m_engineTime < m_scenario->time())
     {
         m_engineState = EngineRunning;
@@ -185,20 +186,65 @@ bool Player::update(float elapsedTime)
         sfx::SampleMap::get(sfx::Sample::Engine).setPitch(1.0f + pitch);
     }
 
+    Vector3D vel = m_velocity + dir()*m_debugBoost;
+    Vector3D delta = vel*elapsedTime;
+    float path = 0;
+
+    Vector3D posSurface, normSurface;
+    bool colSurface = m_scenario->surface().testCollision(m_position, m_position + delta, 1.5f, posSurface, normSurface);
+
+    Vector3D posObject, normObject;
+    Object *colObject = m_scenario->collisionManager().testCollision(m_position, m_position + delta, 1.5f, posObject, normObject);
+
+    if (colObject && (!colSurface || glm::length2(posObject - m_position) < glm::length2(posSurface - m_position)))
+    {
+        ActiveObject *activeObject = dynamic_cast<ActiveObject *>(colObject);
+        if (activeObject)
+        {
+            activeObject->damage(m_kineticStrength, m_shockStrength, posObject - normObject*1.5f);
+            damage(activeObject->kineticStrength(), activeObject->shockStrength(), posObject - normObject*1.5f);
+        }
+        sfx::SampleMap::get(sfx::Sample::Boat_Collision).playInstance();
+        m_velocity -= 2*glm::dot(m_velocity, normObject)*normObject;
+        delta = posObject - m_position;
+    }
+    else if (colSurface)
+    {
+        int count = 0;
+        while (colSurface && glm::length2(delta) > 1e-3f && count < 5)
+        {
+            delta -= posSurface - m_position;
+            path += glm::length(posSurface - m_position);
+            m_position = posSurface;
+            delta -= (glm::dot(delta, normSurface) - 1e-3f)*normSurface;
+            colSurface = m_scenario->surface().testCollision(m_position, m_position + delta, 1.5f, posSurface, normSurface);
+            count++;
+        }
+        if (colSurface)
+            delta = Vector3D(0);
+    }
+
+    path += glm::length(delta);
+    m_position += delta;
+    m_speed = path/elapsedTime*3.6f;
+    if (glm::dot(dir(), vel) < 0)
+        m_speed = -m_speed;
+
+
     m_gun.update(elapsedTime);
     if (m_firing && m_gun.state() == Gun::StateReady)
-        m_gun.fire(pos, dir(), up(), right());
+        m_gun.fire(m_position, dir(), up(), right());
     if (m_tur1)
     {
         m_tur1->update(elapsedTime);
         if (m_firing && m_tur1->state() == Gun::StateReady)
-            m_tur1->fire(pos, dir(), up(), right());
+            m_tur1->fire(m_position, dir(), up(), right());
     }
     if (m_tur2)
     {
         m_tur2->update(elapsedTime);
         if (m_firing && m_tur2->state() == Gun::StateReady)
-            m_tur2->fire(pos, dir(), up(), right());
+            m_tur2->fire(m_position, dir(), up(), right());
     }
 
     return false;

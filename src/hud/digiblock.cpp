@@ -54,7 +54,7 @@ void DigiBlock::draw()
     m_children[1]->setFont(height > 5 ? m_hud->fontGreen() : m_hud->fontRed());
     m_children[1]->setText(QString("%1M").arg(height));
     
-    int speed = static_cast<int>(glm::round(m_hud->scenario()->speed()));
+    int speed = static_cast<int>(glm::round(m_hud->scenario()->player()->speed()));
     m_children[2]->setFont(speed > -5 ? m_hud->fontGreen() : m_hud->fontRed());
     m_children[2]->setText(QString("%1KM/H").arg(speed));
     

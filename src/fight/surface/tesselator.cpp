@@ -92,9 +92,8 @@ void Tesselator::PrepareElementSubset(Element &element, int level, const Vector3
 	int v = level - 1;
 
 	Vector3D o = spline.Beta_3_3(u, v);
-	Vector3D t, b;
-	spline.Beta_TB(u, v, t, b);
-    element.addVertex(textureId, (o + trans)*scale, glm::cross(t, b), t0 + tu*(u*dt) + tv*(v*dt));
+	Vector3D n = spline.Beta_norm(u, v);
+    element.addVertex(textureId, (o + trans)*scale, n/scale, t0 + tu*(u*dt) + tv*(v*dt));
     float z = o.z;
 
 	l = 2;
@@ -109,8 +108,8 @@ void Tesselator::PrepareElementSubset(Element &element, int level, const Vector3
 			for (i = 0; i < l - 1; i++, u += du, v += dv)
 			{
 				o = spline.Beta_3_3(u, v);
-				spline.Beta_TB(u, v, t, b);
-                element.addVertex(textureId, (o + trans)*scale, glm::cross(t, b), t0 + tu*(u*dt) + tv*(v*dt));
+                n = spline.Beta_norm(u, v);
+                element.addVertex(textureId, (o + trans)*scale, n/scale, t0 + tu*(u*dt) + tv*(v*dt));
 			}
 			int tmp = du;
 			du = -dv;
@@ -187,7 +186,7 @@ bool Tesselator::intersect(const Vector3D &start, const Vector3D &end, float rad
     Vector3D l = start;
     Vector3D r = end;
     Vector3D m;
-    while (glm::distance2(l, r) > 0.01f)
+    while (glm::distance2(l, r) > 1e-4f)
     {
         m = glm::mix(l, r, 0.5f);
 

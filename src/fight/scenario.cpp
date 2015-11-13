@@ -53,7 +53,6 @@ Scenario::Scenario(const QString &name) :
     m_target(this),
     m_yaw(0),
     m_pitch(0),
-    m_speed(0),
     m_velocityTarget(0),
     m_time(0),
     m_left(0.0f),
@@ -183,8 +182,7 @@ Scenario::Scenario(const QString &name) :
 
         case TypePlayer:
             m_position = getPosition();
-            m_initialYaw = m_file.value("card").toInt()*glm::pi<float>()/4;
-            //m_position.setZ(m_position.z() + 20.0f);
+            m_yaw = m_file.value("card").toInt()*glm::quarter_pi<float>();
             m_height = m_position.z - m_surface.heightAt(m_position.x, m_position.y);
             entry.condTrigger = m_conditionManager.addCondition(0);
 
@@ -340,7 +338,7 @@ void Scenario::setBoat(game::Boat *boat)
 {
     //if (boat->gun() == 3081)
     //    boat->buy(3083, "GUN"); // TODO: remove
-    m_player.reset(new Player(this, boat, m_initialYaw));
+    m_player.reset(new Player(this, boat, m_yaw));
     m_player->setPosition(m_position);
 
     m_buzzers = boat->buzzers().size();
@@ -363,57 +361,19 @@ void Scenario::update(float elapsedTime)
 
     m_player->setTurnVelocity(Vector3D(m_up - m_down, m_left - m_right, 0));
     m_player->update(elapsedTime);
+    m_position = m_player->position();
 
-    Vector3D prevPos = m_position;
     Vector3D dir = m_player->dir();
-    Vector3D vel = m_player->velocity();
-    if (m_forwards == 100)
-        vel += dir*100.0f;
-    if (m_backwards == 100)
-        vel -= dir*100.0f;
     m_yaw = glm::atan(-dir.x, -dir.y);
     m_pitch = dir.z < -1.0f ? -glm::half_pi<float>() : dir.z > 1.0f ? glm::half_pi<float>() : glm::asin(dir.z);
-    m_position += vel*elapsedTime;
-    m_speed = glm::length(vel)*3.6f;
-    if (glm::dot(dir, vel) < 0)
-        m_speed = -m_speed;
-
-    /*Vector3D up = Vector3D(glm::row(m_cameraMatrix, 1));
-    if (up.z < 0)
-    {
-        m_cameraMatrix = glm::rotate(m_cameraMatrix, glm::pi<float>(), dir);
-        m_inverseUpDown = -1.0f;
-    }*/
-
-    if (m_position != prevPos)
-    {
-        Vector3D pos, normal;
-        if (m_surface.testCollision(prevPos, m_position, 1.5f, pos, normal))
-            m_position = pos;
-
-        Object *collision = m_collisionManager.testCollision(prevPos, m_position, 1.5f, pos, normal);
-        if (collision)
-        {
-            ActiveObject *activeObject = dynamic_cast<ActiveObject *>(collision);
-            if (activeObject)
-            {
-                activeObject->damage(m_player->kineticStrength(), m_player->shockStrength(), pos - normal*1.5f);
-                m_player->damage(activeObject->kineticStrength(), activeObject->shockStrength(), pos - normal*1.5f);
-            }
-            m_position = pos;
-        }
-
-        m_height = m_position.z - m_surface.heightAt(m_position.x, m_position.y);
-        m_player->setPosition(m_position);
-    }
+    m_height = m_position.z - m_surface.heightAt(m_position.x, m_position.y);
 
     m_cameraMatrixInverted = Matrix(Vector4D(m_player->right(), 0), Vector4D(m_player->up(), 0), Vector4D(-m_player->dir(), 0), Vector4D(m_position, 1));
     m_cameraMatrix = glm::inverse(m_cameraMatrixInverted);
 
     m_conditionManager.update(elapsedTime);
 
-    float height = m_surface.heightAt(m_position.x, m_position.y);
-    m_conditionManager.testSpace(m_position.x, m_position.y, m_position.z - height);
+    m_conditionManager.testSpace(m_position.x, m_position.y, m_height);
 
     for (const auto &object : m_objects)
         if (object->isEnabled())
@@ -429,6 +389,7 @@ void Scenario::draw()
 {
     glEnable(GL_CULL_FACE);
     glFrontFace(GL_CW);
+    glEnable(GL_NORMALIZE);
 
     glClearColor(0.0, 0.0, 0.15, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -446,19 +407,13 @@ void Scenario::draw()
 
     glEnable(GL_LIGHTING);
 
-    GLfloat light_ambient[] = { 6.0, 6.0, 6.0, 1.0 };
+    GLfloat light_ambient[] = { 4.0, 4.0, 4.0, 1.0 };
     GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
     glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
     
-    GLfloat light_position[] = { 0.0, 0.0, 4.0, 1.0 };
-    GLfloat spot_direction[] = { 0.0, 0.0, -1.0 };
-
-    glPushMatrix();
-    glLoadIdentity();
-    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-    glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, spot_direction);
-    glPopMatrix();
+    glLightfv(GL_LIGHT0, GL_POSITION, glm::value_ptr(Vector4D(m_player->position() - m_player->dir()*5.0f, 1)));
+    glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, glm::value_ptr(m_player->dir()));
 
     glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 90.0);
     glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, 0.1);
@@ -514,9 +469,9 @@ void Scenario::keyPressEvent(QKeyEvent *e)
     if (e->key() == Qt::Key_Down || e->key() == Qt::Key_5)
         m_down = 1.0f;
     if (e->key() == Qt::Key_Q)
-        m_forwards = 100;
+        m_player->setDebugBoost(100);
     if (e->key() == Qt::Key_W)
-        m_backwards = 100;
+        m_player->setDebugBoost(-100);
     if (e->key() == Qt::Key_A)
     {
         m_forwards = 1;
@@ -569,9 +524,9 @@ void Scenario::keyReleaseEvent(QKeyEvent *e)
     if (e->key() == Qt::Key_Down || e->key() == Qt::Key_5)
         m_down = 0.0f;
     if (e->key() == Qt::Key_Q)
-        m_forwards = 0;
+        m_player->setDebugBoost(0);
     if (e->key() == Qt::Key_W)
-        m_backwards = 0;
+        m_player->setDebugBoost(0);
     if (e->key() == Qt::Key_A)
     {
         m_forwards = 0;

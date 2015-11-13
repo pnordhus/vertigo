@@ -25,6 +25,7 @@
 #include <QGLContext>
 #include <QFile>
 
+#include <glm/geometric.hpp>
 
 namespace fight {
 
@@ -126,6 +127,7 @@ bool Surface::testCollision(const Vector3D &start, const Vector3D &end, float ra
         if (m_tesselator.intersect(start/m_scale, end/m_scale, radius/m_scale.z, position, normal))
         {
             position *= m_scale;
+            normal = glm::normalize(normal/m_scale);
             return true;
         }
     }

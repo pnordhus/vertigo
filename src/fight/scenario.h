@@ -62,7 +62,6 @@ public:
     float pitch() const { return m_pitch; }
     float height() const { return m_height; }
     float depth() const { return m_depth - m_position.z; }
-    float speed() const { return m_speed; }
     float time() const { return m_time; }
     int buzzers() const { return m_buzzers; }
     bool blink() const { return static_cast<int>(m_time/0.5f)%2 == 0; }
@@ -118,11 +117,9 @@ private:
     float m_yaw;
     float m_pitch;
     float m_height;
-    float m_speed;
     int m_buzzers;
     std::unique_ptr<Player> m_player;
     float m_velocityTarget;
-    float m_initialYaw;
 
     txt::DesFile m_file;
     int m_depth;
