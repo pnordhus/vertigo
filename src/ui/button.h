@@ -19,6 +19,7 @@
 #define UI_BUTTON_H
 
 #include "label.h"
+#include "util/event.hpp"
 
 #include <functional>
 
@@ -27,12 +28,17 @@ namespace ui {
 class Button : public Label
 {
 public:
-    Button(std::function<void()> funcClicked, Widget *parent = NULL);
+    Button(Widget *parent = NULL);
+    Button(util::event<> &&eventClicked, Widget *parent = NULL);
+
+public:
+    util::event<>& eventClicked() { return m_eventClicked; }
 
 public:
     void setOffset(int offset);
     void setPressedTexture(const gfx::Texture &texture);
     void setDisabledTexture(const gfx::Texture &texture);
+    void setDisabledFont(const gfx::Font &font);
 
 protected:
     void draw();
@@ -44,7 +50,8 @@ private:
     int m_offset;
     gfx::Texture m_pressedTexture;
     gfx::Texture m_disabledTexture;
-    std::function<void()> m_funcClicked;
+    gfx::Font m_disabledFont;
+    util::event<> m_eventClicked;
 };
 
 } // namespace ui

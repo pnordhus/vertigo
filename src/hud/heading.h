@@ -19,7 +19,7 @@
 #define HUD_HEADING_H
 
 
-#include "util/rect.hpp"
+#include "util/geometry2d.h"
 #include "ui/widget.h"
 #include "gfx/texture.h"
 
@@ -33,14 +33,14 @@ class HUD;
 class Heading : public ui::Widget
 {
 public:
-    Heading(HUD *hud, util::Rect rect);
+    Heading(HUD *hud, Rect rect);
 
 protected:
     void draw();
 
 private:
     HUD *m_hud;
-    util::Rect m_rect;
+    Rect m_rect;
     gfx::Texture m_head;
     gfx::Texture m_point;
     gfx::Texture m_way;

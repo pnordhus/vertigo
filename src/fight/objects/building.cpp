@@ -16,24 +16,22 @@
  ***************************************************************************/
 
 #include "building.h"
-#include "scenario.h"
-#include "surface/surface.h"
-#include "collisionmanager.h"
+#include "fight/scenario.h"
+#include "fight/module.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace fight {
 
 
-Building::Building(Scenario *scenario, const QString &name, int size, float angle, int x, int y, int refx, int refy) :
-    Object(scenario, name),
+Building::Building(Scenario *scenario, txt::DesFile &file, int size, float angle, int x, int y, int refx, int refy) :
+    Object(scenario, file),
     m_size(size),
     m_angle(angle)
 {
-    txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
-
     int i = 0;
-    glm::vec3 scale = scenario->surface().scale();
+    Vector3D scale = scenario->surface().scale();
+    m_position = Vector3D(x + 0.5f, y + 0.5f - size, 0)*scale;
 
     while (file.sections().contains(QString("cluster%1").arg(i))) {
         file.setSection(QString("cluster%1").arg(i));
@@ -93,19 +91,18 @@ Building::Building(Scenario *scenario, const QString &name, int size, float angl
 
     for (Cluster &cluster : m_clusters)
     {
-        glm::mat4 m;
-        m = glm::translate(m, glm::vec3((x + 0.5f)*scale.x, (y + 0.5f - size)*scale.y, 0));
-        m = glm::rotate(m, glm::radians(m_angle), glm::vec3(0, 0, 1));
+        Matrix m(1);
+        m = glm::translate(m, m_position);
+        m = glm::rotate(m, glm::radians(m_angle), Vector3D(0, 0, 1));
         m = glm::translate(m, cluster.offset);
-        m = glm::scale(m, glm::vec3(cluster.scale));
-        m = glm::rotate(m, glm::radians(cluster.angle), glm::vec3(0, 0, 1));
+        m = glm::scale(m, Vector3D(cluster.scale));
+        m = glm::rotate(m, glm::radians(cluster.angle), Vector3D(0, 0, 1));
         m_box.add(cluster.module->box().transform(m));
         
         cluster.transform = m;
         cluster.invTransform = glm::inverse(m);
     }
 
-    m_type = BuildingObject;
     scenario->collisionManager().addObject(this);
 }
 
@@ -113,7 +110,7 @@ Building::Building(Scenario *scenario, const QString &name, int size, float angl
 void Building::draw()
 {
     glPushMatrix();
-    glTranslatef(m_position.x, m_position.y - m_size * 16.0f, 0);
+    glTranslatef(m_position.x, m_position.y, m_position.z);
     glRotatef(m_angle, 0, 0, 1);
 
     for (Cluster &cluster : m_clusters)
@@ -129,20 +126,20 @@ void Building::draw()
 }
 
 
-bool Building::intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal)
+bool Building::intersect(const Vector3D &start, const Vector3D &dir, float radius, float &distance, Vector3D &normal)
 {
     bool collision = false;
     for (Cluster &cluster : m_clusters)
     {
         float d;
-        glm::vec3 norm;
-        if (cluster.module->intersect(glm::vec3(cluster.invTransform * glm::vec4(start, 1)), glm::vec3(cluster.invTransform * glm::vec4(dir, 0))*cluster.scale, radius/cluster.scale, d, norm))
+        Vector3D norm;
+        if (cluster.module->intersect(Vector3D(cluster.invTransform * Vector4D(start, 1)), Vector3D(cluster.invTransform * Vector4D(dir, 0))*cluster.scale, radius/cluster.scale, d, norm))
         {
             d *= cluster.scale;
             if (!collision || distance > d)
             {
                 distance = d;
-                normal = glm::vec3(cluster.transform * glm::vec4(norm, 0))/cluster.scale;
+                normal = Vector3D(cluster.transform * Vector4D(norm, 0))/cluster.scale;
                 collision = true;
             }
         }

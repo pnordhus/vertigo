@@ -21,13 +21,18 @@
 namespace ui {
 
 
-Button::Button(std::function<void()> funcClicked, Widget *parent) :
+Button::Button(Widget *parent) :
     Label(parent),
     m_pressed(false),
-    m_offset(1),
-    m_funcClicked(std::move(funcClicked))
+    m_offset(1)
 {
 
+}
+
+Button::Button(util::event<> &&eventClicked, Widget *parent) :
+    Button(parent)
+{
+    m_eventClicked = std::move(eventClicked);
 }
 
 
@@ -49,29 +54,36 @@ void Button::setDisabledTexture(const gfx::Texture &texture)
 }
 
 
+void Button::setDisabledFont(const gfx::Font &font)
+{
+    m_disabledFont = font;
+}
+
+
 void Button::draw()
 {
     if (m_text.isEmpty()) {
         if (!isEnabled() && m_disabledTexture.isValid())
-            m_drawRect = m_disabledTexture.draw().toRect();
+            m_drawRect = util::roundRect(m_disabledTexture.draw());
         else if (m_pressed && m_pressedTexture.isValid())
-            m_drawRect = m_pressedTexture.draw().toRect();
+            m_drawRect = util::roundRect(m_pressedTexture.draw());
         else
-            m_drawRect = m_texture.draw().toRect();
+            m_drawRect = util::roundRect(m_texture.draw());
     } else {
-        QPoint offset;
-        if (m_pressed)
-            offset += QPoint(m_offset, m_offset);
+        Point offset(m_pressed ? m_offset : 0);
 
-        m_drawRect = m_font.draw(m_text, offset, size(), m_alignment & AlignHCenter, m_alignment & AlignBottom);
-        m_drawRect.setTopLeft(m_drawRect.topLeft() - offset);
+        if (!isEnabled() && m_disabledFont.height() != 0)
+            m_drawRect = m_disabledFont.draw(m_text, Rect(offset, Size(width(), height())), m_alignment & AlignHCenter, m_alignment & AlignBottom);
+        else
+            m_drawRect = m_font.draw(m_text, Rect(offset, Size(width(), height())), m_alignment & AlignHCenter, m_alignment & AlignBottom);
+        m_drawRect.setPos(m_drawRect.pos() - offset);
     }
 }
 
 
 bool Button::mousePressEvent(const QPoint &pos, Qt::MouseButton button)
 {
-    if (button == Qt::LeftButton && mapToGlobal(m_drawRect).contains(pos)) {
+    if (button == Qt::LeftButton && mapToGlobal(QRect(m_drawRect.x, m_drawRect.y, m_drawRect.width, m_drawRect.height)).contains(pos)) {
         m_pressed = true;
         return true;
     }
@@ -83,8 +95,8 @@ bool Button::mousePressEvent(const QPoint &pos, Qt::MouseButton button)
 void Button::mouseReleaseEvent(const QPoint &pos, Qt::MouseButton button)
 {
     if (button == Qt::LeftButton) {
-        if (m_pressed && mapToGlobal(m_drawRect).contains(pos))
-            m_funcClicked();
+        if (m_pressed && mapToGlobal(QRect(m_drawRect.x, m_drawRect.y, m_drawRect.width, m_drawRect.height)).contains(pos))
+            m_eventClicked();
         m_pressed = false;
     }
 }

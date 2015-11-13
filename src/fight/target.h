@@ -15,38 +15,53 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef FIGHT_NAVPOINT_H
-#define FIGHT_NAVPOINT_H
+#ifndef FIGHT_TARGET_H
+#define FIGHT_TARGET_H
 
 
-#include "object.h"
+#include "util/geometry3d.h"
 
 
 namespace fight {
 
 
-class NavPoint : public Object
+class Scenario;
+class Object;
+class ActiveObject;
+class NavPoint;
+
+
+class Target
 {
 public:
-    NavPoint(Scenario *scenario, int num);
+    Target(Scenario *scenario);
 
 public:
-    int num() const { return m_num; }
+    bool isLocked() const { return m_locked != nullptr || m_lockedNavPoint != nullptr; }
+    Vector3D position() const;
+    Object* object() const;
 
-public:
-    bool update(float elapsedTime);
+    float distance() const { return m_distance; }
+    bool isPassive() const { return m_isPassive; }
+    void update(float distance, bool isPassive) { m_distance = distance; m_isPassive = isPassive; }
+
+    ActiveObject* locked() const { return m_locked; }
+    NavPoint* lockedNavPoint() const { return m_lockedNavPoint; }
+
+    void lockReset();
+    void lockReticle();
+    void lockNavPoint(NavPoint *navPoint);
 
 private:
-    int m_num;
-    Module *m_state0;
-    Module *m_state1;
-    int m_state;
-    float m_time;
-    bool m_reached;
+    Scenario *m_scenario;
+    ActiveObject *m_locked;
+    NavPoint *m_lockedNavPoint;
+    float m_distance;
+    bool m_isPassive;
 };
 
 
-} // namespace fight
+}
 
 
-#endif // FIGHT_NAVPOINT_H
+#endif // FIGHT_TARGET_H

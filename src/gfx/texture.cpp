@@ -148,31 +148,31 @@ void TexturePrivate::bind()
 }
 
 
-QRectF TexturePrivate::draw(const QRectF &destRect, const QRectF &srcRect)
+RectF TexturePrivate::draw(const RectF &dstRect, const RectF &srcRect, const ClipRect *clipRect)
 {
-    QRectF srcRectTex;
-    srcRectTex.setLeft(srcRect.left() / m_textureWidth);
-    srcRectTex.setRight(srcRect.right() / m_textureWidth);
-    srcRectTex.setTop(srcRect.top() / m_textureHeight);
-    srcRectTex.setBottom(srcRect.bottom() / m_textureHeight);
+    RectF dst = dstRect;
+    RectF src(srcRect.x/m_textureWidth, srcRect.y/m_textureHeight, srcRect.width/m_textureWidth, srcRect.height/m_textureHeight);
 
-    glEnable(GL_TEXTURE_2D);
-    bind();
-    glBegin(GL_QUADS);
-        glTexCoord2f(srcRectTex.left(), srcRectTex.top());
-        glVertex2f(destRect.left(), destRect.top());
+    if (clipRect == nullptr || clipRect->clip(dst, src))
+    {
+        glEnable(GL_TEXTURE_2D);
+        bind();
+        glBegin(GL_QUADS);
+            glTexCoord2f(src.left(), src.top());
+            glVertex2f(dst.left(), dst.top());
 
-        glTexCoord2f(srcRectTex.left(), srcRectTex.bottom());
-        glVertex2f(destRect.left(),  destRect.bottom());
+            glTexCoord2f(src.left(), src.bottom());
+            glVertex2f(dst.left(), dst.bottom());
 
-        glTexCoord2f(srcRectTex.right(), srcRectTex.bottom());
-        glVertex2f(destRect.right(),  destRect.bottom());
+            glTexCoord2f(src.right(), src.bottom());
+            glVertex2f(dst.right(), dst.bottom());
 
-        glTexCoord2f(srcRectTex.right(), srcRectTex.top());
-        glVertex2f(destRect.right(), destRect.top());
-    glEnd();
+            glTexCoord2f(src.right(), src.top());
+            glVertex2f(dst.right(), dst.top());
+        glEnd();
+    }
 
-    return destRect;
+    return dstRect;
 }
 
 

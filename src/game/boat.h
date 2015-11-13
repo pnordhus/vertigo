@@ -24,6 +24,8 @@
 #include <vector>
 #include <set>
 #include "txt/desfile.h"
+#include "util/geometry2d.h"
+#include "util/geometry3d.h"
 
 
 namespace game {
@@ -40,23 +42,39 @@ public:
         QString name;
         int side;
         int type;
-        QPoint pos;
+        Point pos;
         QString dir;
+        Vector3D rel;
+    };
+    enum Defect
+    {
+        DefectGun,
+        DefectToMa,
+        DefectFArm,
+        DefectLArm,
+        DefectRArm,
+        DefectBArm,
+        DefectTur1,
+        DefectTur2
     };
 
 public:
     int type() const { return m_type; }
     const QString& name() const { return m_name; }
     const QString& cockpit() const { return m_cockpit; }
-    const QString& flipMovie1() const { return m_flipMovie1; }
-    const QString& flipMovie2() const { return m_flipMovie2; }
+    const QString& moviePrefix() const { return m_moviePrefix; }
+    txt::DesFile& boatFile() { return m_boatFile; }
 
     const std::vector<Mounting>& mountings() const { return m_mountings; }
+    const Mounting* getMounting(const QString& mounting);
 
     std::vector<int> getItems(const QString& mounting);
     bool canBuy(int model, const QString& mounting, int *oldModel);
     bool canSell(int model, const QString& mounting);
     bool isCompatible(int model);
+    int repairState(int model, const QString& mounting);
+    int repairCost(int model, const QString& mounting);
+    void repair(int model, const QString& mounting, float amount);
     void buy(int model, const QString& mounting);
     void sell(int model, int index, const QString& mounting);
 
@@ -78,6 +96,8 @@ public:
     const std::vector<int>& buzzers() const { return m_buzzers; }
     int fixer() const { return m_fixer; }
 
+    const float* defects() const { return m_defects; }
+
 private:
     void load();
     void addMounting(const QString &name, int side, int type, int x, int y, const QString &dir);
@@ -87,8 +107,8 @@ private:
     int m_type;
     QString m_name;
     QString m_cockpit;
-    QString m_flipMovie1;
-    QString m_flipMovie2;
+    QString m_moviePrefix;
+    txt::DesFile m_boatFile;
 
     std::vector<Mounting> m_mountings;
     std::set<int> m_compatibility;
@@ -109,6 +129,8 @@ private:
     int m_tur2soft;
     std::vector<int> m_buzzers;
     int m_fixer;
+
+    float m_defects[8];
 };
 
 

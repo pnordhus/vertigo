@@ -19,8 +19,13 @@
 #define FIGHT_SURFACE_H
 
 
-#include "element.h"
+#include <map>
+#include <vector>
+#include <QImage>
 #include "tesselator.h"
+
+
+namespace gfx { class Texture; }
 
 
 namespace fight {
@@ -36,14 +41,14 @@ public:
     void load(const QString &name, int maxheightscale, int mapping);
 
 public:
-    void draw(const glm::vec3 &position, const glm::vec3 &direction);
+    void draw(const Vector3D &position, const Vector3D &direction);
     float heightAt(float x, float y);
-    float heightAt(float x, float y, glm::vec3 &normal);
-    const glm::vec3& scale() const { return m_scale; }
+    float heightAt(float x, float y, Vector3D &normal);
+    const Vector3D& scale() const { return m_scale; }
     float height(int x, int y) const;
     void bindTexture(int textureId);
     void setHeight(int x, int y, int refx, int refy, int offset);
-    bool testCollision(const glm::vec3 &start, const glm::vec3 &end, float radius, glm::vec3 &position, glm::vec3 &normal);
+    bool testCollision(const Vector3D &start, const Vector3D &end, float radius, Vector3D &position, Vector3D &normal);
 
 private:
     Element& getElement(int x, int y);
@@ -54,7 +59,7 @@ private:
     QImage m_heightMap;
     QByteArray m_textureMap;
     QByteArray m_textureDir;
-    glm::vec3 m_scale;
+    Vector3D m_scale;
     int m_mapping;
 
 private:

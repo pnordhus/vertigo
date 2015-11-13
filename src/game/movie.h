@@ -23,7 +23,7 @@
 #include "sfx/stream.h"
 #include "gfx/texture.h"
 #include "gfx/video.h"
-#include "ui/label.h"
+#include "gfx/font.h"
 
 #include <functional>
 
@@ -33,10 +33,18 @@ namespace game {
 class Movie : public Renderer
 {
 public:
-    Movie(std::function<void()> &&funcFinished);
+    enum MovieType
+    {
+        MovieFilm = 0,
+        MovieStation = 1,
+        MovieTransit = 2,
+    };
 
 public:
-    void play(const QString &filename);
+    Movie(const QString &filename, MovieType type, const QString &textLarge = "", const QString &textSmall = "");
+
+public:
+    void play(std::function<void()> &&funcFinished);
     void setRect(const QRect &rect);
 
 private:
@@ -47,7 +55,15 @@ private:
     void mousePressEvent(QMouseEvent *);
 
 private:
-    ui::Label m_logo;
+    QString m_filename;
+    MovieType m_type;
+    QString m_textLarge;
+    QString m_textSmall;
+
+    gfx::Texture m_logo;
+    gfx::Font m_fontLarge;
+    gfx::Font m_fontSmall;
+
     gfx::Video m_video;
     gfx::Texture m_texture;
     sfx::Stream m_stream;

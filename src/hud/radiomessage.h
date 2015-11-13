@@ -19,7 +19,7 @@
 #define HUD_RADIOMESSAGE_H
 
 
-#include "util/rect.hpp"
+#include "util/geometry2d.h"
 #include "ui/widget.h"
 #include "ui/label.h"
 #include <QString>
@@ -34,14 +34,14 @@ class HUD;
 class RadioMessage : public ui::Widget
 {
 public:
-    RadioMessage(HUD *hud, util::Rect rect);
+    RadioMessage(HUD *hud, Rect rect);
 
 protected:
     void draw();
 
 private:
     HUD *m_hud;
-    util::Rect m_rect;
+    Rect m_rect;
 
     ui::Label m_lblText;
     gfx::Texture m_black;

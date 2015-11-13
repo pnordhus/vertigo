@@ -15,30 +15,48 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef FIGHT_TURRETBASE_H
-#define FIGHT_TURRETBASE_H
+#ifndef HUD_SONARMONITOR_H
+#define HUD_SONARMONITOR_H
 
 
-#include "object.h"
+#include "util/geometry2d.h"
+#include "ui/widget.h"
+#include "gfx/texture.h"
 
 
-namespace fight {
+namespace hud {
 
 
-class TurretBase : public Object
+class HUD;
+
+
+class SonarMonitor : public ui::Widget
 {
 public:
-    TurretBase(Scenario *scenario, const QString &name);
+    SonarMonitor(HUD *hud, Point point, int radius, int scale);
 
 public:
+    int scale() const { return m_scale; }
+    void setScale(int scale) { m_scale = scale; }
+
+protected:
     void draw();
 
 private:
-    std::unique_ptr<Object> m_body;
+    HUD *m_hud;
+    Point m_point;
+    int m_radius;
+    int m_scale;
+
+    gfx::Texture m_center;
+    gfx::Texture m_nav;
+    gfx::Texture m_friend;
+    gfx::Texture m_enemy;
+    gfx::Texture m_target;
 };
 
 
-} // namespace fight
+} // namespace hud
 
 
-#endif // FIGHT_TURRETBASE_H
+#endif // HUD_SONARMONITOR_H

@@ -53,6 +53,7 @@ Desktop::Desktop(const QString &name) :
     m_nameSound.load("sfx:snd/names/" + nameSound + ".pcm");
     m_approachMovie = QString("gfx:mvi/approach/%1.mvi").arg(file.value("ApproachMovie").toString());
     m_name = file.value("Name").toString();
+    m_description = file.value("Description").toString();
 
     m_lblBackground.setTexture(m_background);
     setRootWidget(&m_lblBackground);
@@ -67,7 +68,7 @@ Desktop::Desktop(const QString &name) :
     label = new ui::Label(&m_lblBackground);
     label->setFont(gfx::Font::Small);
     label->setPosition(8, 10 + gfx::Font(gfx::Font::Large).height());
-    label->setText(file.value("Description").toString());
+    label->setText(m_description);
 
     m_btnNotebook = new ui::Button([this]() { showNotebook(); }, &m_lblBackground);
     m_btnNotebook->setTexture(gfx::Image::loadPCX("gfx:pic/notebook/nbklein.pcx"));

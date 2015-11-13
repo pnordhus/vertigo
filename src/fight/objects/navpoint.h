@@ -15,34 +15,43 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef FIGHT_TURRET_H
-#define FIGHT_TURRET_H
+#ifndef FIGHT_NAVPOINT_H
+#define FIGHT_NAVPOINT_H
 
 
 #include "object.h"
-#include "module.h"
 
 
 namespace fight {
 
 
-class Turret : public Object
+class Module;
+
+
+class NavPoint : public Object
 {
 public:
-    Turret(Scenario *scenario, const QString &name);
+    NavPoint(Scenario *scenario, int num);
 
 public:
+    int num() const { return m_num; }
+
+public:
+    bool update(float elapsedTime);
     void draw();
 
 private:
-    Module *m_armLeft;
-    Module *m_armRight;
-    glm::vec3 m_armLeftPosition;
-    glm::vec3 m_armRightPosition;
+    int m_num;
+    float m_scale;
+    Module *m_state0;
+    Module *m_state1;
+    int m_state;
+    float m_time;
+    bool m_reached;
 };
 
 
 } // namespace fight
 
 
-#endif // FIGHT_TURRET_H
+#endif // FIGHT_NAVPOINT_H

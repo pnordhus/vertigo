@@ -19,7 +19,7 @@
 #define HUD_BETA_H
 
 
-#include "util/rect.hpp"
+#include "util/geometry2d.h"
 #include "ui/widget.h"
 #include "gfx/texture.h"
 
@@ -33,14 +33,14 @@ class HUD;
 class Beta : public ui::Widget
 {
 public:
-    Beta(HUD *hud, util::Rect rect);
+    Beta(HUD *hud, Rect rect);
 
 protected:
     void draw();
 
 private:
     HUD *m_hud;
-    util::Rect m_rect;
+    Rect m_rect;
     gfx::Texture m_beta;
     gfx::Texture m_point;
 };

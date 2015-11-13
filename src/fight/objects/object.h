@@ -20,12 +20,12 @@
 
 
 #include <QGLContext>
-#include "boundingbox.h"
-#include "condition.h"
-#include "collisionmanager.h"
-#include "modulemanager.h"
-#include "txt/desfile.h"
+#include "fight/boundingbox.h"
+#include "fight/condition.h"
 #include <memory>
+
+
+namespace txt { class DesFile; }
 
 
 namespace fight {
@@ -34,19 +34,12 @@ namespace fight {
 class Scenario;
 
 
-enum ObjectType
-{
-    UnknownObject,
-    BuildingObject,
-    TrashObject,
-};
-
-
 class Object
 {
 public:
     Object(Scenario *scenario);
-    Object(Scenario *scenario, const QString &name, float scale = 1/32.0f);
+    Object(Scenario *scenario, txt::DesFile &file, float scale = 1/32.0f);
+    Object(const Object& x) = delete;
     virtual ~Object() { }
 
 public:
@@ -54,52 +47,30 @@ public:
     void enable();
     void disable();
     bool isEnabled() const { return m_enabled; }
-    virtual void setPosition(const glm::vec3 &pos);
-    const glm::vec3& position() const { return m_position; }
 
-    ObjectType type() const { return m_type; }
+    virtual void setPosition(const Vector3D &pos);
+    const Vector3D& position() const { return m_position; }
     const BoundingBox& box() const { return m_box; }
+    virtual Vector3D center() const { return (m_box.minPoint() + m_box.maxPoint())*0.5f; }
     bool isStatic() const { return m_static; }
-    CollisionCache *collisionCache() const { return m_collisionCache.get(); }
-    void setCollisionCache(CollisionCache *cache);
 
     Condition* condEnable() { return &m_condEnable; }
-    ConditionEvent* eventDestroy() { return &m_eventDestroy; }
-    ConditionEvent* eventAttack() { return &m_eventAttack; }
-    ConditionEvent* eventIdentify() { return &m_eventIdentify; }
-    ConditionEvent* eventParalyze() { return &m_eventParalyze; }
-    ConditionEvent* eventFinish() { return &m_eventFinish; }
-    ConditionEvent* eventBoard() { return &m_eventBoard; }
 
 public:
     virtual bool update(float elapsedTime);
     virtual void draw();
-    virtual bool intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal);
-    virtual void destroy();
+    virtual bool intersect(const Vector3D &start, const Vector3D &dir, float radius, float &distance, Vector3D &normal);
 
 protected:
     Scenario *m_scenario;
 
     bool m_enabled;
-    Module *m_base;
-    float m_scale;
-    glm::vec3 m_position;
+    Vector3D m_position;
 
-    ObjectType m_type;
     BoundingBox m_box;
     bool m_static;
-    std::unique_ptr<CollisionCache> m_collisionCache;
 
     ConditionEnable m_condEnable;
-    ConditionEvent m_eventDestroy;
-    ConditionEvent m_eventAttack;
-    ConditionEvent m_eventIdentify;
-    ConditionEvent m_eventParalyze;
-    ConditionEvent m_eventFinish;
-    ConditionEvent m_eventBoard;
-
-private:
-    Object(const Object& x) : m_condEnable(x.m_scenario, this) { }
 };
 
 

@@ -42,6 +42,9 @@ MainMenu::MainMenu(std::function<void(QString)> funcStartGame, std::function<voi
     m_lblLoad(&m_title, false),
     m_lblLoadTitle(&m_lblLoad),
     m_btnLoadBack([this]() { showMain(); }, &m_lblLoad),
+    m_lblLoading(&m_title, false),
+    m_lblLoadingTitle(&m_lblLoading),
+    m_lblLoadingWait(&m_lblLoading),
     m_cursor(false),
     m_funcStartGame(std::move(funcStartGame)),
     m_funcLoadGame(std::move(funcLoadGame))
@@ -108,6 +111,18 @@ MainMenu::MainMenu(std::function<void(QString)> funcStartGame, std::function<voi
     m_btnLoadBack.setFont(gfx::Font::Large);
     m_btnLoadBack.setText(txt::StringTable::get(txt::MainMenu));
 
+    m_lblLoadingTitle.setFont(gfx::Font::Large);
+    m_lblLoadingTitle.setPosition(0, 316);
+    m_lblLoadingTitle.setWidth(640);
+    m_lblLoadingTitle.setAlignment(ui::Label::AlignHCenter);
+    m_lblLoadingTitle.setText(txt::StringTable::get(txt::MainMenu_Loading));
+
+    m_lblLoadingWait.setFont(gfx::Font::Large);
+    m_lblLoadingWait.setPosition(0, 336);
+    m_lblLoadingWait.setWidth(640);
+    m_lblLoadingWait.setAlignment(ui::Label::AlignHCenter);
+    m_lblLoadingWait.setText(txt::StringTable::get(txt::MainMenu_PleaseWait));
+
     changeState(Presents);
 }
 
@@ -121,9 +136,19 @@ void MainMenu::draw()
             m_cursor = !m_cursor;
         }
 
-        QRect rect = gfx::Font(gfx::Font::Large).draw(m_name, QPoint(0, 328), QSize(640, -1), true, false);
+        Rect rect = gfx::Font(gfx::Font::Large).draw(m_name, Rect(0, 328, 640, -1), true, false);
         if (m_cursor)
-            gfx::Font(gfx::Font::Large).draw("_", rect.topRight() + QPoint(0, 2));
+            gfx::Font(gfx::Font::Large).draw("_", rect.pos() + Point(rect.width, 2));
+    }
+    if (m_state == Loading)
+    {
+        QGLWidget *win = window();
+        if (win->doubleBuffer())
+            win->swapBuffers();
+        m_funcLoadGame(m_loadingGame);
+        changeState(Title);
+        if (win->doubleBuffer())
+            win->swapBuffers();
     }
 }
 
@@ -147,6 +172,13 @@ void MainMenu::changeState(State state)
 
     case Title:
         setRootWidget(&m_title);
+        showMain();
+        m_state = state;
+        break;
+
+    case Loading:
+        setRootWidget(&m_title);
+        showLoading();
         m_state = state;
         break;
 
@@ -201,6 +233,7 @@ void MainMenu::showMain()
     m_lblMain.show();
     m_lblNew.hide();
     m_lblLoad.hide();
+    m_lblLoading.hide();
 }
 
 void MainMenu::showNew()
@@ -225,7 +258,7 @@ void MainMenu::showLoad()
     foreach (const Chapter::SavedGame &game, games) {
         QString name = game.name;
 
-        m_btnLoadSave.emplace_back([this, name]() { m_funcLoadGame(name); showMain(); }, &m_lblLoad);
+        m_btnLoadSave.emplace_back([this, name]() { changeState(Loading); m_loadingGame = name; }, &m_lblLoad);
         ui::Button &button = m_btnLoadSave.back();
         button.setPosition(0, y);
         button.setWidth(640);
@@ -246,5 +279,13 @@ void MainMenu::showLoad()
         y += 20;
     }
 }
+
+
+void MainMenu::showLoading()
+{
+    m_lblLoad.hide();
+    m_lblLoading.show();
+}
+
 
 } // namespace game

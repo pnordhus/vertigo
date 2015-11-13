@@ -15,24 +15,38 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef FIGHT_MINE_H
-#define FIGHT_MINE_H
+#ifndef HUD_ACTIVESONAR_H
+#define HUD_ACTIVESONAR_H
 
 
-#include "object.h"
+#include "util/geometry2d.h"
+#include "ui/widget.h"
+#include "gfx/texture.h"
 
 
-namespace fight {
+namespace hud {
 
 
-class Mine : public Object
+class HUD;
+
+
+class ActiveSonar : public ui::Widget
 {
 public:
-    Mine(Scenario *scenario, const QString &name);
+    ActiveSonar(HUD *hud, Rect rect);
+
+protected:
+    void draw();
+
+private:
+    HUD *m_hud;
+    Rect m_rect;
+    gfx::Texture m_actBo;
+    gfx::Texture m_actOu;
 };
 
 
-} // namespace fight
+} // namespace hud
 
 
-#endif // FIGHT_MINE_H
+#endif // HUD_ACTIVESONAR_H

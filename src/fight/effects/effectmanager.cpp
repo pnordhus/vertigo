@@ -16,7 +16,10 @@
  ***************************************************************************/
 
 #include "effectmanager.h"
-#include "../scenario.h"
+#include "billboard.h"
+#include "effect.h"
+#include "projectile.h"
+#include "fight/scenario.h"
 
 
 namespace fight {
@@ -30,32 +33,38 @@ EffectManager::EffectManager(Scenario *scenario) :
     file.load("vfx:sobjects/explosio.des");
     for (int i = 0; i < 27; i++)
         m_billboards.emplace(std::piecewise_construct,
-            std::forward_as_tuple((Effects)(Explosion_0 + i)),
-            std::forward_as_tuple(m_scenario->textureManager(), file, i));
+            std::forward_as_tuple((Effects)((int)Effects::Explosion_0 + i)),
+            std::forward_as_tuple(m_scenario->textureManager(), file, i, i < 12));
     file.load("vfx:sobjects/shoot.des");
     for (int i = 0; i < 9; i++)
         m_billboards.emplace(std::piecewise_construct,
-            std::forward_as_tuple((Effects)(Shoot_0 + i)),
+            std::forward_as_tuple((Effects)((int)Effects::Shoot_0 + i)),
             std::forward_as_tuple(m_scenario->textureManager(), file, i));
     file.load("vfx:sobjects/debris.des");
     for (int i = 0; i < 23; i++)
         m_billboards.emplace(std::piecewise_construct,
-            std::forward_as_tuple((Effects)(Debris_0 + i)),
-            std::forward_as_tuple(m_scenario->textureManager(), file, i));
+            std::forward_as_tuple((Effects)((int)Effects::Debris_0 + i)),
+            std::forward_as_tuple(m_scenario->textureManager(), file, i, false));
     file.load("vfx:sobjects/trash.des");
     for (int i = 0; i < 5; i++)
         m_billboards.emplace(std::piecewise_construct,
-            std::forward_as_tuple((Effects)(Trash_0 + i)),
-            std::forward_as_tuple(m_scenario->textureManager(), file, i));
+            std::forward_as_tuple((Effects)((int)Effects::Trash_0 + i)),
+            std::forward_as_tuple(m_scenario->textureManager(), file, i, false));
     file.load("vfx:sobjects/bubble.des");
     for (int i = 0; i < 3; i++)
         m_billboards.emplace(std::piecewise_construct,
-            std::forward_as_tuple((Effects)(Bubble_0 + i)),
-            std::forward_as_tuple(m_scenario->textureManager(), file, i));
+            std::forward_as_tuple((Effects)((int)Effects::Bubble_0 + i)),
+            std::forward_as_tuple(m_scenario->textureManager(), file, i, false));
 }
 
 
-Effect* EffectManager::addEffect(Effects effect, const glm::vec3 &position, float angle, float scale)
+Billboard* EffectManager::getBillboard(Effects effect)
+{
+    return &m_billboards.at(effect);
+}
+
+
+Effect* EffectManager::addEffect(Effects effect, const Vector3D &position, float angle, float scale)
 {
     Effect *object = new Effect(m_scenario, getBillboard(effect), angle, scale);
     m_effects.emplace_back(object);
@@ -64,7 +73,7 @@ Effect* EffectManager::addEffect(Effects effect, const glm::vec3 &position, floa
 }
 
 
-Projectile* EffectManager::addProjectile(Effects projectile, const glm::vec3 &position, const glm::vec3 &direction)
+Projectile* EffectManager::addProjectile(Effects projectile, const Vector3D &position, const Vector3D &direction)
 {
     Projectile *object = new Projectile(m_scenario, getBillboard(projectile));
     m_effects.emplace_back(object);

@@ -17,25 +17,28 @@
 
 #include "projectile.h"
 #include "billboard.h"
-#include "../scenario.h"
+#include "fight/scenario.h"
 
 
 namespace fight {
 
 
 Projectile::Projectile(Scenario *scenario, Billboard *billboard) : 
-    Effect(scenario, billboard, 0, 2)
+    Effect(scenario, billboard, qrand()%360, 2)
 {
+    m_kineticShield = m_kineticShieldMax = billboard->kineticShield();
+    m_kineticStrength = billboard->kineticStrength();
+    m_shockStrength = billboard->shockStrength();
 }
 
 
-void Projectile::setPosition(const glm::vec3 &pos)
+void Projectile::setPosition(const Vector3D &pos)
 {
     m_originPos = pos;
     Object::setPosition(pos);
 }
 
-void Projectile::setDirection(const glm::vec3 &direction)
+void Projectile::setDirection(const Vector3D &direction)
 {
     m_direction = direction;
 }
@@ -43,31 +46,32 @@ void Projectile::setDirection(const glm::vec3 &direction)
 
 bool Projectile::update(float elapsedTime)
 {
-    m_elapsedTime += elapsedTime;
-    if (m_elapsedTime == 0)
+    m_time += elapsedTime;
+    if (m_time == 0)
         return false;
-    if (m_elapsedTime*m_billboard->velocity()/1000 > m_billboard->range())
+    if (m_time*m_billboard->velocity() > m_billboard->range())
     {
         disable();
         return true;
     }
 
-    glm::vec3 newPos = m_originPos + m_direction*(m_elapsedTime*m_billboard->velocity()/1000);
+    Vector3D newPos = m_originPos + m_direction*(m_time*m_billboard->velocity());
 
-    glm::vec3 pos, normal;
+    Vector3D pos, normal;
     if (m_scenario->surface().testCollision(m_position, newPos, m_billboard->collisionRadius(), pos, normal))
     {
-        m_scenario->effectManager().addEffect(Explosion_12, pos);
+        m_scenario->effectManager().addEffect(Effects::Explosion_12, pos);
         disable();
         return true;
     }
-    Object *collision = m_scenario->collisionManager().testCollision(this, newPos, m_billboard->collisionRadius(), pos, normal);
+    Object *collision = m_scenario->collisionManager().testCollision(m_position, newPos, m_billboard->collisionRadius(), pos, normal, &m_collisionCache);
     if (collision)
     {
-        if (collision->type() == TrashObject)
-            collision->destroy();
+        ActiveObject *activeObject = dynamic_cast<ActiveObject *>(collision);
+        if (activeObject)
+            activeObject->damage(m_kineticStrength, m_shockStrength, pos - normal*m_billboard->collisionRadius());
         else
-            m_scenario->effectManager().addEffect(Explosion_11, pos, qrand()%360);
+            m_scenario->effectManager().addEffect(Effects::Explosion_11, pos, qrand()%360);
         disable();
         return true;
     }

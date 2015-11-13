@@ -45,6 +45,7 @@ public:
     void start();
     void draw();
     const QString& name() const { return m_name; }
+    const QString& description() const { return m_description; }
     const QString& approachMovie() const { return m_approachMovie; }
 
 private:
@@ -85,6 +86,7 @@ private:
     Departure *m_departure;
     ui::Button *m_btnQuit;
     QString m_name;
+    QString m_description;
     QString m_approachMovie;
     MiniMovie m_miniMovie;
     bool m_first;

@@ -16,10 +16,12 @@
  ***************************************************************************/
 
 #include "module.h"
+#include "gfx/texturemanager.h"
 #include <QDataStream>
 #include <QFile>
 #include <QGLContext>
 #include <QVector3D>
+#include <glm/geometric.hpp>
 
 
 namespace fight {
@@ -34,7 +36,7 @@ Module::Module(gfx::TextureManager &texMan, const QString &name)
     stream.setByteOrder(QDataStream::LittleEndian);
     stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 
-    unsigned int i, j;
+    unsigned int i, j, k;
     quint32 numFaces;
     quint32 numVertices;
     std::map<QString, Mesh*> meshes;
@@ -45,14 +47,14 @@ Module::Module(gfx::TextureManager &texMan, const QString &name)
     stream >> numVertices;
     stream.skipRawData(4);
 
-    std::vector<glm::vec3> vertices;
+    std::vector<Vector3D> vertices;
     vertices.reserve(numVertices);
 
     for (i = 0; i < numVertices; i++) {
         quint32 index;
         QVector3D qv;
         stream >> index >> qv;
-        glm::vec3 v = glm::vec3(qv.x(), qv.y(), qv.z());
+        Vector3D v = Vector3D(qv.x(), qv.y(), qv.z());
         vertices.push_back(v);
         m_box.add(v);
     }
@@ -77,7 +79,7 @@ Module::Module(gfx::TextureManager &texMan, const QString &name)
             stream >> numVertices2;
             stream.skipRawData(4);
 
-            std::vector<glm::vec2> texCoords;
+            std::vector<Vector2D> texCoords;
             texCoords.reserve(numVertices2 * 2);
 
             for (j = 0; j < numVertices2; j++) {
@@ -128,13 +130,26 @@ Module::Module(gfx::TextureManager &texMan, const QString &name)
                     mesh->indices.push_back(i0);
                     mesh->indices.push_back(i0 + j - 1);
                     mesh->indices.push_back(i0 + j);
+
+                    Vector3D u = mesh->vertices[i0 + j] - mesh->vertices[i0];
+                    Vector3D v = mesh->vertices[i0 + j - 1] - mesh->vertices[i0];
+
+                    Vector3D n = glm::cross(u, v);
+                    float l = glm::length(n);
+                    if (l > 1e-5)
+                        n /= l;
+                    else
+                        n = Vector3D(0);
+
+                    for (k = 0; k < 1 + (j == 2 ? 2 : 0); k++)
+                        mesh->normals.push_back(n);
                 }
             }
         }
     }
 
     for (const Mesh &mesh : m_meshes)
-        m_collisionMesh.addTriangles(mesh.vertices, mesh.indices);
+        m_collisionMesh.addTriangles(mesh.vertices, mesh.normals, mesh.indices);
 }
 
 
@@ -143,20 +158,22 @@ void Module::draw()
     glEnable(GL_TEXTURE_2D);
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    //glEnableClientState(GL_NORMAL_ARRAY);
+    glEnableClientState(GL_NORMAL_ARRAY);
 
     for (Mesh &mesh : m_meshes)
     {
         mesh.texture.bind();
         glVertexPointer(3, GL_FLOAT, 0, mesh.vertices.data());
-        //glNormalPointer(GL_FLOAT, 0, mesh.normals.data());
+        glNormalPointer(GL_FLOAT, 0, mesh.normals.data());
         glTexCoordPointer(2, GL_FLOAT, 0, mesh.texCoords.data());
         glDrawElements(GL_TRIANGLES, mesh.indices.size(), GL_UNSIGNED_SHORT, mesh.indices.data());
     }
+
+    glDisableClientState(GL_NORMAL_ARRAY);
 }
 
 
-bool Module::intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal)
+bool Module::intersect(const Vector3D &start, const Vector3D &dir, float radius, float &distance, Vector3D &normal)
 {
     return m_collisionMesh.intersect(start, dir, radius, distance, normal);
 }

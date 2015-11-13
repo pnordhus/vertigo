@@ -15,46 +15,32 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef FIGHT_BUILDING_H
-#define FIGHT_BUILDING_H
+#include "activesonar.h"
+#include "hud.h"
+#include "fight/scenario.h"
 
 
-#include "object.h"
+namespace hud {
 
 
-namespace fight {
-
-
-class Surface;
-
-
-class Building : public Object
+ActiveSonar::ActiveSonar(HUD *hud, Rect rect) :
+    ui::Widget(hud->widget()),
+    m_hud(hud),
+    m_rect(rect),
+    m_actBo(hud->getImage("hudactbo"), true),
+    m_actOu(hud->getImage("hudactou"), true)
 {
-public:
-    Building(Scenario *scenario, const QString &name, int size, float angle, int x, int y, int refx, int refy);
-
-public:
-    void draw();
-    bool intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal);
-
-private:
-    struct Cluster
-    {
-        Module *module;
-        glm::vec3 offset;
-        float scale;
-        float angle;
-        glm::mat4 transform;
-        glm::mat4 invTransform;
-    };
-
-    std::vector<Cluster> m_clusters;
-    int m_size;
-    float m_angle;
-};
+}
 
 
-} // namespace fight
+void ActiveSonar::draw()
+{
+    Rect rect = m_hud->projectCenter(m_rect);
+    if (m_hud->scenario()->sonar().isActive())
+        m_actBo.draw(rect.x, rect.y + 1);
+    else if (m_hud->scenario()->sonar().isActivating())
+        m_actOu.draw(rect.x, rect.y + 1);
+}
 
 
-#endif // FIGHT_BUILDING_H
+} // namespace hud

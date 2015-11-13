@@ -16,9 +16,10 @@
  ***************************************************************************/
 
 #include "collisionmanager.h"
-#include "object.h"
+#include "objects/object.h"
 
 #include <glm/geometric.hpp>
+
 
 namespace fight {
 
@@ -28,7 +29,7 @@ CollisionCache::CollisionCache()
 }
 
 
-void CollisionCache::addObject(Object *object, bool collision, const glm::vec3 &position, const glm::vec3 &normal)
+void CollisionCache::addObject(Object *object, bool collision, const Vector3D &position, const Vector3D &normal)
 {
     m_entries.emplace_back();
     CacheEntry &entry = m_entries.back();
@@ -39,7 +40,7 @@ void CollisionCache::addObject(Object *object, bool collision, const glm::vec3 &
 }
 
 
-bool CollisionCache::testObject(Object *object, bool &collision, glm::vec3 &position, glm::vec3 &normal)
+bool CollisionCache::testObject(Object *object, bool &collision, Vector3D &position, Vector3D &normal)
 {
     for (const CacheEntry &entry :  m_entries)
         if (entry.object == object)
@@ -64,40 +65,17 @@ void CollisionManager::addObject(Object *object)
 }
 
 
-Object* CollisionManager::testCollision(const glm::vec3 &start, const glm::vec3 &end, float radius, glm::vec3 &position, glm::vec3 &normal)
+void CollisionManager::removeObject(Object *object)
 {
-    glm::vec3 dir = end - start;
-    float distance = glm::length(dir);
-    dir /= distance;
-
-    Object *collisionObject = NULL;
-    for (Object *object : m_objects)
-        if (object->isEnabled() && object->box().test(end, radius))
-        {
-            bool collision = false;
-            float d;
-            glm::vec3 norm;
-
-            collision = object->intersect(start, dir, radius, d, norm);
-
-            if (collision && distance > d)
-            {
-                distance = d;
-                position = start;
-                if (distance > 0)
-                    position += dir*distance;
-                normal = norm;
-                collisionObject = object;
-            }
-        }
-    return collisionObject;
+    auto it = std::find(m_objects.begin(), m_objects.end(), object);
+    (*it) = m_objects.back();
+    m_objects.pop_back();
 }
 
 
-Object* CollisionManager::testCollision(Object *cacheObject, const glm::vec3 &end, float radius, glm::vec3 &position, glm::vec3 &normal)
+Object* CollisionManager::testCollision(const Vector3D &start, const Vector3D &end, float radius, Vector3D &position, Vector3D &normal, CollisionCache *collisionCache)
 {
-    glm::vec3 start = cacheObject->position();
-    glm::vec3 dir = end - start;
+    Vector3D dir = end - start;
     float distance = glm::length(dir);
     dir /= distance;
 
@@ -107,18 +85,16 @@ Object* CollisionManager::testCollision(Object *cacheObject, const glm::vec3 &en
         {
             bool collision = false;
             float d;
-            glm::vec3 pos, norm;
+            Vector3D pos, norm;
 
-            if (object->isStatic() && cacheObject->isStatic())
+            if (object->isStatic() && collisionCache)
             {
-                if (cacheObject->collisionCache() == NULL)
-                    cacheObject->setCollisionCache(new CollisionCache());
-                if (cacheObject->collisionCache()->testObject(object, collision, pos, norm))
+                if (collisionCache->testObject(object, collision, pos, norm))
                     d = glm::dot(pos - start, dir);
                 else
                 {
                     collision = object->intersect(start, dir, radius, d, norm);
-                    cacheObject->collisionCache()->addObject(object, collision, start + dir*d, norm);
+                    collisionCache->addObject(object, collision, start + dir*d, norm);
                 }
             }
             else

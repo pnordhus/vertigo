@@ -24,9 +24,10 @@ namespace fight {
 
 ConditionManager::ConditionManager(Scenario *scenario) :
     m_scenario(scenario),
-    m_condAutopilot(scenario),
+    m_condSuccess(scenario),
     m_condFailure(scenario)
 {
+    m_condFailure.addDependency(&m_condSuccess, false);
 }
 
 
@@ -37,7 +38,7 @@ Condition* ConditionManager::addCondition(int limit)
 }
 
 
-ConditionRadio* ConditionManager::addCondRadio(const glm::vec3 &pos, const QString &text)
+ConditionRadio* ConditionManager::addCondRadio(const Vector3D &pos, const QString &text)
 {
     m_condRadio.emplace_back(m_scenario, pos, text);
     return &m_condRadio.back();
@@ -62,7 +63,7 @@ void ConditionManager::delayComplete(Condition *cond, int delay)
 {
     m_delayEntries.emplace_back();
     m_delayEntries.back().cond = cond;
-    m_delayEntries.back().completeTime = m_scenario->time() + delay*1000;
+    m_delayEntries.back().completeTime = m_scenario->time() + delay;
 }
 
 
@@ -140,8 +141,8 @@ void ConditionManager::updateObjective(int id, int index, int wccond)
                 std::forward_as_tuple(m_scenario, 1)).first->second;
             if (objective < 16)
             {
-                cond->addDependency(&m_condAutopilot);
-                m_condAutopilot.setLimit(m_condAutopilot.limit() + 1);
+                cond->addDependency(&m_condSuccess);
+                m_condSuccess.setLimit(m_condSuccess.limit() + 1);
             }
         }
         else
@@ -184,18 +185,17 @@ void ConditionManager::buildDependencies()
     for (const auto &pair : condEntries)
     {
         const ConditionEntry &entry = pair.second;
-
-        if (entry.cond1 == 0 && entry.cond2 != 0)
-            qDebug() << "Abnormal condition" << pair.first;
         if (entry.condTrigger == nullptr)
         {
-            qDebug() << "Undefined object";
+            qDebug() << "Undefined object" << pair.first;
             continue;
         }
+
+        entry.condTrigger->setDelay(entry.del);
         if (entry.cond1 == 0)
         {
-            if (entry.del != 0)
-                delayComplete(entry.condTrigger, entry.del);
+            if (entry.cond2 != 0)
+                qDebug() << "Abnormal condition" << pair.first;
             continue;
         }
 
@@ -205,8 +205,10 @@ void ConditionManager::buildDependencies()
         entry.condTrigger->setLimit(entry.cond2 != 0 && entry.op == 0 ? 2 : 1);
         if (entry.op != 0 && entry.op != 1)
             qDebug() << "Unhandled condition operation" << entry.op;
-        entry.condTrigger->setDelay(entry.del);
     }
+    for (const auto &pair : condEntries)
+        if (pair.second.condTrigger)
+            pair.second.condTrigger->tryComplete();
 }
 
 
@@ -219,7 +221,7 @@ void ConditionManager::initCondition(int cond, int dep, int ref, Condition *cond
         if (condEntries.find(ref) == condEntries.end())
             qDebug() << "Condition reference not found" << ref;
         if (condEntries[ref].condSignal == nullptr)
-            qDebug() << "Undefined object";
+            qDebug() << "Undefined object" << ref;
         else
             condEntries[ref].condSignal->addDependency(condDepend, cond == 1);
     }
@@ -230,7 +232,7 @@ void ConditionManager::initCondition(int cond, int dep, int ref, Condition *cond
         if (condEntries.find(ref) == condEntries.end())
             qDebug() << "Condition reference not found" << ref;
         if (condEntries[ref].condAttacked == nullptr)
-            qDebug() << "Undefined object";
+            qDebug() << "Undefined object" << ref;
         else
             condEntries[ref].condAttacked->addDependency(condDepend, cond == 2);
     }
@@ -241,7 +243,7 @@ void ConditionManager::initCondition(int cond, int dep, int ref, Condition *cond
         if (condEntries.find(ref) == condEntries.end())
             qDebug() << "Condition reference not found" << ref;
         if (condEntries[ref].condIdentified == nullptr)
-            qDebug() << "Undefined object";
+            qDebug() << "Undefined object" << ref;
         else
             condEntries[ref].condIdentified->addDependency(condDepend, cond == 3);
     }
@@ -251,7 +253,7 @@ void ConditionManager::initCondition(int cond, int dep, int ref, Condition *cond
             qDebug() << "Unhandled condition dep" << cond << dep;
         if (ref != -1)
             qDebug() << "Unexpected reference" << cond << ref;
-        m_condAutopilot.addDependency(condDepend);
+        m_condSuccess.addDependency(condDepend);
     }
     if (cond == 5)
     {
@@ -280,7 +282,7 @@ void ConditionManager::initCondition(int cond, int dep, int ref, Condition *cond
         if (condEntries.find(ref) == condEntries.end())
             qDebug() << "Condition reference not found" << ref;
         if (condEntries[ref].condParalyzed == nullptr)
-            qDebug() << "Undefined object";
+            qDebug() << "Undefined object" << ref;
         else
            condEntries[ref].condParalyzed->addDependency(condDepend);
     }
@@ -291,7 +293,7 @@ void ConditionManager::initCondition(int cond, int dep, int ref, Condition *cond
         if (condEntries.find(ref) == condEntries.end())
             qDebug() << "Condition reference not found" << ref;
         if (condEntries[ref].condFinished == nullptr)
-            qDebug() << "Undefined object";
+            qDebug() << "Undefined object" << ref;
         else
             condEntries[ref].condFinished->addDependency(condDepend, cond == 43);
     }
@@ -302,7 +304,7 @@ void ConditionManager::initCondition(int cond, int dep, int ref, Condition *cond
         if (condEntries.find(ref) == condEntries.end())
             qDebug() << "Condition reference not found" << ref;
         if (condEntries[ref].condBoarded == nullptr)
-            qDebug() << "Undefined object";
+            qDebug() << "Undefined object" << ref;
         else
             condEntries[ref].condBoarded->addDependency(condDepend, cond == 45);
     }
