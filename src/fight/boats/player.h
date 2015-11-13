@@ -36,7 +36,7 @@ public:
     enum EngineState { EngineOff, EngineStartup, EngineRunning, EngineShutdown };
 
 public:
-    Player(Scenario *scenario, game::Boat *boat);
+    Player(Scenario *scenario, game::Boat *boat, float yaw);
 
 public:
     int shield(int index) const { return m_shield[index]; };
@@ -59,6 +59,16 @@ private:
 
     EngineState m_engineState;
     float m_engineTime;
+
+    float m_roll;
+    float m_rollCenterVelocity;
+    float m_bottomAlphaSupport;
+
+    float m_currentTime;
+    Vector3D m_currentNoise1;
+    Vector3D m_currentNoise2;
+    Vector3D m_currentAmplitude;
+    float m_current;
 
     bool m_firing;
     Gun m_gun;

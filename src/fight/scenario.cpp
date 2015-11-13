@@ -51,6 +51,8 @@ Scenario::Scenario(const QString &name) :
     m_conditionManager(this),
     m_sonar(this),
     m_target(this),
+    m_yaw(0),
+    m_pitch(0),
     m_speed(0),
     m_velocityTarget(0),
     m_time(0),
@@ -59,8 +61,7 @@ Scenario::Scenario(const QString &name) :
     m_up(0.0f),
     m_down(0.0f),
     m_forwards(0.0f),
-    m_backwards(0.0f),
-    m_inverseUpDown(1.0f)
+    m_backwards(0.0f)
 {
     qsrand(name.right(4).toInt());
 
@@ -141,7 +142,7 @@ Scenario::Scenario(const QString &name) :
         switch (type) {
         case TypeBoat:
             {
-                object = new SimpleBoat(this, objectDes, info);
+                object = new SimpleBoat(this, objectDes, info, 0);
                 Vector3D pos = getPosition();
                 pos.z += 20.0f;
                 object->setPosition(pos);
@@ -150,7 +151,7 @@ Scenario::Scenario(const QString &name) :
 
         case TypeBomber:
             {
-                object = new SimpleBoat(this, objectDes, info);
+                object = new SimpleBoat(this, objectDes, info, 0);
                 Vector3D pos = getPosition();
                 pos.z += 20.0f;
                 object->setPosition(pos);
@@ -182,7 +183,7 @@ Scenario::Scenario(const QString &name) :
 
         case TypePlayer:
             m_position = getPosition();
-            initialDir = 45.0f * m_file.value("card").toInt();
+            m_initialYaw = m_file.value("card").toInt()*glm::pi<float>()/4;
             //m_position.setZ(m_position.z() + 20.0f);
             m_height = m_position.z - m_surface.heightAt(m_position.x, m_position.y);
             entry.condTrigger = m_conditionManager.addCondition(0);
@@ -339,7 +340,7 @@ void Scenario::setBoat(game::Boat *boat)
 {
     //if (boat->gun() == 3081)
     //    boat->buy(3083, "GUN"); // TODO: remove
-    m_player.reset(new Player(this, boat));
+    m_player.reset(new Player(this, boat, m_initialYaw));
     m_player->setPosition(m_position);
 
     m_buzzers = boat->buzzers().size();
@@ -360,7 +361,7 @@ void Scenario::update(float elapsedTime)
 {
     m_time += elapsedTime;
 
-    m_player->setTurnVelocity(m_right - m_left, (m_up - m_down)*m_inverseUpDown);
+    m_player->setTurnVelocity(Vector3D(m_up - m_down, m_left - m_right, 0));
     m_player->update(elapsedTime);
 
     Vector3D prevPos = m_position;
@@ -509,15 +510,9 @@ void Scenario::keyPressEvent(QKeyEvent *e)
     if (e->key() == Qt::Key_Right || e->key() == Qt::Key_6)
         m_right = 1.0f;
     if (e->key() == Qt::Key_Up || e->key() == Qt::Key_8)
-    {
         m_up = 1.0f;
-        m_inverseUpDown = 1.0f;
-    }
     if (e->key() == Qt::Key_Down || e->key() == Qt::Key_5)
-    {
         m_down = 1.0f;
-        m_inverseUpDown = 1.0f;
-    }
     if (e->key() == Qt::Key_Q)
         m_forwards = 100;
     if (e->key() == Qt::Key_W)

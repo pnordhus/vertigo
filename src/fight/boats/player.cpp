@@ -19,6 +19,7 @@
 #include "fight/scenario.h"
 #include "game/boat.h"
 
+#include <glm/gtx/transform.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/matrix_access.hpp>
 #include <glm/geometric.hpp>
@@ -27,14 +28,24 @@
 namespace fight {
 
 
-Player::Player(Scenario *scenario, game::Boat *boat) :
-    SimpleBoat(scenario, boat->boatFile(), ObjectInfo()),
+Player::Player(Scenario *scenario, game::Boat *boat, float yaw) :
+    SimpleBoat(scenario, boat->boatFile(), ObjectInfo(), yaw),
     m_engineState(EngineRunning),
+    m_roll(0),
+    m_currentTime(8.0f),
+    m_currentNoise1(0),
+    m_currentNoise2(0),
     m_firing(false),
     m_gun(scenario, boat->gun() - 3073)
 {
     int i;
     txt::DesFile &file = boat->boatFile();
+
+    file.setSection("kinematics");
+    m_rollCenterVelocity = file.value("RollCenterVelocity").toFloat();
+    m_bottomAlphaSupport = file.value("BottomAlphaSupport").toFloat();
+    m_currentAmplitude = Vector3D(file.value("CurrentAmplitudeB").toFloat(), file.value("CurrentAmplitudeC").toFloat(), file.value("CurrentAmplitudeA").toFloat());
+    m_current = file.value("Current").toFloat();
 
     file.setSection("defense");
     for (i = 0; i < 4; i++)
@@ -114,7 +125,45 @@ void Player::damage(int kinetic, int shock, const Vector3D &position)
 
 bool Player::update(float elapsedTime)
 {
-    updateOrientation(elapsedTime);
+    m_roll = 0;
+    if (glm::abs(dir().z) < 0.99999f)
+        m_roll = glm::dot(glm::normalize(Vector3D(dir().y, -dir().x, 0)), up());
+
+    m_angleVelocity.x += m_angleVelocity.x*m_angleFriction.x*64*elapsedTime;
+    m_angleVelocity.x -= 0.64f*dir().z*m_maxAngleVelocity.x*elapsedTime;
+    if (m_turnVelocity.x > 0 && m_angleVelocity.x < m_maxAngleVelocity.x)
+        m_angleVelocity.x -= m_maxAngleVelocity.x*m_angleFriction.x*64*elapsedTime;
+    else if (m_turnVelocity.x < 0 && m_angleVelocity.x > -m_maxAngleVelocity.x)
+        m_angleVelocity.x += m_maxAngleVelocity.x*m_angleFriction.x*64*elapsedTime;
+
+    m_angleVelocity.y += m_angleVelocity.y*m_angleFriction.y*64*elapsedTime;
+    m_angleVelocity.y += m_roll*m_rollCenterVelocity*64*m_maxAngleVelocity.y*elapsedTime;
+    if (m_turnVelocity.y > 0 && m_angleVelocity.y < m_maxAngleVelocity.y)
+        m_angleVelocity.y -= m_maxAngleVelocity.y*m_angleFriction.y*64*elapsedTime;
+    if (m_turnVelocity.y < 0 && m_angleVelocity.y > -m_maxAngleVelocity.y)
+        m_angleVelocity.y += m_maxAngleVelocity.y*m_angleFriction.y*64*elapsedTime;
+
+    m_angleVelocity.z = m_roll*m_bottomAlphaSupport*m_maxAngleVelocity.z;
+
+    const float currentLen = 8.0f;
+    m_currentTime += elapsedTime;
+    if (m_currentTime > currentLen*0.75f)
+    {
+        m_currentTime = 0;
+        m_currentNoise1 = m_currentNoise2;
+        m_currentNoise2 = Vector3D(0.5f*qrand()/RAND_MAX, 0.5f*qrand()/RAND_MAX, 0.5f*qrand()/RAND_MAX);
+        m_currentNoise2 *= m_currentNoise2;
+        if (m_currentNoise1.z > 0)
+            m_currentNoise2 = -m_currentNoise2;
+    }
+    float t = m_currentTime/currentLen;
+    if (t < 0.25f)
+        m_angleVelocity += m_currentAmplitude*m_currentNoise1*glm::sin(glm::pi<float>()*2*(t + 0.75f));
+    m_angleVelocity += m_currentAmplitude*m_currentNoise2*glm::sin(glm::pi<float>()*2*t);
+
+    m_orientation *= glm::mat3(glm::rotate(m_angleVelocity.z*elapsedTime, Vector3D(0, 0, 1))) * glm::mat3(glm::rotate(m_angleVelocity.y*elapsedTime, dir())) * glm::mat3(glm::rotate(m_angleVelocity.x*elapsedTime, right()));
+    m_orientationInverted = glm::transpose(m_orientation);
+
     updateVelocity(elapsedTime);
 
     Vector3D pos = m_scenario->position();

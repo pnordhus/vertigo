@@ -29,7 +29,7 @@ namespace fight {
 class SimpleBoat : public SimpleObject
 {
 public:
-    SimpleBoat(Scenario *scenario, txt::DesFile &file, const ObjectInfo &info);
+    SimpleBoat(Scenario *scenario, txt::DesFile &file, const ObjectInfo &info, float yaw);
 
 public:
     const glm::mat3& orientation() const { return m_orientation; }
@@ -44,7 +44,7 @@ public:
     void setVelocityTarget(float velocityTarget) { m_velocityTarget = velocityTarget; }
     bool fullThrottle() const { return m_fullThrottle; }
     void setFullThrottle(bool fullThrottle) { m_fullThrottle = fullThrottle; }
-    void setTurnVelocity(float yaw, float pitch) { m_turnX = pitch; m_turnZ = yaw; }
+    void setTurnVelocity(const Vector3D &turnVelocity) { m_turnVelocity = turnVelocity; }
 
 public:
     bool update(float elapsedTime);
@@ -57,14 +57,18 @@ protected:
 
     float m_velocityTarget;
     bool m_fullThrottle;
-    float m_turnX;
-    float m_turnZ;
 
     float m_maxVelocity;
     float m_minVelocity;
     float m_maxOrientationAcceleration;
     float m_maxOrientationRetardation;
     Vector3D m_orientationFriction;
+
+    Vector3D m_angleVelocity;
+    Vector3D m_turnVelocity;
+
+    Vector3D m_maxAngleVelocity;
+    Vector3D m_angleFriction;
 };
 
 

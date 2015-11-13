@@ -23,19 +23,25 @@
 namespace fight {
 
 
-SimpleBoat::SimpleBoat(Scenario *scenario, txt::DesFile &file, const ObjectInfo &info) :
+SimpleBoat::SimpleBoat(Scenario *scenario, txt::DesFile &file, const ObjectInfo &info, float yaw) :
     SimpleObject(scenario, file, info),
-    m_orientation(1),
-    m_orientationInverted(1),
     m_velocityTarget(0),
-    m_fullThrottle(false)
+    m_fullThrottle(false),
+    m_angleVelocity(0),
+    m_turnVelocity(0)
 {
+    m_orientation = glm::mat3(glm::rotate(yaw, Vector3D(0, 0, 1)));
+    m_orientationInverted = glm::transpose(m_orientation);
+
     file.setSection("kinematics");
     m_maxVelocity = file.value("MaxVelocity").toFloat() / 32.0f;
     m_minVelocity = file.value("MinVelocity").toFloat() / 32.0f;
     m_maxOrientationAcceleration = file.value("MaxOrientationAcceleration").toFloat() / 32.0f;
     m_maxOrientationRetardation = file.value("MaxOrientationRetardation").toFloat() / 32.0f;
     m_orientationFriction = Vector3D(-file.value("OrientationFrictionX").toFloat(), -file.value("OrientationFrictionY").toFloat(), -file.value("OrientationFrictionZ").toFloat());
+
+    m_maxAngleVelocity = Vector3D(file.value("MaxAngleVelocityB").toFloat(), file.value("MaxAngleVelocityC").toFloat(), file.value("MaxAngleVelocityA").toFloat());
+    m_angleFriction = Vector3D(-file.value("AngleFrictionB").toFloat(), -file.value("AngleFrictionC").toFloat(), -file.value("AngleFrictionA").toFloat());
 }
 
 
@@ -68,7 +74,13 @@ void SimpleBoat::updateVelocity(float elapsedTime)
 
 void SimpleBoat::updateOrientation(float elapsedTime)
 {
-    m_orientation *= glm::mat3(glm::rotate(m_turnX*1.5f*elapsedTime, right()) * glm::rotate(m_turnZ*1.5f*elapsedTime, Vector3D(0, 0, 1)));
+    m_angleVelocity += m_angleVelocity*m_angleFriction*elapsedTime;
+    if (glm::abs(m_angleVelocity.x) < m_turnVelocity.x*m_maxAngleVelocity.x)
+        m_angleVelocity.x = m_turnVelocity.x*m_maxAngleVelocity.x;
+    if (m_angleVelocity.z < m_turnVelocity.z*m_maxAngleVelocity.z)
+        m_angleVelocity.z = m_turnVelocity.z*m_maxAngleVelocity.z;
+
+    m_orientation *= glm::mat3(glm::rotate(m_angleVelocity.x*elapsedTime, right())) * glm::mat3(glm::rotate(m_angleVelocity.z*elapsedTime, Vector3D(0, 0, 1)));
     m_orientationInverted = glm::transpose(m_orientation);
 }
 
