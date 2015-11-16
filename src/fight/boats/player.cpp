@@ -154,8 +154,7 @@ bool Player::update(float elapsedTime)
     {
         m_currentTime = 0;
         m_currentNoise1 = m_currentNoise2;
-        m_currentNoise2 = Vector3D(0.5f*qrand()/RAND_MAX, 0.5f*qrand()/RAND_MAX, 0.5f*qrand()/RAND_MAX);
-        m_currentNoise2 *= m_currentNoise2;
+        m_currentNoise2 = Vector3D(0.25f*qrand()/RAND_MAX, 0.25f*qrand()/RAND_MAX, 0.5f*qrand()/RAND_MAX);
         if (m_currentNoise1.z > 0)
             m_currentNoise2 = -m_currentNoise2;
     }
@@ -190,42 +189,42 @@ bool Player::update(float elapsedTime)
     Vector3D delta = vel*elapsedTime;
     float path = 0;
 
-    Vector3D posSurface, normSurface;
-    bool colSurface = m_scenario->surface().testCollision(m_position, m_position + delta, 1.5f, posSurface, normSurface);
-
-    Vector3D posObject, normObject;
-    Object *colObject = m_scenario->collisionManager().testCollision(m_position, m_position + delta, 1.5f, posObject, normObject);
-
-    if (colObject && (!colSurface || glm::length2(posObject - m_position) < glm::length2(posSurface - m_position)))
+    int count = 0;
+    while (glm::length2(delta) > 1e-3f && count < 5)
     {
-        ActiveObject *activeObject = dynamic_cast<ActiveObject *>(colObject);
-        if (activeObject)
+        Vector3D posSurface, normSurface;
+        bool colSurface = m_scenario->surface().testCollision(m_position, m_position + delta, 1.5f, posSurface, normSurface);
+
+        Vector3D posObject, normObject;
+        Object *colObject = m_scenario->collisionManager().testCollision(m_position, m_position + delta, 1.5f, posObject, normObject);
+
+        if (colObject && (!colSurface || glm::length2(posObject - m_position) < glm::length2(posSurface - m_position)))
         {
-            activeObject->damage(m_kineticStrength, m_shockStrength, posObject - normObject*1.5f);
-            damage(activeObject->kineticStrength(), activeObject->shockStrength(), posObject - normObject*1.5f);
+            ActiveObject *activeObject = dynamic_cast<ActiveObject *>(colObject);
+            if (activeObject)
+            {
+                activeObject->damage(m_kineticStrength, m_shockStrength, posObject - normObject*1.5f);
+                damage(activeObject->kineticStrength(), activeObject->shockStrength(), posObject - normObject*1.5f);
+            }
+            sfx::SampleMap::get(sfx::Sample::Boat_Collision).playInstance();
+            m_velocity -= 2*glm::dot(m_velocity, normObject)*normObject;
+            delta = posObject - m_position;
         }
-        sfx::SampleMap::get(sfx::Sample::Boat_Collision).playInstance();
-        m_velocity -= 2*glm::dot(m_velocity, normObject)*normObject;
-        delta = posObject - m_position;
-    }
-    else if (colSurface)
-    {
-        int count = 0;
-        while (colSurface && glm::length2(delta) > 1e-3f && count < 5)
+        else if (colSurface)
         {
             delta -= posSurface - m_position;
             path += glm::length(posSurface - m_position);
             m_position = posSurface;
             delta -= (glm::dot(delta, normSurface) - 1e-3f)*normSurface;
-            colSurface = m_scenario->surface().testCollision(m_position, m_position + delta, 1.5f, posSurface, normSurface);
             count++;
+            continue;
         }
-        if (colSurface)
-            delta = Vector3D(0);
+
+        path += glm::length(delta);
+        m_position += delta;
+        break;
     }
 
-    path += glm::length(delta);
-    m_position += delta;
     m_speed = path/elapsedTime*3.6f;
     if (glm::dot(dir(), vel) < 0)
         m_speed = -m_speed;
