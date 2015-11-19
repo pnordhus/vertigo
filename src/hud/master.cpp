@@ -86,7 +86,7 @@ void Master::draw()
     }
     if (target.lockedNavPoint() != nullptr)
     {
-        Vector4D point4 = m * Vector4D(target.lockedNavPoint()->position() - m_hud->scenario()->position(), 1);
+        Vector4D point4 = m * Vector4D(target.lockedNavPoint()->position(), 1);
         drawPoint(point4, rect, true, true, true);
     }
 

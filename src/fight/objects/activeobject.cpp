@@ -41,10 +41,6 @@ ActiveObject::ActiveObject(Scenario *scenario, txt::DesFile &file, const ObjectI
     file.setSection("defense");
     m_kineticShield = m_kineticShieldMax = file.value("kineticshield0").toInt();
     m_shockShield = m_shockShieldMax = file.value("shockshield0", 10000000).toInt();
-
-    file.setSection("offense");
-    m_kineticStrength = file.value("kineticstrength").toInt();
-    m_shockStrength = file.value("shockstrength").toInt();
 }
 
 

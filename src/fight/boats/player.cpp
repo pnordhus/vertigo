@@ -110,15 +110,15 @@ float Player::range() const
 void Player::damage(int kinetic, int shock, const Vector3D &position)
 {
     Vector3D dirDamage = glm::normalize(position - m_position);
-    float cosZ = glm::dot(dirDamage, dir());
-    if (cosZ > 0.9)
+    float cosY = glm::dot(dirDamage, dir());
+    if (cosY > 0.9)
         m_shield[0] -= kinetic;
-    else if (cosZ < -0.9)
+    else if (cosY < -0.9)
         m_shield[3] -= kinetic;
     else
     {
-        float cosY = glm::dot(dirDamage, up());
-        if (cosY > 0)
+        float cosZ = glm::dot(dirDamage, up());
+        if (cosZ > 0)
             m_shield[1] -= kinetic;
         else
             m_shield[2] -= kinetic;
@@ -202,10 +202,8 @@ bool Player::update(float elapsedTime)
         {
             ActiveObject *activeObject = dynamic_cast<ActiveObject *>(colObject);
             if (activeObject)
-            {
                 activeObject->damage(m_kineticStrength, m_shockStrength, posObject - normObject*1.5f);
-                damage(activeObject->kineticStrength(), activeObject->shockStrength(), posObject - normObject*1.5f);
-            }
+            damage(colObject->kineticStrength(), colObject->shockStrength(), posObject - normObject*1.5f);
             sfx::SampleMap::get(sfx::Sample::Boat_Collision).playInstance();
             m_velocity -= 2*glm::dot(m_velocity, normObject)*normObject;
             delta = posObject - m_position;

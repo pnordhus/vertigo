@@ -37,6 +37,11 @@ Object::Object(Scenario *scenario, txt::DesFile &file, float scale) :
     m_static(true),
     m_condEnable(scenario, this)
 {
+    file.setSection("offense");
+    if (!file.contains("kineticstrength"))
+        file.setSection("offense0");
+    m_kineticStrength = file.value("kineticstrength").toInt();
+    m_shockStrength = file.value("shockstrength").toInt();
 }
 
 

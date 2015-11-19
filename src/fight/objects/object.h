@@ -54,6 +54,9 @@ public:
     virtual Vector3D center() const { return (m_box.minPoint() + m_box.maxPoint())*0.5f; }
     bool isStatic() const { return m_static; }
 
+    int kineticStrength() const { return m_kineticStrength; };
+    int shockStrength() const { return m_shockStrength; };
+
     Condition* condEnable() { return &m_condEnable; }
 
 public:
@@ -69,6 +72,9 @@ protected:
 
     BoundingBox m_box;
     bool m_static;
+
+    int m_kineticStrength;
+    int m_shockStrength;
 
     ConditionEnable m_condEnable;
 };
