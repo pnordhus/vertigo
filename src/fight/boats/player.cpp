@@ -190,7 +190,7 @@ bool Player::update(float elapsedTime)
     float path = 0;
 
     int count = 0;
-    while (glm::length2(delta) > 1e-3f && count < 5)
+    while (glm::length2(delta) > 1e-5f && count < 5)
     {
         Vector3D posSurface, normSurface;
         bool colSurface = m_scenario->surface().testCollision(m_position, m_position + delta, 1.5f, posSurface, normSurface);
