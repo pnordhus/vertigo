@@ -350,7 +350,7 @@ void Scenario::setBoat(game::Boat *boat)
 
 void Scenario::setRect(const RectF &rect, const Vector2D &center)
 {
-    m_projectionMatrix = glm::translate(Vector3D(center, 0)) * glm::perspective(glm::radians(60.0f), float(rect.width / rect.height), 0.1f, 10000.0f);
+    m_projectionMatrix = glm::translate(Vector3D(center, 0)) * glm::perspective(glm::radians(60.0f), float(rect.width / rect.height), 0.1f, 500.0f);
     m_projectionMatrixInverted = glm::inverse(m_projectionMatrix);
 }
 

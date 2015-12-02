@@ -128,10 +128,6 @@ void Player::damage(int kinetic, int shock, const Vector3D &position)
 
 bool Player::update(float elapsedTime)
 {
-    m_roll = 0;
-    if (glm::abs(dir().z) < 0.99999f)
-        m_roll = glm::dot(glm::normalize(Vector3D(dir().y, -dir().x, 0)), up());
-
     m_angleVelocity.x += m_angleVelocity.x*m_angleFriction.x*64*elapsedTime;
     m_angleVelocity.x -= 0.64f*dir().z*m_maxAngleVelocity.x*elapsedTime;
     if (m_turnVelocity.x > 0 && m_angleVelocity.x < m_maxAngleVelocity.x)
@@ -165,6 +161,10 @@ bool Player::update(float elapsedTime)
 
     m_orientation *= glm::mat3(glm::rotate(m_angleVelocity.z*elapsedTime, Vector3D(0, 0, 1))) * glm::mat3(glm::rotate(m_angleVelocity.y*elapsedTime, dir())) * glm::mat3(glm::rotate(m_angleVelocity.x*elapsedTime, right()));
     m_orientationInverted = glm::transpose(m_orientation);
+
+    m_roll = 0;
+    if (glm::abs(dir().z) < 0.99999f)
+        m_roll = glm::dot(glm::normalize(Vector3D(dir().y, -dir().x, 0)), up());
 
     updateVelocity(elapsedTime);
 

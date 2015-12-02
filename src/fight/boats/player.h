@@ -42,6 +42,7 @@ public:
     int shield(int index) const { return m_shield[index]; };
     int shieldMax(int index) const { return m_shieldMax[index]; };
     bool engineRunning() const { return m_engineState == EngineRunning; }
+    float roll() const { return m_roll; };
     float speed() const { return m_speed; };
     float noise() const;
     float range() const;

@@ -40,6 +40,7 @@
 #include "mastermonitor.h"
 #include "sonarmonitor.h"
 #include "autopilot.h"
+#include "horizon.h"
 
 
 namespace hud {
@@ -147,6 +148,10 @@ void HUD::load(game::Boat *boat)
 
     Crosshair *crosshair = new Crosshair(this, m_center, &master->clipRect());
     m_children.emplace_back(crosshair);
+
+    file.setSection("hudsynthetichorizon");
+    Horizon *horizon = new Horizon(this, m_center, file);
+    m_children.emplace_back(horizon);
 }
 
 
@@ -231,11 +236,13 @@ void HUD::draw()
     m_integerScale = true;
     glMatrixMode(GL_PROJECTION);
     glLoadMatrixf(glm::value_ptr(m_integerScaleProjectionMatrix));
+    glMatrixMode(GL_MODELVIEW);
     m_integerScaleWidget.doDraw();
 
     m_integerScale = false;
     glMatrixMode(GL_PROJECTION);
     glLoadMatrixf(glm::value_ptr(m_noScaleProjectionMatrix));
+    glMatrixMode(GL_MODELVIEW);
     m_noScaleWidget.doDraw();
 
     if (rect().x() != m_rectGL.x || rect().y() != m_rectGL.y)

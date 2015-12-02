@@ -169,6 +169,8 @@ set(SOURCES
     hud/sonarmonitor.h
     hud/autopilot.cpp
     hud/autopilot.h
+    hud/horizon.cpp
+    hud/horizon.h
 
     sfx/sound.cpp
     sfx/sound.h
