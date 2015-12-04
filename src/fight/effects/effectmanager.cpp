@@ -19,6 +19,7 @@
 #include "billboard.h"
 #include "effect.h"
 #include "projectile.h"
+#include "bubble.h"
 #include "fight/scenario.h"
 
 
@@ -86,11 +87,27 @@ Projectile* EffectManager::addProjectile(Effects projectile, const Vector3D &pos
 void EffectManager::update(float elapsedTime)
 {
     m_effects.remove_if([elapsedTime](const std::unique_ptr<Effect> &effect) { return effect->update(elapsedTime); });
+    m_bubbles.remove_if([elapsedTime](const std::unique_ptr<Effect> &bubble) { return bubble->update(elapsedTime); });
+
+    while (m_bubbles.size() < 100)
+    {
+        Bubble *bubble = new Bubble(m_scenario, getBillboard(Effects::Bubble_0));
+        m_bubbles.emplace_back(bubble);
+        Vector3D pos = m_scenario->position();
+        pos.x += qrand()%100 - 50;
+        pos.y += qrand()%100 - 50;
+        pos.z -= 50;
+        bubble->setPosition(pos);
+        if (bubble->update(0))
+            m_bubbles.pop_back();
+    }
 }
 
 
 void EffectManager::draw()
 {
+    for (const auto &bubble : m_bubbles)
+        bubble->draw();
     for (const auto &effect : m_effects)
         effect->draw();
 }

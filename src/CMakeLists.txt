@@ -41,6 +41,8 @@ set(SOURCES
     fight/effects/projectile.h
     fight/effects/trash.cpp
     fight/effects/trash.h
+    fight/effects/bubble.cpp
+    fight/effects/bubble.h
 
     fight/objects/activeobject.cpp
     fight/objects/activeobject.h

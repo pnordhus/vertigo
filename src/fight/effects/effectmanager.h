@@ -53,6 +53,7 @@ private:
     Scenario *m_scenario;
     std::map<Effects, Billboard> m_billboards;
     std::list<std::unique_ptr<Effect>> m_effects;
+    std::list<std::unique_ptr<Effect>> m_bubbles;
 };
 
 
