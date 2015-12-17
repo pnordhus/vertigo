@@ -474,22 +474,28 @@ void Scenario::keyPressEvent(QKeyEvent *e)
         m_player->setDebugBoost(-100);
     if (e->key() == Qt::Key_A)
     {
-        m_forwards = 1;
-        m_player->setVelocityTarget(m_player->maxVelocity());
-        m_player->setFullThrottle(true);
+        m_forwards = m_backwards + 1;
+        if (m_player->engineRunning())
+        {
+            m_player->setVelocityTarget(m_player->maxVelocity());
+            m_player->setFullThrottle(true);
+        }
     }
     if (e->key() == Qt::Key_Z)
     {
-        m_backwards = 1;
-        m_player->setVelocityTarget(m_player->minVelocity());
-        m_player->setFullThrottle(true);
+        m_backwards = m_forwards + 1;
+        if (m_player->engineRunning())
+        {
+            m_player->setVelocityTarget(m_player->minVelocity());
+            m_player->setFullThrottle(true);
+        }
     }
     if (e->key() == Qt::Key_S)
     {
         m_velocityTarget += 2.778f;
         if (m_velocityTarget > m_player->maxVelocity())
             m_velocityTarget = m_player->maxVelocity();
-        if (m_forwards != 1 && m_backwards != 1)
+        if (m_forwards == 0 && m_backwards == 0 && m_player->engineRunning())
             m_player->setVelocityTarget(m_velocityTarget);
     }
     if (e->key() == Qt::Key_X)
@@ -497,17 +503,37 @@ void Scenario::keyPressEvent(QKeyEvent *e)
         m_velocityTarget -= 2.778f;
         if (m_velocityTarget < m_player->minVelocity())
             m_velocityTarget = m_player->minVelocity();
-        if (m_forwards != 1 && m_backwards != 1)
+        if (m_forwards == 0 && m_backwards == 0 && m_player->engineRunning())
             m_player->setVelocityTarget(m_velocityTarget);
     }
     if (e->key() == Qt::Key_C)
     {
         m_velocityTarget = 0;
-        if (m_forwards != 1 && m_backwards != 1)
+        if (m_forwards == 0 && m_backwards == 0 && m_player->engineRunning())
             m_player->setVelocityTarget(m_velocityTarget);
     }
     if (e->key() == Qt::Key_QuoteLeft)
+    {
         m_player->engineToggle();
+        if (m_player->engineRunning())
+        {
+            if (m_forwards == 0 && m_backwards == 0)
+                m_player->setVelocityTarget(m_velocityTarget);
+            else
+            {
+                if (m_backwards > 0)
+                    m_player->setVelocityTarget(m_player->minVelocity());
+                if (m_forwards > m_backwards)
+                    m_player->setVelocityTarget(m_player->maxVelocity());
+                m_player->setFullThrottle(true);
+            }
+        }
+        else
+        {
+            m_player->setVelocityTarget(0);
+            m_player->setFullThrottle(false);
+        }
+    }
     if (e->key() == Qt::Key_Space)
         m_player->fire();
 }
@@ -530,9 +556,9 @@ void Scenario::keyReleaseEvent(QKeyEvent *e)
     if (e->key() == Qt::Key_A)
     {
         m_forwards = 0;
-        if (m_backwards > 0)
+        if (m_backwards > 0 && m_player->engineRunning())
             m_player->setVelocityTarget(m_player->minVelocity());
-        else
+        else if (m_player->engineRunning())
         {
             m_player->setVelocityTarget(m_velocityTarget);
             m_player->setFullThrottle(false);
@@ -541,9 +567,9 @@ void Scenario::keyReleaseEvent(QKeyEvent *e)
     if (e->key() == Qt::Key_Z)
     {
         m_backwards = 0;
-        if (m_forwards > 0)
+        if (m_forwards > 0 && m_player->engineRunning())
             m_player->setVelocityTarget(m_player->maxVelocity());
-        else
+        else if (m_player->engineRunning())
         {
             m_player->setVelocityTarget(m_velocityTarget);
             m_player->setFullThrottle(false);

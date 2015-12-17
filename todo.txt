@@ -26,7 +26,6 @@ HUD
 - Turrets targeting
 
 Effects
-- Bubbles
 - Explosions: debris, dead bodies
 - Dust clouds behind crawlers and tanks
 - Torpedo trails
