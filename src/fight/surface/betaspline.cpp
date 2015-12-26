@@ -112,14 +112,14 @@ void BetaSpline::InitFrame(int x, int y)
 {
 	for (short k = 0; k < 4; k++) 
 		for (short l = 0; l < 4; l++) 
-            frame[k][l] = glm::vec3(l - 1, k - 1, m_height(x + l - 1, y + k - 1));
+            frame[k][l] = Vector3D(l - 1, k - 1, m_height(x + l - 1, y + k - 1));
 }
 
 
-glm::vec3 BetaSpline::Beta_3_3(float u, float v)
+Vector3D BetaSpline::Beta_3_3(float u, float v)
 {
 	short k, l;
-	glm::vec3 t = glm::vec3(0, 0, 0);
+	Vector3D t = Vector3D(0, 0, 0);
 
 	for (k = 0; k < 4; k++) 
 		for (l = 0; l < 4; l++) 
@@ -128,10 +128,10 @@ glm::vec3 BetaSpline::Beta_3_3(float u, float v)
 }
 
 
-glm::vec3 BetaSpline::Beta_3_3(int u, int v)
+Vector3D BetaSpline::Beta_3_3(int u, int v)
 {
 	short k, l;
-	glm::vec3 t = glm::vec3(0, 0, 0);
+	Vector3D t = Vector3D(0, 0, 0);
 
 	for (k = 0; k < 4; k++) 
 		for (l = 0; l < 4; l++) 
@@ -140,11 +140,11 @@ glm::vec3 BetaSpline::Beta_3_3(int u, int v)
 }
 
 
-glm::vec3 BetaSpline::Beta_norm(float u, float v)
+Vector3D BetaSpline::Beta_norm(float u, float v)
 {
 	short k, l;
-	glm::vec3 t = glm::vec3(0, 0, 0);
-	glm::vec3 o = glm::vec3(0, 0, 0);
+	Vector3D t = Vector3D(0, 0, 0);
+	Vector3D o = Vector3D(0, 0, 0);
 
 	for (k = 0; k < 4; k++)
 		for (l = 0; l < 4; l++)
@@ -156,11 +156,11 @@ glm::vec3 BetaSpline::Beta_norm(float u, float v)
 }
 
 
-glm::vec3 BetaSpline::Beta_norm(int u, int v)
+Vector3D BetaSpline::Beta_norm(int u, int v)
 {
 	short k, l;
-	glm::vec3 t = glm::vec3(0, 0, 0);
-	glm::vec3 o = glm::vec3(0, 0, 0);
+	Vector3D t = Vector3D(0, 0, 0);
+	Vector3D o = Vector3D(0, 0, 0);
 
 	for (k = 0; k < 4; k++)
 		for (l = 0; l < 4; l++)
@@ -172,11 +172,11 @@ glm::vec3 BetaSpline::Beta_norm(int u, int v)
 }
 
 
-void BetaSpline::Beta_TB(int u, int v, glm::vec3 &tangent, glm::vec3 &binormal)
+void BetaSpline::Beta_TB(int u, int v, Vector3D &tangent, Vector3D &binormal)
 {
 	short k, l;
-	tangent = glm::vec3(0, 0, 0);
-	binormal = glm::vec3(0, 0, 0);
+	tangent = Vector3D(0, 0, 0);
+	binormal = Vector3D(0, 0, 0);
 
 	for (k = 0; k < 4; k++)
 		for (l = 0; l < 4; l++)

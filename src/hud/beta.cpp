@@ -24,7 +24,7 @@
 namespace hud {
 
 
-Beta::Beta(HUD *hud, util::Rect rect) :
+Beta::Beta(HUD *hud, Rect rect) :
     ui::Widget(hud->widget()),
     m_hud(hud),
     m_rect(rect),
@@ -36,9 +36,9 @@ Beta::Beta(HUD *hud, util::Rect rect) :
 
 void Beta::draw()
 {
-    int offset = 360 + static_cast<int>(glm::degrees(m_hud->scenario()->pitch())*4);
-    util::Rect rect = m_hud->projectCenter(m_rect);
-    m_beta.draw(rect.x + m_point.width() + 1, rect.y, QRectF(0, offset, m_beta.width(), m_rect.height));
+    int offset = 360 + static_cast<int>(glm::degrees(m_hud->scenario()->pitch())*2);
+    Rect rect = m_hud->projectCenter(m_rect);
+    m_beta.draw(rect.x + m_point.width() + 1, rect.y, RectF(0, offset, m_beta.width(), m_rect.height));
     m_point.draw(rect.x, rect.y + rect.height/2 - (m_point.height() + 1)/2);
 }
 

@@ -15,10 +15,10 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "object.h"
-#include "conditionmanager.h"
+#include "condition.h"
 #include "scenario.h"
-#include <glm/common.hpp>
+#include "objects/object.h"
+#include "sfx/samplemap.h"
 
 
 namespace fight {
@@ -39,9 +39,8 @@ void Condition::setLimit(int limit)
 }
 
 
-void Condition::inc()
+void Condition::tryComplete()
 {
-    m_current++;
     if (m_current == m_limit)
     {
         if (m_delay != 0)
@@ -49,6 +48,13 @@ void Condition::inc()
         else
             complete();
     }
+}
+
+
+void Condition::inc()
+{
+    m_current++;
+    tryComplete();
 }
 
 
@@ -72,10 +78,10 @@ ConditionEvent::ConditionEvent() :
 void ConditionEvent::addDependency(Condition *cond, bool positive)
 {
     if (positive)
-        m_dependInc << cond;
+        m_dependInc.push_back(cond);
     else
     {
-        m_dependDec << cond;
+        m_dependDec.push_back(cond);
         cond->m_current++;
     }
 }
@@ -86,23 +92,34 @@ void ConditionEvent::complete()
     if (m_completed)
         return;
     m_completed = true;
-    foreach (Condition *cond, m_dependInc)
+    for (Condition *cond : m_dependInc)
         cond->inc();
-    foreach (Condition *cond, m_dependDec)
+    for (Condition *cond : m_dependDec)
         cond->dec();
 }
 
 
-ConditionAutopilot::ConditionAutopilot(Scenario *scenario) :
-    Condition(scenario, 0)
+ConditionSuccess::ConditionSuccess(Scenario *scenario) :
+    Condition(scenario, 1)
 {
 }
 
 
-void ConditionAutopilot::complete()
+void ConditionSuccess::complete()
 {
-    Condition::complete();
-    //m_scenario->
+    if (m_delay == 0)
+    {
+        if (m_scenario->endType() == 0)
+            sfx::SampleMap::get(sfx::Sample::MissionAccomplished).play();
+
+        m_delay = 3;
+        tryComplete();
+    }
+    else
+    {
+        Condition::complete();
+        sfx::SampleMap::get(sfx::Sample::Autopilot).play();
+    }
 }
 
 
@@ -115,7 +132,8 @@ ConditionFailure::ConditionFailure(Scenario *scenario) :
 void ConditionFailure::complete()
 {
     Condition::complete();
-    //m_scenario->
+    sfx::SampleMap::get(sfx::Sample::MissionFailed).play();
+    m_scenario->conditionManager().delayComplete(this, 10);
 }
 
 
@@ -156,7 +174,7 @@ void ConditionSpace::test(float x, float y, float height)
 }
 
 
-ConditionRadio::ConditionRadio(Scenario *scenario, const glm::vec3 &pos, const QString &text) :
+ConditionRadio::ConditionRadio(Scenario *scenario, const Vector3D &pos, const QString &text) :
     Condition(scenario, 0),
     m_pos(pos),
     m_text(text)
@@ -168,8 +186,8 @@ void ConditionRadio::complete()
 {
     Condition::complete();
     m_time = m_scenario->time();
-    if (m_scenario->radio().size() > 0 && m_time < m_scenario->radio().back()->time() + 5000.0f)
-        m_time = m_scenario->radio().back()->time() + 5000.0f;
+    if (m_scenario->radio().size() > 0 && m_time < m_scenario->radio().back()->time() + 5.0f)
+        m_time = m_scenario->radio().back()->time() + 5.0f;
     m_scenario->radio().push_back(this);
 }
 

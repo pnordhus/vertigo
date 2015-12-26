@@ -27,7 +27,9 @@ namespace sfx {
 Sound::Sound() :
     m_source(0),
     m_buffer(0),
-    m_volume(1.0f)
+    m_volume(1.0f),
+    m_randomPitch(0),
+    m_instance(false)
 {
 
 }
@@ -38,6 +40,8 @@ Sound::Sound(Sound&& o)
     m_source = o.m_source;
     m_buffer = o.m_buffer;
     m_volume = o.m_volume;
+    m_randomPitch = o.m_randomPitch;
+    m_instance = o.m_instance;
     o.m_source = 0;
     o.m_buffer = 0;
 }
@@ -45,14 +49,29 @@ Sound::Sound(Sound&& o)
 Sound::Sound(const QString &file) :
     m_source(0),
     m_buffer(0),
-    m_volume(1.0f)
+    m_volume(1.0f),
+    m_randomPitch(0),
+    m_instance(false)
 {
     load(file);
 }
 
 
+Sound::Sound(const Sound &o) :
+    m_source(0),
+    m_buffer(o.m_buffer),
+    m_volume(o.m_volume),
+    m_randomPitch(o.m_randomPitch),
+    m_instance(true)
+{
+}
+
+
 Sound::~Sound()
 {
+    if (m_instance)
+        m_buffer = 0;
+    m_instance = false;
     stop();
     if (m_buffer != 0)
         alDeleteBuffers(1, &m_buffer);
@@ -66,6 +85,8 @@ void Sound::stop()
         SoundSystem::get()->release(m_source);
         m_source = 0;
     }
+    if (m_instance)
+        delete this;
 }
 
 
@@ -84,10 +105,21 @@ bool Sound::acquire()
 
 void Sound::play()
 {
+    if (m_source > 0)
+    {
+        ALint state;
+        alGetSourcei(m_source, AL_SOURCE_STATE, &state);
+        if (state == AL_STOPPED)
+            stop();
+        else
+            return;
+    }
     if (!acquire())
         return;
 
     alSourcei(m_source, AL_LOOPING, AL_FALSE);
+    if (m_randomPitch > 0)
+        alSourcef(m_source, AL_PITCH, 1 - m_randomPitch*qrand()/RAND_MAX);
     alSourcei(m_source, AL_BUFFER, m_buffer);
     alSourcePlay(m_source);
 }
@@ -101,6 +133,15 @@ void Sound::playLoop()
     alSourcei(m_source, AL_LOOPING, AL_TRUE);
     alSourcei(m_source, AL_BUFFER, m_buffer);
     alSourcePlay(m_source);
+}
+
+
+void Sound::playInstance()
+{
+    Sound *sound = new Sound(*this);
+    sound->play();
+    if (sound->m_source == 0)
+        delete sound;
 }
 
 
@@ -168,6 +209,19 @@ void Sound::setVolume(float volume)
     m_volume = volume;
     if (m_source > 0)
         alSourcef(m_source, AL_GAIN, volume);
+}
+
+
+void Sound::setRandomPitch(float randomPitch)
+{
+    m_randomPitch = randomPitch;
+}
+
+
+void Sound::setPitch(float pitch)
+{
+    if (m_source > 0)
+        alSourcef(m_source, AL_PITCH, pitch);
 }
 
 

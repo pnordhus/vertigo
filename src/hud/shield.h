@@ -19,7 +19,7 @@
 #define HUD_SHIELD_H
 
 
-#include "util/rect.hpp"
+#include "util/geometry2d.h"
 #include "ui/widget.h"
 #include "gfx/texture.h"
 
@@ -33,14 +33,14 @@ class HUD;
 class Shield : public ui::Widget
 {
 public:
-    Shield(HUD *hud, util::Rect rect);
+    Shield(HUD *hud, Rect rect);
 
 protected:
     void draw();
 
 private:
     HUD *m_hud;
-    util::Rect m_rect;
+    Rect m_rect;
     std::vector<gfx::Texture> m_shield;
 };
 

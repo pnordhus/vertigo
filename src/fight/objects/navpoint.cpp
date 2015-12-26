@@ -15,95 +15,64 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "object.h"
-#include "scenario.h"
+#include "navpoint.h"
+#include "fight/scenario.h"
+#include "fight/module.h"
+#include "sfx/samplemap.h"
+#include <glm/geometric.hpp>
 
 
 namespace fight {
 
 
-Object::Object(Scenario *scenario) :
-    m_scenario(scenario),
-    m_enabled(true),
-    m_type(UnknownObject),
-    m_static(true),
-    m_condEnable(scenario, this)
+NavPoint::NavPoint(Scenario *scenario, int num) :
+    Object(scenario),
+    m_num(num),
+    m_time(0),
+    m_reached(false)
 {
+    m_state0 = scenario->moduleManager().get("thumper2.mod");
+    m_state1 = scenario->moduleManager().get("thumper1.mod");
+    m_scale = 0.03;
+    m_state = 0;
+    m_box = m_state0->box().scale(m_scale);
 }
 
 
-Object::Object(Scenario *scenario, const QString &name, float scale) :
-    m_scenario(scenario),
-    m_enabled(true),
-    m_type(UnknownObject),
-    m_static(true),
-    m_condEnable(scenario, this)
+bool NavPoint::update(float elapsedTime)
 {
-    txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
-    file.setSection("cluster");
-    m_base = scenario->moduleManager().get(file.value("base").toString());
-
-    file.setSection("size");
-    m_scale = file.value("scale").toFloat() * scale;
-}
-
-
-void Object::setEnabled(bool enabled)
-{
-    m_enabled = enabled;
-}
-
-
-void Object::enable()
-{
-    m_enabled = true;
-}
-
-
-void Object::disable()
-{
-    m_enabled = false;
-}
-
-
-void Object::setCollisionCache(CollisionCache *cache)
-{
-    m_collisionCache.reset(cache);
-}
-
-
-void Object::setPosition(const glm::vec3 &pos)
-{
-    m_position = pos;
-}
-
-
-bool Object::update(float elapsedTime)
-{
+    m_time += elapsedTime;
+    while (m_time > 0.5f)
+    {
+        if (m_state == 0)
+            m_state = 1;
+        else
+            m_state = 0;
+        m_time -= 0.5f;
+    }
+    if (m_enabled && !m_reached)
+    {
+        Vector3D d = m_scenario->position() - m_position;
+        if (glm::dot(d, d) < 400.0f)
+        {
+            sfx::SampleMap::get(sfx::Sample::NavPoint).play();
+            m_reached = true;
+        }
+    }
     return false;
 }
 
 
-void Object::draw()
+void NavPoint::draw()
 {
     glPushMatrix();
     glTranslatef(m_position.x, m_position.y, m_position.z);
     glScalef(m_scale, m_scale, m_scale);
-    m_base->draw();
+    if (m_state == 0)
+        m_state0->draw();
+    if (m_state == 1)
+        m_state1->draw();
     glPopMatrix();
-}
-
-
-bool Object::intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal)
-{
-    return false;
-}
-
-
-void Object::destroy()
-{
-    disable();
-    m_eventDestroy.complete();
 }
 
 

@@ -19,27 +19,38 @@
 #define FIGHT_BILLBOARD_H
 
 
-#include "../object.h"
+#include <vector>
+#include "util/geometry3d.h"
+#include "gfx/texture.h"
+
+
+namespace gfx { class TextureManager; }
+namespace txt { class DesFile; }
 
 
 namespace fight {
 
 
+class BoundingBox;
+
+
 class Billboard
 {
 public:
-    Billboard(gfx::TextureManager &texMan, txt::DesFile &name, int index);
+    Billboard(gfx::TextureManager &texMan, txt::DesFile &name, int index, bool blendColor = true);
 
 public:
-    void draw(const glm::vec3 &position, float angle, float scale, int time, const glm::mat4 &cameraMatrixInverted);
+    void draw(const Vector3D &position, float angle, float scale, float time, const Matrix &cameraMatrixInverted);
 
     BoundingBox box();
-    bool intersect(const glm::vec3 &start, const glm::vec3 &dir, float &distance);
+    bool intersect(const Vector3D &start, const Vector3D &dir, float &distance);
     
-    int duration() const { return m_stages.size()*m_displayTime; }
+    float duration() const { return m_stages.size()*m_displayTime; }
     float range() const { return m_range; }
     float velocity() const { return m_velocity; }
     float collisionRadius() const { return m_collisionRadius; }
+    float noiseLevel() const { return m_noiseLevel; }
+    int kineticShield() const { return m_kineticShield; }
     int kineticStrength() const { return m_kineticStrength; }
     int shockStrength() const { return m_shockStrength; }
 
@@ -47,18 +58,21 @@ private:
     struct Stage
     {
         gfx::Texture texture;
-        glm::vec2 texCoords[4];
-        glm::vec2 scale;
-        glm::vec2 offset;
+        Vector2D texCoords[4];
+        Vector2D scale;
+        Vector2D offset;
     };
 
-    int m_displayTime;
+    float m_displayTime;
     std::vector<Stage> m_stages;
     float m_scale;
+    bool m_blendColor;
 
     float m_range;
     float m_velocity;
     float m_collisionRadius;
+    float m_noiseLevel;
+    int m_kineticShield;
     int m_kineticStrength;
     int m_shockStrength;
 };

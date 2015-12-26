@@ -22,7 +22,7 @@
 namespace hud {
 
 
-EnergyBar::EnergyBar(HUD *hud, util::Rect rect) :
+EnergyBar::EnergyBar(HUD *hud, Rect rect) :
     ui::Widget(hud->widget()),
     m_hud(hud),
     m_rect(rect),
@@ -34,8 +34,8 @@ EnergyBar::EnergyBar(HUD *hud, util::Rect rect) :
 void EnergyBar::draw()
 {
     int offset = 0;
-    util::Rect rect = m_hud->projectCenter(m_rect);
-    m_energy.draw(rect.x, rect.y + offset, QRectF(0, offset, m_energy.width(), m_energy.height() - offset));
+    Rect rect = m_hud->projectCenter(m_rect);
+    m_energy.draw(rect.x, rect.y + offset, RectF(0, offset, m_energy.width(), m_energy.height() - offset));
 }
 
 

@@ -19,6 +19,8 @@
 #define GAME_CHAPTER_H
 
 
+#include <memory>
+#include <queue>
 #include "area.h"
 #include "briefing.h"
 #include "desktop.h"
@@ -27,10 +29,10 @@
 #include "movie.h"
 #include "task.h"
 #include "boat.h"
-#include "hud/hud.h"
 
 
 namespace fight { class Scenario; }
+namespace hud { class HUD; }
 
 
 namespace game {
@@ -87,6 +89,7 @@ public:
     QList<Task> tasks();
     Boat* boat() const { return m_boat; }
     int credits() const { return m_credits; }
+    hud::HUD* hud() const { return m_HUD.get(); }
 
 private:
     void load(const QString &filename, bool load);
@@ -122,7 +125,7 @@ private:
     Desktop *m_desktop;
     Briefing *m_briefing;
     Movie *m_movie;
-    QStringList m_movies;
+    std::queue<Movie, std::list<Movie>> m_movies;
     QMap<int, QString> m_approachMovieReplacement;
     QMap<int, Station> m_stations;
     int m_currentStation;
@@ -141,7 +144,7 @@ private:
     bool m_movieHarbour;
     Mission *m_mission;
     fight::Scenario *m_scenario;
-    hud::HUD m_HUD;
+    std::unique_ptr<hud::HUD> m_HUD;
     txt::DesFile m_tasksFile;
     bool m_save;
     Boat *m_boat;

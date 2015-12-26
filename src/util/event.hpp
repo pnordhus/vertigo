@@ -28,7 +28,8 @@ class event
 {
 public:
     event() { };
-    event(const std::function<void(Args...)> &func) { connect(func); };
+    event(event &&e) : m_handlers(std::move(e.m_handlers)) {};
+    template<class F> event(const F &func) { connect(func); };
     event(std::function<void(Args...)> &&func) { connect(std::move(func)); };
 
 public:
@@ -49,6 +50,7 @@ public:
     }
 
 public:
+    event& operator= (event &&e) { m_handlers = std::move(e.m_handlers); return *this; };
     void operator+= (const std::function<void(Args...)> &func) { connect(func); }
     void operator+= (std::function<void(Args...)> &&func) { connect(std::move(func)); }
     void operator() (Args... args) const { fire(args...); }

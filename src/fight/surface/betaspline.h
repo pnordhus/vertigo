@@ -21,8 +21,7 @@
 
 #include <functional>
 #include <vector>
-#include <glm/vec3.hpp>
-#include <glm/vec2.hpp>
+#include "util/geometry3d.h"
 
 
 namespace fight {
@@ -36,11 +35,11 @@ public:
 public:
     void InitFrame(int x, int y);
 
-    glm::vec3 Beta_3_3(float u, float v);
-	glm::vec3 Beta_3_3(int u, int v);
-	glm::vec3 Beta_norm(float u, float v);
-	glm::vec3 Beta_norm(int u, int v);
-	void Beta_TB(int u, int v, glm::vec3 &tangent, glm::vec3 &binormal);
+    Vector3D Beta_3_3(float u, float v);
+	Vector3D Beta_3_3(int u, int v);
+	Vector3D Beta_norm(float u, float v);
+	Vector3D Beta_norm(int u, int v);
+	void Beta_TB(int u, int v, Vector3D &tangent, Vector3D &binormal);
 
 private:
     float b(int i, float t);
@@ -57,7 +56,7 @@ private:
 	std::vector<float> B[4];
 	std::vector<float> BS[4];
 
-	glm::vec3 frame[4][4];
+	Vector3D frame[4][4];
 };
 
 

@@ -19,7 +19,7 @@
 #define HUD_DIGIBLOCK_H
 
 
-#include "util/rect.hpp"
+#include "util/geometry2d.h"
 #include "ui/widget.h"
 #include "ui/label.h"
 
@@ -33,14 +33,14 @@ class HUD;
 class DigiBlock : public ui::Widget
 {
 public:
-    DigiBlock(HUD *hud, util::Rect rect);
+    DigiBlock(HUD *hud, Rect rect);
 
 protected:
     void draw();
 
 private:
     HUD *m_hud;
-    util::Rect m_rect;
+    Rect m_rect;
     std::vector<std::unique_ptr<ui::Label>> m_children;
 };
 

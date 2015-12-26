@@ -19,11 +19,10 @@
 #define SURFACE_ELEMENT_H
 
 
-#include "gfx/texture.h"
-#include "util/rect.hpp"
 #include <map>
-#include <glm/vec3.hpp>
-#include <glm/vec2.hpp>
+#include <vector>
+#include "util/geometry2d.h"
+#include "util/geometry3d.h"
 
 
 namespace fight {
@@ -35,32 +34,32 @@ class Surface;
 class Element
 {
 public:
-    Element(Surface *surface, const util::Rect &rect);
+    Element(Surface *surface, const Rect &rect);
 
 public:
     int numVertices(int textureId);
-	void addVertex(int textureId, const glm::vec3 &position, const glm::vec3 &normal, const glm::vec2 &texCoords);
-    void addTriangle(int textureId, quint16 a, quint16 b, quint16 c);
+	void addVertex(int textureId, const Vector3D &position, const Vector3D &normal, const Vector2D &texCoords);
+    void addTriangle(int textureId, unsigned short a, unsigned short b, unsigned short c);
 
     void draw();
-    util::Rect rect() const { return m_rect; }
+    Rect rect() const { return m_rect; }
     float maxZ() const { return m_maxZ; }
     float minZ() const { return m_minZ; }
-    glm::vec3 center() const;
-    bool testCollision(const glm::vec3 &center, float radius);
+    Vector3D center() const;
+    bool testCollision(const Vector3D &center, float radius);
 
 private:
     struct ElementSubset
     {
-        std::vector<glm::vec3> vertices;
-        std::vector<glm::vec3> normals;
-        std::vector<glm::vec2> texCoords;
-        std::vector<quint16> indices;
+        std::vector<Vector3D> vertices;
+        std::vector<Vector3D> normals;
+        std::vector<Vector2D> texCoords;
+        std::vector<unsigned short> indices;
     };
 
 private:
     Surface *m_surface;
-    util::Rect m_rect;
+    Rect m_rect;
     float m_maxZ;
     float m_minZ;
     std::vector<float> m_heights;

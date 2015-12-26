@@ -19,28 +19,33 @@
 #define GAME_BRIEFING_H
 
 
-#include "menu.h"
+#include "util/event.hpp"
+#include "renderer.h"
 #include "gfx/texture.h"
 #include "sfx/sound.h"
 #include "ui/label.h"
 #include <QTime>
 
-#include <functional>
 
 namespace game {
 
 
-class Briefing : public Menu
+class Briefing : public Renderer
 {
 private:
     enum State { Init, Text, Targets, Hints, Arrow, PressKey };
 
 public:
-    Briefing(std::function<void()> &&funcStart);
+    Briefing();
+
+public:
+    util::event<>& eventInit() { return m_eventInit; }
+    util::event<>& eventStart() { return m_eventStart; }
 
 private:
     void activate();
     void deactivate();
+    void setRect(const QRect &rect);
     void draw();
     void keyPressEvent(QKeyEvent *);
 
@@ -49,8 +54,7 @@ private:
     sfx::Sound m_backgroundSound;
     sfx::Sound m_openSound;
     sfx::Sound m_woopSound;
-    ui::Label m_background;
-    ui::Label *m_lblMain;
+    ui::Label m_lblMain;
     ui::Label *m_lblMap;
     ui::Label *m_lblArrow;
     ui::Label *m_lblPressKey;
@@ -59,7 +63,8 @@ private:
     State m_state;
     bool m_toggleState;
     int m_nextLine;
-    std::function<void()> m_funcStart;
+    util::event<> m_eventInit;
+    util::event<> m_eventStart;
 };
 
 

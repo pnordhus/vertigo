@@ -15,24 +15,29 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef FIGHT_MINE_H
-#define FIGHT_MINE_H
+#include "autopilot.h"
+#include "hud.h"
+#include "fight/scenario.h"
 
 
-#include "object.h"
+namespace hud {
 
 
-namespace fight {
-
-
-class Mine : public Object
+Autopilot::Autopilot(HUD *hud, Rect rect) :
+    ui::Widget(hud->widget()),
+    m_hud(hud),
+    m_rect(rect),
+    m_autopilot(hud->getImage("hudautop"), true)
 {
-public:
-    Mine(Scenario *scenario, const QString &name);
-};
+}
 
 
-} // namespace fight
+void Autopilot::draw()
+{
+    Rect rect = m_hud->projectCenter(m_rect);
+    if (m_hud->scenario()->conditionManager().autopilot() && m_hud->scenario()->blink())
+        m_autopilot.draw(rect.x, rect.y + 1);
+}
 
 
-#endif // FIGHT_MINE_H
+} // namespace hud

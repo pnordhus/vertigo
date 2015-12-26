@@ -23,14 +23,16 @@
 namespace game {
 
 
-Movie::Movie(std::function<void()> &&funcFinished) :
+    Movie::Movie(const QString &filename, MovieType type, const QString &textLarge, const QString &textSmall) :
     m_pause(false),
-    m_funcFinished(std::move(funcFinished))
+    m_filename(filename),
+    m_type(type),
+    m_textLarge(textLarge),
+    m_textSmall(textSmall),
+    m_logo(gfx::Image::load("gfx:img/movie/mvilogo.img", gfx::ColorTable("gfx:pal/movie/moviepal.pal"))),
+    m_fontLarge(gfx::Font::Large),
+    m_fontSmall(gfx::Font::Small)
 {
-    hideCursor();
-
-    const gfx::ColorTable colorTable("gfx:pal/movie/moviepal.pal");
-    m_logo.setTexture(gfx::Image::load("gfx:img/movie/mvilogo.img", colorTable));
 }
 
 
@@ -45,9 +47,12 @@ void Movie::deactivate()
 
 }
 
-void Movie::play(const QString &filename)
+void Movie::play(std::function<void()> &&funcFinished)
 {
-    m_video.open(filename);
+    hideCursor();
+    m_funcFinished = std::move(funcFinished);
+
+    m_video.open(m_filename);
     m_video.play();
 
     m_texture.createEmpty(m_video.width(), m_video.height() + 4, gfx::Texture::RGBA);
@@ -93,12 +98,25 @@ void Movie::draw()
         m_texture.draw();
 
         int y = static_cast<int>((2 - rectOrtho().y())/rectOrtho().height()*height());
-        if (y >= 74)
+        if (m_type == MovieFilm && y >= 74)
         {
-            m_logo.setPosition(0, (y - 74)/2);
             setupOrthographicMatrix(190, height());
             setupGL(false);
-            m_logo.doDraw();
+            m_logo.draw(0, (y - 74)/2);
+        }
+        if (m_type == MovieTransit)
+        {
+            setupOrthographicMatrix(200, 480);
+            setupGL(false);
+            m_fontLarge.draw(m_textLarge, Rect(0, y/2*480/height() - 20, 200, -1), true, false);
+            m_fontSmall.draw(m_textSmall, Rect(0, y/2*480/height() - 6, 200, -1), true, false);
+        }
+        if (m_type == MovieStation)
+        {
+            setupOrthographicMatrix(width()*480/height(), 480);
+            setupGL(false);
+            m_fontLarge.draw(m_textLarge, Rect(8, 8, -1, -1), false, false);
+            m_fontSmall.draw(m_textSmall, Rect(8, 22, -1, -1), false, false);
         }
     }
 }
@@ -108,6 +126,7 @@ void Movie::keyPressEvent(QKeyEvent *event)
 {
     if (event->key() == Qt::Key_Escape) {
         m_funcFinished();
+        return;
     }
 
     if (event->key() == Qt::Key_Space) {

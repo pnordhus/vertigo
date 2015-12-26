@@ -35,14 +35,14 @@ BoundingBox::BoundingBox(const BoundingBox &box) :
 }
 
 
-BoundingBox::BoundingBox(const glm::vec3 &min, const glm::vec3 &max) :
+BoundingBox::BoundingBox(const Vector3D &min, const Vector3D &max) :
     m_min(min),
     m_max(max)
 {
 }
 
 
-void BoundingBox::add(const glm::vec3 &point)
+void BoundingBox::add(const Vector3D &point)
 {
     if (m_min.x > point.x)
         m_min.x = point.x;
@@ -66,7 +66,7 @@ void BoundingBox::add(const BoundingBox &box)
 }
 
 
-bool BoundingBox::test(const glm::vec3 &center, float radius) const
+bool BoundingBox::test(const Vector3D &center, float radius) const
 {
     if (center.x + radius < m_min.x)
         return false;
@@ -84,23 +84,34 @@ bool BoundingBox::test(const glm::vec3 &center, float radius) const
 }
 
 
-BoundingBox BoundingBox::transform(const glm::mat4 &m) const
+BoundingBox BoundingBox::transform(const Matrix &m) const
 {
     BoundingBox ret;
     for (int i = 0; i < 8; i++)
     {
-        glm::vec3 vertex = m_min;
+        Vector3D vertex = m_min;
         if (i & 1)
             vertex.x = m_max.x;
         if (i & 2)
             vertex.y = m_max.y;
         if (i & 4)
             vertex.z = m_max.z;
-        vertex = glm::vec3(m * glm::vec4(vertex, 1));
+        vertex = Vector3D(m * Vector4D(vertex, 1));
         ret.add(vertex);
     }
     return ret;
 }
 
+
+BoundingBox BoundingBox::scale(float scale) const
+{
+    return BoundingBox(m_min*scale, m_max*scale);
+}
+
+
+BoundingBox BoundingBox::translate(const Vector3D &t) const
+{
+    return BoundingBox(m_min + t, m_max + t);
+}
 
 } // namespace fight

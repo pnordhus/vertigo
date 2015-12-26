@@ -20,19 +20,22 @@
 
 
 #include "game/renderer.h"
-#include "util/rect.hpp"
+#include "util/geometry2d.h"
 #include "util/event.hpp"
 #include "ui/label.h"
-#include "txt/desfile.h"
 #include "gfx/colortable.h"
 #include "gfx/image.h"
 
 
-namespace fight { class Scenario; }
+namespace fight { class Scenario; class ActiveObject; }
 namespace game { class Boat; }
+namespace txt { class DesFile; }
 
 
 namespace hud {
+
+
+class SonarMonitor;
 
 
 class HUD : public game::Renderer
@@ -48,26 +51,31 @@ public:
     int navPoint() const { return m_navPoint; }
 
     bool wide() const { return m_wide; }
-    util::RectF rectHUD() const { return m_rectHUD; }
-    ui::Widget* widget() { return &m_rootWidget; }
+    const RectF& rectHUD() const { return m_rectHUD; }
+    const Point& center() const { return m_center; }
+    ui::Widget* widget() { return m_integerScale ? &m_integerScaleWidget : &m_noScaleWidget; }
     gfx::Image getImage(const QString &name);
     gfx::Font& fontGreen() { return m_fontGreen; }
     gfx::Font& fontRed() { return m_fontRed; }
     gfx::Font& fontYellow() { return m_fontYellow; }
 
+    const Matrix& hudProjectionMatrix() const { return m_integerScale ? m_integerScaleProjectionMatrix : m_noScaleProjectionMatrix; }
+    const Matrix& hudProjectionMatrixInverted() const { return m_integerScale ? m_integerScaleProjectionMatrixInverted : m_noScaleProjectionMatrixInverted; }
+    Point project(const Point &point);
+    Rect projectCenter(const Rect &rect);
+
     void load(game::Boat *boat);
     void start(fight::Scenario *scenario);
-    glm::ivec2 project(const glm::ivec2 &point);
-    util::Rect projectCenter(const util::Rect &rect);
 
-protected:
     void setRect(const QRect &rect);
     void draw();
+
+protected:
     void keyPressEvent(QKeyEvent *);
     void keyReleaseEvent(QKeyEvent *);
 
 private:
-    util::Rect readRect(const txt::DesFile &file);
+    Rect readRect(const txt::DesFile &file);
 
 private:
     util::event<> m_eventSuccess;
@@ -78,10 +86,14 @@ private:
     int m_navPoint;
 
     bool m_wide;
-    util::RectF m_rectHUD;
-    glm::ivec2 m_center;
-    glm::mat4 m_hudProjectionMatrix;
-    glm::mat4 m_hudProjectionMatrixInverted;
+    Rect m_rectGL;
+    RectF m_rectHUD;
+    Point m_center;
+    bool m_integerScale;
+    Matrix m_integerScaleProjectionMatrix;
+    Matrix m_integerScaleProjectionMatrixInverted;
+    Matrix m_noScaleProjectionMatrix;
+    Matrix m_noScaleProjectionMatrixInverted;
 
     const gfx::ColorTable m_colorTable;
     gfx::Font m_fontGreen;
@@ -89,8 +101,11 @@ private:
     gfx::Font m_fontYellow;
 
     ui::Label m_cockpit;
-    ui::Label m_rootWidget;
+    ui::Label m_integerScaleWidget;
+    ui::Label m_noScaleWidget;
     std::vector<std::unique_ptr<ui::Widget>> m_children;
+    SonarMonitor* m_sonar1;
+    SonarMonitor* m_sonar2;
 };
 
 

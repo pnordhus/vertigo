@@ -18,6 +18,7 @@
 #include "chapter.h"
 #include "items.h"
 #include "fight/scenario.h"
+#include "hud/hud.h"
 #include "sfx/soundsystem.h"
 #include "txt/desfile.h"
 #include <QDesktopServices>
@@ -49,6 +50,7 @@ Chapter::Chapter(const QString &name, std::function<void(Renderer*)> funcSetRend
     m_credits(0),
     m_mission(NULL),
     m_scenario(NULL),
+    m_HUD(new hud::HUD()),
     m_boat(NULL),
     m_end(false),
     m_name(name),
@@ -67,7 +69,7 @@ Chapter::Chapter(const QString &name, std::function<void(Renderer*)> funcSetRend
 
     m_tasksFile.load("dat:story/tasks.des");
 
-    m_HUD.eventSuccess() += [this]() { finishMission(); };
+    m_HUD->eventSuccess() += [this]() { finishMission(); };
 }
 
 
@@ -108,7 +110,7 @@ void Chapter::loadChapter(int chapter)
 
 void Chapter::load(const QString &filename, bool load)
 {
-    m_movies.clear();
+    m_movies = std::queue<Movie, std::list<Movie>>();
     delete m_area;
     if (m_desktop)
         m_desktop->deleteLater();
@@ -158,7 +160,7 @@ void Chapter::load(const QString &filename, bool load)
     foreach (const QString &key, file.keys().filter(QRegExp("^mission\\d*")))
         m_successfulMissions.append(file.value(key).toString());
 
-    file.setSection("area2");
+    file.setSection(QString("area%1").arg(m_area->code()));
     foreach (const QString &key, file.keys().filter(QRegExp("^mission\\d*")))
         addMission(file.value(key).toString(), -1);
 
@@ -190,7 +192,7 @@ void Chapter::load(const QString &filename, bool load)
     {
         delete m_boat;
         m_boat = new Boat(file);
-        m_HUD.load(m_boat);
+        m_HUD->load(m_boat);
     }
 
     // the intro has always been played
@@ -256,11 +258,11 @@ void Chapter::save() const
     i = 1;
     foreach (const Mission *mission, m_missions) {
         if (mission->station() == -1) {
-            file.setSection("area2");
+            file.setSection(QString("area%1").arg(m_area->code()));
             file.setValue(QString("mission%1").arg(i++), mission->shortName());
         } else {
             file.setSection(QString("station%1").arg(mission->station()));
-            file.setValue("mission1", mission->shortName());
+            file.setValue(QString("mission%1").arg(i++), mission->shortName()); // TODO: Mission index
         }
     }
 
@@ -312,6 +314,16 @@ void Chapter::save() const
         }
     }
 
+    file.setSection("Defect");
+    file.setValue("Gun", m_boat->defects()[Boat::DefectGun]);
+    file.setValue("ToMa", m_boat->defects()[Boat::DefectToMa]);
+    file.setValue("FArm", m_boat->defects()[Boat::DefectFArm]);
+    file.setValue("LArm", m_boat->defects()[Boat::DefectLArm]);
+    file.setValue("RArm", m_boat->defects()[Boat::DefectRArm]);
+    file.setValue("BArm", m_boat->defects()[Boat::DefectBArm]);
+    file.setValue("Tur1", m_boat->defects()[Boat::DefectTur1]);
+    file.setValue("Tur2", m_boat->defects()[Boat::DefectTur2]);
+
     const QString path = dataLocation();
     file.save(QString("%1/save/%2.des").arg(path, m_name));
 }
@@ -351,7 +363,9 @@ void Chapter::setStation(int stationIndex, bool load)
     }
 
     if (m_movieHarbour && previousStation >= 0)
-        m_movies << QString("gfx:mvi/film/%1hf.mvi").arg("hiob");
+        m_movies.emplace(QString("gfx:mvi/film/%1hf.mvi").arg(m_boat->moviePrefix()), Movie::MovieTransit, 
+                         txt::StringTable::get(txt::Movie_Dock), 
+                         QString("%1 %2 ...").arg(txt::StringTable::get(txt::Movie_Leaving)).arg(m_stations[previousStation].name()));
 
     if (!m_mission && !load)
         playApproach(true);
@@ -378,19 +392,27 @@ void Chapter::startMission(const QString &name)
         }
     }
 
+    if (m_movieHarbour)
+        m_movies.emplace(QString("gfx:mvi/film/%1hf.mvi").arg(m_boat->moviePrefix()), Movie::MovieTransit,
+                         txt::StringTable::get(txt::Movie_Dock),
+                         QString("%1 %2 ...").arg(txt::StringTable::get(txt::Movie_Leaving)).arg(m_stations[m_currentStation].name()));
+
     m_currentStation = -1;
 
-    startMission();
+    playMovies();
 }
 
 
 void Chapter::startMission()
 {
     Q_ASSERT(m_mission);
+    Q_ASSERT(m_scenario == NULL);
 
     if (m_briefing)
         m_briefing->deleteLater();
-    m_briefing = new Briefing([this]() { startScenario(); });
+    m_briefing = new Briefing();
+    m_briefing->eventInit() += [this]() { m_scenario = new fight::Scenario(m_mission->scenario()); };
+    m_briefing->eventStart() += [this]() { startScenario(); };
     m_funcSetRenderer(m_briefing);
 }
 
@@ -402,10 +424,9 @@ void Chapter::startScenario()
     m_briefing = NULL;
 
     Q_ASSERT(m_mission);
-    Q_ASSERT(m_scenario == NULL);
-    m_scenario = new fight::Scenario(m_mission->scenario());
-    m_HUD.start(m_scenario);
-    m_funcSetRenderer(&m_HUD);
+    Q_ASSERT(m_scenario);
+    m_HUD->start(m_scenario);
+    m_funcSetRenderer(m_HUD.get());
 }
 
 
@@ -423,7 +444,7 @@ void Chapter::finishMission()
     m_save = true;
 
     if (m_currentStation < 0) {
-        //TODO: this should be selectable from within the mission
+        //TODO: this should be selectable from within the mission if more than one station is enabled
         foreach (const Station& station, m_stations) {
             if (station.isEnabled()) {
                 setStation(station.index());
@@ -431,7 +452,7 @@ void Chapter::finishMission()
             }
         }
     } else {
-        playApproach(false);
+        playApproach(true);
         playMovies();
     }
 }
@@ -447,26 +468,28 @@ void Chapter::playApproach(bool autopilot)
             if (reg.cap(1).toInt() == 36)
                 m_end = true;
         }
-        m_movies << "gfx:mvi/film/" + movie;
+        m_movies.emplace("gfx:mvi/film/" + movie, Movie::MovieFilm);
     } else {
         if (m_movieAutopilot && autopilot)
-            m_movies << QString("gfx:mvi/film/%1fl.mvi").arg("hiob");
+            m_movies.emplace(QString("gfx:mvi/film/%1fl.mvi").arg(m_boat->moviePrefix()), Movie::MovieTransit,
+                             txt::StringTable::get(txt::Movie_Autopilot),
+                             QString("%1 %2 ...").arg(txt::StringTable::get(txt::Movie_Approaching)).arg(m_desktop->name()));
         if (m_movieApproach)
-            m_movies << m_desktop->approachMovie();
+            m_movies.emplace(m_desktop->approachMovie(), Movie::MovieStation, m_desktop->name(), m_desktop->description());
     }
 }
 
 
 void Chapter::playMovie(int movie)
 {
-    m_movies << QString("gfx:mvi/film/d%1.mvi").arg(movie, 2, 10, QChar('0'));
+    m_movies.emplace(QString("gfx:mvi/film/d%1.mvi").arg(movie, 2, 10, QChar('0')), Movie::MovieFilm);
     playMovies();
 }
 
 
 void Chapter::playMovies()
 {
-    if (m_movies.isEmpty()) {
+    if (m_movies.empty()) {
         sfx::SoundSystem::get()->resumeAll();
         if (m_mission) {
             startMission();
@@ -482,8 +505,8 @@ void Chapter::playMovies()
     } else {
         sfx::SoundSystem::get()->pauseAll();
         Q_ASSERT(m_movie == NULL);
-        m_movie = new Movie([this]() { movieFinished(); });
-        m_movie->play(m_movies.takeFirst());
+        m_movie = &m_movies.front();
+        m_movie->play([this]() { movieFinished(); });
         m_funcSetRenderer(m_movie);
     }
 }
@@ -492,8 +515,8 @@ void Chapter::playMovies()
 void Chapter::movieFinished()
 {
     m_funcSetRenderer(nullptr);
-    delete m_movie;
     m_movie = NULL;
+    m_movies.pop();
     playMovies();
 }
 
@@ -667,7 +690,7 @@ void Chapter::toggleMovieHarbour()
 void Chapter::upgradeBoat(int type)
 {
     m_boat->upgrade(type);
-    m_HUD.load(m_boat);
+    m_HUD->load(m_boat);
 }
 
 

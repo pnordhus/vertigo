@@ -52,8 +52,8 @@ void List::draw()
 {
     int y = 0;
     foreach (const QString &line, m_text) {
-        QRect rect = m_font.draw(line, QPoint(0, y), QSize(width(), -1), m_alignCenter, false);
-        y += rect.height();
+        Rect rect = m_font.draw(line, Rect(0, y, width(), -1), m_alignCenter, false);
+        y += rect.height;
     }
 }
 

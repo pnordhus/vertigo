@@ -3,16 +3,29 @@ Phisics
 - Currents
 
 AI
+- otyp  1 - idle
+- otyp  2 - move
+- otyp  3 - patrol
+- otyp  4 - attack target
 - otyp  5 - escort
+- otyp  6 - ambush target?
+- otyp  7 - tower?
+- otyp  8 - torpedotower?
+- otyp  9 - goto?
 - otyp 10 - boarding
 - otyp 11 - self-destruct
 
 HUD
-- Messages
 - Friendly fire messages
+- Torpedo lock and countdown
+- Voxel radar
+- Slave monitor
+- Alert
+- Icons: locked, radiation, current
+- Pause
+- Turrets targeting
 
 Effects
-- Bubbles
 - Explosions: debris, dead bodies
 - Dust clouds behind crawlers and tanks
 - Torpedo trails
@@ -20,4 +33,3 @@ Effects
 
 Sound effects
 - Sound of nearby engines
-- Collision sound

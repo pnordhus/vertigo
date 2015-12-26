@@ -15,17 +15,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef FIGHT_OBJECT_H
-#define FIGHT_OBJECT_H
+#ifndef FIGHT_ACTIVEOBJECT_H
+#define FIGHT_ACTIVEOBJECT_H
 
 
-#include <QGLContext>
-#include "boundingbox.h"
-#include "condition.h"
-#include "collisionmanager.h"
-#include "modulemanager.h"
-#include "txt/desfile.h"
-#include <memory>
+#include "object.h"
 
 
 namespace fight {
@@ -34,36 +28,25 @@ namespace fight {
 class Scenario;
 
 
-enum ObjectType
-{
-    UnknownObject,
-    BuildingObject,
-    TrashObject,
-};
-
-
-class Object
+class ActiveObject : public Object
 {
 public:
-    Object(Scenario *scenario);
-    Object(Scenario *scenario, const QString &name, float scale = 1/32.0f);
-    virtual ~Object() { }
+    struct ObjectInfo
+    {
+        int iff;
+        QString name;
+        QString cargo;
+        int sensor;
+        int sensorRange;
+
+        ObjectInfo() : iff(0), name(""), cargo(""), sensor(0), sensorRange(0) { }
+    };
 
 public:
-    void setEnabled(bool);
-    void enable();
-    void disable();
-    bool isEnabled() const { return m_enabled; }
-    virtual void setPosition(const glm::vec3 &pos);
-    const glm::vec3& position() const { return m_position; }
+    ActiveObject(Scenario *scenario);
+    ActiveObject(Scenario *scenario, txt::DesFile &file, const ObjectInfo &info);
 
-    ObjectType type() const { return m_type; }
-    const BoundingBox& box() const { return m_box; }
-    bool isStatic() const { return m_static; }
-    CollisionCache *collisionCache() const { return m_collisionCache.get(); }
-    void setCollisionCache(CollisionCache *cache);
-
-    Condition* condEnable() { return &m_condEnable; }
+public:
     ConditionEvent* eventDestroy() { return &m_eventDestroy; }
     ConditionEvent* eventAttack() { return &m_eventAttack; }
     ConditionEvent* eventIdentify() { return &m_eventIdentify; }
@@ -71,26 +54,27 @@ public:
     ConditionEvent* eventFinish() { return &m_eventFinish; }
     ConditionEvent* eventBoard() { return &m_eventBoard; }
 
+    int iff() const { return m_info.iff; }
+    const QString& name() const { return m_info.name; }
+    const QString& cargo() const { return m_info.cargo; }
+    int sensor() const { return m_info.sensor; }
+    int sensorRange() const { return m_info.sensorRange; }
+    virtual float noise() const { return m_noise + (m_info.sensor > 1 ? 1 : 0); }
+    bool isIdentified() const { return m_eventIdentify.isCompleted(); }
+
+    int kineticShield() const { return m_kineticShield; };
+    int shockShield() const { return m_shockShield; };
+    int kineticShieldMax() const { return m_kineticShieldMax; };
+    int shockShieldMax() const { return m_shockShieldMax; };
+
+    const Vector3D& velocity() const { return m_velocity; }
+
 public:
-    virtual bool update(float elapsedTime);
-    virtual void draw();
-    virtual bool intersect(const glm::vec3 &start, const glm::vec3 &dir, float radius, float &distance, glm::vec3 &normal);
+    virtual void damage(int kinetic, int shock, const Vector3D &position);
     virtual void destroy();
+    void identify();
 
 protected:
-    Scenario *m_scenario;
-
-    bool m_enabled;
-    Module *m_base;
-    float m_scale;
-    glm::vec3 m_position;
-
-    ObjectType m_type;
-    BoundingBox m_box;
-    bool m_static;
-    std::unique_ptr<CollisionCache> m_collisionCache;
-
-    ConditionEnable m_condEnable;
     ConditionEvent m_eventDestroy;
     ConditionEvent m_eventAttack;
     ConditionEvent m_eventIdentify;
@@ -98,12 +82,20 @@ protected:
     ConditionEvent m_eventFinish;
     ConditionEvent m_eventBoard;
 
-private:
-    Object(const Object& x) : m_condEnable(x.m_scenario, this) { }
+    ObjectInfo m_info;
+    float m_noise;
+    bool m_identified;
+
+    int m_kineticShield;
+    int m_shockShield;
+    int m_kineticShieldMax;
+    int m_shockShieldMax;
+
+    Vector3D m_velocity;
 };
 
 
 } // namespace fight
 
 
-#endif // FIGHT_OBJECT_H
+#endif // FIGHT_ACTIVEOBJECT_H

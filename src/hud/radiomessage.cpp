@@ -24,7 +24,7 @@
 namespace hud {
 
 
-RadioMessage::RadioMessage(HUD *hud, util::Rect rect) :
+RadioMessage::RadioMessage(HUD *hud, Rect rect) :
     ui::Widget(hud->widget()),
     m_hud(hud),
     m_rect(rect),
@@ -45,7 +45,7 @@ void RadioMessage::draw()
     int i = m_hud->scenario()->radio().size() - 1;
     while (i >= 0 && m_hud->scenario()->radio()[i]->time() > m_hud->scenario()->time())
         i--;
-    if (i < 0 || m_hud->scenario()->radio()[i]->time() < m_hud->scenario()->time() - 4500.0f)
+    if (i < 0 || m_hud->scenario()->radio()[i]->time() < m_hud->scenario()->time() - 4.5f)
     {
         m_lblText.setVisible(false);
         return;
@@ -57,7 +57,7 @@ void RadioMessage::draw()
     }
 
     util::RectangleInclusive<int> rect = m_hud->projectCenter(m_rect);
-    m_black.draw(QRectF(rect.x, rect.y, rect.width, rect.height));
+    m_black.draw(rect);
     m_edgeBL.draw(rect.left(), rect.bottom() - m_edgeBL.height());
     m_edgeBR.draw(rect.right() - m_edgeBR.width(), rect.bottom() - m_edgeBR.height());
     m_edgeTL.draw(rect.left(), rect.top());
@@ -65,7 +65,15 @@ void RadioMessage::draw()
 
     m_lblText.setPosition(rect.x, rect.y + 2);
     m_lblText.setSize(rect.width, rect.height - 5);
-    m_lblText.setText(m_hud->scenario()->radio()[i]->text());
+    QString text = m_hud->scenario()->radio()[i]->text();
+    if (text[0] == '#')
+    {
+        text = text.mid(1);
+        m_lblText.setFont(m_hud->fontRed());
+    }
+    else
+        m_lblText.setFont(m_hud->fontGreen());
+    m_lblText.setText(text);
 }
 
 

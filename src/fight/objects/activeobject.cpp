@@ -15,57 +15,67 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "navpoint.h"
-#include "scenario.h"
+#include "activeobject.h"
+#include "fight/scenario.h"
 #include "sfx/samplemap.h"
-#include <glm/geometric.hpp>
 
 
 namespace fight {
 
 
-NavPoint::NavPoint(Scenario *scenario, int num) :
-    Object(scenario),
-    m_num(num),
-    m_time(0),
-    m_reached(false)
+ActiveObject::ActiveObject(Scenario *scenario) :
+    Object(scenario)
 {
-    m_state0 = scenario->moduleManager().get("thumper2.mod");
-    m_state1 = scenario->moduleManager().get("thumper1.mod");
-    m_scale = 0.03;
-
-    m_base = m_state0;
-    m_state = 0;
+    m_shockShield = m_shockShieldMax = 10000000;
 }
 
 
-bool NavPoint::update(float elapsedTime)
+ActiveObject::ActiveObject(Scenario *scenario, txt::DesFile &file, const ObjectInfo &info) :
+    Object(scenario, file),
+    m_info(info),
+    m_identified(false)
 {
-    m_time += elapsedTime;
-    while (m_time > 500.0f)
+    file.setSection("noise");
+    m_noise = file.value("level").toFloat();
+
+    file.setSection("defense");
+    m_kineticShield = m_kineticShieldMax = file.value("kineticshield0").toInt();
+    m_shockShield = m_shockShieldMax = file.value("shockshield0", 10000000).toInt();
+}
+
+
+void ActiveObject::damage(int kinetic, int shock, const Vector3D &position)
+{
+    m_kineticShield -= kinetic;
+    m_shockShield -= shock;
+    if (m_kineticShield < 0)
     {
-        if (m_state == 0)
-        {
-            m_state = 1;
-            m_base = m_state1;
-        }
-        else
-        {
-            m_state = 0;
-            m_base = m_state0;
-        }
-        m_time -= 500.0f;
+        destroy();
+        return;
     }
-    if (m_enabled && !m_reached)
+    if (m_shockShield < 0)
     {
-        glm::vec3 d = m_scenario->position() - m_position;
-        if (glm::dot(d, d) < 400.0f)
-        {
-            sfx::SampleMap::get(sfx::Sample::NavPoint).play();
-            m_reached = true;
-        }
+        m_eventParalyze.complete();
     }
-    return false;
+}
+
+
+void ActiveObject::destroy()
+{
+    disable();
+    m_eventDestroy.complete();
+    if (m_scenario->target().locked() == this)
+    {
+        m_scenario->target().lockReset();
+        sfx::SampleMap::get(sfx::Sample::TargetDestroyed).play();
+    }
+}
+
+
+void ActiveObject::identify()
+{
+    m_eventIdentify.complete();
+    sfx::SampleMap::get(sfx::Sample::TargetIdentified).play();
 }
 
 

@@ -16,20 +16,20 @@
  ***************************************************************************/
 
 #include "turret.h"
-#include "scenario.h"
+#include "fight/scenario.h"
 
 
 namespace fight {
 
 
-Turret::Turret(Scenario *scenario, const QString &name) :
-    Object(scenario, name),
+Turret::Turret(Scenario *scenario, txt::DesFile &file) :
+    Object(scenario, file),
     m_armLeft(nullptr),
     m_armRight(nullptr)
 {
-    txt::DesFile file(QString("vfx:sobjects/%1.des").arg(name));
     file.setSection("cluster");
-    m_base = scenario->moduleManager().get(file.value("body").toString());
+    m_body = scenario->moduleManager().get(file.value("body").toString());
+    m_box = m_body->box();
 
     if (file.contains("arml") && file.value("arml") != "no")
     {
@@ -37,6 +37,7 @@ Turret::Turret(Scenario *scenario, const QString &name) :
         m_armLeftPosition.x = file.value("ArmLOffsetX").toFloat();
         m_armLeftPosition.y = file.value("ArmLOffsetY").toFloat();
         m_armLeftPosition.z = file.value("ArmLOffsetZ").toFloat();
+        m_box.add(m_armLeft->box().translate(m_armLeftPosition));
     }
 
     if (file.contains("armr") && file.value("armr") != "no")
@@ -45,6 +46,7 @@ Turret::Turret(Scenario *scenario, const QString &name) :
         m_armRightPosition.x = file.value("ArmROffsetX").toFloat();
         m_armRightPosition.y = file.value("ArmROffsetY").toFloat();
         m_armRightPosition.z = file.value("ArmROffsetZ").toFloat();
+        m_box.add(m_armRight->box().translate(m_armRightPosition));
     }
 }
 
@@ -53,7 +55,7 @@ void Turret::draw()
 {
     glTranslatef(m_position.x, m_position.y, m_position.z);
     //glScalef(m_scale, m_scale, m_scale);
-    m_base->draw();
+    m_body->draw();
 
     if (m_armLeft != nullptr)
     {
@@ -70,6 +72,35 @@ void Turret::draw()
         m_armRight->draw();
         glPopMatrix();
     }
+}
+
+
+bool Turret::intersect(const Vector3D &start, const Vector3D &dir, float radius, float &distance, Vector3D &normal)
+{
+    bool collision = m_body->intersect(start - m_position, dir, radius, distance, normal);
+
+    float d;
+    Vector3D norm;
+    if (m_armLeft != nullptr && m_armLeft->intersect(start - m_position - m_armLeftPosition, dir, radius, d, norm))
+    {
+        if (!collision || distance > d)
+        {
+            distance = d;
+            normal = norm;
+            collision = true;
+        }
+    }
+    if (m_armRight != nullptr && m_armRight->intersect(start - m_position - m_armRightPosition, dir, radius, d, norm))
+    {
+        if (!collision || distance > d)
+        {
+            distance = d;
+            normal = norm;
+            collision = true;
+        }
+    }
+
+    return collision;
 }
 
 

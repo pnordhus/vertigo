@@ -15,30 +15,38 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#ifndef FIGHT_TURRETBASE_H
-#define FIGHT_TURRETBASE_H
+#ifndef HUD_ACTIVESONAR_H
+#define HUD_ACTIVESONAR_H
 
 
-#include "object.h"
+#include "util/geometry2d.h"
+#include "ui/widget.h"
+#include "gfx/texture.h"
 
 
-namespace fight {
+namespace hud {
 
 
-class TurretBase : public Object
+class HUD;
+
+
+class ActiveSonar : public ui::Widget
 {
 public:
-    TurretBase(Scenario *scenario, const QString &name);
+    ActiveSonar(HUD *hud, Rect rect);
 
-public:
+protected:
     void draw();
 
 private:
-    std::unique_ptr<Object> m_body;
+    HUD *m_hud;
+    Rect m_rect;
+    gfx::Texture m_actBo;
+    gfx::Texture m_actOu;
 };
 
 
-} // namespace fight
+} // namespace hud
 
 
-#endif // FIGHT_TURRETBASE_H
+#endif // HUD_ACTIVESONAR_H

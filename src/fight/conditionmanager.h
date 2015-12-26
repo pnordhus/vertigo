@@ -19,10 +19,15 @@
 #define CONDITIONMANAGER_H
 
 
-#include "object.h"
+#include <map>
+#include <list>
+#include "condition.h"
 
 
 namespace fight {
+
+
+class Scenario;
 
 
 class ConditionManager
@@ -56,11 +61,13 @@ public:
     void buildDependencies();
 
     Condition* addCondition(int limit = 0);
-    ConditionRadio* addCondRadio(const glm::vec3 &pos, const QString &text);
+    ConditionRadio* addCondRadio(const Vector3D &pos, const QString &text);
     ConditionSpace* addCondSpace(int x, int y, int dimx, int dimy, int minz, int maxz);
     void testSpace(float x, float y, float height);
     void delayComplete(Condition *cond, int delay);
     void update(float elapsedTime);
+
+    bool autopilot() const { return m_condSuccess.isCompleted(); }
 
 private:
     Scenario *m_scenario;
@@ -69,7 +76,7 @@ private:
     std::list<ConditionRadio> m_condRadio;
     std::list<ConditionSpace> m_condSpaces;
 
-    ConditionAutopilot m_condAutopilot;
+    ConditionSuccess m_condSuccess;
     ConditionFailure m_condFailure;
     std::map<int, Condition> m_condObjectives;
 

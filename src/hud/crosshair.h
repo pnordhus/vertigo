@@ -19,9 +19,10 @@
 #define HUD_CROSSHAIR_H
 
 
-#include <glm/vec2.hpp>
+#include "util/geometry2d.h"
 #include "ui/widget.h"
 #include "gfx/texture.h"
+#include "gfx/cliprect.h"
 
 
 namespace hud {
@@ -33,7 +34,7 @@ class HUD;
 class Crosshair : public ui::Widget
 {
 public:
-    Crosshair(HUD *hud, glm::ivec2 center);
+    Crosshair(HUD *hud, glm::ivec2 center, const gfx::ClipRect *clipRect);
 
 protected:
     void draw();
@@ -41,7 +42,9 @@ protected:
 private:
     HUD *m_hud;
     glm::ivec2 m_center;
+    const gfx::ClipRect *m_clipRect;
     gfx::Texture m_targ;
+    gfx::Texture m_aim;
 };
 
 

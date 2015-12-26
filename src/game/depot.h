@@ -27,6 +27,7 @@
 #include "ui/itemlist.h"
 
 #include <map>
+#include <deque>
 
 namespace game {
 
@@ -37,6 +38,19 @@ class Depot : public ui::Frame
 private:
     enum State { Flipping, Loading, Ready, Repair };
     enum LoadingState { Arrows, List1, List2 };
+    class RepairItem
+    {
+    public:
+        int model;
+        QString mounting;
+        int state;
+        int cost;
+        ui::Label lblState;
+        ui::Label lblCost;
+        ui::Button btnRepair;
+        
+        RepairItem(int model, const QString &mounting, ui::Label *parent) : model(model), mounting(mounting), lblState(parent), lblCost(parent), btnRepair(parent) { }
+    };
 
 public:
     Depot(std::function<void()> &&funcClose);
@@ -53,19 +67,25 @@ private:
     void updateInfo();
     void updateCredits();
     void updateButtons();
+    void repairItem(int index);
+    void repairAll();
 
 protected:
     void draw();
     bool mousePressEvent(const QPoint &pos, Qt::MouseButton button);
 
 private:
-    ui::Label *m_backgroundLabel;
+    ui::Label m_backgroundLabel;
     sfx::Sound m_backgroundSound;
+    
+    ui::Label m_panelMountings;
+    ui::Label m_panelRepair;
+
     gfx::Video m_videoFlip1;
     gfx::Video m_videoFlip2;
     gfx::Texture m_boatTexture;
-
     ui::Label *m_boatLabel;
+
     ui::Label *m_boatName;
     ui::Label *m_credits;
     ui::Button *m_btnFlip;
@@ -85,10 +105,16 @@ private:
     ui::ItemList *m_itemList1;
     ui::ItemList *m_itemList2;
 
+    std::map<int, ui::Arrow> m_mountingArrows;
+
+    std::list<ui::Label> m_repairLabels;
+    std::deque<RepairItem> m_repairItems;
+    ui::Label m_repairCost;
+    ui::Button m_repairButton;
+
     Boat *m_boat;
     int m_side;
     int m_mounting;
-    std::map<int, ui::Arrow> m_mountingArrows;
     std::vector<int> m_list1;
     std::vector<int> m_list2;
     int m_selectedList;
@@ -112,3 +138,4 @@ private:
 
 
 #endif // GAME_DEPOT_H
+ 

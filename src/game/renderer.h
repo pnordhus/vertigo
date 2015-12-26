@@ -22,11 +22,12 @@
 
 #include <QDebug>
 #include <QRect>
-#include <glm/mat4x4.hpp>
+#include "util/geometry3d.h"
 
 
 class QKeyEvent;
 class QMouseEvent;
+class QGLWidget;
 
 
 namespace game {
@@ -43,14 +44,14 @@ public:
     virtual void deactivate() {}
 
 public:
-    void setWindow(QWidget *window);
+    void setWindow(QGLWidget *window);
     virtual bool isCursorVisible() const { return m_cursorVisible; }
     virtual void setRect(const QRect &rect);
     QRect rect() const { return m_rect; }
     int width() const { return m_rect.width(); }
     int height() const { return m_rect.height(); }
-    const glm::mat4& projectionMatrix() const { return m_projectionMatrix; }
-    const glm::mat4& projectionMatrixInverted() const { return m_projectionMatrixInverted; }
+    const Matrix& projectionMatrix() const { return m_projectionMatrix; }
+    const Matrix& projectionMatrixInverted() const { return m_projectionMatrixInverted; }
     QRectF rectOrtho() const { return m_rectOrtho; }
     QPointF screenToImage(const QPointF &pos);
 
@@ -66,17 +67,17 @@ protected:
     void hideCursor();
     void setupOrthographicMatrix(float w, float h);
     void setupGL(bool clear = true);
-    QWidget* window() const { return m_window; }
+    QGLWidget* window() const { return m_window; }
 
 protected:
-    glm::mat4 m_projectionMatrix;
-    glm::mat4 m_projectionMatrixInverted;
+    Matrix m_projectionMatrix;
+    Matrix m_projectionMatrixInverted;
 
 private:
     bool m_cursorVisible;
     QRect m_rect;
     QRectF m_rectOrtho;
-    QWidget *m_window;
+    QGLWidget *m_window;
 };
 
 

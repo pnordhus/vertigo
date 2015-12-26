@@ -19,7 +19,8 @@
 #define CONDITION_H
 
 
-#include <glm/vec3.hpp>
+#include <vector>
+#include "util/geometry3d.h"
 #include <QString>
 
 
@@ -45,8 +46,8 @@ public:
 
 protected:
     bool m_completed;
-    QList<Condition *> m_dependInc;
-    QList<Condition *> m_dependDec;
+    std::vector<Condition *> m_dependInc;
+    std::vector<Condition *> m_dependDec;
 };
 
 
@@ -60,6 +61,7 @@ public:
 public:
     void setLimit(int limit);
     int limit() const { return m_limit; }
+    void tryComplete();
     void inc();
     void dec();
     void setDelay(int delay);
@@ -74,10 +76,10 @@ protected:
 };
 
 
-class ConditionAutopilot : public Condition
+class ConditionSuccess : public Condition
 {
 public:
-    ConditionAutopilot(Scenario *scenario);
+    ConditionSuccess(Scenario *scenario);
 
 public:
     void complete();
@@ -91,9 +93,6 @@ public:
 
 public:
     void complete();
-
-private:
-    Scenario *m_scenario;
 };
 
 
@@ -133,10 +132,10 @@ private:
 class ConditionRadio : public Condition
 {
 public:
-    ConditionRadio(Scenario *scenario, const glm::vec3 &pos, const QString &text);
+    ConditionRadio(Scenario *scenario, const Vector3D &pos, const QString &text);
 
 public:
-    const glm::vec3& pos() const { return m_pos; }
+    const Vector3D& pos() const { return m_pos; }
     const QString& text() const { return m_text; }
     float time() const { return m_time; }
 
@@ -144,7 +143,7 @@ public:
     void complete();
 
 private:
-    glm::vec3 m_pos;
+    Vector3D m_pos;
     QString m_text;
     float m_time;
 };

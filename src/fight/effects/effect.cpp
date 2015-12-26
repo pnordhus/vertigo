@@ -17,18 +17,18 @@
 
 #include "effect.h"
 #include "billboard.h"
-#include "../scenario.h"
+#include "fight/scenario.h"
 
 
 namespace fight {
 
 
 Effect::Effect(Scenario *scenario, Billboard *billboard, float angle, float scale) : 
-    Object(scenario),
+    ActiveObject(scenario),
     m_billboard(billboard),
     m_angle(angle),
     m_scale(scale),
-    m_elapsedTime(0),
+    m_time(0),
     m_permanent(false)
 {
 }
@@ -36,8 +36,8 @@ Effect::Effect(Scenario *scenario, Billboard *billboard, float angle, float scal
 
 bool Effect::update(float elapsedTime)
 {
-    m_elapsedTime += elapsedTime;
-    if (!m_permanent && m_elapsedTime >= m_billboard->duration())
+    m_time += elapsedTime;
+    if (!m_permanent && m_time >= m_billboard->duration())
     {
         disable();
         return true;
@@ -48,7 +48,7 @@ bool Effect::update(float elapsedTime)
 
 void Effect::draw()
 {
-    m_billboard->draw(m_position, m_angle, m_scale, m_elapsedTime, m_scenario->cameraMatrixInverted());
+    m_billboard->draw(m_position - m_scenario->position(), m_angle, m_scale, m_time, m_scenario->cameraMatrixInverted());
 }
 
 

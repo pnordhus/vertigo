@@ -80,9 +80,9 @@ void Vertigo::startGame(const QString &name)
     }
 
     m_name = name;
-    m_intro.reset(new Movie([this]() { introFinished(); }));
+    m_intro.reset(new Movie("gfx:mvi/film/d02.mvi", Movie::MovieFilm));
     m_window.setRenderer(m_intro.get());
-    m_intro->play("gfx:mvi/film/d02.mvi");
+    m_intro->play([this]() { introFinished(); });
 }
 
 void Vertigo::loadGame(const QString &name)

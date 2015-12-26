@@ -12,8 +12,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 set(SOURCES
     fight/boundingbox.cpp
     fight/boundingbox.h
-    fight/building.cpp
-    fight/building.h
     fight/collisionmanager.cpp
     fight/collisionmanager.h
     fight/collisionmesh.cpp
@@ -22,22 +20,16 @@ set(SOURCES
     fight/condition.h
     fight/conditionmanager.cpp
     fight/conditionmanager.h
-    fight/mine.cpp
-    fight/mine.h
     fight/module.cpp
     fight/module.h
     fight/modulemanager.cpp
     fight/modulemanager.h
-    fight/navpoint.cpp
-    fight/navpoint.h
-    fight/object.cpp
-    fight/object.h
     fight/scenario.cpp
     fight/scenario.h
-    fight/turret.cpp
-    fight/turret.h
-    fight/turretbase.cpp
-    fight/turretbase.h
+    fight/sonar.cpp
+    fight/sonar.h
+    fight/target.cpp
+    fight/target.h
 
     fight/effects/billboard.cpp
     fight/effects/billboard.h
@@ -49,6 +41,30 @@ set(SOURCES
     fight/effects/projectile.h
     fight/effects/trash.cpp
     fight/effects/trash.h
+    fight/effects/bubble.cpp
+    fight/effects/bubble.h
+
+    fight/objects/activeobject.cpp
+    fight/objects/activeobject.h
+    fight/objects/building.cpp
+    fight/objects/building.h
+    fight/objects/mine.cpp
+    fight/objects/mine.h
+    fight/objects/navpoint.cpp
+    fight/objects/navpoint.h
+    fight/objects/object.cpp
+    fight/objects/object.h
+    fight/objects/simpleobject.cpp
+    fight/objects/simpleobject.h
+    fight/objects/turret.cpp
+    fight/objects/turret.h
+    fight/objects/turretbase.cpp
+    fight/objects/turretbase.h
+
+    fight/boats/player.cpp
+    fight/boats/player.h
+    fight/boats/simpleboat.cpp
+    fight/boats/simpleboat.h
 
     fight/surface/betaspline.cpp
     fight/surface/betaspline.h
@@ -58,6 +74,9 @@ set(SOURCES
     fight/surface/surface.h
     fight/surface/tesselator.cpp
     fight/surface/tesselator.h
+
+    fight/weapons/gun.cpp
+    fight/weapons/gun.h
 
     game/area.cpp
     game/area.h
@@ -121,6 +140,8 @@ set(SOURCES
     gfx/texturemanager.h
     gfx/video.cpp
     gfx/video.h
+    gfx/cliprect.cpp
+    gfx/cliprect.h
 
     hud/hud.cpp
     hud/hud.h
@@ -140,6 +161,18 @@ set(SOURCES
     hud/energybar.h
     hud/shield.cpp
     hud/shield.h
+    hud/activesonar.cpp
+    hud/activesonar.h
+    hud/master.cpp
+    hud/master.h
+    hud/mastermonitor.cpp
+    hud/mastermonitor.h
+    hud/sonarmonitor.cpp
+    hud/sonarmonitor.h
+    hud/autopilot.cpp
+    hud/autopilot.h
+    hud/horizon.cpp
+    hud/horizon.h
 
     sfx/sound.cpp
     sfx/sound.h
@@ -178,6 +211,8 @@ set(SOURCES
     util/event.hpp
     util/file.cpp
     util/file.h
+    util/rect.hpp
+    util/size.hpp
 )
 
 add_executable(vertigo WIN32 ${SOURCES})

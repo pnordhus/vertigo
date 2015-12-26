@@ -18,14 +18,15 @@
 #include "heading.h"
 #include "hud.h"
 #include "fight/scenario.h"
-#include "fight/navpoint.h"
+#include "fight/objects/navpoint.h"
+#include <glm/geometric.hpp>
 #include <glm/trigonometric.hpp>
 
 
 namespace hud {
 
 
-Heading::Heading(HUD *hud, util::Rect rect) :
+Heading::Heading(HUD *hud, Rect rect) :
     ui::Widget(hud->widget()),
     m_hud(hud),
     m_rect(rect),
@@ -39,13 +40,15 @@ Heading::Heading(HUD *hud, util::Rect rect) :
 void Heading::draw()
 {
     int offset = 360 + static_cast<int>(glm::degrees(m_hud->scenario()->yaw())*2);
-    util::Rect rect = m_hud->projectCenter(m_rect);
-    m_head.draw(rect.x, rect.y, QRectF(offset, 0, m_rect.width, m_head.height()));
+    Rect rect = m_hud->projectCenter(m_rect);
+    m_head.draw(rect.pos(), RectF(offset, 0, m_rect.width, m_head.height()));
     m_point.draw(rect.x + rect.width/2 - (m_point.width() + 1)/2, rect.y + m_head.height() + 1);
 
     if (m_hud->navPoint() >= 0)
     {
-        glm::vec3 dir = m_hud->scenario()->position() - m_hud->scenario()->navPoints()[m_hud->navPoint()]->position();
+        Vector3D dir = m_hud->scenario()->position() - m_hud->scenario()->navPoints()[m_hud->navPoint()]->position();
+        if (glm::length(dir) <= 80.0f && m_hud->scenario()->blink())
+            return;
         int navOffset = 360 + static_cast<int>(glm::degrees(glm::atan(dir.x, dir.y))*2) - offset;
         if (navOffset < -360)
             navOffset += 720;
@@ -69,7 +72,7 @@ void Heading::draw()
                 right = m_way.width()/2;
             navOffset = rect.width - m_way.width() - halfRect + halfWay;
         }
-        m_way.draw(rect.x + halfRect - halfWay + navOffset + right, rect.y + 7, QRectF(left, 0, m_way.width() - left - right, m_way.height()));
+        m_way.draw(rect.x + halfRect - halfWay + navOffset + right, rect.y + 7, RectF(left, 0, m_way.width() - left - right, m_way.height()));
     }
 }
 
