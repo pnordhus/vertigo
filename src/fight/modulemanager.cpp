@@ -16,7 +16,6 @@
  ***************************************************************************/
 
 #include "modulemanager.h"
-#include "module.h"
 
 
 namespace fight {

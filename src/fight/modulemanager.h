@@ -18,19 +18,14 @@
 #ifndef FIGHT_MODULEMANAGER_H
 #define FIGHT_MODULEMANAGER_H
 
+#include "module.h"
 
 #include <map>
 #include <QString>
 
-
 namespace gfx { class TextureManager; }
 
-
 namespace fight {
-
-
-class Module;
-
 
 class ModuleManager
 {
@@ -45,8 +40,6 @@ private:
     std::map<QString, Module> m_modules;
 };
 
-
 } // namespace fight
-
 
 #endif // FIGHT_MODULEMANAGER_H

@@ -16,8 +16,6 @@
  ***************************************************************************/
 
 #include "effectmanager.h"
-#include "billboard.h"
-#include "effect.h"
 #include "projectile.h"
 #include "bubble.h"
 #include "fight/scenario.h"

@@ -18,22 +18,19 @@
 #ifndef FIGHT_EFFECTMANAGER_H
 #define FIGHT_EFFECTMANAGER_H
 
+#include "billboard.h"
+#include "effect.h"
 
 #include <map>
 #include <list>
 #include <memory>
 #include "util/geometry3d.h"
 
-
 namespace fight {
 
-
 class Scenario;
-class Billboard;
-class Effect;
 enum class Effects;
 class Projectile;
-
 
 class EffectManager
 {
@@ -55,7 +52,6 @@ private:
     std::list<std::unique_ptr<Effect>> m_effects;
     std::list<std::unique_ptr<Effect>> m_bubbles;
 };
-
 
 enum class Effects
 {
@@ -129,8 +125,6 @@ enum class Effects
     Bubble_2,
 };
 
-
 } // namespace fight
-
 
 #endif // FIGHT_EFFECTMANAGER_H

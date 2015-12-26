@@ -15,7 +15,6 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.  *
  ***************************************************************************/
 
-#include "betaspline.h"
 #include "tesselator.h"
 #include "element.h"
 #include "surface.h"

@@ -31,7 +31,6 @@
 #include "objects/simpleobject.h"
 
 #include "boats/simpleboat.h"
-#include "boats/player.h"
 
 #include <QGLContext>
 #include <QTime>

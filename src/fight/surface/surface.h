@@ -18,21 +18,16 @@
 #ifndef FIGHT_SURFACE_H
 #define FIGHT_SURFACE_H
 
+#include "element.h"
+#include "tesselator.h"
 
 #include <map>
 #include <vector>
 #include <QImage>
-#include "tesselator.h"
-
 
 namespace gfx { class Texture; }
 
-
 namespace fight {
-
-
-class Element;
-
 
 class Surface
 {
@@ -67,8 +62,6 @@ private:
     Tesselator m_tesselator;
 };
 
-
 } // namespace fight
-
 
 #endif // FIGHT_SURFACE_H

@@ -18,7 +18,6 @@
 #ifndef FIGHT_SCENARIO_H
 #define FIGHT_SCENARIO_H
 
-
 #include <QDebug>
 #include <QKeyEvent>
 #include <functional>
@@ -27,6 +26,7 @@
 #include "util/deferreddeletable.h"
 #include "gfx/texturemanager.h"
 #include "txt/desfile.h"
+#include "boats/player.h"
 #include "surface/surface.h"
 #include "effects/effectmanager.h"
 #include "conditionmanager.h"
@@ -35,17 +35,12 @@
 #include "sonar.h"
 #include "target.h"
 
-
 namespace game { class Boat; }
-
 
 namespace fight {
 
-
 class Object;
 class NavPoint;
-class Player;
-
 
 class Scenario : public util::DeferredDeletable
 {
@@ -156,8 +151,6 @@ private:
     Matrix m_cameraMatrixInverted;
 };
 
-
 } // namespace fight
-
 
 #endif // FIGHT_SCENARIO_H

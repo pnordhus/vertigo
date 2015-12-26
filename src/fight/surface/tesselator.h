@@ -18,18 +18,15 @@
 #ifndef SURFACE_TESSELATOR_H
 #define SURFACE_TESSELATOR_H
 
+#include "betaspline.h"
 
 #include <QByteArray>
 #include "util/geometry3d.h"
 
-
 namespace fight {
-
 
 class Element;
 class Surface;
-class BetaSpline;
-
 
 class Tesselator
 {
@@ -53,8 +50,6 @@ private:
     Surface *m_surface;
 };
 
-
 } // namespace fight
-
 
 #endif // SURFACE_TESSELATOR_H
