@@ -23,6 +23,7 @@
 #include "effects/trash.h"
 #include "game/boat.h"
 #include "sfx/samplemap.h"
+#include "util/debug.h"
 
 #include "objects/building.h"
 #include "objects/mine.h"
@@ -119,7 +120,7 @@ Scenario::Scenario(const QString &name) :
         {
             const int dType = m_file.value("dtyp").toInt();
             if (types.find(dType) == types.end()) {
-                qDebug() << "Unhandled dtype" << dType;
+                util::Debug() << "Unhandled dtype " << dType;
                 continue;
             }
             objectDes.load(QString("vfx:sobjects/%1.des").arg(types[dType]));
@@ -242,7 +243,7 @@ Scenario::Scenario(const QString &name) :
         case TypeSpace:
             {
                 if (m_file.value("pz").toInt() != 0)
-                    qDebug() << "Unexpected space parameter";
+                    util::Debug() << "Unexpected space parameter";
                 ConditionSpace *space = m_conditionManager.addCondSpace(m_file.value("px").toInt()*m_surface.scale().x,
                                                                         m_file.value("py").toInt()*m_surface.scale().y,
                                                                         m_file.value("dimx").toInt()*m_surface.scale().x,
@@ -255,7 +256,7 @@ Scenario::Scenario(const QString &name) :
             break;
 
         default:
-            qDebug() << "Unhandled movable" << type << m_file.value("dtyp").toInt();;
+            util::Debug() << "Unhandled movable " << type << " " << m_file.value("dtyp").toInt();
         }
 
         if (object != NULL)
@@ -301,7 +302,7 @@ Scenario::Scenario(const QString &name) :
 
         const int type = m_file.value("typ").toInt();
         if (type != 5120)
-            qDebug() << "Unhandled radio type " << type;
+            util::Debug() << "Unhandled radio type " << type;
 
         ConditionRadio *radio = m_conditionManager.addCondRadio(getPosition(), m_file.valueText("rtxt"));
         entry.condTrigger = radio;

@@ -18,7 +18,6 @@
 #ifndef FIGHT_SCENARIO_H
 #define FIGHT_SCENARIO_H
 
-#include <QDebug>
 #include <QKeyEvent>
 #include <functional>
 #include "util/geometry2d.h"

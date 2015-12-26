@@ -17,6 +17,7 @@
 
 #include "conditionmanager.h"
 #include "scenario.h"
+#include "util/debug.h"
 
 
 namespace fight {
@@ -125,10 +126,10 @@ void ConditionManager::updateObjective(int id, int index, int wccond)
         condFailure = entry.condSignal;
         break;
     default:
-        qDebug() << "Unhandled objective condition" << id << wccond;
+        util::Debug() << "Unhandled objective condition " << id << " " << wccond;
     }
     if (condSuccess == NULL && condFailure == NULL)
-        qDebug() << "Unachievable objective" << id << index;
+        util::Debug() << "Unachievable objective " << id << " " << index;
 
     Condition *cond;
     if (condSuccess != NULL)
@@ -187,7 +188,7 @@ void ConditionManager::buildDependencies()
         const ConditionEntry &entry = pair.second;
         if (entry.condTrigger == nullptr)
         {
-            qDebug() << "Undefined object" << pair.first;
+            util::Debug() << "Undefined object " << pair.first;
             continue;
         }
 
@@ -195,7 +196,7 @@ void ConditionManager::buildDependencies()
         if (entry.cond1 == 0)
         {
             if (entry.cond2 != 0)
-                qDebug() << "Abnormal condition" << pair.first;
+                util::Debug() << "Abnormal condition " << pair.first;
             continue;
         }
 
@@ -204,7 +205,7 @@ void ConditionManager::buildDependencies()
             initCondition(entry.cond2, entry.dep2, entry.ref2, entry.condTrigger);
         entry.condTrigger->setLimit(entry.cond2 != 0 && entry.op == 0 ? 2 : 1);
         if (entry.op != 0 && entry.op != 1)
-            qDebug() << "Unhandled condition operation" << entry.op;
+            util::Debug() << "Unhandled condition operation " << entry.op;
     }
     for (const auto &pair : condEntries)
         if (pair.second.condTrigger)
@@ -217,94 +218,94 @@ void ConditionManager::initCondition(int cond, int dep, int ref, Condition *cond
     if (cond == 1 || cond == 39)
     {
         if (dep != 1)
-            qDebug() << "Unhandled condition dep" << cond << dep;
+            util::Debug() << "Unhandled condition dep " << cond << " " << dep;
         if (condEntries.find(ref) == condEntries.end())
-            qDebug() << "Condition reference not found" << ref;
+            util::Debug() << "Condition reference not found " << ref;
         if (condEntries[ref].condSignal == nullptr)
-            qDebug() << "Undefined object" << ref;
+            util::Debug() << "Undefined object " << ref;
         else
             condEntries[ref].condSignal->addDependency(condDepend, cond == 1);
     }
     if (cond == 2 || cond == 40)
     {
         if (dep != 1)
-            qDebug() << "Unhandled condition dep" << cond << dep;
+            util::Debug() << "Unhandled condition dep " << cond << " " << dep;
         if (condEntries.find(ref) == condEntries.end())
-            qDebug() << "Condition reference not found" << ref;
+            util::Debug() << "Condition reference not found " << ref;
         if (condEntries[ref].condAttacked == nullptr)
-            qDebug() << "Undefined object" << ref;
+            util::Debug() << "Undefined object " << ref;
         else
             condEntries[ref].condAttacked->addDependency(condDepend, cond == 2);
     }
     if (cond == 3 || cond == 41)
     {
         if (dep != 1)
-            qDebug() << "Unhandled condition dep" << cond << dep;
+            util::Debug() << "Unhandled condition dep " << cond << " " << dep;
         if (condEntries.find(ref) == condEntries.end())
-            qDebug() << "Condition reference not found" << ref;
+            util::Debug() << "Condition reference not found " << ref;
         if (condEntries[ref].condIdentified == nullptr)
-            qDebug() << "Undefined object" << ref;
+            util::Debug() << "Undefined object " << ref;
         else
             condEntries[ref].condIdentified->addDependency(condDepend, cond == 3);
     }
     if (cond == 4)
     {
         if (dep != 0)
-            qDebug() << "Unhandled condition dep" << cond << dep;
+            util::Debug() << "Unhandled condition dep " << cond << " " << dep;
         if (ref != -1)
-            qDebug() << "Unexpected reference" << cond << ref;
+            util::Debug() << "Unexpected reference " << cond << " " << ref;
         m_condSuccess.addDependency(condDepend);
     }
     if (cond == 5)
     {
         if (dep != 0)
-            qDebug() << "Unhandled condition dep" << cond << dep;
+            util::Debug() << "Unhandled condition dep " << cond << " " << dep;
         if (ref != -1)
-            qDebug() << "Unexpected reference" << cond << ref;
+            util::Debug() << "Unexpected reference " << cond << " " << ref;
         m_condFailure.addDependency(condDepend);
     }
     if (cond >= 6 && cond <= 37)
     {
         if (dep != 0)
-            qDebug() << "Unhandled condition dep" << cond << dep;
+            util::Debug() << "Unhandled condition dep " << cond << " " << dep;
         if (ref != -1)
-            qDebug() << "Unexpected reference" << cond << ref;
+            util::Debug() << "Unexpected reference " << cond << " " << ref;
         int objective = cond - 6;
         if (m_condObjectives.find(objective) == m_condObjectives.end())
-            qDebug() << "Objective not found" << cond;
+            util::Debug() << "Objective not found " << cond;
         else
             m_condObjectives.at(objective).addDependency(condDepend);
     }
     if (cond == 38)
     {
         if (dep != 1)
-            qDebug() << "Unhandled condition dep" << cond << dep;
+            util::Debug() << "Unhandled condition dep " << cond << " " << dep;
         if (condEntries.find(ref) == condEntries.end())
-            qDebug() << "Condition reference not found" << ref;
+            util::Debug() << "Condition reference not found " << ref;
         if (condEntries[ref].condParalyzed == nullptr)
-            qDebug() << "Undefined object" << ref;
+            util::Debug() << "Undefined object " << ref;
         else
            condEntries[ref].condParalyzed->addDependency(condDepend);
     }
     if (cond == 43 || cond == 44)
     {
         if (dep != 1)
-            qDebug() << "Unhandled condition dep" << cond << dep;
+            util::Debug() << "Unhandled condition dep " << cond << " " << dep;
         if (condEntries.find(ref) == condEntries.end())
-            qDebug() << "Condition reference not found" << ref;
+            util::Debug() << "Condition reference not found " << ref;
         if (condEntries[ref].condFinished == nullptr)
-            qDebug() << "Undefined object" << ref;
+            util::Debug() << "Undefined object " << ref;
         else
             condEntries[ref].condFinished->addDependency(condDepend, cond == 43);
     }
     if (cond == 45 || cond == 46)
     {
         if (dep != 1)
-            qDebug() << "Unhandled condition dep" << cond << dep;
+            util::Debug() << "Unhandled condition dep " << cond << " " << dep;
         if (condEntries.find(ref) == condEntries.end())
-            qDebug() << "Condition reference not found" << ref;
+            util::Debug() << "Condition reference not found " << ref;
         if (condEntries[ref].condBoarded == nullptr)
-            qDebug() << "Undefined object" << ref;
+            util::Debug() << "Undefined object " << ref;
         else
             condEntries[ref].condBoarded->addDependency(condDepend, cond == 45);
     }

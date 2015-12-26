@@ -18,6 +18,7 @@
 #include "building.h"
 #include "fight/scenario.h"
 #include "fight/module.h"
+#include "util/debug.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -64,7 +65,7 @@ Building::Building(Scenario *scenario, txt::DesFile &file, int size, float angle
                     scenario->surface().setHeight(clusterX, clusterY, refx, refy, 0);
                 else
                 {
-                    qDebug("Untested: HeightReference = -1");
+                    util::Debug() << "Untested: HeightReference = -1";
                     scenario->surface().setHeight(clusterX, clusterY, clusterX, clusterY, -4); // TODO: test
                 }
             }

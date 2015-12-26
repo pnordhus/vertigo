@@ -21,6 +21,8 @@
 #include "gfx/colortable.h"
 #include "gfx/image.h"
 
+#include "util/debug.h"
+
 #include <QKeyEvent>
 #include <QSettings>
 #include <QTimer>
@@ -59,7 +61,7 @@ void Window::setRenderer(Renderer *renderer)
 
 void Window::resizeGL(int w, int h)
 {
-    qDebug() << w << h;
+    util::Debug() << w << " " << h;
     glViewport(0, 0, w, h);
 }
 

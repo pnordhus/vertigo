@@ -19,19 +19,15 @@
 #define GAME_RENDERER_H
 
 #include "util/deferreddeletable.h"
-
-#include <QDebug>
-#include <QRect>
 #include "util/geometry3d.h"
 
+#include <QRect>
 
 class QKeyEvent;
 class QMouseEvent;
 class QGLWidget;
 
-
 namespace game {
-
 
 class Renderer : public util::DeferredDeletable
 {
@@ -80,8 +76,6 @@ private:
     QGLWidget *m_window;
 };
 
-
 } // namespace game
-
 
 #endif // GAME_RENDERER_H
