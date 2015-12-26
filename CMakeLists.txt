@@ -15,7 +15,7 @@ if(NOT Qt4_FOUND)
 endif()
 find_package(OpenGL REQUIRED)
 find_package(OpenAL REQUIRED)
-find_package(GLM REQUIRED)
+find_package(glm REQUIRED)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
