@@ -124,7 +124,7 @@ public:
 template<class R>
 inline R roundRect(const R &rect)
 {
-    return R(glm::round(rect.pos()), glm::round(rect.size()));
+    return R(glm::round(rect.pos()), glm::round(rect.size().toVec2()));
 }
 
 

@@ -41,6 +41,9 @@ public:
     Size2D(const Size2D<R> &cast) : width(static_cast<T>(cast.width)), height(static_cast<T>(cast.height)) { };
 
 public:
+    glm::tvec2<T> toVec2() {
+      return glm::tvec2<T>(width, height);
+    }
 
 public:
     T width;
@@ -63,20 +66,6 @@ glm::tvec2<T> operator - (const glm::tvec2<T> &a, const Size2D<T> &b)
 
 
 } // namespace util
-
-
-namespace glm {
-namespace detail {
-    template <typename R, typename T, precision P>
-    struct functor1<R, T, P, util::Size2D>
-    {
-        GLM_FUNC_QUALIFIER static util::Size2D<R, P> call(R(*Func) (T x), util::Size2D<T, P> const & v)
-        {
-            return util::Size2D<R, P>(Func(v.width), Func(v.height));
-        }
-    };
-}
-}
 
 
 #endif // UTIL_SIZE_H

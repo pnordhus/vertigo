@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.11 FATAL_ERROR)
 
 project(vertigo)
 
@@ -9,13 +9,11 @@ set(SDL2_BUILDING_LIBRARY 1)
 add_definitions(-DSDL_MAIN_HANDLED)
 
 find_package(SDL2 REQUIRED)
-find_package(Qt4 4.6.0)
-if(NOT Qt4_FOUND)
-    find_package(Qt5OpenGL REQUIRED)
-endif()
+find_package(Qt5OpenGL REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(OpenAL REQUIRED)
 find_package(glm REQUIRED)
+add_definitions(-DGLM_ENABLE_EXPERIMENTAL)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 

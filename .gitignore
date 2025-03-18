@@ -1,5 +1,10 @@
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+Makefile
+cmake_install.cmake
+
 /build*
-/CMakeLists.txt.user
 /Debug*
 /AD*
 *moc_*.cpp
